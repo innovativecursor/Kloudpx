@@ -14,8 +14,8 @@ export default defineConfig({
   },
   define: {
     "process.env": {
-      REACT_APP_UAT_URL: "https://api.homexbuilderscorp.com",
-      // REACT_APP_UAT_URL: "http://localhost:4000",
+      // REACT_APP_UAT_URL: "https://api.homexbuilderscorp.com",
+      REACT_APP_UAT_URL: "http://localhost:8000",
       REACT_APP_ENCRYPTION: "WABBALABBA@3344$$1DUB43DUB",
       FONT_KEY: "AIzaSyC9NHFb4eI6H6AxlvLeHF_7Us7LTNg3deI",
     },
