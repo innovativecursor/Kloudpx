@@ -54,14 +54,18 @@ function Navigation(props) {
             <SideDrawer />
           </div>
         ) : (
-          ""
+          <div className="">
+            <Navbar />
+            <SideDrawer />
+          </div>
         )}
 
         <div>
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/reset/:token" element={<ResetPassword />} />
-            <Route element={<PrivateRoute />}>
+            {/* <Route element={<PrivateRoute />}> */}
+            <Route>
               <Route path="/home" element={<Home />} />
               <Route path="/inquiries" element={<Inquiries />} />
               <Route path="/createProjects" element={<CreateProjects />} />

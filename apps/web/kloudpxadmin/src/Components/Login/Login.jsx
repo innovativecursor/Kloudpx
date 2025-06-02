@@ -18,25 +18,26 @@ function Login(props) {
 
   const onLogin = async () => {
     try {
-      const encryptedEmail = CryptoJS.AES.encrypt(
-        email,
-        process.env.REACT_APP_ENCRYPTION
-      ).toString();
-      const encryptedPassword = CryptoJS.AES.encrypt(
-        password,
-        process.env.REACT_APP_ENCRYPTION
-      ).toString();
-      const answer = await postAxiosCall("/login", {
-        encryptedEmail,
-        encryptedPassword,
-      });
-      if (answer) {
-        localStorage.setItem("access_token", answer?.token);
-        props.isLoggedIn(answer?.sendUserInfo);
-        navigateTo("/home");
-      } else {
-        // Handle error
-      }
+      // const encryptedEmail = CryptoJS.AES.encrypt(
+      //   email,
+      //   process.env.REACT_APP_ENCRYPTION
+      // ).toString();
+      // const encryptedPassword = CryptoJS.AES.encrypt(
+      //   password,
+      //   process.env.REACT_APP_ENCRYPTION
+      // ).toString();
+      // const answer = await postAxiosCall("/login", {
+      //   encryptedEmail,
+      //   encryptedPassword,
+      // });
+      // if (answer) {
+      //   localStorage.setItem("access_token", answer?.token);
+      //   props.isLoggedIn(answer?.sendUserInfo);
+      //   navigateTo("/home");
+      // } else {
+      //   // Handle error
+      // }
+      navigateTo("/home");
     } catch (error) {
       Swal.fire({
         title: "Error",
