@@ -7,10 +7,11 @@
   "scripts": {
     "dev:web": "turbo run dev --filter=web",
     "build:web": "turbo run build --filter=web",
-    "dev": "turbo run dev",
+    "dev": "concurrently \"npm --prefix apps/api run dev\" \"npm --prefix apps/web/kloudpxfe run dev\"",
     "build": "turbo run build"
   },
   "devDependencies": {
+    "concurrently": "^9.1.2",
     "turbo": "^1.12.3"
   }
 }
