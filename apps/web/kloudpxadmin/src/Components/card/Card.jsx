@@ -36,7 +36,7 @@ const Card = () => {
           key={id}
           className="card flex items-center justify-evenly p-4 bg-white rounded-lg shadow-md"
         >
-          <div className="text-highlight md:text-5xl text-2xl">{icon}</div>
+          <div className="text-blue-500 md:text-5xl text-2xl">{icon}</div>
           <div className="flex flex-col items-center">
             <h2 className="mt-4 md:text-xl font-semibold">{title}</h2>
             <p className="text-highlight font-medium">Quantity: {qty}</p>

@@ -26,7 +26,7 @@ function SideDrawer() {
         </div>
       </button>
       <Drawer
-        title="Homex Builders Corp."
+        title="Kloud Pharma Portal"
         placement={placement}
         width={500}
         onClose={onClose}
