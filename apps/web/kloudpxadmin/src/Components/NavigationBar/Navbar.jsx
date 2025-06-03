@@ -1,48 +1,142 @@
+// import React, { useState } from "react";
+// import { NavLink } from "react-router-dom";
+// import { connect } from "react-redux";
+// import logo from "../../../public/kloudlogo.webp";
+
+// function Navbar(props) {
+//   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+//   const toggleMobileMenu = () => {
+//     setIsMobileMenuOpen(!isMobileMenuOpen);
+//   };
+
+//   const logOut = () => {
+//     localStorage.clear();
+//     localStorage.removeItem("access_token");
+//     // navigateTo("/")
+//     props.loggedOut();
+//   };
+
+//   return (
+//     <nav className="bg-white shadow-md px-4 py-3">
+//       <div className="flex items-center justify-between">
+//         <div className="flex items-center space-x-2 w-full max-w-md">
+//           <input
+//             type="text"
+//             placeholder="Search"
+//             className="w-full rounded-full px-4 py-2 bg-gray-100 focus:outline-none"
+//           />
+//         </div>
+
+//         <div className="md:hidden">
+//           <button onClick={toggleMobileMenu}>
+//             <svg
+//               xmlns="http://www.w3.org/2000/svg"
+//               className="h-6 w-6 text-gray-700"
+//               fill="none"
+//               viewBox="0 0 24 24"
+//               stroke="currentColor"
+//             >
+//               <path
+//                 strokeLinecap="round"
+//                 strokeLinejoin="round"
+//                 strokeWidth="2"
+//                 d="M4 6h16M4 12h16m-7 6h7"
+//               />
+//             </svg>
+//           </button>
+//         </div>
+
+//         <div className="hidden md:flex items-center space-x-6">
+//           <div className="relative">
+//             <i className="ri-notification-3-line text-2xl text-gray-600"></i>
+//             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
+//               2
+//             </span>
+//           </div>
+
+//           {/* Profile */}
+//           <div className="w-10 h-10">
+//             <img
+//               src="https://via.placeholder.com/150"
+//               alt="profile"
+//               className="w-full h-full rounded-full object-cover"
+//             />
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Mobile Menu */}
+//       {isMobileMenuOpen && (
+//         <div className="md:hidden mt-3 space-y-2 text-center">
+//           <NavLink to="/home" className="block text-lg text-gray-700">
+//             Home
+//           </NavLink>
+//           <button
+//             onClick={logOut}
+//             className="block text-lg text-red-600 font-medium"
+//           >
+//             Logout
+//           </button>
+//         </div>
+//       )}
+//     </nav>
+//   );
+// }
+
+// const mapStateToProps = (state) => {
+//   return {
+//     userDetails: state.universalReducer,
+//   };
+// };
+
+// export default connect(mapStateToProps)(Navbar);
+
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { connect } from "react-redux";
 import logo from "../../../public/kloudlogo.webp";
+
 function Navbar(props) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
-  const logOut = async () => {
-    window.localStorage.clear();
+
+  const logOut = () => {
+    localStorage.clear();
     localStorage.removeItem("access_token");
-    navigateTo("/");
+    // navigateTo("/")
     props.loggedOut();
   };
+
   return (
-    <nav className=" bg-homexbg bg-opacity-10 p-2 shadow-xl">
-      <div className="container mx-auto">
-        <div className="flex justify-between items-center">
-          {/* Logo or Brand Name */}
-          <div className="">
-            <NavLink href="/" className=" text-3xl font-serif ">
+    <div className="bg-white shadow-md px-4 py-3">
+      <nav className=" container mx-auto ">
+        <div className="flex items-center justify-between">
+          {/* Left */}
+          <div className="flex items-center space-x-4 w-full max-w-md">
+            <NavLink to="/">
               <img
                 src={logo}
-                className="h-fit"
-                alt="logo"
-                loading="eager"
-                priority={true}
-                style={{
-                  height: "50%",
-                  width: "50%",
-                  verticalAlign: "middle",
-                  // transform: "scale(6.5)",
-                }}
+                alt="Logo"
+                className="w-16 md:w-20 object-contain"
               />
             </NavLink>
+            <input
+              type="text"
+              placeholder="Search"
+              className="w-52 md:w-full rounded-full px-4 py-2 bg-gray-100 focus:outline-none"
+            />
           </div>
 
-          {/* Mobile Menu Button (Hamburger) */}
+          {/* Hamburger for Mobile */}
           <div className="md:hidden">
-            <button onClick={toggleMobileMenu} className="text-highlight">
+            <button onClick={toggleMobileMenu}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
+                className="h-7 w-7 text-gray-700"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -52,56 +146,50 @@ function Navbar(props) {
                   strokeLinejoin="round"
                   strokeWidth="2"
                   d="M4 6h16M4 12h16m-7 6h7"
-                ></path>
+                />
               </svg>
             </button>
           </div>
 
-          {/* Desktop Menu */}
-
-          <ul className="hidden md:flex space-x-8 text-xl justify-center items-center text-highlight font-medium">
-            {/* <div className="">
-              <p className="font-semibold">
-                Hi, {props.userDetails?.firstName} {props.userDetails?.lastName}
-              </p>
-            </div> */}
-            <li>
-              <NavLink to="/home" className="">
-                Home
-              </NavLink>
-            </li>
-
-            <li>
-              <NavLink to="/" className="" onClick={logOut}>
-                Logout
-              </NavLink>
-            </li>
-          </ul>
+          {/* Right Side */}
+          <div className="hidden md:flex items-center space-x-6">
+            <div className="relative">
+              <i className="ri-notification-3-line text-2xl text-gray-600"></i>
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
+                2
+              </span>
+            </div>
+            <div className="w-10 h-10">
+              <img
+                src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid&w=740"
+                alt="profile"
+                className="w-full h-full rounded-full object-cover"
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Mobile Menu (Hidden by Default) */}
-        <div className={`md:hidden ${isMobileMenuOpen ? "block" : "hidden"}`}>
-          <ul className="mt-2 space-y-2 text-center text-xl">
-            <li>
-              <NavLink to="/home" className="text-highlight">
-                Home
-              </NavLink>
-            </li>
-
-            <li>
-              <NavLink to="/" className="text-highlight">
-                Logout
-              </NavLink>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden mt-3 space-y-2 text-center">
+            <NavLink to="/home" className="block text-lg text-gray-700">
+              Home
+            </NavLink>
+            <button
+              onClick={logOut}
+              className=" text-lg text-red-600 font-medium"
+            >
+              Logout
+            </button>
+          </div>
+        )}
+      </nav>
+    </div>
   );
 }
-const mapStateToProps = (state) => {
-  return {
-    userDetails: state.universalReducer,
-  };
-};
+
+const mapStateToProps = (state) => ({
+  userDetails: state.universalReducer,
+});
+
 export default connect(mapStateToProps)(Navbar);

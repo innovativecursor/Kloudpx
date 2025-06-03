@@ -51,18 +51,12 @@ function Navigation(props) {
   return (
     <>
       <div>
-        {location.pathname !== "/" && props.loggedIn ? (
-          <div className="">
+        {location.pathname !== "/" && (
+          <>
             <Navbar />
             <SideDrawer />
-          </div>
-        ) : (
-          <div className="">
-            <Navbar />
-            <SideDrawer />
-          </div>
+          </>
         )}
-
         <div>
           <Routes>
             <Route path="/" element={<Login />} />
