@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"net/http"
-	"pharmacy-app/internal/auth"
+	"internal/auth"
 
 	"github.com/gin-gonic/gin"
 )
