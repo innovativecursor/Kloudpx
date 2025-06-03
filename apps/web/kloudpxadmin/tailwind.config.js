@@ -37,7 +37,10 @@ export default {
         widest: "4px",
       },
       backgroundColor: {
-        homexbg: "#304a36",
+        homexbg: "#0070BA",
+      },
+      textColor: {
+        highlight: "#0070BA",
       },
     },
   },

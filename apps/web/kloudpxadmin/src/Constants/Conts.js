@@ -1,26 +1,13 @@
 export const Menu = {
-  inquiries: [{ text: "View Inquiries", link: "/inquiries" }],
-  projects: [
-    { text: "Create Projects", link: "/createProjects" },
-    { text: "Update Projects", link: "/updateProjects" },
-    { text: "Delete Projects", link: "/deleteProjects" },
+  Medicines: [
+    { text: "Add Medicine", link: "/addMedicine" },
+    { text: "Update Medicines", link: "/updateMedicines" },
+    { text: "Delete Medicines", link: "/deleteMedicines" },
   ],
-  about: [{ text: "About Us", link: "/about" }],
-  services: [
-    { text: "Create Services", link: "/createServices" },
-    { text: "Update Services", link: "/updateServices" },
-    { text: "Delete Services", link: "/deleteServices" },
+  OTC_Products: [
+    { text: "Add OTC Product", link: "/addOtcProduct" },
+    { text: "Update OTC Products", link: "/updateOTC_Products" },
+    { text: "Delete OTC Products", link: "/deleteOTC_Products" },
   ],
-  achievement: [{ text: "Achievement's Page", link: "/achievements" }],
-  testimonials: [
-    { text: "Create Testimonials", link: "/createTestimonial" },
-    { text: "Update Testimonials", link: "/updateTestimonial" },
-    { text: "Delete Testimonials", link: "/deleteTestimonial" },
-  ],
-  Staff: [
-    { text: "Create Staff", link: "/createStaff" },
-    { text: "Update Staff", link: "/updateStaff" },
-    { text: "Delete Staff", link: "/deleteStaff" },
-  ],
-  Users: [{ text: "Create Users", link: "/createUsers" }],
+  Invoices: [{ text: "Order History", link: "/orderHistory" }],
 };

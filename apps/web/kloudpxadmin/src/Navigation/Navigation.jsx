@@ -32,6 +32,9 @@ import UpdateStaff from "../Components/UpdateStaff/UpdateStaff";
 import AddStaff from "../Components/AddStaff/AddStaff";
 import DeleteStaff from "../Components/DeleteStaff/DeleteStaff";
 import CreateUsers from "../Components/createUsers/CreateUsers";
+import AddMedicine from "../Components/addMedicine/AddMedicine";
+import OrderHistory from "../Components/Invoices/OrderHistory";
+import AddOtcProduct from "../Components/OTC/AddOtcProduct";
 
 function Navigation(props) {
   const location = useLocation();
@@ -69,27 +72,31 @@ function Navigation(props) {
               <Route path="/home" element={<Home />} />
               <Route path="/inquiries" element={<Inquiries />} />
               <Route path="/createProjects" element={<CreateProjects />} />
+              <Route path="/addMedicine" element={<AddMedicine />} />
+              <Route path="/addOtcProduct" element={<AddOtcProduct />} />
+              <Route path="/orderHistory" element={<OrderHistory />} />
+
               <Route
-                path="/updateProjects"
-                element={<ProductTable pageMode="Update" type="Projects" />}
+                path="/updateMedicines"
+                element={<ProductTable pageMode="Update" type="Medicines" />}
               />
               <Route path="/updateProjectsinner" element={<Updateprojects />} />
               <Route
-                path="/deleteProjects"
-                element={<ProductTable pageMode="Delete" type="Projects" />}
+                path="/deleteMedicines"
+                element={<ProductTable pageMode="Delete" type="Medicines" />}
               />
               <Route path="/deleteProjectsinner" element={<DeleteProjects />} />
 
               <Route path="/about" element={<About />} />
               <Route path="/createServices" element={<CreateService />} />
               <Route
-                path="/updateServices"
-                element={<ProductTable pageMode="Update" type="Services" />}
+                path="/updateOTC_Products"
+                element={<ProductTable pageMode="Update" type="OTC_Products" />}
               />
               <Route path="/updateServicesinner" element={<UpdateService />} />
               <Route
-                path="/deleteServices"
-                element={<ProductTable pageMode="Delete" type="Services" />}
+                path="/deleteOTC_Products"
+                element={<ProductTable pageMode="Delete" type="OTC_Products" />}
               />
               <Route path="/deleteServicesinner" element={<DeleteService />} />
               <Route path="/achievements" element={<Achievements />} />

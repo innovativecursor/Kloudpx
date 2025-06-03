@@ -21,8 +21,8 @@ function SideDrawer() {
         onClick={showDrawer}
         className="top-1/2 fixed rounded-lg text-6xl z-10"
       >
-        <div className="rounded-full bg-slate-500 border-spacing-8 p-2 ml-1">
-          <FaArrowRight className="h-10 w-10" />
+        <div className="rounded-full bg-homexbg border-spacing-8 p-2 ml-1">
+          <FaArrowRight className="h-10 w-10 text-white" />
         </div>
       </button>
       <Drawer
@@ -43,7 +43,7 @@ function SideDrawer() {
           {Object.entries(Menu).map(([key, actions]) => (
             <Panel
               header={
-                <div className="text-lg font-semibold text-blue-600">
+                <div className="text-lg font-semibold text-highlight">
                   {key.charAt(0).toUpperCase() + key.slice(1)}
                 </div>
               }
@@ -54,7 +54,7 @@ function SideDrawer() {
                 {actions.map((el) => (
                   <li key={el.link} onClick={onClose}>
                     <NavLink to={el.link}>
-                      <div className="card hover:bg-blue-300 hover:text-white text-xl font-medium my-8">
+                      <div className="card hover:bg-[#3FA9EE] hover:text-white text-base tracking-wide font-medium my-2.5">
                         {el.text}
                       </div>
                     </NavLink>

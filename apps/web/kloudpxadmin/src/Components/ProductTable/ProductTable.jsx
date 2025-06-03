@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import GlobalForm from "../GlobalForm/GlobalForm";
-import { Button, Input, Menu, Modal, Table } from "antd";
+import { Button, Input, Menu, Modal, Table, message } from "antd";
 import PageWrapper from "../PageContainer/PageWrapper";
 import { deleteAxiosCall, getAxiosCall } from "../../Axios/UniversalAxiosCalls";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
 
@@ -11,8 +11,8 @@ function ProductTable(props) {
   const [openModal, setopenModal] = useState(false);
   const [inqMessage, setInqMessage] = useState("");
   const [result, setResult] = useState(null);
-  const [switchRoutes, setSwitchRoutes] = useState(false);
   const navigateTo = useNavigate();
+
   const inquiry_columns = [
     {
       title: "Inquiry_ID",
@@ -37,12 +37,12 @@ function ProductTable(props) {
     },
     {
       title: "Action",
-      dataIndex: "",
-      key: "x",
+      key: "view",
       render: (text, record) => (
         <Button
           onClick={() => {
-            setopenModal(true), setInqMessage(record?.message);
+            setopenModal(true);
+            setInqMessage(record?.message);
           }}
         >
           View
@@ -51,13 +51,13 @@ function ProductTable(props) {
     },
     {
       title: "Action",
-      dataIndex: "",
-      key: "x",
+      key: "delete",
       render: (text, record) => (
         <Button onClick={() => deleteInquiry(record.inquiry_id)}>Delete</Button>
       ),
     },
   ];
+
   const testimonials_col = [
     {
       title: "Client's Name",
@@ -76,6 +76,7 @@ function ProductTable(props) {
       key: "client_rating",
     },
   ];
+
   const staff_col = [
     {
       title: "Staff Name",
@@ -89,6 +90,7 @@ function ProductTable(props) {
       key: "staff_position",
     },
   ];
+
   const services_col = [
     {
       title: "Service Name",
@@ -99,15 +101,16 @@ function ProductTable(props) {
       title: "Created At",
       dataIndex: "createdAt",
       key: "createdAt",
-      render: (text) => new Date(text).toLocaleDateString(), // Format the date
+      render: (text) => new Date(text).toLocaleDateString(),
     },
     {
       title: "Updated At",
       dataIndex: "updatedAt",
       key: "updatedAt",
-      render: (text) => new Date(text).toLocaleDateString(), // Format the date
+      render: (text) => new Date(text).toLocaleDateString(),
     },
   ];
+
   const projects_col = [
     {
       title: "Project Id",
@@ -161,6 +164,44 @@ function ProductTable(props) {
     },
   ];
 
+  const medicines_col = [
+    {
+      title: "Medicine Name",
+      dataIndex: "medicine_name",
+      key: "medicine_name",
+      fixed: "left",
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+      key: "category",
+    },
+    {
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
+    },
+  ];
+
+  const otc_products_col = [
+    {
+      title: "Product Name",
+      dataIndex: "product_name",
+      key: "product_name",
+      fixed: "left",
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+      key: "category",
+    },
+    {
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
+    },
+  ];
+
   const deleteInquiry = async (id) => {
     try {
       Swal.fire({
@@ -182,28 +223,36 @@ function ProductTable(props) {
       message.error("Failed to delete inquiry");
     }
   };
+
   useEffect(() => {
     answer();
   }, [props?.type]);
 
   const answer = async () => {
-    if (props?.type == "Inquiries" && props?.type) {
+    if (props?.type === "Inquiries") {
       const result = await getAxiosCall("/fetchInquiries");
       setResult(result?.data);
-    } else if (props?.type == "Projects" && props?.type) {
+    } else if (props?.type === "Projects") {
       const result = await getAxiosCall("/getproject");
       setResult(result?.data);
-    } else if (props?.type == "Services") {
+    } else if (props?.type === "Services") {
       const result = await getAxiosCall("/getservice");
       setResult(result?.data);
-    } else if (props?.type == "Testimonials") {
+    } else if (props?.type === "Testimonials") {
       const result = await getAxiosCall("/gettestimonials");
       setResult(result?.data);
-    } else if (props?.type == "Staff") {
+    } else if (props?.type === "Staff") {
       const result = await getAxiosCall("/getteam");
+      setResult(result?.data);
+    } else if (props?.type === "Medicines") {
+      const result = await getAxiosCall("/getMedicines");
+      setResult(result?.data);
+    } else if (props?.type === "OTC_Products") {
+      const result = await getAxiosCall("/getOTCProducts");
       setResult(result?.data);
     }
   };
+
   const renderTable = () => {
     switch (props.type) {
       case "Projects":
@@ -213,22 +262,17 @@ function ProductTable(props) {
               columns={projects_col}
               dataSource={result}
               size="large"
-              onRow={(record, rowIndex) => {
-                return {
-                  onClick: () => {
-                    navigateTo(
-                      props.pageMode === "Delete"
-                        ? "/deleteProjectsinner"
-                        : "/updateProjectsinner",
-                      { state: record }
-                    );
-                  },
-                };
-              }}
-              scroll={{
-                x: 1000,
-                y: 1500,
-              }}
+              onRow={(record) => ({
+                onClick: () => {
+                  navigateTo(
+                    props.pageMode === "Delete"
+                      ? "/deleteProjectsinner"
+                      : "/updateProjectsinner",
+                    { state: record }
+                  );
+                },
+              })}
+              scroll={{ x: 1000, y: 1500 }}
             />
           </PageWrapper>
         );
@@ -240,7 +284,6 @@ function ProductTable(props) {
                 columns={inquiry_columns}
                 dataSource={result}
                 size="large"
-                onRow={() => ({})}
                 scroll={{ x: 1000, y: 1500 }}
               />
             </PageWrapper>
@@ -248,12 +291,11 @@ function ProductTable(props) {
               open={openModal}
               title="Description"
               centered
-              closeIcon
-              maskClosable={true} // Ensures that clicking outside closes the modal
-              closable={true} // Hides the "X" close button
+              maskClosable={true}
+              closable={true}
               footer={null}
               destroyOnClose={true}
-              onCancel={() => setopenModal(false)} // Add this line to close the modal when clicking outside
+              onCancel={() => setopenModal(false)}
             >
               <p>{inqMessage}</p>
             </Modal>
@@ -266,22 +308,17 @@ function ProductTable(props) {
               columns={services_col}
               dataSource={result}
               size="large"
-              onRow={(record, rowIndex) => {
-                return {
-                  onClick: () => {
-                    navigateTo(
-                      props.pageMode === "Delete"
-                        ? "/deleteServicesinner"
-                        : "/updateServicesinner",
-                      { state: record }
-                    );
-                  },
-                };
-              }}
-              scroll={{
-                x: 1000,
-                y: 1500,
-              }}
+              onRow={(record) => ({
+                onClick: () => {
+                  navigateTo(
+                    props.pageMode === "Delete"
+                      ? "/deleteServicesinner"
+                      : "/updateServicesinner",
+                    { state: record }
+                  );
+                },
+              })}
+              scroll={{ x: 1000, y: 1500 }}
             />
           </PageWrapper>
         );
@@ -292,22 +329,17 @@ function ProductTable(props) {
               columns={testimonials_col}
               dataSource={result}
               size="large"
-              onRow={(record, rowIndex) => {
-                return {
-                  onClick: () => {
-                    navigateTo(
-                      props.pageMode === "Delete"
-                        ? "/deleteTestimonialinner"
-                        : "/updateTestimonialinner",
-                      { state: record }
-                    );
-                  },
-                };
-              }}
-              scroll={{
-                x: 1000,
-                y: 1500,
-              }}
+              onRow={(record) => ({
+                onClick: () => {
+                  navigateTo(
+                    props.pageMode === "Delete"
+                      ? "/deleteTestimonialinner"
+                      : "/updateTestimonialinner",
+                    { state: record }
+                  );
+                },
+              })}
+              scroll={{ x: 1000, y: 1500 }}
             />
           </PageWrapper>
         );
@@ -318,40 +350,71 @@ function ProductTable(props) {
               columns={staff_col}
               dataSource={result}
               size="large"
-              onRow={(record, rowIndex) => {
-                return {
-                  onClick: () => {
-                    navigateTo(
-                      props.pageMode === "Delete"
-                        ? "/deleteStaffinner"
-                        : "/updateStaffinner",
-                      { state: record }
-                    );
-                  },
-                };
-              }}
-              scroll={{
-                x: 1000,
-                y: 1500,
-              }}
+              onRow={(record) => ({
+                onClick: () => {
+                  navigateTo(
+                    props.pageMode === "Delete"
+                      ? "/deleteStaffinner"
+                      : "/updateStaffinner",
+                    { state: record }
+                  );
+                },
+              })}
+              scroll={{ x: 1000, y: 1500 }}
             />
           </PageWrapper>
         );
-      case "Users":
+      case "Medicines":
         return (
-          <PageWrapper title={`${props.pageMode} Users`}>
+          <PageWrapper title={`${props.pageMode} Medicines`}>
             <Table
-              columns={user_col}
+              columns={medicines_col}
               dataSource={result}
               size="large"
+              onRow={(record) => ({
+                onClick: () => {
+                  navigateTo(
+                    props.pageMode === "Delete"
+                      ? "/deleteMedicine"
+                      : "/updateMedicine",
+                    { state: record }
+                  );
+                },
+              })}
+              scroll={{ x: 1000, y: 1500 }}
+            />
+          </PageWrapper>
+        );
+      case "OTC_Products":
+        return (
+          <PageWrapper title={`${props.pageMode} OTC Products`}>
+            <Table
+              columns={otc_products_col}
+              dataSource={result}
+              size="large"
+              onRow={(record) => ({
+                onClick: () => {
+                  navigateTo(
+                    props.pageMode === "Delete" ? "/deleteOTC" : "/updateOTC",
+                    { state: record }
+                  );
+                },
+              })}
               scroll={{ x: 1000, y: 1500 }}
             />
           </PageWrapper>
         );
       default:
+        return <p>No data available</p>;
     }
   };
-  return <>{renderTable()}</>;
+
+  return (
+    <>
+      <GlobalForm />
+      {renderTable()}
+    </>
+  );
 }
 
 export default ProductTable;

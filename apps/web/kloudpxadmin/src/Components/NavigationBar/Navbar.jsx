@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { connect } from "react-redux";
-import logo from "../../../public/Homex.webp";
+import logo from "../../../public/kloudlogo.webp";
 function Navbar(props) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -15,7 +15,7 @@ function Navbar(props) {
     props.loggedOut();
   };
   return (
-    <nav className="bg-homexbg shadow-2xl">
+    <nav className=" bg-homexbg bg-opacity-10 p-2 shadow-xl">
       <div className="container mx-auto">
         <div className="flex justify-between items-center">
           {/* Logo or Brand Name */}
@@ -28,8 +28,8 @@ function Navbar(props) {
                 loading="eager"
                 priority={true}
                 style={{
-                  height: "10%",
-                  width: "10%",
+                  height: "50%",
+                  width: "50%",
                   verticalAlign: "middle",
                   // transform: "scale(6.5)",
                 }}
@@ -39,7 +39,7 @@ function Navbar(props) {
 
           {/* Mobile Menu Button (Hamburger) */}
           <div className="md:hidden">
-            <button onClick={toggleMobileMenu} className="text-white">
+            <button onClick={toggleMobileMenu} className="text-highlight">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6"
@@ -59,7 +59,7 @@ function Navbar(props) {
 
           {/* Desktop Menu */}
 
-          <ul className="hidden md:flex space-x-8 text-xl justify-center items-center text-white">
+          <ul className="hidden md:flex space-x-8 text-xl justify-center items-center text-highlight font-medium">
             {/* <div className="">
               <p className="font-semibold">
                 Hi, {props.userDetails?.firstName} {props.userDetails?.lastName}
@@ -81,17 +81,17 @@ function Navbar(props) {
 
         {/* Mobile Menu (Hidden by Default) */}
         <div className={`md:hidden ${isMobileMenuOpen ? "block" : "hidden"}`}>
-          <ul className="mt-2 space-y-2 text-xl">
+          <ul className="mt-2 space-y-2 text-center text-xl">
             <li>
-              <a href="#" className="text-black">
+              <NavLink to="/home" className="text-highlight">
                 Home
-              </a>
+              </NavLink>
             </li>
 
             <li>
-              <a href="#" className="text-black">
+              <NavLink to="/" className="text-highlight">
                 Logout
-              </a>
+              </NavLink>
             </li>
           </ul>
         </div>
