@@ -1,9 +1,12 @@
-import React from "react";
 import logo from "../../../public/kloudlogo.webp";
+import { getAxiosCall } from "../../Axios/UniversalAxiosCalls";
+// import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const handleGoogleLogin = () => {
-    window.location.href = "/home";
+  // const navigate = useNavigate();
+  const handleGoogleLogin = async () => {
+    const result = await getAxiosCall("/oauth/login");
+    console.log("result", result);
   };
 
   return (
