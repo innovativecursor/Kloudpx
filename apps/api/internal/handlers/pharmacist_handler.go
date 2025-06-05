@@ -5,47 +5,19 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
-	"time"
+	"strings"
+	//"time"
 
 	"github.com/hashmi846003/online-med.git/internal/auth"
 	"github.com/hashmi846003/online-med.git/internal/database"
 	"github.com/hashmi846003/online-med.git/internal/models"
-
 	"github.com/gin-gonic/gin"
 )
 
-// PharmacistRegister handles pharmacist registration
-func PharmacistRegister(c *gin.Context) {
-	var pharmacist models.Pharmacist
-	if err := c.ShouldBindJSON(&pharmacist); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	hashedPassword, err := auth.HashPassword(pharmacist.Password)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not hash password"})
-		return
-	}
-
-	err = database.DB.QueryRow(
-		"INSERT INTO pharmacists (username, password) VALUES ($1, $2) RETURNING id",
-		pharmacist.Username, hashedPassword,
-	).Scan(&pharmacist.ID)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Username already exists"})
-		return
-	}
-
-	c.JSON(http.StatusCreated, gin.H{"id": pharmacist.ID, "username": pharmacist.Username})
-}
-
-// PharmacistLogin handles pharmacist login
-func PharmacistLogin(c *gin.Context) {
+// PharmacistOAuthLogin handles pharmacist OAuth login
+func PharmacistOAuthLogin(c *gin.Context) {
 	var credentials struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
+		AccessToken string `json:"access_token"`
 	}
 
 	if err := c.ShouldBindJSON(&credentials); err != nil {
@@ -53,36 +25,88 @@ func PharmacistLogin(c *gin.Context) {
 		return
 	}
 
-	var pharmacist models.Pharmacist
-	err := database.DB.QueryRow(
-		"SELECT id, username, password FROM pharmacists WHERE username = $1",
-		credentials.Username,
-	).Scan(&pharmacist.ID, &pharmacist.Username, &pharmacist.Password)
-
+	// Verify token with provider
+	userInfo, err := auth.GetUserInfo(credentials.AccessToken)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
 
-	if !auth.CheckPasswordHash(credentials.Password, pharmacist.Password) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+	// Check if this is a pharmacist email domain
+	if !isPharmacistEmail(userInfo.Email) {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "OAuth login is restricted to pharmacist accounts",
+		})
 		return
 	}
 
-	token, err := auth.GenerateAccessToken(pharmacist.ID, pharmacist.Username, "pharmacist")
+	// Find or create pharmacist user
+	pharmacist, err := findOrCreatePharmacist(userInfo)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Pharmacist processing failed"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	// Generate JWT with pharmacist role
+	token, err := auth.GenerateAccessToken(pharmacist.ID, pharmacist.Name, "pharmacist")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Token generation failed"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"token": token,
+		"role":  "pharmacist",
+	})
 }
 
-// GetPendingCarts retrieves carts needing review
+func isPharmacistEmail(email string) bool {
+	pharmacistDomains := []string{"pharmacy.yourdomain.com", "yourpharmacist.com"}
+	
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return false
+	}
+
+	domain := parts[1]
+	for _, d := range pharmacistDomains {
+		if domain == d {
+			return true
+		}
+	}
+	return false
+}
+
+func findOrCreatePharmacist(info *auth.UserInfo) (*models.Pharmacist, error) {
+	var pharmacist models.Pharmacist
+	
+	err := database.DB.QueryRow(
+		"SELECT id, name, email FROM pharmacists WHERE oauth_id = $1",
+		info.ID,
+	).Scan(&pharmacist.ID, &pharmacist.Name, &pharmacist.Email)
+
+	if err == nil {
+		return &pharmacist, nil
+	}
+
+	if errors.Is(err, sql.ErrNoRows) {
+		err = database.DB.QueryRow(
+			`INSERT INTO pharmacists (name, email, oauth_id, oauth_provider) 
+			VALUES ($1, $2, $3, 'oauth') 
+			RETURNING id, name, email`,
+			info.Name, info.Email, info.ID,
+		).Scan(&pharmacist.ID, &pharmacist.Name, &pharmacist.Email)
+
+		if err != nil {
+			return nil, err
+		}
+		return &pharmacist, nil
+	}
+
+	return nil, err
+}
+
+// Pharmacist-specific handlers
 func GetPendingCarts(c *gin.Context) {
 	rows, err := database.DB.Query(
 		"SELECT id, user_id FROM carts WHERE status = 'submitted'",
@@ -104,21 +128,6 @@ func GetPendingCarts(c *gin.Context) {
 	c.JSON(http.StatusOK, carts)
 }
 
-// CartItemDetail represents detailed view of a cart item
-type CartItemDetail struct {
-	ID                    int       `json:"id"`
-	OriginalMedicineID    int       `json:"original_medicine_id"`
-	OriginalMedicineName  string    `json:"original_medicine_name"`
-	OriginalGenericName   string    `json:"original_generic_name"`
-	MedicineID            int       `json:"medicine_id"`
-	MedicineName          string    `json:"medicine_name"`
-	GenericName           string    `json:"generic_name"`
-	Quantity              int       `json:"quantity"`
-	Status                string    `json:"status"`
-	CreatedAt             time.Time `json:"created_at"`
-}
-
-// GetCartDetails retrieves cart items for review
 func GetCartDetails(c *gin.Context) {
 	cartID := c.Param("cartID")
 	cartIDInt, err := strconv.Atoi(cartID)
@@ -168,20 +177,20 @@ func GetCartDetails(c *gin.Context) {
 	}
 	defer rows.Close()
 
-	var items []CartItemDetail
+	var items []models.CartItemDetail
 	for rows.Next() {
-		var item CartItemDetail
+		var item models.CartItemDetail
 		err := rows.Scan(
 			&item.ID,
-			&item.OriginalMedicineID,
-			&item.OriginalMedicineName,
-			&item.OriginalGenericName,
+		//	&item.OriginalMedicineID,
+		//	&item.OriginalMedicineName,
+		//	&item.OriginalGenericName,
 			&item.MedicineID,
 			&item.MedicineName,
 			&item.GenericName,
 			&item.Quantity,
 			&item.Status,
-			&item.CreatedAt,
+		//	&item.CreatedAt,
 		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan cart item"})
@@ -192,7 +201,7 @@ func GetCartDetails(c *gin.Context) {
 
 	response := struct {
 		Cart   models.Cart      `json:"cart"`
-		Items  []CartItemDetail `json:"items"`
+		Items  []models.CartItemDetail `json:"items"`
 	}{
 		Cart:  cart,
 		Items: items,
@@ -201,7 +210,6 @@ func GetCartDetails(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// ReviewCart processes pharmacist review and substitutions
 func ReviewCart(c *gin.Context) {
 	cartID := c.Param("cartID")
 	cartIDInt, err := strconv.Atoi(cartID)

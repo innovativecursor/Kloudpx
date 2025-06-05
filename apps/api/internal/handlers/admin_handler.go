@@ -3,48 +3,20 @@ package handlers
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
+
+	"github.com/gin-gonic/gin"
 	"github.com/hashmi846003/online-med.git/internal/auth"
 	"github.com/hashmi846003/online-med.git/internal/database"
 	"github.com/hashmi846003/online-med.git/internal/models"
-	"strconv"
-
-	"github.com/gin-gonic/gin"
 )
 
-// AdminRegister handles admin registration
-func AdminRegister(c *gin.Context) {
-	var admin models.Admin
-	if err := c.ShouldBindJSON(&admin); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	hashedPassword, err := auth.HashPassword(admin.Password)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not hash password"})
-		return
-	}
-
-	err = database.DB.QueryRow(
-		"INSERT INTO admins (username, password) VALUES ($1, $2) RETURNING id",
-		admin.Username, hashedPassword,
-	).Scan(&admin.ID)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Username already exists"})
-		return
-	}
-
-	c.JSON(http.StatusCreated, gin.H{"id": admin.ID, "username": admin.Username})
-}
-
-// AdminLogin handles admin login
-func AdminLogin(c *gin.Context) {
+// AdminOAuthLogin handles admin OAuth login
+func AdminOAuthLogin(c *gin.Context) {
 	var credentials struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
+		AccessToken string `json:"access_token"`
 	}
 
 	if err := c.ShouldBindJSON(&credentials); err != nil {
@@ -52,36 +24,88 @@ func AdminLogin(c *gin.Context) {
 		return
 	}
 
-	var admin models.Admin
-	err := database.DB.QueryRow(
-		"SELECT id, username, password FROM admins WHERE username = $1",
-		credentials.Username,
-	).Scan(&admin.ID, &admin.Username, &admin.Password)
-
+	// Verify token with provider
+	userInfo, err := auth.GetUserInfo(credentials.AccessToken)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
 	}
 
-	if !auth.CheckPasswordHash(credentials.Password, admin.Password) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+	// Check if this is an admin email domain
+	if !isAdminEmail(userInfo.Email) {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "OAuth login is restricted to admin accounts",
+		})
 		return
 	}
 
-	token, err := auth.GenerateAccessToken(admin.ID, admin.Username, "admin")
+	// Find or create admin user
+	admin, err := findOrCreateAdmin(userInfo)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Admin processing failed"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	// Generate JWT with admin role
+	token, err := auth.GenerateAccessToken(admin.ID, admin.Name, "admin")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Token generation failed"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"token": token,
+		"role":  "admin",
+	})
 }
 
-// AddMedicine adds a new medicine to inventory
+func isAdminEmail(email string) bool {
+	adminDomains := []string{"admin.yourdomain.com", "youradmin.com"}
+	
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return false
+	}
+
+	domain := parts[1]
+	for _, d := range adminDomains {
+		if domain == d {
+			return true
+		}
+	}
+	return false
+}
+
+func findOrCreateAdmin(info *auth.UserInfo) (*models.Admin, error) {
+	var admin models.Admin
+	
+	err := database.DB.QueryRow(
+		"SELECT id, name, email FROM admins WHERE oauth_id = $1",
+		info.ID,
+	).Scan(&admin.ID, &admin.Name, &admin.Email)
+
+	if err == nil {
+		return &admin, nil
+	}
+
+	if errors.Is(err, sql.ErrNoRows) {
+		err = database.DB.QueryRow(
+			`INSERT INTO admins (name, email, oauth_id, oauth_provider) 
+			VALUES ($1, $2, $3, 'oauth') 
+			RETURNING id, name, email`,
+			info.Name, info.Email, info.ID,
+		).Scan(&admin.ID, &admin.Name, &admin.Email)
+
+		if err != nil {
+			return nil, err
+		}
+		return &admin, nil
+	}
+
+	return nil, err
+}
+
+// Medicine management handlers (unchanged)
 func AddMedicine(c *gin.Context) {
 	var medicine models.Medicine
 	if err := c.ShouldBindJSON(&medicine); err != nil {
@@ -92,7 +116,8 @@ func AddMedicine(c *gin.Context) {
 	err := database.DB.QueryRow(
 		`INSERT INTO medicines (name, generic_name, prescription_required, stock, price) 
 		VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-		medicine.BrandName, medicine.GenericName, medicine.PrescriptionRequired, medicine.QuantityInPieces, medicine.SellingPrice,
+		medicine.BrandName, medicine.GenericName, medicine.PrescriptionRequired, 
+		medicine.QuantityInPieces, medicine.SellingPrice,
 	).Scan(&medicine.ID)
 
 	if err != nil {
@@ -103,7 +128,6 @@ func AddMedicine(c *gin.Context) {
 	c.JSON(http.StatusCreated, medicine)
 }
 
-// UpdateMedicine modifies an existing medicine
 func UpdateMedicine(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -145,7 +169,6 @@ func UpdateMedicine(c *gin.Context) {
 	c.JSON(http.StatusOK, medicine)
 }
 
-// DeleteMedicine removes a medicine from inventory
 func DeleteMedicine(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -169,7 +192,6 @@ func DeleteMedicine(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Medicine deleted successfully"})
 }
 
-// ListMedicines retrieves all medicines
 func ListMedicines(c *gin.Context) {
 	rows, err := database.DB.Query(
 		"SELECT id, name, generic_name, prescription_required, stock, price FROM medicines",
@@ -184,7 +206,8 @@ func ListMedicines(c *gin.Context) {
 	for rows.Next() {
 		var med models.Medicine
 		if err := rows.Scan(
-			&med.ID, &med.BrandName, &med.GenericName, &med.PrescriptionRequired, &med.QuantityInPieces, &med.SellingPrice,
+			&med.ID, &med.BrandName, &med.GenericName, &med.PrescriptionRequired, 
+			&med.QuantityInPieces, &med.SellingPrice,
 		); err == nil {
 			medicines = append(medicines, med)
 		}
@@ -193,7 +216,6 @@ func ListMedicines(c *gin.Context) {
 	c.JSON(http.StatusOK, medicines)
 }
 
-// ListUsers retrieves all users (without passwords)
 func ListUsers(c *gin.Context) {
 	rows, err := database.DB.Query("SELECT id, username FROM users")
 	if err != nil {
@@ -219,25 +241,18 @@ func ListUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
-// ListAdmins retrieves all admins (without passwords)
 func ListAdmins(c *gin.Context) {
-	rows, err := database.DB.Query("SELECT id, username FROM admins")
+	rows, err := database.DB.Query("SELECT id, name, email FROM admins")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not retrieve admins"})
 		return
 	}
 	defer rows.Close()
 
-	var admins []struct {
-		ID       int    `json:"id"`
-		Username string `json:"username"`
-	}
+	var admins []models.Admin
 	for rows.Next() {
-		var a struct {
-			ID       int    `json:"id"`
-			Username string `json:"username"`
-		}
-		if err := rows.Scan(&a.ID, &a.Username); err == nil {
+		var a models.Admin
+		if err := rows.Scan(&a.ID, &a.Name, &a.Email); err == nil {
 			admins = append(admins, a)
 		}
 	}
@@ -245,25 +260,18 @@ func ListAdmins(c *gin.Context) {
 	c.JSON(http.StatusOK, admins)
 }
 
-// ListPharmacists retrieves all pharmacists (without passwords)
 func ListPharmacists(c *gin.Context) {
-	rows, err := database.DB.Query("SELECT id, username FROM pharmacists")
+	rows, err := database.DB.Query("SELECT id, name, email FROM pharmacists")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not retrieve pharmacists"})
 		return
 	}
 	defer rows.Close()
 
-	var pharmacists []struct {
-		ID       int    `json:"id"`
-		Username string `json:"username"`
-	}
+	var pharmacists []models.Pharmacist
 	for rows.Next() {
-		var p struct {
-			ID       int    `json:"id"`
-			Username string `json:"username"`
-		}
-		if err := rows.Scan(&p.ID, &p.Username); err == nil {
+		var p models.Pharmacist
+		if err := rows.Scan(&p.ID, &p.Name, &p.Email); err == nil {
 			pharmacists = append(pharmacists, p)
 		}
 	}
@@ -271,58 +279,6 @@ func ListPharmacists(c *gin.Context) {
 	c.JSON(http.StatusOK, pharmacists)
 }
 
-// ResetPassword resets password for any account
-func ResetPassword(c *gin.Context) {
-	var request struct {
-		UserType string `json:"user_type"` // "user", "admin", or "pharmacist"
-		UserID   int    `json:"user_id"`
-		Password string `json:"password"`
-	}
-
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	hashedPassword, err := auth.HashPassword(request.Password)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not hash password"})
-		return
-	}
-
-	var table string
-	switch request.UserType {
-	case "user":
-		table = "users"
-	case "admin":
-		table = "admins"
-	case "pharmacist":
-		table = "pharmacists"
-	default:
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user type"})
-		return
-	}
-
-	result, err := database.DB.Exec(
-		fmt.Sprintf("UPDATE %s SET password = $1 WHERE id = $2", table),
-		hashedPassword, request.UserID,
-	)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not reset password"})
-		return
-	}
-
-	rowsAffected, _ := result.RowsAffected()
-	if rowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Password reset successfully"})
-}
-
-// GetUserDetails retrieves detailed information about a specific user
 func GetUserDetails(c *gin.Context) {
 	idStr := c.Param("id")
 	userID, err := strconv.Atoi(idStr)
@@ -357,39 +313,6 @@ func GetUserDetails(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// AdminGetMedicineDetails retrieves detailed information about a specific medicine (renamed to avoid conflict)
-func AdminGetMedicineDetails(c *gin.Context) {
-	idStr := c.Param("id")
-	medicineID, err := strconv.Atoi(idStr)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid medicine ID"})
-		return
-	}
-
-	var medicine models.Medicine
-	err = database.DB.QueryRow(`
-		SELECT id, name, generic_name, prescription_required, stock, price
-		FROM medicines 
-		WHERE id = $1`,
-		medicineID,
-	).Scan(
-		&medicine.ID, &medicine.BrandName, &medicine.GenericName, 
-		&medicine.PrescriptionRequired, &medicine.QuantityInPieces, &medicine.SellingPrice,
-	)
-
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Medicine not found"})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
-		return
-	}
-
-	c.JSON(http.StatusOK, medicine)
-}
-
-// GetOrderStatistics retrieves order statistics
 func GetOrderStatistics(c *gin.Context) {
 	var stats struct {
 		TotalOrders      int     `json:"total_orders"`
@@ -399,7 +322,6 @@ func GetOrderStatistics(c *gin.Context) {
 		AvgOrderValue    float64 `json:"avg_order_value"`
 	}
 
-	// Get total orders
 	err := database.DB.QueryRow(
 		"SELECT COUNT(*) FROM carts WHERE status != 'pending'",
 	).Scan(&stats.TotalOrders)
@@ -408,7 +330,6 @@ func GetOrderStatistics(c *gin.Context) {
 		return
 	}
 
-	// Get pending orders
 	err = database.DB.QueryRow(
 		"SELECT COUNT(*) FROM carts WHERE status = 'submitted' OR status = 'reviewed'",
 	).Scan(&stats.PendingOrders)
@@ -417,7 +338,6 @@ func GetOrderStatistics(c *gin.Context) {
 		return
 	}
 
-	// Get completed orders
 	err = database.DB.QueryRow(
 		"SELECT COUNT(*) FROM carts WHERE status = 'completed'",
 	).Scan(&stats.CompletedOrders)
@@ -426,7 +346,6 @@ func GetOrderStatistics(c *gin.Context) {
 		return
 	}
 
-	// Get total revenue
 	err = database.DB.QueryRow(`
 		SELECT COALESCE(SUM(ci.quantity * m.price), 0)
 		FROM cart_items ci
@@ -439,7 +358,6 @@ func GetOrderStatistics(c *gin.Context) {
 		return
 	}
 
-	// Calculate average order value
 	if stats.CompletedOrders > 0 {
 		stats.AvgOrderValue = stats.TotalRevenue / float64(stats.CompletedOrders)
 	}
@@ -447,9 +365,8 @@ func GetOrderStatistics(c *gin.Context) {
 	c.JSON(http.StatusOK, stats)
 }
 
-// GetLowStockMedicines retrieves medicines with low stock
 func GetLowStockMedicines(c *gin.Context) {
-	threshold := 10 // Default threshold
+	threshold := 10
 	if param := c.Query("threshold"); param != "" {
 		if val, err := strconv.Atoi(param); err == nil {
 			threshold = val

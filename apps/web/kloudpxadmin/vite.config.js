@@ -20,6 +20,8 @@ export default defineConfig({
       REACT_APP_UAT_URL: "http://localhost:8000",
       REACT_APP_ENCRYPTION: "WABBALABBA@3344$$1DUB43DUB",
       FONT_KEY: "AIzaSyC9NHFb4eI6H6AxlvLeHF_7Us7LTNg3deI",
+      CLIENT_ID:
+        "573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com",
     },
   },
   plugins: [react({})],

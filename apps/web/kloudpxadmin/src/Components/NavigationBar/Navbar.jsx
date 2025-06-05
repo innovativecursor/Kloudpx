@@ -1,114 +1,15 @@
-// import React, { useState } from "react";
-// import { NavLink } from "react-router-dom";
-// import { connect } from "react-redux";
-// import logo from "../../../public/kloudlogo.webp";
-
-// function Navbar(props) {
-//   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-//   const toggleMobileMenu = () => {
-//     setIsMobileMenuOpen(!isMobileMenuOpen);
-//   };
-
-//   const logOut = () => {
-//     localStorage.clear();
-//     localStorage.removeItem("access_token");
-//     // navigateTo("/")
-//     props.loggedOut();
-//   };
-
-//   return (
-//     <nav className="bg-white shadow-md px-4 py-3">
-//       <div className="flex items-center justify-between">
-//         <div className="flex items-center space-x-2 w-full max-w-md">
-//           <input
-//             type="text"
-//             placeholder="Search"
-//             className="w-full rounded-full px-4 py-2 bg-gray-100 focus:outline-none"
-//           />
-//         </div>
-
-//         <div className="md:hidden">
-//           <button onClick={toggleMobileMenu}>
-//             <svg
-//               xmlns="http://www.w3.org/2000/svg"
-//               className="h-6 w-6 text-gray-700"
-//               fill="none"
-//               viewBox="0 0 24 24"
-//               stroke="currentColor"
-//             >
-//               <path
-//                 strokeLinecap="round"
-//                 strokeLinejoin="round"
-//                 strokeWidth="2"
-//                 d="M4 6h16M4 12h16m-7 6h7"
-//               />
-//             </svg>
-//           </button>
-//         </div>
-
-//         <div className="hidden md:flex items-center space-x-6">
-//           <div className="relative">
-//             <i className="ri-notification-3-line text-2xl text-gray-600"></i>
-//             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
-//               2
-//             </span>
-//           </div>
-
-//           {/* Profile */}
-//           <div className="w-10 h-10">
-//             <img
-//               src="https://via.placeholder.com/150"
-//               alt="profile"
-//               className="w-full h-full rounded-full object-cover"
-//             />
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Mobile Menu */}
-//       {isMobileMenuOpen && (
-//         <div className="md:hidden mt-3 space-y-2 text-center">
-//           <NavLink to="/home" className="block text-lg text-gray-700">
-//             Home
-//           </NavLink>
-//           <button
-//             onClick={logOut}
-//             className="block text-lg text-red-600 font-medium"
-//           >
-//             Logout
-//           </button>
-//         </div>
-//       )}
-//     </nav>
-//   );
-// }
-
-// const mapStateToProps = (state) => {
-//   return {
-//     userDetails: state.universalReducer,
-//   };
-// };
-
-// export default connect(mapStateToProps)(Navbar);
-
-import React, { useState } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { connect } from "react-redux";
 import logo from "../../../public/kloudlogo.webp";
+import { googleLogout } from "@react-oauth/google";
 
-function Navbar(props) {
+function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const logOut = () => {
-    localStorage.clear();
-    localStorage.removeItem("access_token");
-    // navigateTo("/")
-    props.loggedOut();
   };
 
   return (
@@ -176,7 +77,7 @@ function Navbar(props) {
               Home
             </NavLink>
             <button
-              onClick={logOut}
+              onClick={() => googleLogout()}
               className=" text-lg text-red-600 font-medium"
             >
               Logout
