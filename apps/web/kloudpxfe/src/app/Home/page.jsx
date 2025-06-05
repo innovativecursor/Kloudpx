@@ -8,7 +8,7 @@ function Home() {
   return (
     <div className="homepage">
       <Hero />
-      <Products />
+      {/* <Products /> */}
       <HomeFloatingBtn />
     </div>
   );
