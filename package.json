@@ -10,7 +10,7 @@
     "dev": "concurrently \"npm run dev:admin\" \"npm run dev:frontend\" \"npm run dev:go\"",
     "dev:admin": "npm run dev --prefix apps/web/kloudpxadmin",
     "dev:frontend": "npm run dev --prefix apps/web/kloudpxfe",
-    "dev:go": "cd apps/api && air",
+    "dev:go": "cd apps/api && go run main.go",
     "build": "turbo run build"
   },
   "devDependencies": {
