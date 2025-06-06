@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // @vite-ignore
 import axios from "axios";
 // @vite-ignore

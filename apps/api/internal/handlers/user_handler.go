@@ -366,7 +366,7 @@ func CheckoutCart(c *gin.Context) {
 }
 
 // ConfirmCart handles user confirmation of reviewed cart
-/*func ConfirmCart(c *gin.Context) {
+func ConfirmCart(c *gin.Context) {
 	cartID := c.Param("cartID")
 	userID := c.MustGet("userID").(int)
 
@@ -504,7 +504,7 @@ func CheckoutCart(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "Cart reset to pending"})
 	}
 }
-*/
+//*/
 // GenerateInvoice generates a PDF invoice for a completed order
 func GenerateInvoice(c *gin.Context) {
 	orderID := c.Param("orderID")
