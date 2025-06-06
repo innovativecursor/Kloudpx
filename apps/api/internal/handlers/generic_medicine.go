@@ -3,7 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"net/http"
-
+	"strconv"
 	"github.com/hashmi846003/online-med.git/internal/models"
 	"github.com/gin-gonic/gin"
 )
@@ -100,7 +100,14 @@ func (h *GenericMedicineHandler) UpdateGenericMedicine(c *gin.Context) {
 		return
 	}
 
-	generic.ID, _ = c.Params.GetInt("id")
+	// Convert the ID from string to int
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+	generic.ID = idInt
+	
 	c.JSON(http.StatusOK, generic)
 }
 
