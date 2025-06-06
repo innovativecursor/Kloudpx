@@ -116,7 +116,7 @@ func AddMedicine(c *gin.Context) {
 	err := database.DB.QueryRow(
 		`INSERT INTO medicines (name, generic_name, prescription_required, stock, price) 
 		VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-		medicine.BrandName, medicine.GenericName, medicine.PrescriptionRequired, 
+		medicine.BrandName, medicine.ID, medicine.PrescriptionRequired, 
 		medicine.QuantityInPieces, medicine.SellingPrice,
 	).Scan(&medicine.ID)
 
@@ -151,7 +151,7 @@ func UpdateMedicine(c *gin.Context) {
 			stock = $4, 
 			price = $5 
 		WHERE id = $6`,
-		medicine.BrandName, medicine.GenericName, medicine.PrescriptionRequired, 
+		medicine.BrandName, medicine.GenericID, medicine.PrescriptionRequired, 
 		medicine.QuantityInPieces, medicine.SellingPrice, medicine.ID,
 	)
 
@@ -206,7 +206,7 @@ func ListMedicines(c *gin.Context) {
 	for rows.Next() {
 		var med models.Medicine
 		if err := rows.Scan(
-			&med.ID, &med.BrandName, &med.GenericName, &med.PrescriptionRequired, 
+			&med.ID, &med.BrandName, &med.GenericID, &med.PrescriptionRequired, 
 			&med.QuantityInPieces, &med.SellingPrice,
 		); err == nil {
 			medicines = append(medicines, med)
