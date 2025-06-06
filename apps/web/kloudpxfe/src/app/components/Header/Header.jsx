@@ -102,7 +102,7 @@ const Header = () => {
             {/* <div className='bg-red-400 overflow-x-auto w-[90%]'>
               <TopItems items={items} />
             </div> */}
-            <div className="w-full bg-red-400">
+            <div className="w-[90%] bg-red-400">
               <TopItems items={items} />
             </div>
 
