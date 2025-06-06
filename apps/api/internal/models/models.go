@@ -1,4 +1,3 @@
-
 package models
 
 import (
@@ -27,6 +26,57 @@ type Admin struct {
 	LastLogin     sql.NullTime   `json:"last_login,omitempty"`
 }
 
+type Supplier struct {
+	ID               int       `json:"id"`
+	AdminID          int       `json:"admin_id"`
+	SupplierName     string    `json:"supplier_name"`
+	Cost             float64   `json:"cost"`
+	DiscountProvided float64   `json:"discount_provided"`
+	QuantityInPiece  int       `json:"quantity_in_piece"`
+	QuantityInBox    int       `json:"quantity_in_box"`
+	CostPrice        float64   `json:"cost_price"`
+	Taxes            float64   `json:"taxes"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
+}
+
+type GenericMedicine struct {
+	ID          int       `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type Tax struct {
+	VAT float64 `json:"vat"`
+}
+
+type Medicine struct {
+	ID                   int       `json:"id"`
+	BrandName            string    `json:"name"`
+	GenericID            int       `json:"generic_id"`
+	Description          string    `json:"description"`
+	Category             string    `json:"category"`
+	QuantityInPieces     int       `json:"stock"`
+	Supplier             string    `json:"supplier"`
+	PurchasePrice        float64   `json:"purchase_price"`
+	SellingPrice         float64   `json:"price"`
+	TaxType              string    `json:"tax_type"`
+	Tax                  Tax       `json:"tax"`
+	MinimumThreshold     int       `json:"minimum_threshold"`
+	MaximumThreshold     int       `json:"maximum_threshold"`
+	EstimatedLeadTime    int       `json:"estimated_lead_time"`
+	PrescriptionRequired bool      `json:"prescription_required"`
+	CreatedAt            time.Time `json:"created_at"`
+	UpdatedAt            time.Time `json:"updated_at"`
+}
+
+type MedicineWithGeneric struct {
+	Medicine
+	Generic GenericMedicine `json:"generic"`
+}
+
 type Pharmacist struct {
 	ID            int            `json:"id"`
 	Name          string         `json:"name"`
@@ -35,26 +85,6 @@ type Pharmacist struct {
 	OAuthProvider string         `json:"-"`
 	CreatedAt     time.Time      `json:"created_at"`
 	LastLogin     sql.NullTime   `json:"last_login,omitempty"`
-}
-
-type Medicine struct {
-	ID                   int       `json:"id"`
-	BrandName            string    `json:"name"` // JSON tag alias
-	GenericName          string    `json:"generic_name"`
-	Description          string    `json:"description"`
-	Category             string    `json:"category"`
-	QuantityInPieces     int       `json:"stock"` // JSON tag alias
-	Supplier             string    `json:"supplier"`
-	PurchasePrice        float64   `json:"purchase_price"`
-	SellingPrice         float64   `json:"price"` // JSON tag alias
-	TaxType              string    `json:"tax_type"`
-	TaxRate              float64   `json:"tax_rate"`
-	MinimumThreshold     int       `json:"minimum_threshold"`
-	MaximumThreshold     int       `json:"maximum_threshold"`
-	EstimatedLeadTime    int       `json:"estimated_lead_time"`
-	PrescriptionRequired bool      `json:"prescription_required"`
-	CreatedAt            time.Time `json:"created_at"`
-	UpdatedAt            time.Time `json:"updated_at"`
 }
 
 type Cart struct {
@@ -90,6 +120,7 @@ type Order struct {
 	CartID     int       `json:"cart_id"`
 	TotalPrice float64   `json:"total_price"`
 	Status     string    `json:"status"`
+	Tax        Tax       `json:"tax"`
 	CreatedAt  time.Time `json:"created_at"`
 }
 
@@ -132,6 +163,7 @@ type OrderItem struct {
 	Price       float64 `json:"price"`
 	Status      string  `json:"status"`
 	ItemTotal   float64 `json:"item_total"`
+	Tax         Tax     `json:"tax"`
 }
 
 type OrderDetails struct {
@@ -147,6 +179,7 @@ type DirectOrder struct {
 	Quantity   int       `json:"quantity"`
 	TotalPrice float64   `json:"total_price"`
 	Status     string    `json:"status"`
+	Tax        Tax       `json:"tax"`
 	CreatedAt  time.Time `json:"created_at"`
 }
 
