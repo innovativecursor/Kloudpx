@@ -51,83 +51,106 @@ function Navigation(props) {
   return (
     <>
       <div>
-        {location.pathname !== "/" && (
-          <>
+        {location.pathname !== "/" && props.loggedIn ? (
+          <div className="">
             <Navbar />
             <SideDrawer />
-          </>
+          </div>
+        ) : (
+          ""
         )}
         <div>
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/reset/:token" element={<ResetPassword />} />
-            {/* <Route element={<PrivateRoute />}> */}
-            <Route>
-              <Route path="/home" element={<Home />} />
-              <Route path="/inquiries" element={<Inquiries />} />
-              <Route path="/createProjects" element={<CreateProjects />} />
-              <Route path="/addMedicine" element={<AddMedicine />} />
-              <Route path="/addOtcProduct" element={<AddOtcProduct />} />
-              <Route path="/orderHistory" element={<OrderHistory />} />
+            <Route element={<PrivateRoute />}>
+              <Route>
+                <Route path="/home" element={<Home />} />
+                <Route path="/inquiries" element={<Inquiries />} />
+                <Route path="/createProjects" element={<CreateProjects />} />
+                <Route path="/addMedicine" element={<AddMedicine />} />
+                <Route path="/addOtcProduct" element={<AddOtcProduct />} />
+                <Route path="/orderHistory" element={<OrderHistory />} />
 
-              <Route
-                path="/updateMedicines"
-                element={<ProductTable pageMode="Update" type="Medicines" />}
-              />
-              <Route path="/updateProjectsinner" element={<Updateprojects />} />
-              <Route
-                path="/deleteMedicines"
-                element={<ProductTable pageMode="Delete" type="Medicines" />}
-              />
-              <Route path="/deleteProjectsinner" element={<DeleteProjects />} />
+                <Route
+                  path="/updateMedicines"
+                  element={<ProductTable pageMode="Update" type="Medicines" />}
+                />
+                <Route
+                  path="/updateProjectsinner"
+                  element={<Updateprojects />}
+                />
+                <Route
+                  path="/deleteMedicines"
+                  element={<ProductTable pageMode="Delete" type="Medicines" />}
+                />
+                <Route
+                  path="/deleteProjectsinner"
+                  element={<DeleteProjects />}
+                />
 
-              <Route path="/about" element={<About />} />
-              <Route path="/createServices" element={<CreateService />} />
-              <Route
-                path="/updateOTC_Products"
-                element={<ProductTable pageMode="Update" type="OTC_Products" />}
-              />
-              <Route path="/updateServicesinner" element={<UpdateService />} />
-              <Route
-                path="/deleteOTC_Products"
-                element={<ProductTable pageMode="Delete" type="OTC_Products" />}
-              />
-              <Route path="/deleteServicesinner" element={<DeleteService />} />
-              <Route path="/achievements" element={<Achievements />} />
-              <Route
-                path="/createTestimonial"
-                element={<CreateTestimonials />}
-              />
-              <Route
-                path="/updateTestimonial"
-                element={<ProductTable pageMode="Update" type="Testimonials" />}
-              />
-              <Route
-                path="/updateTestimonialinner"
-                element={<UpdateTestimonial />}
-              />
-              <Route
-                path="/deleteTestimonial"
-                element={<ProductTable pageMode="Delete" type="Testimonials" />}
-              />
-              <Route
-                path="/deleteTestimonialinner"
-                element={<DeleteTestimonials />}
-              />
-              <Route path="/createStaff" element={<AddStaff />} />
-              <Route
-                path="/updateStaff"
-                element={<ProductTable pageMode="Update" type="Staff" />}
-              />
-              <Route path="/updateStaffinner" element={<UpdateStaff />} />
-              <Route
-                path="/deleteStaff"
-                element={<ProductTable pageMode="Delete" type="Staff" />}
-              />
-              <Route path="/deleteStaffinner" element={<DeleteStaff />} />
-              {props?.userDetails?.role_id > 4 && (
-                <Route path="/createUsers" element={<CreateUsers />} />
-              )}
+                <Route path="/about" element={<About />} />
+                <Route path="/createServices" element={<CreateService />} />
+                <Route
+                  path="/updateOTC_Products"
+                  element={
+                    <ProductTable pageMode="Update" type="OTC_Products" />
+                  }
+                />
+                <Route
+                  path="/updateServicesinner"
+                  element={<UpdateService />}
+                />
+                <Route
+                  path="/deleteOTC_Products"
+                  element={
+                    <ProductTable pageMode="Delete" type="OTC_Products" />
+                  }
+                />
+                <Route
+                  path="/deleteServicesinner"
+                  element={<DeleteService />}
+                />
+                <Route path="/achievements" element={<Achievements />} />
+                <Route
+                  path="/createTestimonial"
+                  element={<CreateTestimonials />}
+                />
+                <Route
+                  path="/updateTestimonial"
+                  element={
+                    <ProductTable pageMode="Update" type="Testimonials" />
+                  }
+                />
+                <Route
+                  path="/updateTestimonialinner"
+                  element={<UpdateTestimonial />}
+                />
+                <Route
+                  path="/deleteTestimonial"
+                  element={
+                    <ProductTable pageMode="Delete" type="Testimonials" />
+                  }
+                />
+                <Route
+                  path="/deleteTestimonialinner"
+                  element={<DeleteTestimonials />}
+                />
+                <Route path="/createStaff" element={<AddStaff />} />
+                <Route
+                  path="/updateStaff"
+                  element={<ProductTable pageMode="Update" type="Staff" />}
+                />
+                <Route path="/updateStaffinner" element={<UpdateStaff />} />
+                <Route
+                  path="/deleteStaff"
+                  element={<ProductTable pageMode="Delete" type="Staff" />}
+                />
+                <Route path="/deleteStaffinner" element={<DeleteStaff />} />
+                {props?.userDetails?.role_id > 4 && (
+                  <Route path="/createUsers" element={<CreateUsers />} />
+                )}
+              </Route>
             </Route>
             <Route path="*" element={<Robots />} />
           </Routes>
