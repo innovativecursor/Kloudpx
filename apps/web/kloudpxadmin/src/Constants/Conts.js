@@ -10,4 +10,9 @@ export const Menu = {
     { text: "Delete OTC Products", link: "/deleteOTC_Products" },
   ],
   Invoices: [{ text: "Order History", link: "/orderHistory" }],
+  Supplier_Management: [
+    { text: "Add Supplier", link: "" },
+    { text: "Update Supplier", link: "" },
+    { text: "Delete Supplier", link: "" },
+  ],
 };

@@ -53,13 +53,20 @@ function Navbar() {
           </div>
 
           {/* Right Side */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden md:flex items-center space-x-3">
+            <button
+              onClick={() => googleLogout()}
+              className=" text-lg text-red-600 font-medium"
+            >
+              <i className="ri-logout-box-r-line font-semibold text-xl"></i>
+            </button>
             <div className="relative">
               <i className="ri-notification-3-line text-2xl text-gray-600"></i>
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
                 2
               </span>
             </div>
+
             <div className="w-10 h-10">
               <img
                 src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid&w=740"
@@ -67,6 +74,7 @@ function Navbar() {
                 className="w-full h-full rounded-full object-cover"
               />
             </div>
+
           </div>
         </div>
 
@@ -74,13 +82,13 @@ function Navbar() {
         {isMobileMenuOpen && (
           <div className="md:hidden mt-3 space-y-2 text-center">
             <NavLink to="/home" className="block text-lg text-gray-700">
-              Home
+          <i className="ri-home-4-line"></i>
             </NavLink>
             <button
               onClick={() => googleLogout()}
               className=" text-lg text-red-600 font-medium"
             >
-              Logout
+              <i className="ri-logout-box-r-line"></i>
             </button>
           </div>
         )}
