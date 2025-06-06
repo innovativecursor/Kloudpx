@@ -3,7 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"net/http"
-
+	"strconv"
 	"github.com/gin-gonic/gin"
 	"github.com/hashmi846003/online-med.git/internal/models"
 )
@@ -131,7 +131,68 @@ func (h *SupplierHandler) GetSupplier(c *gin.Context) {
 
 	c.JSON(http.StatusOK, supplier)
 }
+// UpdateSupplier updates a supplier
+func (h *SupplierHandler) UpdateSupplier(c *gin.Context) {
+	id := c.Param("id")
 
+	var supplier models.Supplier
+	if err := c.ShouldBindJSON(&supplier); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Get admin ID from context (set by auth middleware)
+	adminID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	query := `UPDATE suppliers SET 
+		supplier_name = $1, 
+		cost = $2, 
+		discount_provided = $3, 
+		quantity_in_piece = $4, 
+		quantity_in_box = $5, 
+		cost_price = $6, 
+		taxes = $7, 
+		updated_at = CURRENT_TIMESTAMP 
+		WHERE id = $8 AND admin_id = $9
+		RETURNING updated_at`
+
+	err := h.DB.QueryRow(
+		query,
+		supplier.SupplierName,
+		supplier.Cost,
+		supplier.DiscountProvided,
+		supplier.QuantityInPiece,
+		supplier.QuantityInBox,
+		supplier.CostPrice,
+		supplier.Taxes,
+		id,
+		adminID,
+	).Scan(&supplier.UpdatedAt)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Supplier not found or you don't have permission to update it"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Convert the ID from string to int
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+	supplier.ID = idInt
+	supplier.AdminID = adminID.(int)
+	c.JSON(http.StatusOK, supplier)
+}
+/*
 // UpdateSupplier updates a supplier
 func (h *SupplierHandler) UpdateSupplier(c *gin.Context) {
 	id := c.Param("id")
@@ -187,7 +248,7 @@ func (h *SupplierHandler) UpdateSupplier(c *gin.Context) {
 	supplier.AdminID = adminID.(int)
 	c.JSON(http.StatusOK, supplier)
 }
-
+*/
 // DeleteSupplier deletes a supplier
 func (h *SupplierHandler) DeleteSupplier(c *gin.Context) {
 	id := c.Param("id")
