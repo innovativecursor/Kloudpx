@@ -813,7 +813,7 @@ func GetOrderDetails(c *gin.Context) {
 }
 
 // SearchMedicines allows users to search for medicines
-func SearchMedicines(c *gin.Context) {
+/*func SearchMedicines(c *gin.Context) {
 	query := strings.ToLower(c.Query("q"))
 	if query == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Search query required"})
@@ -851,9 +851,59 @@ func SearchMedicines(c *gin.Context) {
 
 	c.JSON(http.StatusOK, medicines)
 }
+*/func SearchMedicines(c *gin.Context) {
+    query := strings.ToLower(c.Query("q"))
+    if query == "" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Search query required"})
+        return
+    }
 
+    rows, err := database.DB.Query(
+        `SELECT m.id, m.name, m.generic_id, g.name as generic_name, 
+         m.prescription_required, m.stock, m.price 
+        FROM medicines m
+        LEFT JOIN generic_medicines g ON m.generic_id = g.id
+        WHERE LOWER(m.name) LIKE '%' || $1 || '%' 
+        OR LOWER(g.name) LIKE '%' || $1 || '%'`,
+        query,
+    )
+
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not search medicines"})
+        return
+    }
+    defer rows.Close()
+
+    type MedicineResponse struct {
+        ID                   int     `json:"id"`
+        Name                 string  `json:"name"`
+        GenericID            int     `json:"generic_id"`
+        GenericName          string  `json:"generic_name"`
+        PrescriptionRequired bool    `json:"prescription_required"`
+        Stock                int     `json:"stock"`
+        Price                float64 `json:"price"`
+    }
+
+    var medicines []MedicineResponse
+    for rows.Next() {
+        var med MedicineResponse
+        if err := rows.Scan(
+            &med.ID,
+            &med.Name,
+            &med.GenericID,
+            &med.GenericName,
+            &med.PrescriptionRequired,
+            &med.Stock,
+            &med.Price,
+        ); err == nil {
+            medicines = append(medicines, med)
+        }
+    }
+
+    c.JSON(http.StatusOK, medicines)
+}
 // GetMedicineDetails retrieves details for a specific medicine
-func GetMedicineDetails(c *gin.Context) {
+/*func GetMedicineDetails(c *gin.Context) {
 	medicineID := c.Param("id")
 	id, err := strconv.Atoi(medicineID)
 	if err != nil {
@@ -919,7 +969,86 @@ func GetMedicineDetails(c *gin.Context) {
 		"alternatives": altMedicines,
 	})
 }
+*/
+func GetMedicineDetails(c *gin.Context) {
+    medicineID := c.Param("id")
+    id, err := strconv.Atoi(medicineID)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid medicine ID"})
+        return
+    }
 
+    type MedicineResponse struct {
+        ID                   int     `json:"id"`
+        Name                 string  `json:"name"`
+        GenericID            int     `json:"generic_id"`
+        GenericName          string  `json:"generic_name"`
+        PrescriptionRequired bool    `json:"prescription_required"`
+        Stock                int     `json:"stock"`
+        Price                float64 `json:"price"`
+    }
+    
+    var medicine MedicineResponse
+    err = database.DB.QueryRow(
+        `SELECT m.id, m.name, m.generic_id, g.name as generic_name, 
+         m.prescription_required, m.stock, m.price 
+        FROM medicines m
+        LEFT JOIN generic_medicines g ON m.generic_id = g.id
+        WHERE m.id = $1`,
+        id,
+    ).Scan(
+        &medicine.ID,
+        &medicine.Name,
+        &medicine.GenericID,
+        &medicine.GenericName,
+        &medicine.PrescriptionRequired,
+        &medicine.Stock,
+        &medicine.Price,
+    )
+
+    if err != nil {
+        if errors.Is(err, sql.ErrNoRows) {
+            c.JSON(http.StatusNotFound, gin.H{"error": "Medicine not found"})
+            return
+        }
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+        return
+    }
+
+    // Get alternatives with same generic ID
+    alternatives, err := database.DB.Query(
+        `SELECT m.id, m.name, m.stock, m.price 
+        FROM medicines m
+        WHERE m.generic_id = $1 AND m.id != $2`,
+        medicine.GenericID, medicine.ID,
+    )
+
+    if err != nil {
+        c.JSON(http.StatusOK, gin.H{"medicine": medicine})
+        return
+    }
+    defer alternatives.Close()
+
+    type Alternative struct {
+        ID    int     `json:"id"`
+        Name  string  `json:"name"`
+        Stock int     `json:"stock"`
+        Price float64 `json:"price"`
+    }
+
+    var altMedicines []Alternative
+    for alternatives.Next() {
+        var alt Alternative
+        if err := alternatives.Scan(&alt.ID, &alt.Name, &alt.Stock, &alt.Price); err == nil {
+            altMedicines = append(altMedicines, alt)
+        }
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "medicine":    medicine,
+        "alternatives": altMedicines,
+    })
+}
 // UpdateProfile updates user information
 func UpdateProfile(c *gin.Context) {
 	userID := c.MustGet("userID").(int)
