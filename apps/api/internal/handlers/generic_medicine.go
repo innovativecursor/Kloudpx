@@ -4,8 +4,9 @@ import (
 	"database/sql"
 	"net/http"
 	"strconv"
-	"github.com/hashmi846003/online-med.git/internal/models"
+
 	"github.com/gin-gonic/gin"
+	"github.com/innovativecursor/Kloudpx/internal/models"
 )
 
 // GenericMedicineHandler struct to hold db connection
@@ -107,7 +108,7 @@ func (h *GenericMedicineHandler) UpdateGenericMedicine(c *gin.Context) {
 		return
 	}
 	generic.ID = idInt
-	
+
 	c.JSON(http.StatusOK, generic)
 }
 

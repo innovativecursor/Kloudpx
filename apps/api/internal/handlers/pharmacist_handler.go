@@ -6,12 +6,13 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
 	//"time"
 
-	"github.com/hashmi846003/online-med.git/internal/auth"
-	"github.com/hashmi846003/online-med.git/internal/database"
-	"github.com/hashmi846003/online-med.git/internal/models"
 	"github.com/gin-gonic/gin"
+	"github.com/innovativecursor/Kloudpx/internal/auth"
+	"github.com/innovativecursor/Kloudpx/internal/database"
+	"github.com/innovativecursor/Kloudpx/internal/models"
 )
 
 // PharmacistOAuthLogin handles pharmacist OAuth login
@@ -62,7 +63,7 @@ func PharmacistOAuthLogin(c *gin.Context) {
 
 func isPharmacistEmail(email string) bool {
 	pharmacistDomains := []string{"pharmacy.yourdomain.com", "yourpharmacist.com"}
-	
+
 	parts := strings.Split(email, "@")
 	if len(parts) != 2 {
 		return false
@@ -79,7 +80,7 @@ func isPharmacistEmail(email string) bool {
 
 func findOrCreatePharmacist(info *auth.UserInfo) (*models.Pharmacist, error) {
 	var pharmacist models.Pharmacist
-	
+
 	err := database.DB.QueryRow(
 		"SELECT id, name, email FROM pharmacists WHERE oauth_id = $1",
 		info.ID,
@@ -182,9 +183,9 @@ func GetCartDetails(c *gin.Context) {
 		var item models.CartItemDetail
 		err := rows.Scan(
 			&item.ID,
-		//	&item.OriginalMedicineID,
-		//	&item.OriginalMedicineName,
-		//	&item.OriginalGenericName,
+			//	&item.OriginalMedicineID,
+			//	&item.OriginalMedicineName,
+			//	&item.OriginalGenericName,
 			&item.MedicineID,
 			&item.MedicineName,
 			&item.GenericName,
@@ -200,8 +201,8 @@ func GetCartDetails(c *gin.Context) {
 	}
 
 	response := struct {
-		Cart   models.Cart      `json:"cart"`
-		Items  []models.CartItemDetail `json:"items"`
+		Cart  models.Cart             `json:"cart"`
+		Items []models.CartItemDetail `json:"items"`
 	}{
 		Cart:  cart,
 		Items: items,
@@ -217,7 +218,7 @@ func ReviewCart(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid cart ID"})
 		return
 	}
-	
+
 	var reviewData struct {
 		Replacements map[int]int `json:"replacements"` // [itemID]newMedicineID
 	}

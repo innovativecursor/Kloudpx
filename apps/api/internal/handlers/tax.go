@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hashmi846003/online-med.git/internal/models"
+	"github.com/innovativecursor/Kloudpx/internal/models"
 )
 
 // TaxHandler struct to hold db connection

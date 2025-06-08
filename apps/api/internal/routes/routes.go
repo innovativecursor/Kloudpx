@@ -1,11 +1,10 @@
-
 package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/hashmi846003/online-med.git/internal/auth"
-	"github.com/hashmi846003/online-med.git/internal/database"
-	"github.com/hashmi846003/online-med.git/internal/handlers"
+	"github.com/innovativecursor/Kloudpx/internal/auth"
+	"github.com/innovativecursor/Kloudpx/internal/database"
+	"github.com/innovativecursor/Kloudpx/internal/handlers"
 )
 
 func SetupRoutes(r *gin.Engine) {
@@ -95,12 +94,13 @@ func SetupRoutes(r *gin.Engine) {
 		admin.GET("/medicines/low-stock", handlers.GetLowStockMedicines)
 	}
 }
+
 /*package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/hashmi846003/online-med.git/internal/auth"
-	"github.com/hashmi846003/online-med.git/internal/handlers"
+	"github.com/innovativecursor/Kloudpx/internal/auth"
+	"github.com/innovativecursor/Kloudpx/internal/handlers"
 )
 
 func SetupRoutes(r *gin.Engine) {

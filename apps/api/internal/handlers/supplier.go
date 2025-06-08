@@ -4,8 +4,9 @@ import (
 	"database/sql"
 	"net/http"
 	"strconv"
+
 	"github.com/gin-gonic/gin"
-	"github.com/hashmi846003/online-med.git/internal/models"
+	"github.com/innovativecursor/Kloudpx/internal/models"
 )
 
 // SupplierHandler struct to hold db connection
@@ -131,6 +132,7 @@ func (h *SupplierHandler) GetSupplier(c *gin.Context) {
 
 	c.JSON(http.StatusOK, supplier)
 }
+
 // UpdateSupplier updates a supplier
 func (h *SupplierHandler) UpdateSupplier(c *gin.Context) {
 	id := c.Param("id")
@@ -192,6 +194,7 @@ func (h *SupplierHandler) UpdateSupplier(c *gin.Context) {
 	supplier.AdminID = adminID.(int)
 	c.JSON(http.StatusOK, supplier)
 }
+
 /*
 // UpdateSupplier updates a supplier
 func (h *SupplierHandler) UpdateSupplier(c *gin.Context) {
@@ -210,15 +213,15 @@ func (h *SupplierHandler) UpdateSupplier(c *gin.Context) {
 		return
 	}
 
-	query := `UPDATE suppliers SET 
-		supplier_name = $1, 
-		cost = $2, 
-		discount_provided = $3, 
-		quantity_in_piece = $4, 
-		quantity_in_box = $5, 
-		cost_price = $6, 
-		taxes = $7, 
-		updated_at = CURRENT_TIMESTAMP 
+	query := `UPDATE suppliers SET
+		supplier_name = $1,
+		cost = $2,
+		discount_provided = $3,
+		quantity_in_piece = $4,
+		quantity_in_box = $5,
+		cost_price = $6,
+		taxes = $7,
+		updated_at = CURRENT_TIMESTAMP
 		WHERE id = $8 AND admin_id = $9
 		RETURNING updated_at`
 

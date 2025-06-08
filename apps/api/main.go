@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/hashmi846003/online-med.git/internal/database"
-	"github.com/hashmi846003/online-med.git/internal/routes"
+	"github.com/innovativecursor/Kloudpx/internal/database"
+	"github.com/innovativecursor/Kloudpx/internal/routes"
 	"github.com/joho/godotenv"
 )
 
@@ -52,8 +52,8 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/hashmi846003/online-med.git/internal/database"
-	"github.com/hashmi846003/online-med.git/internal/routes"
+	"github.com/innovativecursor/Kloudpx/internal/database"
+	"github.com/innovativecursor/Kloudpx/internal/routes"
 	"github.com/joho/godotenv"
 )
 
