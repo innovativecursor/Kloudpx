@@ -1,11 +1,11 @@
-
 package handlers
 
 import (
 	"database/sql"
 	"net/http"
-	"github.com/hashmi846003/online-med.git/internal/database"
-	"github.com/hashmi846003/online-med.git/internal/models"
+
+	"github.com/innovativecursor/Kloudpx/internal/database"
+	"github.com/innovativecursor/Kloudpx/internal/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -76,8 +76,8 @@ func GetCart(c *gin.Context) {
 	}
 
 	response := struct {
-		CartID int               `json:"cart_id"`
-		Status string            `json:"status"`
+		CartID int                `json:"cart_id"`
+		Status string             `json:"status"`
 		Items  []CartItemResponse `json:"items"`
 	}{
 		CartID: cart.ID,

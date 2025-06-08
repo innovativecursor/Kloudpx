@@ -1,4 +1,3 @@
-
 package database
 
 import (
@@ -52,27 +51,64 @@ func createTables() {
 
 		`CREATE TABLE IF NOT EXISTS admins (
 			id SERIAL PRIMARY KEY,
-			username VARCHAR(50) UNIQUE NOT NULL,
-			password TEXT NOT NULL,
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+			name VARCHAR(100) NOT NULL,
+			email VARCHAR(100) UNIQUE NOT NULL,
+			oauth_id VARCHAR(255),
+			oauth_provider VARCHAR(50),
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			last_login TIMESTAMP
 		)`,
 
-		`CREATE TABLE IF NOT EXISTS pharmacists (
+		`CREATE TABLE IF NOT EXISTS suppliers (
 			id SERIAL PRIMARY KEY,
-			username VARCHAR(50) UNIQUE NOT NULL,
-			password TEXT NOT NULL,
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+			admin_id INT NOT NULL REFERENCES admins(id),
+			supplier_name VARCHAR(100) NOT NULL,
+			cost DECIMAL(10,2),
+			discount_provided DECIMAL(10,2),
+			quantity_in_piece INT,
+			quantity_in_box INT,
+			cost_price DECIMAL(10,2),
+			taxes DECIMAL(10,2),
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		)`,
+
+		`CREATE TABLE IF NOT EXISTS generic_medicines (
+			id SERIAL PRIMARY KEY,
+			name VARCHAR(100) NOT NULL,
+			description TEXT,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		)`,
 
 		`CREATE TABLE IF NOT EXISTS medicines (
 			id SERIAL PRIMARY KEY,
-			name VARCHAR(100) NOT NULL,
-			generic_name VARCHAR(100) NOT NULL,
+			brand_name VARCHAR(100) NOT NULL,
+			generic_id INT NOT NULL REFERENCES generic_medicines(id),
+			description TEXT,
+			category VARCHAR(100),
+			quantity_in_pieces INT,
+			supplier VARCHAR(100),
+			purchase_price DECIMAL(10,2),
+			selling_price DECIMAL(10,2),
+			tax_type VARCHAR(50),
+			vat DECIMAL(10,2),
+			minimum_threshold INT,
+			maximum_threshold INT,
+			estimated_lead_time INT,
 			prescription_required BOOLEAN NOT NULL,
-			stock INT NOT NULL,
-			price DECIMAL(10,2) NOT NULL,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		)`,
+
+		`CREATE TABLE IF NOT EXISTS pharmacists (
+			id SERIAL PRIMARY KEY,
+			name VARCHAR(100) NOT NULL,
+			email VARCHAR(100) UNIQUE NOT NULL,
+			oauth_id VARCHAR(255),
+			oauth_provider VARCHAR(50),
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			last_login TIMESTAMP
 		)`,
 
 		`CREATE TABLE IF NOT EXISTS carts (
@@ -108,6 +144,7 @@ func createTables() {
 			cart_id INT NOT NULL REFERENCES carts(id),
 			total_price DECIMAL(10,2) NOT NULL,
 			status VARCHAR(20) NOT NULL DEFAULT 'completed',
+			vat DECIMAL(10,2),
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		)`,
 

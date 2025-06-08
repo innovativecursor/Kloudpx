@@ -7,13 +7,15 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
 	//"os"
-	"github.com/hashmi846003/online-med.git/internal/auth"
-	"github.com/hashmi846003/online-med.git/internal/database"
-	"github.com/hashmi846003/online-med.git/internal/models"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/innovativecursor/Kloudpx/internal/auth"
+	"github.com/innovativecursor/Kloudpx/internal/database"
+	"github.com/innovativecursor/Kloudpx/internal/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jung-kurt/gofpdf"
@@ -30,10 +32,10 @@ func UserProfile(c *gin.Context) {
 		WHERE id = $1`,
 		userID,
 	).Scan(
-		&user.ID, 
-		&user.Username, 
-		&user.Email, 
-		&user.CreatedAt, 
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.CreatedAt,
 		&user.LastLogin,
 	)
 
@@ -52,7 +54,7 @@ func UserProfile(c *gin.Context) {
 // CreateCart creates a new cart for the user
 func CreateCart(c *gin.Context) {
 	userID := c.MustGet("userID").(int)
-	
+
 	var cart models.Cart
 	err := database.DB.QueryRow(
 		"INSERT INTO carts (user_id) VALUES ($1) RETURNING id",
@@ -78,7 +80,7 @@ func AddToCart(c *gin.Context) {
 		"SELECT user_id FROM carts WHERE id = $1",
 		cartID,
 	).Scan(&cartUserID)
-	
+
 	if err != nil || cartUserID != userID {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Cart not found or access denied"})
 		return
@@ -211,7 +213,7 @@ func CheckoutCart(c *gin.Context) {
 		"SELECT user_id FROM carts WHERE id = $1",
 		cartID,
 	).Scan(&cartUserID)
-	
+
 	if err != nil || cartUserID != userID {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Cart not found or access denied"})
 		return
@@ -245,9 +247,9 @@ func CheckoutCart(c *gin.Context) {
 
 	if len(missingItems) > 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error":          "Prescriptions missing for some items",
-			"missing_items":  missingItems,
-			"message":        "Please upload prescriptions for all required medicines",
+			"error":         "Prescriptions missing for some items",
+			"missing_items": missingItems,
+			"message":       "Please upload prescriptions for all required medicines",
 		})
 		return
 	}
@@ -289,9 +291,9 @@ func CheckoutCart(c *gin.Context) {
 
 	// Get cart items
 	rows, err := database.DB.Query(
-		`SELECT 
-			ci.id, 
-			ci.medicine_id, 
+		`SELECT
+			ci.id,
+			ci.medicine_id,
 			m.name,
 			m.generic_name,
 			m.prescription_required,
@@ -414,8 +416,8 @@ func ConfirmCart(c *gin.Context) {
 
 		// Update inventory
 		rows, err := tx.Query(
-			`SELECT medicine_id, quantity 
-			FROM cart_items 
+			`SELECT medicine_id, quantity
+			FROM cart_items
 			WHERE cart_id = $1`,
 			cartID,
 		)
@@ -433,8 +435,8 @@ func ConfirmCart(c *gin.Context) {
 			}
 
 			_, err = tx.Exec(
-				`UPDATE medicines 
-				SET stock = stock - $1 
+				`UPDATE medicines
+				SET stock = stock - $1
 				WHERE id = $2 AND stock >= $1`,
 				quantity, medicineID,
 			)
@@ -462,7 +464,7 @@ func ConfirmCart(c *gin.Context) {
 		}
 
 		_, err = tx.Exec(
-			`INSERT INTO orders (user_id, cart_id, total_price) 
+			`INSERT INTO orders (user_id, cart_id, total_price)
 			VALUES ($1, $2, $3)`,
 			userID, cartID, total,
 		)
@@ -484,8 +486,8 @@ func ConfirmCart(c *gin.Context) {
 		// Reset cart to pending and revert changes
 		_, err = tx.Exec(
 			`UPDATE carts SET status = 'pending' WHERE id = $1;
-			UPDATE cart_items 
-			SET medicine_id = original_medicine_id, status = 'pending' 
+			UPDATE cart_items
+			SET medicine_id = original_medicine_id, status = 'pending'
 			WHERE cart_id = $1 AND status = 'replaced'`,
 			cartID,
 		)
@@ -519,7 +521,7 @@ func GenerateInvoice(c *gin.Context) {
 		Username  string
 		Email     sql.NullString
 	}
-	
+
 	err := database.DB.QueryRow(
 		`SELECT o.id, o.user_id, o.total_price, o.created_at,
 		 u.username, u.email
@@ -528,11 +530,11 @@ func GenerateInvoice(c *gin.Context) {
 		WHERE o.id = $1`,
 		orderID,
 	).Scan(
-		&order.ID, 
-		&order.UserID, 
-		&order.Total, 
+		&order.ID,
+		&order.UserID,
+		&order.Total,
 		&order.CreatedAt,
-		&order.Username, 
+		&order.Username,
 		&order.Email,
 	)
 
@@ -589,51 +591,51 @@ func GenerateInvoice(c *gin.Context) {
 	// Generate PDF invoice
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
-	
+
 	// Pharmacy Information
 	pdf.SetFont("Arial", "B", 16)
 	pdf.Cell(0, 10, "Pharmacy App")
 	pdf.Ln(12)
-	
+
 	pdf.SetFont("Arial", "", 12)
 	pdf.Cell(0, 10, "123 Health Street, MedCity")
 	pdf.Ln(5)
 	pdf.Cell(0, 10, "Phone: (123) 456-7890 | Email: contact@pharmacyapp.com")
 	pdf.Ln(15)
-	
+
 	// Invoice Title
 	pdf.SetFont("Arial", "B", 20)
 	pdf.Cell(0, 10, "INVOICE")
 	pdf.Ln(15)
-	
+
 	// Order Information
 	pdf.SetFont("Arial", "", 12)
 	pdf.Cell(40, 10, "Invoice Number:")
 	pdf.Cell(0, 10, fmt.Sprintf("INV-%d", order.ID))
 	pdf.Ln(8)
-	
+
 	pdf.Cell(40, 10, "Invoice Date:")
 	pdf.Cell(0, 10, order.CreatedAt.Format("January 2, 2006"))
 	pdf.Ln(15)
-	
+
 	// Customer Information
 	pdf.SetFont("Arial", "B", 14)
 	pdf.Cell(0, 10, "Bill To:")
 	pdf.Ln(8)
-	
+
 	pdf.SetFont("Arial", "", 12)
 	pdf.Cell(40, 10, "Customer:")
 	pdf.Cell(0, 10, order.Username)
 	pdf.Ln(8)
-	
+
 	if order.Email.Valid {
 		pdf.Cell(40, 10, "Email:")
 		pdf.Cell(0, 10, order.Email.String)
 		pdf.Ln(8)
 	}
-	
+
 	pdf.Ln(10)
-	
+
 	// Items Table
 	pdf.SetFont("Arial", "B", 12)
 	pdf.CellFormat(100, 10, "Item", "1", 0, "", false, 0, "")
@@ -641,7 +643,7 @@ func GenerateInvoice(c *gin.Context) {
 	pdf.CellFormat(20, 10, "Qty", "1", 0, "C", false, 0, "")
 	pdf.CellFormat(20, 10, "Price", "1", 0, "R", false, 0, "")
 	pdf.CellFormat(20, 10, "Total", "1", 1, "R", false, 0, "")
-	
+
 	pdf.SetFont("Arial", "", 12)
 	for _, item := range items {
 		itemTotal := float64(item.Quantity) * item.Price
@@ -651,12 +653,12 @@ func GenerateInvoice(c *gin.Context) {
 		pdf.CellFormat(20, 10, fmt.Sprintf("$%.2f", item.Price), "1", 0, "R", false, 0, "")
 		pdf.CellFormat(20, 10, fmt.Sprintf("$%.2f", itemTotal), "1", 1, "R", false, 0, "")
 	}
-	
+
 	// Total
 	pdf.SetFont("Arial", "B", 12)
 	pdf.CellFormat(170, 10, "Grand Total:", "1", 0, "R", false, 0, "")
 	pdf.CellFormat(20, 10, fmt.Sprintf("$%.2f", order.Total), "1", 1, "R", false, 0, "")
-	
+
 	// Footer
 	pdf.Ln(15)
 	pdf.SetFont("Arial", "I", 10)
@@ -784,7 +786,7 @@ func GetOrderDetails(c *gin.Context) {
 		ID        int       `json:"id"`
 		CreatedAt time.Time `json:"created_at"`
 	}
-	
+
 	err = database.DB.QueryRow(
 		`SELECT id, created_at 
 		FROM orders 
@@ -813,7 +815,7 @@ func GetOrderDetails(c *gin.Context) {
 }
 
 // SearchMedicines allows users to search for medicines
-func SearchMedicines(c *gin.Context) {
+/*func SearchMedicines(c *gin.Context) {
 	query := strings.ToLower(c.Query("q"))
 	if query == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Search query required"})
@@ -821,9 +823,9 @@ func SearchMedicines(c *gin.Context) {
 	}
 
 	rows, err := database.DB.Query(
-		`SELECT id, name, generic_name, prescription_required, stock, price 
-		FROM medicines 
-		WHERE LOWER(name) LIKE '%' || $1 || '%' 
+		`SELECT id, name, generic_name, prescription_required, stock, price
+		FROM medicines
+		WHERE LOWER(name) LIKE '%' || $1 || '%'
 		OR LOWER(generic_name) LIKE '%' || $1 || '%'`,
 		query,
 	)
@@ -851,9 +853,60 @@ func SearchMedicines(c *gin.Context) {
 
 	c.JSON(http.StatusOK, medicines)
 }
+*/func SearchMedicines(c *gin.Context) {
+	query := strings.ToLower(c.Query("q"))
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Search query required"})
+		return
+	}
+
+	rows, err := database.DB.Query(
+		`SELECT m.id, m.name, m.generic_id, g.name as generic_name, 
+         m.prescription_required, m.stock, m.price 
+        FROM medicines m
+        LEFT JOIN generic_medicines g ON m.generic_id = g.id
+        WHERE LOWER(m.name) LIKE '%' || $1 || '%' 
+        OR LOWER(g.name) LIKE '%' || $1 || '%'`,
+		query,
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not search medicines"})
+		return
+	}
+	defer rows.Close()
+
+	type MedicineResponse struct {
+		ID                   int     `json:"id"`
+		Name                 string  `json:"name"`
+		GenericID            int     `json:"generic_id"`
+		GenericName          string  `json:"generic_name"`
+		PrescriptionRequired bool    `json:"prescription_required"`
+		Stock                int     `json:"stock"`
+		Price                float64 `json:"price"`
+	}
+
+	var medicines []MedicineResponse
+	for rows.Next() {
+		var med MedicineResponse
+		if err := rows.Scan(
+			&med.ID,
+			&med.Name,
+			&med.GenericID,
+			&med.GenericName,
+			&med.PrescriptionRequired,
+			&med.Stock,
+			&med.Price,
+		); err == nil {
+			medicines = append(medicines, med)
+		}
+	}
+
+	c.JSON(http.StatusOK, medicines)
+}
 
 // GetMedicineDetails retrieves details for a specific medicine
-func GetMedicineDetails(c *gin.Context) {
+/*func GetMedicineDetails(c *gin.Context) {
 	medicineID := c.Param("id")
 	id, err := strconv.Atoi(medicineID)
 	if err != nil {
@@ -863,8 +916,8 @@ func GetMedicineDetails(c *gin.Context) {
 
 	var medicine models.Medicine
 	err = database.DB.QueryRow(
-		`SELECT id, name, generic_name, prescription_required, stock, price 
-		FROM medicines 
+		`SELECT id, name, generic_name, prescription_required, stock, price
+		FROM medicines
 		WHERE id = $1`,
 		id,
 	).Scan(
@@ -887,8 +940,8 @@ func GetMedicineDetails(c *gin.Context) {
 
 	// Get alternatives with same generic name
 	alternatives, err := database.DB.Query(
-		`SELECT id, name, stock, price 
-		FROM medicines 
+		`SELECT id, name, stock, price
+		FROM medicines
 		WHERE generic_name = $1 AND id != $2`,
 		medicine.GenericName, medicine.ID,
 	)
@@ -916,6 +969,86 @@ func GetMedicineDetails(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"medicine":    medicine,
+		"alternatives": altMedicines,
+	})
+}
+*/
+func GetMedicineDetails(c *gin.Context) {
+	medicineID := c.Param("id")
+	id, err := strconv.Atoi(medicineID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid medicine ID"})
+		return
+	}
+
+	type MedicineResponse struct {
+		ID                   int     `json:"id"`
+		Name                 string  `json:"name"`
+		GenericID            int     `json:"generic_id"`
+		GenericName          string  `json:"generic_name"`
+		PrescriptionRequired bool    `json:"prescription_required"`
+		Stock                int     `json:"stock"`
+		Price                float64 `json:"price"`
+	}
+
+	var medicine MedicineResponse
+	err = database.DB.QueryRow(
+		`SELECT m.id, m.name, m.generic_id, g.name as generic_name, 
+         m.prescription_required, m.stock, m.price 
+        FROM medicines m
+        LEFT JOIN generic_medicines g ON m.generic_id = g.id
+        WHERE m.id = $1`,
+		id,
+	).Scan(
+		&medicine.ID,
+		&medicine.Name,
+		&medicine.GenericID,
+		&medicine.GenericName,
+		&medicine.PrescriptionRequired,
+		&medicine.Stock,
+		&medicine.Price,
+	)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Medicine not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		return
+	}
+
+	// Get alternatives with same generic ID
+	alternatives, err := database.DB.Query(
+		`SELECT m.id, m.name, m.stock, m.price 
+        FROM medicines m
+        WHERE m.generic_id = $1 AND m.id != $2`,
+		medicine.GenericID, medicine.ID,
+	)
+
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"medicine": medicine})
+		return
+	}
+	defer alternatives.Close()
+
+	type Alternative struct {
+		ID    int     `json:"id"`
+		Name  string  `json:"name"`
+		Stock int     `json:"stock"`
+		Price float64 `json:"price"`
+	}
+
+	var altMedicines []Alternative
+	for alternatives.Next() {
+		var alt Alternative
+		if err := alternatives.Scan(&alt.ID, &alt.Name, &alt.Stock, &alt.Price); err == nil {
+			altMedicines = append(altMedicines, alt)
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"medicine":     medicine,
 		"alternatives": altMedicines,
 	})
 }

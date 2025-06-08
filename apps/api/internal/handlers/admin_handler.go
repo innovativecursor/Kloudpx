@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hashmi846003/online-med.git/internal/auth"
-	"github.com/hashmi846003/online-med.git/internal/database"
-	"github.com/hashmi846003/online-med.git/internal/models"
+	"github.com/innovativecursor/Kloudpx/internal/auth"
+	"github.com/innovativecursor/Kloudpx/internal/database"
+	"github.com/innovativecursor/Kloudpx/internal/models"
 )
 
 // AdminOAuthLogin handles admin OAuth login
@@ -61,7 +61,7 @@ func AdminOAuthLogin(c *gin.Context) {
 
 func isAdminEmail(email string) bool {
 	adminDomains := []string{"admin.yourdomain.com", "youradmin.com"}
-	
+
 	parts := strings.Split(email, "@")
 	if len(parts) != 2 {
 		return false
@@ -78,7 +78,7 @@ func isAdminEmail(email string) bool {
 
 func findOrCreateAdmin(info *auth.UserInfo) (*models.Admin, error) {
 	var admin models.Admin
-	
+
 	err := database.DB.QueryRow(
 		"SELECT id, name, email FROM admins WHERE oauth_id = $1",
 		info.ID,
@@ -116,7 +116,7 @@ func AddMedicine(c *gin.Context) {
 	err := database.DB.QueryRow(
 		`INSERT INTO medicines (name, generic_name, prescription_required, stock, price) 
 		VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-		medicine.BrandName, medicine.GenericName, medicine.PrescriptionRequired, 
+		medicine.BrandName, medicine.ID, medicine.PrescriptionRequired,
 		medicine.QuantityInPieces, medicine.SellingPrice,
 	).Scan(&medicine.ID)
 
@@ -151,7 +151,7 @@ func UpdateMedicine(c *gin.Context) {
 			stock = $4, 
 			price = $5 
 		WHERE id = $6`,
-		medicine.BrandName, medicine.GenericName, medicine.PrescriptionRequired, 
+		medicine.BrandName, medicine.GenericID, medicine.PrescriptionRequired,
 		medicine.QuantityInPieces, medicine.SellingPrice, medicine.ID,
 	)
 
@@ -206,7 +206,7 @@ func ListMedicines(c *gin.Context) {
 	for rows.Next() {
 		var med models.Medicine
 		if err := rows.Scan(
-			&med.ID, &med.BrandName, &med.GenericName, &med.PrescriptionRequired, 
+			&med.ID, &med.BrandName, &med.GenericID, &med.PrescriptionRequired,
 			&med.QuantityInPieces, &med.SellingPrice,
 		); err == nil {
 			medicines = append(medicines, med)
@@ -315,11 +315,11 @@ func GetUserDetails(c *gin.Context) {
 
 func GetOrderStatistics(c *gin.Context) {
 	var stats struct {
-		TotalOrders      int     `json:"total_orders"`
-		PendingOrders    int     `json:"pending_orders"`
-		CompletedOrders  int     `json:"completed_orders"`
-		TotalRevenue     float64 `json:"total_revenue"`
-		AvgOrderValue    float64 `json:"avg_order_value"`
+		TotalOrders     int     `json:"total_orders"`
+		PendingOrders   int     `json:"pending_orders"`
+		CompletedOrders int     `json:"completed_orders"`
+		TotalRevenue    float64 `json:"total_revenue"`
+		AvgOrderValue   float64 `json:"avg_order_value"`
 	}
 
 	err := database.DB.QueryRow(
