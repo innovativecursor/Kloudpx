@@ -5,7 +5,7 @@ import Title from "../comman/Title";
 import { getAxiosCall, updateAxiosCall } from "../../Axios/UniversalAxiosCalls";
 import Button from "../comman/Button";
 
-const EditMedicine = () => {
+const UpdateMedicine = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -249,4 +249,4 @@ const EditMedicine = () => {
     );
 };
 
-export default EditMedicine;
+export default UpdateMedicine;
