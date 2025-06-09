@@ -1,4 +1,4 @@
-package models
+/*package models
 
 import (
 	"database/sql"
@@ -199,3 +199,4 @@ type OAuthUser struct {
 	Name    string `json:"name"`
 	Picture string `json:"picture"`
 }
+*/

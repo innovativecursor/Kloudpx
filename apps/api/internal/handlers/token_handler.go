@@ -1,6 +1,98 @@
 package handlers
 
 import (
+	//"database/sql"
+	"net/http"
+	"time"
+	"log"
+	"os"
+	"github.com/hashmi846003/online-med.git/internal/database"
+	"github.com/gin-gonic/gin"
+	"github.com/hashmi846003/online-med.git/internal/auth"
+	"github.com/hashmi846003/online-med.git/internal/models"
+)
+
+// RefreshToken handles token refresh
+func RefreshToken(c *gin.Context) {
+	refreshToken, err := c.Cookie("refresh_token")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Refresh token required"})
+		return
+	}
+
+	var userID int
+	var expiresAt time.Time
+	err = database.DB.QueryRow(
+		"SELECT user_id, expires_at FROM refresh_tokens WHERE token = $1",
+		refreshToken,
+	).Scan(&userID, &expiresAt)
+
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid refresh token"})
+		return
+	}
+
+	if time.Now().After(expiresAt) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Refresh token expired"})
+		return
+	}
+
+	var username, role string
+	err = database.DB.QueryRow(
+		"SELECT username, CASE WHEN EXISTS (SELECT 1 FROM admins WHERE id = $1) THEN 'admin' WHEN EXISTS (SELECT 1 FROM pharmacists WHERE id = $1) THEN 'pharmacist' ELSE 'user' END FROM users WHERE id = $1",
+		userID,
+	).Scan(&username, &role)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user info"})
+		return
+	}
+
+	accessToken, err := auth.GenerateAccessToken(userID, username, role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate access token"})
+		return
+	}
+
+	newRefreshToken, newExpiresAt, err := auth.GenerateRefreshToken(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate refresh token"})
+		return
+	}
+
+	// Delete old refresh token
+	_, err = database.DB.Exec("DELETE FROM refresh_tokens WHERE token = $1", refreshToken)
+	if err != nil {
+		log.Println("Failed to delete old refresh token:", err)
+	}
+
+	// Set new refresh token in cookie
+	auth.SetRefreshTokenCookie(c, newRefreshToken, newExpiresAt)
+
+	c.JSON(http.StatusOK, models.TokenPair{
+		AccessToken:  accessToken,
+		RefreshToken: newRefreshToken,
+	})
+}
+
+// Logout handles user logout
+func Logout(c *gin.Context) {
+	refreshToken, err := c.Cookie("refresh_token")
+	if err == nil {
+		_, err = database.DB.Exec("DELETE FROM refresh_tokens WHERE token = $1", refreshToken)
+		if err != nil {
+			log.Println("Failed to delete refresh token:", err)
+		}
+	}
+
+	// Clear the refresh token cookie
+	c.SetCookie("refresh_token", "", -1, "/", os.Getenv("COOKIE_DOMAIN"), os.Getenv("SECURE_COOKIE") == "true", true)
+	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
+}
+
+/*package handlers
+
+import (
 	"database/sql"
 	"net/http"
 	"github.com/hashmi846003/online-med.git/internal/auth"
@@ -116,4 +208,4 @@ func Logout(c *gin.Context) {
 		os.Getenv("SECURE_COOKIE") == "true", true)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
-}
+}*/

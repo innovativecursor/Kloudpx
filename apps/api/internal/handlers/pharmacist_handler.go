@@ -1,6 +1,217 @@
 package handlers
 
 import (
+	//"database/sql"
+	"net/http"
+	"time"
+	"strconv"
+	"github.com/hashmi846003/online-med.git/internal/database"
+	"github.com/gin-gonic/gin"
+	"github.com/hashmi846003/online-med.git/internal/models"
+)
+
+// GetPendingCarts retrieves pending carts for pharmacist review
+func GetPendingCarts(c *gin.Context) {
+	rows, err := database.DB.Query(
+		`SELECT 
+			c.id,
+			u.username,
+			c.created_at,
+			COUNT(ci.id) as item_count
+		FROM carts c
+		JOIN users u ON c.user_id = u.id
+		JOIN cart_items ci ON ci.cart_id = c.id
+		WHERE c.status = 'checkout_completed'
+		GROUP BY c.id, u.username
+		ORDER BY c.created_at ASC`,
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get pending carts"})
+		return
+	}
+	defer rows.Close()
+
+	var carts []struct {
+		ID        int       `json:"id"`
+		Username  string    `json:"username"`
+		CreatedAt time.Time `json:"created_at"`
+		ItemCount int       `json:"item_count"`
+	}
+
+	for rows.Next() {
+		var cart struct {
+			ID        int       `json:"id"`
+			Username  string    `json:"username"`
+			CreatedAt time.Time `json:"created_at"`
+			ItemCount int       `json:"item_count"`
+		}
+		err := rows.Scan(
+			&cart.ID,
+			&cart.Username,
+			&cart.CreatedAt,
+			&cart.ItemCount,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read pending carts"})
+			return
+		}
+		carts = append(carts, cart)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"carts": carts})
+}
+
+// GetCartDetails retrieves details of a specific cart for pharmacist review
+func GetCartDetails(c *gin.Context) {
+	cartID, err := strconv.Atoi(c.Param("cartID"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid cart ID"})
+		return
+	}
+
+	// Get cart status
+	var status string
+	err = database.DB.QueryRow("SELECT status FROM carts WHERE id = $1", cartID).Scan(&status)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Cart not found"})
+		return
+	}
+
+	if status != "checkout_completed" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Cart not ready for review"})
+		return
+	}
+
+	// Get cart items with details
+	rows, err := database.DB.Query(
+		`SELECT 
+			ci.id, 
+			m.brand_name, 
+			gm.name as generic_name,
+			m.prescription_required,
+			ci.quantity,
+			m.selling_price,
+			ci.status,
+			CASE WHEN p.id IS NULL THEN false ELSE true END as has_prescription
+		FROM cart_items ci
+		JOIN medicines m ON ci.medicine_id = m.id
+		JOIN generic_medicines gm ON m.generic_id = gm.id
+		LEFT JOIN prescriptions p ON p.cart_item_id = ci.id
+		WHERE ci.cart_id = $1`,
+		cartID,
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get cart items"})
+		return
+	}
+	defer rows.Close()
+
+	var items []models.CartItemDetail
+	var total float64
+
+	for rows.Next() {
+		var item models.CartItemDetail
+		var price float64
+		err := rows.Scan(
+			&item.ID,
+			&item.MedicineName,
+			&item.GenericName,
+			&item.PrescriptionRequired,
+			&item.Quantity,
+			&price,
+			&item.Status,
+			&item.HasPrescription,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read cart items"})
+			return
+		}
+		item.Price = price
+		items = append(items, item)
+		total += price * float64(item.Quantity)
+	}
+
+	// Get VAT rate
+	var vatRate float64
+	err = database.DB.QueryRow("SELECT vat FROM medicines LIMIT 1").Scan(&vatRate)
+	if err != nil {
+		vatRate = 0
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"cart_id": cartID,
+		"status":  status,
+		"items":   items,
+		"total":   total * (1 + vatRate/100),
+		"vat":     vatRate,
+	})
+}
+
+// ReviewCart handles pharmacist review of a cart
+func ReviewCart(c *gin.Context) {
+	cartID, err := strconv.Atoi(c.Param("cartID"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid cart ID"})
+		return
+	}
+
+	var req struct {
+		Approved bool `json:"approved"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	// Verify cart is in correct status
+	var status string
+	err = database.DB.QueryRow("SELECT status FROM carts WHERE id = $1", cartID).Scan(&status)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Cart not found"})
+		return
+	}
+
+	if status != "checkout_completed" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Cart not ready for review"})
+		return
+	}
+
+	newStatus := "rejected"
+	if req.Approved {
+		newStatus = "approved"
+	}
+
+	// Update cart status
+	_, err = database.DB.Exec(
+		"UPDATE carts SET status = $1, updated_at = NOW() WHERE id = $2",
+		newStatus, cartID,
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart status"})
+		return
+	}
+
+	// Update all cart items status
+	_, err = database.DB.Exec(
+		"UPDATE cart_items SET status = $1 WHERE cart_id = $2",
+		newStatus, cartID,
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart items"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Cart review completed successfully"})
+}
+
+/*package handlers
+
+import (
 	"database/sql"
 	"errors"
 	"net/http"
@@ -323,4 +534,4 @@ func ReviewCart(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Cart reviewed successfully"})
-}
+}*/
