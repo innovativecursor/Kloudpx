@@ -1,0 +1,141 @@
+.dropdown {
+  position: absolute !important;
+  top: 83%;
+  left: 35%;
+  z-index: 999;
+  width: 26rem;
+  background-color: #fff;
+  /* border: 1px solid #ccc; */
+  border-top: none;
+  box-shadow: 4px 4px 4px 4px rgba(0, 0, 0, 0.1);
+  transition: 500ms ease;
+  border-radius: 7px;
+  padding: 10px 10px;
+}
+
+.dropdown-menu ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  transition: 0.3s ease all;
+}
+
+.dropdown-menu li {
+  padding: 10px;
+  cursor: pointer;
+  color: black;
+  width: 100%;
+}
+
+.dropdown-menu li:hover {
+  background-color: #f4f4f4;
+}
+
+.dropdown.active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+  transition: 500ms ease !important;
+}
+
+.dropdown.inactive {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transform: translateY(-20px) !important;
+  transition: 500ms ease !important;
+}
+
+.header-search-KSF {
+  color: #545151;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.image-card-container {
+  padding: 3px !important;
+}
+
+/* .img-search-card {
+  width: 100%;
+} */
+.img-title-card {
+  font-size: 11px;
+  color: black;
+  text-align: center;
+  /* margin: 2px; */
+  /* white-space: nowrap; */
+  font-weight: 500;
+  padding: 1px;
+  text-overflow: ellipsis !important;
+  width: 100%;
+}
+
+.card-search-bar {
+  width: 100%;
+  height: 120px;
+  margin: 3px 0;
+  border-radius: 5px;
+}
+
+.card-search-bar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-card-container {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 10px;
+}
+
+.search-list-items {
+  display: grid;
+}
+.search-list-items:hover {
+  background-color: #fff !important;
+}
+.searched-item {
+  padding: 1px;
+  margin: 4px 4px;
+  color: #8f218e;
+}
+
+.remove-item {
+  margin: 5px;
+  font-size: 12px;
+  color: #3c3cb8;
+}
+
+.remove-item:hover {
+  text-decoration: underline;
+}
+.search-child-item {
+  padding: 1px;
+  margin: 4px 4px;
+  display: flex;
+  justify-content: space-between;
+}
+.icon-n-text {
+  display: flex;
+}
+.search-bar-icons-n-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.history-icon-search-bar {
+  margin-top: 5px;
+}
+
+.history-icon {
+  font-size: 18px;
+  color: #665c5c !important;
+}
+
+@media (max-width: 960px) {
+  .dropdown {
+    left: 24%;
+  }
+}

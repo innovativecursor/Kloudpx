@@ -1,0 +1,20 @@
+.price-dropdown-min-price {
+  width: 70px !important;
+  border: 1px solid #b2b2b2 !important;
+  border-radius: 10px !important;
+}
+
+.price-dropdown-max-price {
+  width: 70px !important;
+  border: 1px solid #b2b2b2 !important;
+  border-radius: 10px !important;
+}
+
+.price-inputs-price-dropdown {
+  display: flex;
+  gap: 10px;
+}
+
+.price-inputs-go-btn-price-dropdown {
+  margin: 26px 5px !important;
+}

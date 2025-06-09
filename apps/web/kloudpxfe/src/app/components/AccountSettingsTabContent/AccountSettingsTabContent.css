@@ -1,0 +1,11 @@
+.account-setting-update-details-btn {
+  display: flex;
+  justify-content: center;
+}
+.input-account-grp-setting {
+  background-color: #9a0101;
+}
+
+.input-account-icon {
+  font-size: 21px;
+}

@@ -1,0 +1,9 @@
+.card {
+  width: 300px; /* Set the fixed width for the card */
+  margin: 0 10px; /* Adjust margins for spacing between cards */
+}
+
+.card-img-top {
+  width: 100%;
+  height: auto;
+}

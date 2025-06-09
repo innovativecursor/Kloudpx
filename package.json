@@ -1,0 +1,29 @@
+{
+  "name": "kloudpx-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/web"
+  ],
+  "scripts": {
+    "dev:web": "turbo run dev --filter=web",
+    "build:web": "turbo run build --filter=web",
+    "dev": "concurrently \"npm run dev:admin\" \"npm run dev:frontend\" \"npm run dev:go\"",
+    "dev:admin": "npm run dev --prefix apps/web/kloudpxadmin",
+    "dev:frontend": "npm run dev --prefix apps/web/kloudpxfe",
+    "dev:go": "cd apps/api && air",
+    "build": "turbo run build"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.1.2",
+    "turbo": "^1.12.3",
+    "vite": "^6.3.5"
+  },
+  "dependencies": {
+    "framer-motion": "^12.16.0",
+    "react-slick": "^0.30.3",
+    "slick-carousel": "^1.8.1",
+    "swiper": "^11.2.8",
+    "victory": "^37.3.6"
+  }
+}
