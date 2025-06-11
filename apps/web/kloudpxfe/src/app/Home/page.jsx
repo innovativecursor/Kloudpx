@@ -4,6 +4,7 @@ import Products from "@/app/components/Products/Products";
 import Footer from "@/app/components/Footer/Footer";
 import HomeFloatingBtn from "@/app/components/HomeFloatingBtn/HomeFloatingBtn";
 
+
 function Home() {
   return (
     <div className="homepage">

@@ -1,30 +1,23 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
+import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { Navigation } from 'swiper/modules';
-
 import TitleSlider from '../titleslider/TitleSlider';
 import AddToCart from '../button/AddToCart';
 import DetailsCard from './DetailsCard';
+import useSwiperNavigation from "@/hooks/useSwiperNavigation"
 
 
 const SwiperSlider = ({ data, title }) => {
-    const prevRef = useRef(null);
-    const nextRef = useRef(null);
-    const [swiperInstance, setSwiperInstance] = useState(null);
-
-    useEffect(() => {
-        if (swiperInstance?.params?.navigation) {
-            swiperInstance.params.navigation.prevEl = prevRef.current;
-            swiperInstance.params.navigation.nextEl = nextRef.current;
-            swiperInstance.navigation.init();
-            swiperInstance.navigation.update();
-        }
-    }, [swiperInstance]);
+    const {
+        prevRef,
+        nextRef,
+        setSwiperInstance,
+    } = useSwiperNavigation();
 
     return (
         <div className="responsive-mx mt-8 md:mt-24">
@@ -36,8 +29,8 @@ const SwiperSlider = ({ data, title }) => {
                 modules={[Navigation]}
                 breakpoints={{
                     0: { slidesPerView: 2, spaceBetween: 20 },
-                    640: { slidesPerView: 2, spaceBetween: 20 },
-                    768: { slidesPerView: 3, spaceBetween: 20 },
+                    640: { slidesPerView: 3, spaceBetween: 20 },
+                    768: { slidesPerView: 4, spaceBetween: 20 },
                     1024: { slidesPerView: 5, spaceBetween: 30 },
                 }}
                 className="mySwiper"
@@ -49,7 +42,7 @@ const SwiperSlider = ({ data, title }) => {
                                 <img
                                     src={product.productImg}
                                     alt={product.title}
-                                    className="object-contain max-w-[80%]"
+                                    className="object-contain lg:max-w-[80%] sm:max-w-[50%] max-w-[70%]"
                                 />
                             </div>
                             <div className="mt-2">

@@ -4,12 +4,7 @@ import SearchBar from '@/app/components/searchbar/SearchBar'
 import TopItems from '@/app/components/topitems/TopItems'
 import Hamburger from '@/app/components/modal/Hamburger'
 
-
 const Header = () => {
-
-
-
-
   return (
     <div className=''>
       <div className='flex-between-center responsive-mx mt-3'>
@@ -38,14 +33,15 @@ const Header = () => {
       </div>
       <div className='mt-4'>
         <div className='flex-between-center  border-t border-b border-gray-200'>
-          <div className='responsive-mx flex-between-center gap-6 '>
-            <div className='w-[10%]'>
-              <Hamburger />
+          <div className="w-full px-4 md:px-[8vw]">
+            <div className="flex items-start justify-center  w-full">
+              <div className='w-[5%]'>
+                <Hamburger />
+              </div>
+              <div className="w-full overflow-hidden">
+                <TopItems />
+              </div>
             </div>
-            <div className="w-[90%]">
-              <TopItems />
-            </div>
-
           </div>
         </div>
       </div>

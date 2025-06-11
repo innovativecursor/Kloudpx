@@ -3,7 +3,7 @@ import React from 'react';
 const TitleSlider = ({ title, prevRef, nextRef }) => {
     return (
         <div className="flex-between-center sm:mb-7 mb-5">
-            <h2 className="sm:text-2xl text-xl font-semibold">{title}</h2>
+            <h2 className="sm:text-2xl text-lg font-semibold text-[#00243F] ">{title}</h2>
             <div className="flex gap-3">
                 <button
                     ref={prevRef}
