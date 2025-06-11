@@ -1,28 +1,30 @@
 import { useGoogleLogin } from "@react-oauth/google";
 import logo from "../../../public/kloudlogo.webp";
-import { getAxiosCall } from "../../Axios/UniversalAxiosCalls";
+import { getAxiosCall, postAxiosCall } from "../../Axios/UniversalAxiosCalls";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router";
+// import { useNavigate } from "react-router";
 import { connect } from "react-redux";
 
-const Login = (props) => {
-  const navigate = useNavigate();
+const Login = () => {
+  // const navigate = useNavigate();
 
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
         console.log("Token Response:", tokenResponse);
-
         const result = await getAxiosCall("/auth/oauth/callback", {
           code: tokenResponse?.code,
         });
-
         console.log("API Result:", result);
+        const real = await postAxiosCall("/auth/admin/oauth", {
+          access_token: result?.data?.access_token,
+        });
+        console.log("API oauth admin login :", real);
 
         if (result) {
           localStorage.setItem("access_token", result?.code);
-          props?.isLoggedIn(result?.user);
-          navigate("/home");
+          // props?.isLoggedIn(result?.user);
+          // navigate("/home");
         }
       } catch (error) {
         console.error(error);
