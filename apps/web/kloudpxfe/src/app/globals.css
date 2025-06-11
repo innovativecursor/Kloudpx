@@ -2809,7 +2809,7 @@ ul.my_account_tabs li a i {
 }
 
 .responsive-mx {
-  @apply mx-3 sm:mx-5 mt-3 md:mx-[4vw] lg:mx-[8vw];
+  @apply mx-3 sm:mx-5  md:mx-[4vw] lg:mx-[8vw];
 }
 
 .flex-between-center {
@@ -2819,3 +2819,4 @@ ul.my_account_tabs li a i {
 .text-color {
   color: #0070BA;
 }
+

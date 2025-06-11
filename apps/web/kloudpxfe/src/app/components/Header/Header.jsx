@@ -2,74 +2,17 @@ import React from 'react'
 import Logo from '@/app/components/logo/Logo'
 import SearchBar from '@/app/components/searchbar/SearchBar'
 import TopItems from '@/app/components/topitems/TopItems'
+import Hamburger from '@/app/components/modal/Hamburger'
 
 
 const Header = () => {
 
 
-  const items = [
-    {
-      iconClass: "ri-capsule-line",
-      name: "Medicines",
-    },
-    {
-      iconClass: "ri-user-heart-line",
-      name: "Personal Care",
-    },
-    {
-      iconClass: "ri-heart-pulse-line",
-      name: "Healthcare Devices",
-    },
-    {
-      iconClass: "ri-baby-line",
-      name: "Baby",
-    },
-    {
-      iconClass: "ri-shield-cross-line",
-      name: "Vitamins & Supplements",
-    },
-    {
-      iconClass: "ri-git-repository-private-line",
-      name: "Pets",
-    },
-    {
-      iconClass: "ri-leaf-line",
-      name: "Herbs",
-    },
-    {
-      iconClass: "ri-capsule-line",
-      name: "Medicines",
-    },
-    {
-      iconClass: "ri-user-heart-line",
-      name: "Personal Care",
-    },
-    {
-      iconClass: "ri-heart-pulse-line",
-      name: "Healthcare Devices",
-    },
-    {
-      iconClass: "ri-baby-line",
-      name: "Baby",
-    },
-    {
-      iconClass: "ri-shield-cross-line",
-      name: "Vitamins & Supplements",
-    },
-    {
-      iconClass: "ri-git-repository-private-line",
-      name: "Pets",
-    },
-    {
-      iconClass: "ri-leaf-line",
-      name: "Herbs",
-    },
-  ];
 
 
   return (
     <div className=''>
-      <div className='flex-between-center responsive-mx'>
+      <div className='flex-between-center responsive-mx mt-3'>
         <div className='flex-between-center lg:w-[75%] sm:w-[75%] w-[45%]'>
           <Logo />
           <SearchBar />
@@ -94,16 +37,13 @@ const Header = () => {
         </div>
       </div>
       <div className='mt-4'>
-        <div className='flex-between-center border-t bg-green-400 border-b border-gray-200'>
+        <div className='flex-between-center  border-t border-b border-gray-200'>
           <div className='responsive-mx flex-between-center gap-6 '>
             <div className='w-[10%]'>
-              <i className="ri-menu-2-fill font-medium text-2xl"></i>
+              <Hamburger />
             </div>
-            {/* <div className='bg-red-400 overflow-x-auto w-[90%]'>
-              <TopItems items={items} />
-            </div> */}
-            <div className="w-[90%] bg-red-400">
-              <TopItems items={items} />
+            <div className="w-[90%]">
+              <TopItems />
             </div>
 
           </div>

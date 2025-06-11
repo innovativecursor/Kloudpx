@@ -1,4 +1,4 @@
-// module github.com/hashmi846003/online-med.git
+module github.com/hashmi846003/online-med.git
 
 go 1.23.0
 
