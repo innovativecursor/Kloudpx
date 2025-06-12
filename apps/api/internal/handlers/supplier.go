@@ -1,283 +1,121 @@
 package handlers
 
 import (
-	"database/sql"
 	"net/http"
-	"strconv"
-
 	"github.com/gin-gonic/gin"
-	"github.com/innovativecursor/Kloudpx/internal/models"
+	"github.com/innovativecursor/Kloudpx/internal/database"
 )
 
-// SupplierHandler struct to hold db connection
-type SupplierHandler struct {
-	DB *sql.DB
-}
+type SupplierHandler struct{}
 
-// NewSupplierHandler creates a new SupplierHandler
-func NewSupplierHandler(db *sql.DB) *SupplierHandler {
-	return &SupplierHandler{DB: db}
-}
+func (s *SupplierHandler) CreateSupplier(c *gin.Context) {
+	var req struct {
+		Name     string  `json:"name"`
+		Cost     float64 `json:"cost"`
+		Quantity int     `json:"quantity"`
+	}
 
-// CreateSupplier creates a new supplier
-func (h *SupplierHandler) CreateSupplier(c *gin.Context) {
-	var supplier models.Supplier
-	if err := c.ShouldBindJSON(&supplier); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
 
-	// Get admin ID from context (set by auth middleware)
-	adminID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	supplier.AdminID = adminID.(int)
-
-	query := `INSERT INTO suppliers (
-		admin_id, supplier_name, cost, discount_provided, quantity_in_piece, 
-		quantity_in_box, cost_price, taxes
-	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
-	RETURNING id, created_at, updated_at`
-
-	err := h.DB.QueryRow(
-		query,
-		supplier.AdminID,
-		supplier.SupplierName,
-		supplier.Cost,
-		supplier.DiscountProvided,
-		supplier.QuantityInPiece,
-		supplier.QuantityInBox,
-		supplier.CostPrice,
-		supplier.Taxes,
-	).Scan(&supplier.ID, &supplier.CreatedAt, &supplier.UpdatedAt)
+	_, err := database.DB.Exec("INSERT INTO suppliers (name, cost, quantity) VALUES ($1, $2, $3)",
+		req.Name, req.Cost, req.Quantity)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add supplier"})
 		return
 	}
 
-	c.JSON(http.StatusCreated, supplier)
+	c.JSON(http.StatusOK, gin.H{"message": "Supplier added successfully"})
 }
 
-// ListSuppliers lists all suppliers
-func (h *SupplierHandler) ListSuppliers(c *gin.Context) {
-	query := `SELECT id, admin_id, supplier_name, cost, discount_provided, quantity_in_piece, 
-	          quantity_in_box, cost_price, taxes, created_at, updated_at 
-	          FROM suppliers ORDER BY supplier_name`
-	rows, err := h.DB.Query(query)
+func (s *SupplierHandler) ListSuppliers(c *gin.Context) {
+	rows, err := database.DB.Query("SELECT id, name, cost, quantity FROM suppliers")
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch suppliers"})
 		return
 	}
 	defer rows.Close()
 
-	var suppliers []models.Supplier
+	var suppliers []map[string]interface{}
 	for rows.Next() {
-		var s models.Supplier
-		err := rows.Scan(
-			&s.ID,
-			&s.AdminID,
-			&s.SupplierName,
-			&s.Cost,
-			&s.DiscountProvided,
-			&s.QuantityInPiece,
-			&s.QuantityInBox,
-			&s.CostPrice,
-			&s.Taxes,
-			&s.CreatedAt,
-			&s.UpdatedAt,
-		)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
+		var id int
+		var name string
+		var cost float64
+		var quantity int
+		if err := rows.Scan(&id, &name, &cost, &quantity); err != nil {
+			continue
 		}
-		suppliers = append(suppliers, s)
+		suppliers = append(suppliers, map[string]interface{}{
+			"id":       id,
+			"name":     name,
+			"cost":     cost,
+			"quantity": quantity,
+		})
 	}
 
-	c.JSON(http.StatusOK, suppliers)
+	c.JSON(http.StatusOK, gin.H{"suppliers": suppliers})
 }
 
-// GetSupplier gets a single supplier by ID
-func (h *SupplierHandler) GetSupplier(c *gin.Context) {
+func (s *SupplierHandler) GetSupplier(c *gin.Context) {
 	id := c.Param("id")
 
-	var supplier models.Supplier
-	query := `SELECT id, admin_id, supplier_name, cost, discount_provided, quantity_in_piece, 
-	          quantity_in_box, cost_price, taxes, created_at, updated_at 
-	          FROM suppliers WHERE id = $1`
-	err := h.DB.QueryRow(query, id).Scan(
-		&supplier.ID,
-		&supplier.AdminID,
-		&supplier.SupplierName,
-		&supplier.Cost,
-		&supplier.DiscountProvided,
-		&supplier.QuantityInPiece,
-		&supplier.QuantityInBox,
-		&supplier.CostPrice,
-		&supplier.Taxes,
-		&supplier.CreatedAt,
-		&supplier.UpdatedAt,
-	)
+	var supplierID int
+	var name string
+	var cost float64
+	var quantity int
+
+	err := database.DB.QueryRow("SELECT id, name, cost, quantity FROM suppliers WHERE id=$1", id).
+		Scan(&supplierID, &name, &cost, &quantity)
+
 	if err != nil {
-		if err == sql.ErrNoRows {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Supplier not found"})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Supplier not found"})
 		return
+	}
+
+	supplier := map[string]interface{}{
+		"id":       supplierID,
+		"name":     name,
+		"cost":     cost,
+		"quantity": quantity,
 	}
 
 	c.JSON(http.StatusOK, supplier)
 }
 
-// UpdateSupplier updates a supplier
-func (h *SupplierHandler) UpdateSupplier(c *gin.Context) {
+func (s *SupplierHandler) UpdateSupplier(c *gin.Context) {
 	id := c.Param("id")
 
-	var supplier models.Supplier
-	if err := c.ShouldBindJSON(&supplier); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	var req struct {
+		Name     string  `json:"name"`
+		Cost     float64 `json:"cost"`
+		Quantity int     `json:"quantity"`
+	}
+
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
 
-	// Get admin ID from context (set by auth middleware)
-	adminID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	query := `UPDATE suppliers SET 
-		supplier_name = $1, 
-		cost = $2, 
-		discount_provided = $3, 
-		quantity_in_piece = $4, 
-		quantity_in_box = $5, 
-		cost_price = $6, 
-		taxes = $7, 
-		updated_at = CURRENT_TIMESTAMP 
-		WHERE id = $8 AND admin_id = $9
-		RETURNING updated_at`
-
-	err := h.DB.QueryRow(
-		query,
-		supplier.SupplierName,
-		supplier.Cost,
-		supplier.DiscountProvided,
-		supplier.QuantityInPiece,
-		supplier.QuantityInBox,
-		supplier.CostPrice,
-		supplier.Taxes,
-		id,
-		adminID,
-	).Scan(&supplier.UpdatedAt)
+	_, err := database.DB.Exec("UPDATE suppliers SET name=$1, cost=$2, quantity=$3 WHERE id=$4",
+		req.Name, req.Cost, req.Quantity, id)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Supplier not found or you don't have permission to update it"})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update supplier"})
 		return
 	}
 
-	// Convert the ID from string to int
-	idInt, err := strconv.Atoi(id)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
-		return
-	}
-	supplier.ID = idInt
-	supplier.AdminID = adminID.(int)
-	c.JSON(http.StatusOK, supplier)
+	c.JSON(http.StatusOK, gin.H{"message": "Supplier updated successfully"})
 }
 
-/*
-// UpdateSupplier updates a supplier
-func (h *SupplierHandler) UpdateSupplier(c *gin.Context) {
+func (s *SupplierHandler) DeleteSupplier(c *gin.Context) {
 	id := c.Param("id")
 
-	var supplier models.Supplier
-	if err := c.ShouldBindJSON(&supplier); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Get admin ID from context (set by auth middleware)
-	adminID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	query := `UPDATE suppliers SET
-		supplier_name = $1,
-		cost = $2,
-		discount_provided = $3,
-		quantity_in_piece = $4,
-		quantity_in_box = $5,
-		cost_price = $6,
-		taxes = $7,
-		updated_at = CURRENT_TIMESTAMP
-		WHERE id = $8 AND admin_id = $9
-		RETURNING updated_at`
-
-	err := h.DB.QueryRow(
-		query,
-		supplier.SupplierName,
-		supplier.Cost,
-		supplier.DiscountProvided,
-		supplier.QuantityInPiece,
-		supplier.QuantityInBox,
-		supplier.CostPrice,
-		supplier.Taxes,
-		id,
-		adminID,
-	).Scan(&supplier.UpdatedAt)
-
+	_, err := database.DB.Exec("DELETE FROM suppliers WHERE id=$1", id)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Supplier not found or you don't have permission to update it"})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	supplier.ID, _ = c.Params.GetInt("id")
-	supplier.AdminID = adminID.(int)
-	c.JSON(http.StatusOK, supplier)
-}
-*/
-// DeleteSupplier deletes a supplier
-func (h *SupplierHandler) DeleteSupplier(c *gin.Context) {
-	id := c.Param("id")
-
-	// Get admin ID from context (set by auth middleware)
-	adminID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
-	}
-
-	query := `DELETE FROM suppliers WHERE id = $1 AND admin_id = $2`
-	result, err := h.DB.Exec(query, id, adminID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	if rowsAffected == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Supplier not found or you don't have permission to delete it"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete supplier"})
 		return
 	}
 

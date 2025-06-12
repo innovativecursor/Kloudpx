@@ -1,55 +1,40 @@
 package handlers
 
 import (
-	"database/sql"
 	"net/http"
-
 	"github.com/gin-gonic/gin"
-	"github.com/innovativecursor/Kloudpx/internal/models"
+	"github.com/innovativecursor/Kloudpx/internal/database"
 )
 
-// TaxHandler struct to hold db connection
-type TaxHandler struct {
-	DB *sql.DB
-}
+type TaxHandler struct{}
 
-// NewTaxHandler creates a new TaxHandler
-func NewTaxHandler(db *sql.DB) *TaxHandler {
-	return &TaxHandler{DB: db}
-}
+func (t *TaxHandler) GetTax(c *gin.Context) {
+	var taxRate float64
+	err := database.DB.QueryRow("SELECT vat FROM tax LIMIT 1").Scan(&taxRate)
 
-// GetTax gets the current tax rate
-func (h *TaxHandler) GetTax(c *gin.Context) {
-	var vat float64
-	query := `SELECT vat FROM medicines LIMIT 1`
-	err := h.DB.QueryRow(query).Scan(&vat)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Tax information not found"})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch tax rate"})
 		return
 	}
 
-	tax := models.Tax{VAT: vat}
-	c.JSON(http.StatusOK, tax)
+	c.JSON(http.StatusOK, gin.H{"vat": taxRate})
 }
 
-// UpdateTax updates the tax rate
-func (h *TaxHandler) UpdateTax(c *gin.Context) {
-	var tax models.Tax
-	if err := c.ShouldBindJSON(&tax); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+func (t *TaxHandler) UpdateTax(c *gin.Context) {
+	var req struct {
+		VAT float64 `json:"vat"`
+	}
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
 
-	query := `UPDATE medicines SET vat = $1`
-	_, err := h.DB.Exec(query, tax.VAT)
+	_, err := database.DB.Exec("UPDATE tax SET vat=$1", req.VAT)
+
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update tax rate"})
 		return
 	}
 
-	c.JSON(http.StatusOK, tax)
+	c.JSON(http.StatusOK, gin.H{"message": "Tax rate updated successfully"})
 }

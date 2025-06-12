@@ -20,7 +20,10 @@
     "vite": "^6.3.5"
   },
   "dependencies": {
+    "@vitejs/plugin-react-swc": "^3.10.2",
     "framer-motion": "^12.16.0",
+    "next": "^15.3.3",
+    "react-redux": "^9.2.0",
     "react-slick": "^0.30.3",
     "slick-carousel": "^1.8.1",
     "swiper": "^11.2.8",

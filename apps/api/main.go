@@ -2,91 +2,28 @@ package main
 
 import (
 	"log"
-	"os"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 	"github.com/innovativecursor/Kloudpx/internal/database"
 	"github.com/innovativecursor/Kloudpx/internal/routes"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	// Load environment variables
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found")
-	}
-
-	// Initialize database
-	database.InitDB()
-	defer database.DB.Close()
-
-	// Create Gin router
 	r := gin.Default()
+	database.InitDB()
 
-	// Enable CORS for all origins
+	// Enable CORS middleware
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3004"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,
 	}))
 
-	// Setup routes
-	routes.SetupRoutes(r)
+	// Register all routes
+	routes.routes(r)
 
-	// Start server
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-	r.Run(":" + port)
+	log.Println("Server running on :8080")
+	r.Run(":8080")
 }
-
-/*package main
-
-import (
-	"log"
-	"os"
-
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/innovativecursor/Kloudpx/internal/database"
-	"github.com/innovativecursor/Kloudpx/internal/routes"
-	"github.com/joho/godotenv"
-)
-
-func main() {
-	// Load environment variables
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found")
-	}
-
-	// Initialize database
-	database.InitDB()
-	defer database.DB.Close()
-
-	// Create Gin router
-	r := gin.Default()
-
-	// Enable CORS for all origins
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3004"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-	}))
-
-	// Setup routes
-	routes.SetupRoutes(r)
-
-	// Start server
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-	r.Run(":" + port)
-}
-*/
