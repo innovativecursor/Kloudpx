@@ -7,6 +7,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import PrimaryButton from "@/app/components/button/PrimaryButton";
+import Prescription from "@/app/components/modal/Prescription";
 
 const slidesData = [
   {
@@ -85,19 +86,14 @@ export default function Hero() {
           ))}
         </Swiper>
       )}
-
-
-      <div className="flex items-center justify-center gap-4 sm:text-xs text-[9px] tracking-wider text-gray-600 sm:mt-8 mt-4">
+      <div className="flex items-center justify-center gap-4 sm:text-xs text-[9px] tracking-wider text-gray-600 sm:mt-9 mt-4">
         <div className="flex-grow h-px bg-gray-300"></div>
         PLACE YOUR ORDER VIA
         <div className="flex-grow h-px bg-gray-300"></div>
       </div>
 
+      <Prescription />
 
     </div>
   );
 }
-
-
-
-

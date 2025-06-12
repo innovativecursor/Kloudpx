@@ -1,15 +1,21 @@
-/* eslint-disable react-refresh/only-export-components */
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { connect } from "react-redux";
 import logo from "../../../public/kloudlogo.webp";
 import { googleLogout } from "@react-oauth/google";
+import { Button, Collapse, Drawer, Radio, Space } from "antd";
+import { Menu } from "../../Constants/Conts";
+const { Panel } = Collapse;
 
 function Navbar() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+  const [open, setOpen] = useState(false);
+  const [placement, setPlacement] = useState("left");
+  const showDrawer = () => {
+    setOpen(true);
+  };
+  const onClose = () => {
+    setOpen(false);
   };
 
   return (
@@ -17,7 +23,13 @@ function Navbar() {
       <nav className=" container mx-auto ">
         <div className="flex items-center justify-between">
           {/* Left */}
-          <div className="flex items-center space-x-4 w-full max-w-md">
+          <div className="flex items-center sm:space-x-4 space-x-2 w-full max-w-xl">
+            <button
+              type="primary"
+              onClick={showDrawer}
+            >
+              <i className="ri-menu-2-fill sm:text-3xl text-2xl rounded-full p-1"></i>
+            </button>
             <NavLink to="/">
               <img
                 src={logo}
@@ -28,38 +40,24 @@ function Navbar() {
             <input
               type="text"
               placeholder="Search"
-              className="w-52 md:w-full rounded-full px-4 py-2 bg-gray-100 focus:outline-none"
+              className="hidden md:flex md:w-full rounded-full px-4 py-2 bg-gray-100 focus:outline-none"
             />
           </div>
-
-          {/* Hamburger for Mobile */}
-          <div className="md:hidden">
-            <button onClick={toggleMobileMenu}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-7 w-7 text-gray-700"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16m-7 6h7"
-                />
-              </svg>
-            </button>
-          </div>
-
           {/* Right Side */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => googleLogout()}
+              className=" text-lg text-red-600 font-medium"
+            >
+              <i className="ri-logout-box-r-line font-semibold text-xl"></i>
+            </button>
             <div className="relative">
               <i className="ri-notification-3-line text-2xl text-gray-600"></i>
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
                 2
               </span>
             </div>
+
             <div className="w-10 h-10">
               <img
                 src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid&w=740"
@@ -67,23 +65,55 @@ function Navbar() {
                 className="w-full h-full rounded-full object-cover"
               />
             </div>
+
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden mt-3 space-y-2 text-center">
-            <NavLink to="/home" className="block text-lg text-gray-700">
-              Home
-            </NavLink>
-            <button
-              onClick={() => googleLogout()}
-              className=" text-lg text-red-600 font-medium"
-            >
-              Logout
-            </button>
-          </div>
-        )}
+        <Drawer
+          title="Kloud Pharma Portal"
+          placement={placement}
+          width={500}
+          onClose={onClose}
+          open={open}
+          extra={
+            <Space>
+              <Button onClick={onClose}>Close Menu</Button>
+            </Space>
+          }
+          bodyStyle={{ padding: 0 }}
+          className="!p-0"
+        >
+          <Collapse accordion className="!not-sr-onlyp-0">
+            {Object.entries(Menu).map(([key, actions]) => (
+              <Panel
+                header={
+                  <div className="text-lg font-semibold text-highlight">
+                    {key.charAt(0).toUpperCase() + key.slice(1)}
+                  </div>
+                }
+                key={key}
+                className="bg-white border-0 rounded-lg mb-2"
+              >
+                <ul>
+                  {actions.map((el) => (
+                    <li key={el.link} onClick={onClose}>
+                      <NavLink to={el.link}>
+                        <div className="card hover:bg-[#3FA9EE] hover:text-white text-base tracking-wide font-medium my-2.5">
+                          {el.text}
+                        </div>
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              </Panel>
+            ))}
+          </Collapse>
+          <button
+            onClick={() => googleLogout()}
+            className="text-2xl  mx-6 text-red-600 font-medium"
+          >
+            LogOut  <i className="ri-logout-box-r-line text-lg"></i>
+          </button>
+        </Drawer>
       </nav>
     </div>
   );

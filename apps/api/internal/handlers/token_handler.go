@@ -3,13 +3,12 @@ package handlers
 import (
 	"database/sql"
 	"net/http"
-	"os"
+	"github.com/hashmi846003/online-med.git/internal/auth"
+	"github.com/hashmi846003/online-med.git/internal/database"
+	"github.com/hashmi846003/online-med.git/internal/models"
 	"time"
-
+	"os"
 	"github.com/gin-gonic/gin"
-	"github.com/innovativecursor/Kloudpx/internal/auth"
-	"github.com/innovativecursor/Kloudpx/internal/database"
-	"github.com/innovativecursor/Kloudpx/internal/models"
 )
 
 // RefreshToken handles token refresh requests
@@ -87,7 +86,7 @@ func RefreshToken(c *gin.Context) {
 
 	// Set refresh token in HTTP-only cookie
 	secure := os.Getenv("SECURE_COOKIE") == "true"
-	c.SetCookie("refresh_token", newRefreshToken, int(time.Until(expiresAt).Seconds()), "/",
+	c.SetCookie("refresh_token", newRefreshToken, int(time.Until(expiresAt).Seconds()), "/", 
 		os.Getenv("COOKIE_DOMAIN"), secure, true)
 
 	c.JSON(http.StatusOK, models.TokenPair{
@@ -113,7 +112,7 @@ func Logout(c *gin.Context) {
 	}
 
 	// Clear refresh token cookie
-	c.SetCookie("refresh_token", "", -1, "/", os.Getenv("COOKIE_DOMAIN"),
+	c.SetCookie("refresh_token", "", -1, "/", os.Getenv("COOKIE_DOMAIN"), 
 		os.Getenv("SECURE_COOKIE") == "true", true)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})

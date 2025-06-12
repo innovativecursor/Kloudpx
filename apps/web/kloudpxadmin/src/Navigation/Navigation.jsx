@@ -10,7 +10,6 @@ import {
 import Home from "../Components/Home/Home";
 import { connect } from "react-redux";
 import PrivateRoute from "./PrivateRoute";
-import SideDrawer from "../Components/Drawer/SideDrawer";
 import { matchRoutes, useLocation } from "react-router-dom";
 import Navbar from "../Components/NavigationBar/Navbar";
 import ProductTable from "../Components/ProductTable/ProductTable";
@@ -35,6 +34,9 @@ import CreateUsers from "../Components/createUsers/CreateUsers";
 import AddMedicine from "../Components/addMedicine/AddMedicine";
 import OrderHistory from "../Components/Invoices/OrderHistory";
 import AddOtcProduct from "../Components/OTC/AddOtcProduct";
+import AllMedicine from "../Components/addMedicine/AllMedicine";
+import AddSupplier from "../Components/supplier/AddSupplier";
+import UpdateMedicine from "../Components/addMedicine/UpdateMedicine";
 
 function Navigation(props) {
   const location = useLocation();
@@ -54,7 +56,6 @@ function Navigation(props) {
         {location.pathname !== "/" && props.loggedIn ? (
           <div className="">
             <Navbar />
-            <SideDrawer />
           </div>
         ) : (
           ""
@@ -63,7 +64,9 @@ function Navigation(props) {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/reset/:token" element={<ResetPassword />} />
-            <Route element={<PrivateRoute />}>
+            <Route
+              element={<PrivateRoute />}
+            >
               <Route>
                 <Route path="/home" element={<Home />} />
                 <Route path="/inquiries" element={<Inquiries />} />
@@ -71,6 +74,9 @@ function Navigation(props) {
                 <Route path="/addMedicine" element={<AddMedicine />} />
                 <Route path="/addOtcProduct" element={<AddOtcProduct />} />
                 <Route path="/orderHistory" element={<OrderHistory />} />
+                <Route path="/allmedicine" element={<AllMedicine />} />
+                <Route path="/addsupplier" element={<AddSupplier />} />
+                <Route path="/medicines/edit/:id" element={<UpdateMedicine />} />
 
                 <Route
                   path="/updateMedicines"
