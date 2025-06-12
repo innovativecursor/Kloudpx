@@ -37,12 +37,12 @@ const SwiperSlider = ({ data, title }) => {
             >
                 {data.map(product => (
                     <SwiperSlide key={product.id}>
-                        <div>
-                            <div className="bg-gray-100 py-8 max-h-52 rounded-md flex items-center justify-center">
+                        <div className=''>
+                            <div className="bg-gray-100 py-8 md:max-h-48 sm:max-h-44 max-h-36 rounded-md flex items-center justify-center">
                                 <img
                                     src={product.productImg}
                                     alt={product.title}
-                                    className="object-contain lg:max-w-[80%] sm:max-w-[50%] max-w-[70%]"
+                                    className="object-contain lg:max-w-[80%] md:max-w-[70%] max-w-[60%]"
                                 />
                             </div>
                             <div className="mt-2">
