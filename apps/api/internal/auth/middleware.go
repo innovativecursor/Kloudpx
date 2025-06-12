@@ -1,4 +1,3 @@
-
 package auth
 
 import (
@@ -71,26 +70,44 @@ func AuthMiddleware(role string) gin.HandlerFunc {
 		}
 
 		// Set user information in context
-		userID, ok := claims["user_id"].(float64)
-		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid user ID"})
-			return
-		}
+		if tokenRole == "admin" {
+			adminID, ok := claims["admin_id"].(float64)
+			if !ok {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid admin ID"})
+				return
+			}
 
-		username, ok := claims["username"].(string)
-		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid username"})
-			return
-		}
+			name, ok := claims["name"].(string)
+			if !ok {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid name"})
+				return
+			}
 
-		c.Set("userID", int(userID))
-		c.Set("username", username)
+			c.Set("adminID", int(adminID))
+			c.Set("name", name)
+		} else {
+			userID, ok := claims["user_id"].(float64)
+			if !ok {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid user ID"})
+				return
+			}
+
+			username, ok := claims["username"].(string)
+			if !ok {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid username"})
+				return
+			}
+
+			c.Set("userID", int(userID))
+			c.Set("username", username)
+		}
+		
 		c.Set("role", tokenRole)
 		c.Next()
 	}
 }
 
-// OAuthMiddleware handles OAuth authentication
+// OAuthMiddleware handles OAuth authentication for admins
 func OAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("Authorization")
@@ -100,23 +117,23 @@ func OAuthMiddleware() gin.HandlerFunc {
 		}
 
 		// Verify OAuth token with provider
-		userInfo, err := GetAdminInfo(strings.TrimPrefix(tokenString, "Bearer "))
+		adminInfo, err := GetAdminInfo(strings.TrimPrefix(tokenString, "Bearer "))
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid OAuth token"})
 			return
 		}
 
-		// Find or create user
-		user, err := FindOrCreateOAuth(userInfo)
+		// Find or create admin
+		admin, err := FindOrCreateAdmin(adminInfo)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "User processing failed"})
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Admin processing failed"})
 			return
 		}
 
-		// Set user information in context
-		c.Set("userID", user.ID)
-		c.Set("username", user.Username)
-		c.Set("role", "user")
+		// Set admin information in context
+		c.Set("adminID", admin.ID)
+		c.Set("name", admin.Name)
+		c.Set("role", "admin")
 		c.Set("oauth", true)
 		c.Next()
 	}
