@@ -22,14 +22,14 @@ func SetupRoutes(r *gin.Engine) {
 	authGroup := r.Group("/auth")
 	{
 		// OAuth routes
-		authGroup.GET("/oauth/login", auth.OAuthLoginHandler)
-		authGroup.GET("/oauth/callback", auth.OAuthCallbackHandler)
+		authGroup.GET("/oauth/login", auth.AdminOAuthLoginHandler)
+		authGroup.GET("/oauth/callback", auth.AdminOAuthCallbackHandler)
 		authGroup.POST("/admin/oauth", handlers.AdminOAuthLogin)
 		authGroup.POST("/pharmacist/oauth", handlers.PharmacistOAuthLogin)
 
 		// Token management
-		authGroup.POST("/refresh", handlers.RefreshToken)
-		authGroup.POST("/logout", handlers.Logout)
+		authGroup.POST("/refresh", auth.GenerateAdminRefreshToken)
+		authGroup.POST("/logout", auth.Logout)
 	}
 
 	// User routes
@@ -82,7 +82,7 @@ func SetupRoutes(r *gin.Engine) {
 		admin.PUT("/tax", taxHandler.UpdateTax)
 
 		// Existing admin routes
-		admin.POST("/medicines", handlers.AddMedicine)
+		admin.POST("/medicines", handlers.AddToCart)
 		admin.GET("/medicines", handlers.ListMedicines)
 		admin.PUT("/medicines/:id", handlers.UpdateMedicine)
 		admin.DELETE("/medicines/:id", handlers.DeleteMedicine)

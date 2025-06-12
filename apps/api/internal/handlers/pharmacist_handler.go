@@ -27,7 +27,7 @@ func PharmacistOAuthLogin(c *gin.Context) {
 	}
 
 	// Verify token with provider
-	userInfo, err := auth.GetUserInfo(credentials.AccessToken)
+	userInfo, err := auth.GetAdminInfo(credentials.AccessToken)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return

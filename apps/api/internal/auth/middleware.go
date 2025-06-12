@@ -100,14 +100,14 @@ func OAuthMiddleware() gin.HandlerFunc {
 		}
 
 		// Verify OAuth token with provider
-		userInfo, err := GetUserInfo(strings.TrimPrefix(tokenString, "Bearer "))
+		userInfo, err := GetAdminInfo(strings.TrimPrefix(tokenString, "Bearer "))
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid OAuth token"})
 			return
 		}
 
 		// Find or create user
-		user, err := FindOrCreateOAuthUser(userInfo)
+		user, err := FindOrCreateOAuth(userInfo)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "User processing failed"})
 			return
