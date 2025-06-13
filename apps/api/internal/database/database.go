@@ -18,7 +18,7 @@ func InitDB() {
 		getEnv("DB_PORT", "5432"),
 		getEnv("DB_USER", "postgres"),
 		getEnv("DB_PASSWORD", "secret"),
-		getEnv("DB_NAME", "your_database_name"),
+		getEnv("DB_NAME", "yourapp"),
 		getEnv("SSL_MODE", "disable"),
 	)
 
