@@ -6,7 +6,7 @@ import (
 	"github.com/innovativecursor/Kloudpx/internal/handlers"
 )
 
-func SetupRoutes(
+func RegisterRoutes(
 	r *gin.Engine,
 	genericHandler *handlers.GenericMedicineHandler,
 	supplierHandler *handlers.SupplierHandler,
