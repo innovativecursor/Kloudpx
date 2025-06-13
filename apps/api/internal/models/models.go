@@ -1,35 +1,41 @@
 package models
 
 import (
-	"database/sql"
 	"time"
+	"gorm.io/gorm"
 )
 
 type User struct {
-	ID            int            `json:"id"`
-	Username      string         `json:"username"`
-	Password      string         `json:"-"`
-	Email         sql.NullString `json:"email,omitempty"`
-	OAuthID       sql.NullString `json:"-"`
-	OAuthProvider sql.NullString `json:"-"`
+	gorm.Model
+	//Email    *string `gorm:"uniqueIndex;not null"`
+	//Password string  `gorm:"not null"`
+	//Username string  `gorm:"not null;default:''"`
+	ID            uint           `gorm:"primaryKey" json:"id"`
+	//Username      string         `gorm:"uniqueIndex;not null" json:"username"`
+	Username string `gorm:"not null;default:'unknown'"`
+
+	Password      string         `gorm:"not null" json:"-"`
+	Email         *string        `gorm:"type:varchar(100);uniqueIndex" json:"email,omitempty"`
+	OAuthID       *string        `gorm:"uniqueIndex" json:"-"`
+	OAuthProvider *string        `gorm:"type:varchar(50)" json:"-"`
 	CreatedAt     time.Time      `json:"created_at"`
-	LastLogin     sql.NullTime   `json:"last_login,omitempty"`
+	LastLogin     *time.Time     `json:"last_login,omitempty"`
 }
 
 type Admin struct {
-	ID            int            `json:"id"`
-	Name          string         `json:"name"`
-	Email         string         `json:"email"`
-	OAuthID       string         `json:"-"`
-	OAuthProvider string         `json:"-"`
+	ID            uint           `gorm:"primaryKey" json:"id"`
+	Name          string         `gorm:"not null" json:"name"`
+	Email         *string        `gorm:"type:varchar(100);uniqueIndex" json:"email,omitempty"`
+	OAuthID       *string        `gorm:"uniqueIndex" json:"-"`
+	OAuthProvider *string        `gorm:"type:varchar(50)" json:"-"`
 	CreatedAt     time.Time      `json:"created_at"`
-	LastLogin     sql.NullTime   `json:"last_login,omitempty"`
+	LastLogin     *time.Time     `json:"last_login,omitempty"`
 }
 
 type Supplier struct {
-	ID               int       `json:"id"`
-	AdminID          int       `json:"admin_id"`
-	SupplierName     string    `json:"supplier_name"`
+	ID               uint      `gorm:"primaryKey" json:"id"`
+	AdminID          uint      `gorm:"index" json:"admin_id"`
+	SupplierName     string    `gorm:"not null" json:"supplier_name"`
 	Cost             float64   `json:"cost"`
 	DiscountProvided float64   `json:"discount_provided"`
 	QuantityInPiece  int       `json:"quantity_in_piece"`
@@ -41,8 +47,8 @@ type Supplier struct {
 }
 
 type GenericMedicine struct {
-	ID          int       `json:"id"`
-	Name        string    `json:"name"`
+	ID          uint      `gorm:"primaryKey" json:"id"`
+	Name        string    `gorm:"uniqueIndex;not null" json:"name"`
 	Description string    `json:"description"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
@@ -53,9 +59,9 @@ type Tax struct {
 }
 
 type Medicine struct {
-	ID                   int       `json:"id"`
-	BrandName            string    `json:"name"`
-	GenericID            int       `json:"generic_id"`
+	ID                   uint      `gorm:"primaryKey" json:"id"`
+	BrandName            string    `json:"brand_name"`
+	GenericID            uint      `json:"generic_id"`
 	Description          string    `json:"description"`
 	Category             string    `json:"category"`
 	QuantityInPieces     int       `json:"stock"`
@@ -63,7 +69,7 @@ type Medicine struct {
 	PurchasePrice        float64   `json:"purchase_price"`
 	SellingPrice         float64   `json:"price"`
 	TaxType              string    `json:"tax_type"`
-	Tax                  Tax       `json:"tax"`
+	TaxVAT               float64   `json:"tax_vat"` // For GORM, better to flatten embedded struct
 	MinimumThreshold     int       `json:"minimum_threshold"`
 	MaximumThreshold     int       `json:"maximum_threshold"`
 	EstimatedLeadTime    int       `json:"estimated_lead_time"`
@@ -74,60 +80,61 @@ type Medicine struct {
 
 type MedicineWithGeneric struct {
 	Medicine
-	Generic GenericMedicine `json:"generic"`
+	Generic GenericMedicine `gorm:"foreignKey:GenericID" json:"generic"`
 }
 
 type Pharmacist struct {
-	ID            int            `json:"id"`
-	Name          string         `json:"name"`
-	Email         string         `json:"email"`
-	OAuthID       string         `json:"-"`
-	OAuthProvider string         `json:"-"`
-	CreatedAt     time.Time      `json:"created_at"`
-	LastLogin     sql.NullTime   `json:"last_login,omitempty"`
+	ID            uint       `gorm:"primaryKey" json:"id"`
+	Name          string     `gorm:"not null" json:"name"`
+	Email         *string    `gorm:"type:varchar(100);uniqueIndex" json:"email,omitempty"`
+	Password *string `gorm:"not null" json:"-"`
+	OAuthID       *string    `gorm:"uniqueIndex" json:"-"`
+	OAuthProvider *string    `gorm:"type:varchar(50)" json:"-"`
+	CreatedAt     time.Time  `json:"created_at"`
+	LastLogin     *time.Time `json:"last_login,omitempty"`
 }
 
 type Cart struct {
-	ID        int       `json:"id"`
-	UserID    int       `json:"user_id"`
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	UserID    uint      `gorm:"index" json:"user_id"`
 	Status    string    `json:"status"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type CartItem struct {
-	ID                 int       `json:"id"`
-	CartID             int       `json:"cart_id"`
-	MedicineID         int       `json:"medicine_id"`
+	ID                 uint      `gorm:"primaryKey" json:"id"`
+	CartID             uint      `gorm:"index" json:"cart_id"`
+	MedicineID         uint      `json:"medicine_id"`
 	Quantity           int       `json:"quantity"`
-	OriginalMedicineID int       `json:"original_medicine_id"`
+	OriginalMedicineID uint      `json:"original_medicine_id"`
 	Status             string    `json:"status"`
 	CreatedAt          time.Time `json:"created_at"`
 	UpdatedAt          time.Time `json:"updated_at"`
 }
 
 type Prescription struct {
-	ID         int       `json:"id"`
-	CartItemID int       `json:"cart_item_id"`
-	ImageData  []byte    `json:"-"`
+	ID         uint      `gorm:"primaryKey" json:"id"`
+	CartItemID uint      `gorm:"index" json:"cart_item_id"`
+	ImageData  []byte    `gorm:"type:bytea" json:"-"`
 	Hash       string    `json:"hash"`
 	CreatedAt  time.Time `json:"created_at"`
 }
 
 type Order struct {
-	ID         int       `json:"id"`
-	UserID     int       `json:"user_id"`
-	CartID     int       `json:"cart_id"`
+	ID         uint      `gorm:"primaryKey" json:"id"`
+	UserID     uint      `gorm:"index" json:"user_id"`
+	CartID     uint      `json:"cart_id"`
 	TotalPrice float64   `json:"total_price"`
 	Status     string    `json:"status"`
-	Tax        Tax       `json:"tax"`
+	TaxVAT     float64   `json:"tax_vat"`
 	CreatedAt  time.Time `json:"created_at"`
 }
 
 type RefreshToken struct {
-	ID        int       `json:"id"`
-	UserID    int       `json:"user_id"`
-	Token     string    `json:"token"`
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	UserID    uint      `gorm:"index" json:"user_id"`
+	Token     string    `gorm:"uniqueIndex" json:"token"`
 	ExpiresAt time.Time `json:"expires_at"`
 	CreatedAt time.Time `json:"created_at"`
 }
@@ -138,8 +145,8 @@ type TokenPair struct {
 }
 
 type CartItemDetail struct {
-	ID                   int     `json:"id"`
-	MedicineID           int     `json:"medicine_id"`
+	ID                   uint    `json:"id"`
+	MedicineID           uint    `json:"medicine_id"`
 	MedicineName         string  `json:"medicine_name"`
 	GenericName          string  `json:"generic_name"`
 	PrescriptionRequired bool    `json:"prescription_required"`
@@ -150,10 +157,10 @@ type CartItemDetail struct {
 }
 
 type CartResponse struct {
-	CartID int              `json:"cart_id"`
-	Status string           `json:"status"`
-	Items  []CartItemDetail `json:"items"`
-	Total  float64          `json:"total"`
+	CartID uint              `json:"cart_id"`
+	Status string            `json:"status"`
+	Items  []CartItemDetail  `json:"items"`
+	Total  float64           `json:"total"`
 }
 
 type OrderItem struct {
@@ -163,29 +170,29 @@ type OrderItem struct {
 	Price       float64 `json:"price"`
 	Status      string  `json:"status"`
 	ItemTotal   float64 `json:"item_total"`
-	Tax         Tax     `json:"tax"`
+	TaxVAT      float64 `json:"tax_vat"`
 }
 
 type OrderDetails struct {
-	OrderID int         `json:"order_id"`
+	OrderID uint        `json:"order_id"`
 	Items   []OrderItem `json:"items"`
 	Total   float64     `json:"total"`
 }
 
 type DirectOrder struct {
-	ID         int       `json:"id"`
-	UserID     int       `json:"user_id"`
-	MedicineID int       `json:"medicine_id"`
+	ID         uint      `gorm:"primaryKey" json:"id"`
+	UserID     uint      `json:"user_id"`
+	MedicineID uint      `json:"medicine_id"`
 	Quantity   int       `json:"quantity"`
 	TotalPrice float64   `json:"total_price"`
 	Status     string    `json:"status"`
-	Tax        Tax       `json:"tax"`
+	TaxVAT     float64   `json:"tax_vat"`
 	CreatedAt  time.Time `json:"created_at"`
 }
 
 type InventoryLog struct {
-	ID           int       `json:"id"`
-	MedicineID   int       `json:"medicine_id"`
+	ID           uint      `gorm:"primaryKey" json:"id"`
+	MedicineID   uint      `gorm:"index" json:"medicine_id"`
 	ChangeAmount int       `json:"change_amount"`
 	NewQuantity  int       `json:"new_quantity"`
 	ChangeType   string    `json:"change_type"`

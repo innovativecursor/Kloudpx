@@ -12,21 +12,27 @@ func RegisterRoutes(
 	supplierHandler *handlers.SupplierHandler,
 	taxHandler *handlers.TaxHandler,
 ) {
-	// Health check endpoint
+	// Health check
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
-	// Authentication routes
+	// Auth routes
 	authGroup := r.Group("/auth")
 	{
+		// Admin OAuth login
 		authGroup.POST("/admin/oauth", auth.OAuthMiddleware(), handlers.AdminOAuthLogin)
-		authGroup.POST("/pharmacist/oauth", auth.OAuthMiddleware(), handlers.PharmacistOAuthLogin)
+
+		// JWT login for user and pharmacist
+		authGroup.POST("/user/login", handlers.UserLogin)
+		authGroup.POST("/pharmacist/login", handlers.PharmacistLogin)
+
+		// Common token operations
 		authGroup.POST("/refresh", handlers.RefreshToken)
 		authGroup.POST("/logout", handlers.Logout)
 	}
 
-	// User routes
+	// User routes (JWT protected)
 	user := r.Group("/user")
 	user.Use(auth.AuthMiddleware("user"))
 	{
@@ -36,15 +42,18 @@ func RegisterRoutes(
 		user.POST("/cart/:cartID/checkout", handlers.CheckoutCart)
 		user.GET("/cart/:cartID", handlers.GetCart)
 		user.POST("/cart/:cartID/confirm", handlers.ConfirmCart)
+
 		user.GET("/orders", handlers.GetUserOrders)
 		user.GET("/orders/:orderID", handlers.GetOrderDetails)
 		user.GET("/orders/:orderID/invoice", handlers.GenerateInvoice)
+
 		user.GET("/medicines", handlers.SearchMedicines)
 		user.GET("/medicines/:id", handlers.GetMedicineDetails)
+
 		user.PUT("/profile", handlers.UpdateProfile)
 	}
 
-	// Pharmacist routes
+	// Pharmacist routes (JWT protected)
 	pharmacist := r.Group("/pharmacist")
 	pharmacist.Use(auth.AuthMiddleware("pharmacist"))
 	{
@@ -53,7 +62,7 @@ func RegisterRoutes(
 		pharmacist.POST("/carts/:cartID/review", handlers.ReviewCart)
 	}
 
-	// Admin routes
+	// Admin routes (JWT protected, post OAuth login)
 	admin := r.Group("/admin")
 	admin.Use(auth.AuthMiddleware("admin"))
 	{

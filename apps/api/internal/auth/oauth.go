@@ -2,12 +2,13 @@ package auth
 
 import (
 	"errors"
-	"strings"
+//	"strings"
 
-	"github.com/gin-gonic/gin"
+//	"github.com/gin-gonic/gin"
 )
 
 // Extract Token from Header, Query, or Cookie
+/*
 func ExtractToken(c *gin.Context) string {
 	token := c.GetHeader("Authorization")
 	if token == "" {
@@ -21,7 +22,7 @@ func ExtractToken(c *gin.Context) string {
 	}
 	return strings.TrimPrefix(token, "Bearer ")
 }
-
+*/
 // Mock function to get admin info from OAuth provider
 func GetAdminInfo(token string) (map[string]interface{}, error) {
 	if token == "" {

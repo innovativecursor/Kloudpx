@@ -1,91 +1,236 @@
 package database
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
-	"os"
+	"time"
 
-	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+
+	"github.com/innovativecursor/Kloudpx/internal/models"
 )
 
-var DB *sql.DB
+var DB *gorm.DB
 
 func InitDB() {
-	connStr := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		getEnv("DB_HOST", "localhost"),
-		getEnv("DB_PORT", "5432"),
-		getEnv("DB_USER", "postgres"),
-		getEnv("DB_PASSWORD", "secret"),
-		getEnv("DB_NAME", "yourapp"),
-		getEnv("SSL_MODE", "disable"),
+	// Static config (you can switch back to os.Getenv if using .env later)
+	dbUser := "postgres"
+	dbPass := "secret"
+	dbHost := "localhost"
+	dbPort := "5432" // FIXED: this should be the actual Postgres port, not :8080
+	dbName := "yourapp"
+
+	if dbUser == "" || dbPass == "" || dbHost == "" || dbPort == "" || dbName == "" {
+		log.Fatal("Database environment variables are not fully set")
+	}
+
+	dsn := fmt.Sprintf(
+		"user=%s password=%s host=%s port=%s dbname=%s sslmode=disable TimeZone=Asia/Kolkata",
+		dbUser, dbPass, dbHost, dbPort, dbName,
 	)
 
 	var err error
-	DB, err = sql.Open("postgres", connStr)
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
-		log.Fatalf("Error opening database connection: %v", err)
+		log.Fatal("❌ Failed to connect to database:", err)
 	}
 
-	DB.SetMaxOpenConns(10)
-	DB.SetMaxIdleConns(5)
-	DB.SetConnMaxLifetime(0)
-
-	if err = DB.Ping(); err != nil {
-		log.Fatalf("Error connecting to database: %v", err)
+	sqlDB, err := DB.DB()
+	if err != nil {
+		log.Fatal("❌ Failed to get generic DB object:", err)
 	}
 
-	log.Println("Database connection established successfully!")
-	createTables()
+	// Connection pool settings
+	sqlDB.SetMaxOpenConns(25)
+	sqlDB.SetMaxIdleConns(25)
+	sqlDB.SetConnMaxLifetime(5 * time.Minute)
+
+	err = autoMigrate()
+	if err != nil {
+		log.Fatal("❌ Auto migration failed:", err)
+	}
+
+	log.Println("✅ Database connected and migrated")
 }
 
-func getEnv(key, fallback string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		return value
-	}
-	return fallback
+func autoMigrate() error {
+	return DB.AutoMigrate(
+		&models.User{},
+		&models.Admin{},
+		&models.Pharmacist{},
+		&models.Supplier{},
+		&models.GenericMedicine{},
+		&models.Medicine{},
+		&models.Cart{},
+		&models.CartItem{},
+		&models.Prescription{},
+		&models.Order{},
+		&models.RefreshToken{},
+		&models.DirectOrder{},
+		&models.InventoryLog{},
+	)
 }
 
-func createTables() {
-	tables := []string{
-		`CREATE TABLE IF NOT EXISTS users (
-			id SERIAL PRIMARY KEY,
-			username VARCHAR(50) UNIQUE NOT NULL,
-			password TEXT NOT NULL,
-			email VARCHAR(255),
-			role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'supplier', 'user', 'pharmacist')),
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-		)`,
-		`CREATE TABLE IF NOT EXISTS medicines (
-			id SERIAL PRIMARY KEY,
-			brand_name VARCHAR(100) NOT NULL,
-			generic_name VARCHAR(100) NOT NULL,
-			description TEXT,
-			category VARCHAR(100),
-			prescription_required BOOLEAN NOT NULL,
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-		)`,
-		`CREATE TABLE IF NOT EXISTS carts (
-			id SERIAL PRIMARY KEY,
-			user_id INT NOT NULL REFERENCES users(id),
-			status VARCHAR(20) NOT NULL DEFAULT 'pending',
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-		)`,
-		`CREATE TABLE IF NOT EXISTS prescriptions (
-			id SERIAL PRIMARY KEY,
-			cart_id INT NOT NULL REFERENCES carts(id),
-			pharmacist_id INT NOT NULL REFERENCES users(id),
-			status VARCHAR(20) NOT NULL DEFAULT 'pending',
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-		)`,
+
+/*package database
+
+import (
+	"fmt"
+	"log"
+	"time"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+
+	"github.com/innovativecursor/Kloudpx/internal/models"
+)
+
+var DB *gorm.DB
+
+func InitDB() {
+	// Hardcoded DB config (replace with os.Getenv for production)
+	dbUser := "postgres"
+	dbPass := "secret"
+	dbHost := "localhost"
+	dbPort := "5432" // ✅ removed colon
+	dbName := "yourapp"
+
+	if dbUser == "" || dbPass == "" || dbHost == "" || dbPort == "" || dbName == "" {
+		log.Fatal("Database environment variables are not fully set")
 	}
 
-	for _, table := range tables {
-		_, err := DB.Exec(table)
-		if err != nil {
-			log.Printf("Error creating table: %v\nQuery: %s", err, table)
-		}
+	dsn := fmt.Sprintf(
+		"user=%s password=%s host=%s port=%s dbname=%s sslmode=disable TimeZone=Asia/Kolkata",
+		dbUser, dbPass, dbHost, dbPort, dbName,
+	)
+
+	var err error
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
+	if err != nil {
+		log.Fatal("Failed to connect to database:", err)
 	}
-	log.Println("Database tables verified/created successfully!")
+
+	sqlDB, err := DB.DB()
+	if err != nil {
+		log.Fatal("Failed to get generic DB object:", err)
+	}
+
+	sqlDB.SetMaxOpenConns(25)
+	sqlDB.SetMaxIdleConns(25)
+	sqlDB.SetConnMaxLifetime(5 * time.Minute)
+
+	err = autoMigrate()
+	if err != nil {
+		log.Fatal("Auto migration failed:", err)
+	}
+
+	log.Println("🚀 Database connected and migrated")
 }
+
+func autoMigrate() error {
+	return DB.AutoMigrate(
+		&models.User{},
+		&models.Admin{},
+		&models.Pharmacist{},
+		&models.Supplier{},
+		&models.GenericMedicine{},
+		&models.Medicine{},
+		&models.Cart{},
+		&models.CartItem{},
+		&models.Prescription{},
+		&models.Order{},
+		&models.RefreshToken{},
+		&models.DirectOrder{},
+		&models.InventoryLog{},
+	)
+}
+*/
+
+/*package database
+
+import (
+	"fmt"
+	"log"
+//	"os"
+	"time"
+
+	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+
+	"github.com/innovativecursor/Kloudpx/internal/models"
+)
+
+var DB *gorm.DB
+
+func InitDB() {
+	// Load .env file if exists
+	_ = godotenv.Load()
+
+	dbUser := "postgres"
+	dbPass := "secret"
+	dbHost := "localhost"
+	dbPort := ":8080"
+	dbName := "yourapp"
+
+	if dbUser == "" || dbPass == "" || dbHost == "" || dbPort == "" || dbName == "" {
+		log.Fatal("Database environment variables are not fully set")
+	}
+
+	dsn := fmt.Sprintf(
+		"user=%s password=%s host=%s port=%s dbname=%s sslmode=disable TimeZone=Asia/Kolkata",
+		dbUser, dbPass, dbHost, dbPort, dbName,
+	)
+
+	var err error
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
+	if err != nil {
+		log.Fatal("Failed to connect to database:", err)
+	}
+
+	sqlDB, err := DB.DB()
+	if err != nil {
+		log.Fatal("Failed to get generic DB object:", err)
+	}
+
+	// Optional connection pool settings
+	sqlDB.SetMaxOpenConns(25)
+	sqlDB.SetMaxIdleConns(25)
+	sqlDB.SetConnMaxLifetime(5 * time.Minute)
+
+	err = autoMigrate()
+	if err != nil {
+		log.Fatal("Auto migration failed:", err)
+	}
+
+	log.Println("🚀 Database connected and migrated")
+}
+
+func autoMigrate() error {
+	return DB.AutoMigrate(
+		&models.User{},
+		&models.Admin{},
+		&models.Pharmacist{},
+		&models.Supplier{},
+		&models.GenericMedicine{},
+		&models.Medicine{},
+		&models.Cart{},
+		&models.CartItem{},
+		&models.Prescription{},
+		&models.Order{},
+		&models.RefreshToken{},
+		&models.DirectOrder{},
+		&models.InventoryLog{},
+	)
+}
+*/
