@@ -1,11 +1,5 @@
 @import "tailwindcss";
 
-
-
-
-
-
-
 .flex-between-start {
   display: flex;
   justify-content: space-between;
@@ -21,9 +15,9 @@
 }
 
 .text-color {
-  color: #0070BA;
+  color: #0070ba;
 }
 
 .dark-text {
-  color: #00243F;
+  color: #00243f;
 }

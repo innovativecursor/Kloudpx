@@ -50,7 +50,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <div className="responsive-mx">
+    <div className="responsive-mx mt-8 md:mt-10">
       {isHeroPart && (
         <Swiper
           loop={true}
