@@ -3,6 +3,7 @@ import { Button, Collapse, Drawer, Radio, Space } from "antd";
 import { FaArrowRight } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import { Menu } from "../../Constants/Conts";
+import { googleLogout } from "@react-oauth/google";
 const { Panel } = Collapse;
 
 function SideDrawer() {
@@ -36,8 +37,8 @@ function SideDrawer() {
             <Button onClick={onClose}>Close Menu</Button>
           </Space>
         }
-        bodyStyle={{ padding: 0 }} // This removes padding in inline styles
-        className="!p-0" // This removes padding using Tailwind's utility class with important
+        bodyStyle={{ padding: 0 }}
+        className="!p-0"
       >
         <Collapse accordion className="!not-sr-onlyp-0">
           {Object.entries(Menu).map(([key, actions]) => (
@@ -64,6 +65,12 @@ function SideDrawer() {
             </Panel>
           ))}
         </Collapse>
+        <button
+          onClick={() => googleLogout()}
+          className="text-2xl  mx-6 text-red-600 font-medium"
+        >
+          LogOut  <i className="ri-logout-box-r-line text-lg"></i>
+        </button>
       </Drawer>
     </>
   );

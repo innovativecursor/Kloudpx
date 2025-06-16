@@ -1,8 +1,8 @@
 export const Menu = {
   Medicines: [
     { text: "Add Medicine", link: "/addMedicine" },
-    { text: "Update Medicines", link: "/updateMedicines" },
-    { text: "Delete Medicines", link: "/deleteMedicines" },
+    { text: "Update Medicines", link: "/allmedicine" },
+    { text: "Delete Medicines", link: "/allmedicine" },
   ],
   OTC_Products: [
     { text: "Add OTC Product", link: "/addOtcProduct" },
@@ -10,4 +10,8 @@ export const Menu = {
     { text: "Delete OTC Products", link: "/deleteOTC_Products" },
   ],
   Invoices: [{ text: "Order History", link: "/orderHistory" }],
+  Supplier_Management: [
+    { text: "Add Supplier", link: "/addsupplier" },
+    { text: "Update Supplier", link: "/allsupplier" },
+  ],
 };

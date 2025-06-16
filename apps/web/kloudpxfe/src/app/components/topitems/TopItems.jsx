@@ -1,110 +1,56 @@
-// "use client";
+'use client';
 
-// import React, { useRef, useEffect, useState } from "react";
-// import { motion } from "framer-motion";
-
-// const TopItems = ({ items }) => {
-//   const containerRef = useRef(null);
-//   const [maxDrag, setMaxDrag] = useState(0);
-
-//   useEffect(() => {
-//     const updateMaxDrag = () => {
-//       if (containerRef.current) {
-//         const scrollWidth = containerRef.current.scrollWidth;
-//         const offsetWidth = containerRef.current.offsetWidth;
-//         setMaxDrag(scrollWidth - offsetWidth);
-//       }
-//     };
-
-//     updateMaxDrag();
-
-//     window.addEventListener("resize", updateMaxDrag);
-//     return () => window.removeEventListener("resize", updateMaxDrag);
-//   }, [items]);
-
-//   return (
-//     <motion.div
-//       ref={containerRef}
-//       className="flex overflow-x-hidden gap-6 py-4 scrollbar-hide cursor-grab"
-//       initial={{ x: 100, opacity: 0 }}
-//       animate={{ x: 0, opacity: 1 }}
-//       transition={{ duration: 0.6, ease: "easeOut" }}
-//       drag="x"
-//       dragConstraints={{ left: -maxDrag, right: 0 }}
-//       dragElastic={0.2}
-//       whileTap={{ cursor: "grabbing" }}
-//     >
-//       {items.map((item, index) => (
-//         <div
-//           key={index}
-//           className="flex items-center gap-2 w-44  px-4 rounded-lg cursor-pointer select-none"
-//         >
-//           <i className={`${item.iconClass} text-3xl text-blue-500`}></i>
-//           <p className="text-sm font-normal text-center">{item.name}</p>
-//         </div>
-//       ))}
-//     </motion.div>
-//   );
-// };
-
-// export default TopItems;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import React from "react";
-// import { Swiper, SwiperSlide } from "swiper/react";
-// import "swiper/css";
-
-// const TopItems = ({ items }) => {
-//   return (
-//     <Swiper
-//       spaceBetween={16}
-//       freeMode={true}
-//       slidesPerView={5}
-//       className="w-[90%]"
-//     >
-//       {items.map((item, index) => (
-//         <SwiperSlide
-//           key={index}
-//           className="flex flex-col items-center justify-center gap-2 rounded-lg cursor-pointer select-none bg-blue-400 shadow-sm"
-//         >
-//           <i className={`${item.iconClass} text-3xl text-blue-500`}></i>
-//           <p className="text-sm font-normal text-center">{item.name}</p>
-//         </SwiperSlide>
-//       ))}
-//     </Swiper>
-//   );
-// };
-
-// export default TopItems;
-
-
-
-
-
-
-import React from 'react'
+import React from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import { Navigation } from 'swiper/modules';
+import useSwiperNavigation from '@/hooks/useSwiperNavigation';
 
 const TopItems = () => {
+  const { prevRef, nextRef, setSwiperInstance } = useSwiperNavigation();
+
+  const items = [
+    { image: "/assets/medicine.png", name: "Medicines" },
+    { image: "/assets/percare.png", name: "Personal Care" },
+    { image: "/assets/healthcare.png", name: "Healthcare Devices" },
+    { image: "/assets/baby.png", name: "Baby" },
+    { image: "/assets/vita.png", name: "Vitamins & Supplements" },
+    { image: "/assets/pets.png", name: "Pets" },
+    { image: "/assets/herbs.png", name: "Herbs" },
+    { image: "/assets/medicine.png", name: "Medicines" },
+    { image: "/assets/percare.png", name: "Personal Care" },
+  ];
+
   return (
-    <div>
-
+    <div className="w-full">
+      <Swiper
+        loop={true}
+        modules={[Navigation]}
+        onSwiper={setSwiperInstance}
+        navigation={{
+          prevEl: prevRef.current,
+          nextEl: nextRef.current,
+        }}
+        breakpoints={{
+          0: { slidesPerView: 2, spaceBetween: 10 },
+          640: { slidesPerView: 5, spaceBetween: 15 },
+          768: { slidesPerView: 6, spaceBetween: 20 },
+          1024: { slidesPerView: 7, spaceBetween: 0 },
+        }}
+        className="w-full"
+      >
+        {items.map((item, index) => (
+          <SwiperSlide key={index}>
+            <div className="flex gap-1 items-center justify-center p-2">
+              <img src={item.image} alt={item.name} className="w-6 h-6 object-contain" />
+              <p className="text-[10px] font-medium text-center">{item.name}</p>
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </div>
-  )
-}
+  );
+};
 
-export default TopItems
+export default TopItems;

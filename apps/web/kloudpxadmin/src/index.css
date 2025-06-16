@@ -3,18 +3,65 @@
 @tailwind utilities;
 
 @layer components {
-    .card {
-      background-color: theme('colors.white');
-      border-radius: theme('borderRadius.lg');
-      padding: theme('spacing.5');
-      box-shadow: theme('boxShadow.xl');
-    }
+  .card {
+    background-color: theme('colors.white');
+    border-radius: theme('borderRadius.lg');
+    padding: theme('spacing.5');
+    box-shadow: theme('boxShadow.xl');
   }
+}
 
-  html{
-    scroll-behavior: smooth;
-  }
+html {
+  scroll-behavior: smooth;
+}
 
-  body {
-  @apply bg-blue-50 
+body {
+  @apply bg-blue-50
+}
+
+
+
+.responsive-mx {
+  @apply mx-3 sm:mx-5 mt-16 md:mx-[4vw] lg:mx-[12vw];
+}
+
+
+
+.card {
+  border: 1px solid #0070BA;
+  max-width: 48rem;
+  border-radius: 0.5rem;
+  height: fit-content;
+  padding: 0.75rem;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  width: 100%;
+}
+
+
+
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+  border: 1px solid #555;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
 }
