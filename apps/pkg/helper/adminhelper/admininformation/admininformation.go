@@ -11,10 +11,11 @@ import (
 
 func AddAdminInfo(c *gin.Context, db *gorm.DB, email, firstName, lastName string) (string, error) {
 	admin := models.Admin{
-		Email:         email,
-		FirstName:     firstName,
-		LastName:      lastName,
-		EmailVerified: true,
+		Email:           email,
+		FirstName:       firstName,
+		LastName:        lastName,
+		EmailVerified:   true,
+		ApplicationRole: "admin",
 	}
 
 	// Save admin to DB

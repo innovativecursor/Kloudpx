@@ -54,18 +54,18 @@ function Navigation(props) {
     <>
       <div>
         {location.pathname !== "/" && props.loggedIn ? (
+          ""
+        ) : (
           <div className="">
             <Navbar />
           </div>
-        ) : (
-          ""
         )}
         <div>
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/reset/:token" element={<ResetPassword />} />
             <Route
-              element={<PrivateRoute />}
+             // element={<PrivateRoute />}
             >
               <Route>
                 <Route path="/home" element={<Home />} />

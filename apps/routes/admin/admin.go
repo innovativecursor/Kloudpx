@@ -6,7 +6,9 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/generic"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/oauth"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/middleware"
 	"github.com/innovativecursor/Kloudpx/apps/routes/getapiroutes"
 	"gorm.io/gorm"
 )
@@ -25,15 +27,37 @@ func Admin(db *gorm.DB) {
 		c.String(http.StatusOK, "admin Service Healthy")
 	})
 
-	apiV1.GET("/auth/:provider", func(c *gin.Context) {
-		oauth.AuthHandler(c)
+	// apiV1.GET("/auth/:provider", func(c *gin.Context) {
+	// 	oauth.AuthHandler(c)
+	// })
+
+	// //handle Handle google callback
+	// apiV1.GET("/auth/:provider/callback", func(c *gin.Context) {
+	// 	oauth.AuthCallbackHandler(c, db)
+	// })
+
+	apiV1.GET("/auth/google", func(c *gin.Context) {
+		oauth.GoogleLoginHandler(c)
 	})
 
-	//handle Handle Facebook callback
-	apiV1.GET("/auth/:provider/callback", func(c *gin.Context) {
-		oauth.AuthCallbackHandler(c, db)
+	router.GET("/v1/auth/google/callback", func(c *gin.Context) {
+		oauth.GoogleCallbackHandler(c, db)
 	})
 
+	//add generic
+	apiV1.POST("/generic/add-generic", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		generic.AddGeneric(c, db)
+	})
+
+	//add generic
+	apiV1.GET("/generic/get-generic", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		generic.GetAllGenerics(c, db)
+	})
+
+	//add generic
+	apiV1.GET("/generic/delete-generic/:id", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		generic.DeleteGeneric(c, db)
+	})
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
 	router.Run(":" + port)
