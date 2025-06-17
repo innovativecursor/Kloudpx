@@ -36,11 +36,11 @@ func Admin(db *gorm.DB) {
 	// 	oauth.AuthCallbackHandler(c, db)
 	// })
 
-	apiV1.GET("/auth/google", func(c *gin.Context) {
-		oauth.GoogleLoginHandler(c)
-	})
+	// apiV1.GET("/auth/google", func(c *gin.Context) {
+	// 	oauth.GoogleLoginHandler(c)
+	// })
 
-	router.GET("/v1/auth/google/callback", func(c *gin.Context) {
+	apiV1.GET("/auth/google/callback", func(c *gin.Context) {
 		oauth.GoogleCallbackHandler(c, db)
 	})
 

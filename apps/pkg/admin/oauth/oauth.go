@@ -1,17 +1,20 @@
 package oauth
 
-import (
-	"context"
-	"encoding/json"
-	"log"
-	"net/http"
+// import (
+// 	"context"
+// 	"fmt"
+// 	"html/template"
+// 	"net/http"
+// 	"net/url"
+// 	"sort"
 
-	"github.com/gin-gonic/gin"
-	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/adminhelper/admininformation"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
-	"gorm.io/gorm"
-)
+// 	"github.com/gin-gonic/gin"
+// 	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/adminhelper/admininformation"
+// 	"github.com/markbates/goth"
+// 	"github.com/markbates/goth/gothic"
+// 	"github.com/markbates/goth/providers/google"
+// 	"gorm.io/gorm"
+// )
 
 // type ProviderIndex struct {
 // 	Providers    []string
@@ -79,13 +82,21 @@ import (
 // 	}
 
 // 	// Final response — JSON only
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"message":     "Google authentication successful",
-// 		"jwtoken":     jwtToken,
-// 		"accessToken": user.AccessToken,
-// 		"firstName":   firstName,
-// 		"lastName":    lastName,
-// 	})
+// 	// c.JSON(http.StatusOK, gin.H{
+// 	// 	"message":     "Google authentication successful",
+// 	// 	"jwtoken":     jwtToken,
+// 	// 	"accessToken": user.AccessToken,
+// 	// 	"firstName":   firstName,
+// 	// 	"lastName":    lastName,
+// 	// })
+// 	redirectURL := fmt.Sprintf(
+// 		"http://localhost:3004/google-success?jwtoken=%s&firstName=%s&email=%s",
+// 		jwtToken,
+// 		url.QueryEscape(firstName),
+// 		url.QueryEscape(email),
+// 	)
+
+// 	c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 // }
 
 // func LogoutHandler(c *gin.Context) {
@@ -115,72 +126,145 @@ import (
 // 	t.Execute(c.Writer, "Welcome to the Google home page")
 // }
 
-// OAuth2 Config for Google
-var googleOauthConfig = &oauth2.Config{
-	ClientID:     "573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com",
-	ClientSecret: "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",
-	RedirectURL:  "http://localhost:10001/v1/auth/google/callback",
-	Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
-	Endpoint:     google.Endpoint,
+// // OAuth2 Config for Google
+// var googleOauthConfig = &oauth2.Config{
+// 	ClientID:     "573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com",
+// 	ClientSecret: "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",
+// 	RedirectURL:  "http://localhost:10001/v1/auth/google/callback",
+// 	Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
+// 	Endpoint:     google.Endpoint,
+// }
+
+// const oauthGoogleUserInfoURL = "https://www.googleapis.com/oauth2/v2/userinfo?access_token="
+
+// // Redirects user to Google's OAuth2 consent screen
+// func GoogleLoginHandler(c *gin.Context) {
+// 	state := "randomstate" // In production, store in Redis/session
+// 	url := googleOauthConfig.AuthCodeURL(state, oauth2.AccessTypeOffline)
+// 	c.JSON(http.StatusOK, gin.H{"redirect_url": url})
+// }
+
+// func GoogleCallbackHandler(c *gin.Context, db *gorm.DB) {
+// 	code := c.Query("code")
+// 	if code == "" {
+// 		log.Println("❌ Authorization code missing in callback query")
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Authorization code not found"})
+// 		return
+// 	}
+
+// 	log.Println("✅ Received authorization code:", code)
+
+// 	// Exchange code for token
+// 	token, err := googleOauthConfig.Exchange(context.Background(), code)
+// 	if err != nil {
+// 		log.Println("❌ Token exchange failed:", err)
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Token exchange failed", "details": err.Error()})
+// 		return
+// 	}
+
+// 	log.Println("✅ Token obtained:", token)
+
+// 	// Get user info
+// 	client := googleOauthConfig.Client(context.Background(), token)
+// 	resp, err := client.Get(oauthGoogleUserInfoURL + token.AccessToken)
+// 	if err != nil {
+// 		log.Println("❌ Failed to fetch user info:", err)
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user info", "details": err.Error()})
+// 		return
+// 	}
+// 	defer resp.Body.Close()
+
+// 	if resp.StatusCode != http.StatusOK {
+// 		log.Println("❌ Google API response status:", resp.Status)
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Google API returned non-200"})
+// 		return
+// 	}
+
+// 	var userInfo struct {
+// 		Email     string `json:"email"`
+// 		FirstName string `json:"given_name"`
+// 		LastName  string `json:"family_name"`
+// 	}
+
+// 	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
+// 		log.Println("❌ Failed to decode user info JSON:", err)
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode user info", "details": err.Error()})
+// 		return
+// 	}
+
+// 	log.Println("✅ User info:", userInfo)
+
+// 	// Create or fetch admin and generate JWT
+// 	jwtToken, err := admininformation.AddAdminInfo(c, db, userInfo.Email, userInfo.FirstName, userInfo.LastName)
+// 	if err != nil {
+// 		log.Println("❌ Failed to create/fetch admin:", err)
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create or fetch admin info", "details": err.Error()})
+// 		return
+// 	}
+
+// 	log.Println("✅ JWT generated successfully")
+
+// 	// Final Response
+// 	c.JSON(http.StatusOK, gin.H{
+// 		"message":      "Google authentication successful",
+// 		"jwtoken":      jwtToken,
+// 		"email":        userInfo.Email,
+// 		"firstName":    userInfo.FirstName,
+// 		"lastName":     userInfo.LastName,
+// 		"access_token": token.AccessToken,
+// 	})
+// }
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/adminhelper/admininformation"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+	"gorm.io/gorm"
+)
+
+var googleOauthConfig = &oauth2.Config{}
+
+func init() {
+
+	googleOauthConfig = &oauth2.Config{
+		ClientID:     "573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com",
+		ClientSecret: "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",
+		RedirectURL:  "http://localhost:3004",
+		Scopes:       []string{"profile", "email"},
+		Endpoint:     google.Endpoint,
+	}
 }
-
-const oauthGoogleUserInfoURL = "https://www.googleapis.com/oauth2/v2/userinfo?access_token="
-
-// Redirects user to Google's OAuth2 consent screen
-func GoogleLoginHandler(c *gin.Context) {
-	state := "randomstate" // In production, store in Redis/session
-	url := googleOauthConfig.AuthCodeURL(state, oauth2.AccessTypeOffline)
-	c.JSON(http.StatusOK, gin.H{"redirect_url": url})
-}
-
-// Handles Google OAuth2 callback and returns user info + JWT
 func GoogleCallbackHandler(c *gin.Context, db *gorm.DB) {
 	code := c.Query("code")
-	if code == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Authorization code not found"})
-		return
-	}
+	token, err := googleOauthConfig.Exchange(context.Background(), code)
 
-	// Exchange code for access token
-	token, err := googleOauthConfig.Exchange(context.Background(), code, oauth2.SetAuthURLParam("redirect_uri", googleOauthConfig.RedirectURL))
 	if err != nil {
-		log.Println("Token exchange error:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Token exchange failed", "details": err.Error()})
+		fmt.Println("Error exchanging code: " + err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Get user info
-	client := googleOauthConfig.Client(context.Background(), token)
-	resp, err := client.Get(oauthGoogleUserInfoURL + token.AccessToken)
-	if err != nil || resp.StatusCode != http.StatusOK {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user info"})
-		return
-	}
-	defer resp.Body.Close()
-
-	var userInfo struct {
-		Email     string `json:"email"`
-		FirstName string `json:"given_name"`
-		LastName  string `json:"family_name"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode user info"})
-		return
-	}
-
-	// Create admin or fetch existing + generate JWT
-	jwtToken, err := admininformation.AddAdminInfo(c, db, userInfo.Email, userInfo.FirstName, userInfo.LastName)
+	userInfo, err := admininformation.GetUserInfo(token.AccessToken)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create or fetch admin info", "details": err.Error()})
+		fmt.Println("Error getting user info: " + err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message":   "Google authentication successful",
-		"jwtoken":   jwtToken,
-		"email":     userInfo.Email,
-		"firstName": userInfo.FirstName,
-		"lastName":  userInfo.LastName,
-	})
+	email, _ := userInfo["email"].(string)
+	firstName, _ := userInfo["given_name"].(string)
+	lastName, _ := userInfo["family_name"].(string)
+
+	jwtToken, err := admininformation.AddAdminInfo(c, db, email, firstName, lastName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"token": jwtToken})
 }
