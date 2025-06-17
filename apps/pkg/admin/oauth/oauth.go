@@ -3,12 +3,13 @@ package oauth
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/adminhelper/admininformation"
-	"github.com/markbates/goth/providers/google"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 	"gorm.io/gorm"
 )
 
@@ -125,14 +126,14 @@ var googleOauthConfig = &oauth2.Config{
 
 const oauthGoogleUserInfoURL = "https://www.googleapis.com/oauth2/v2/userinfo?access_token="
 
-// GoogleLoginHandler redirects user to Google's OAuth2 consent screen
+// Redirects user to Google's OAuth2 consent screen
 func GoogleLoginHandler(c *gin.Context) {
-	state := "randomstate" // TODO: Use secure random state and store it in session or Redis
-	url := googleOauthConfig.AuthCodeURL(state)
+	state := "randomstate" // In production, store in Redis/session
+	url := googleOauthConfig.AuthCodeURL(state, oauth2.AccessTypeOffline)
 	c.JSON(http.StatusOK, gin.H{"redirect_url": url})
 }
 
-// GoogleCallbackHandler handles Google callback, retrieves user info, and issues JWT
+// Handles Google OAuth2 callback and returns user info + JWT
 func GoogleCallbackHandler(c *gin.Context, db *gorm.DB) {
 	code := c.Query("code")
 	if code == "" {
@@ -140,9 +141,10 @@ func GoogleCallbackHandler(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Exchange code for token
-	token, err := googleOauthConfig.Exchange(context.Background(), code)
+	// Exchange code for access token
+	token, err := googleOauthConfig.Exchange(context.Background(), code, oauth2.SetAuthURLParam("redirect_uri", googleOauthConfig.RedirectURL))
 	if err != nil {
+		log.Println("Token exchange error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Token exchange failed", "details": err.Error()})
 		return
 	}
@@ -167,14 +169,13 @@ func GoogleCallbackHandler(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Create or fetch admin and generate JWT
+	// Create admin or fetch existing + generate JWT
 	jwtToken, err := admininformation.AddAdminInfo(c, db, userInfo.Email, userInfo.FirstName, userInfo.LastName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create or fetch admin info", "details": err.Error()})
 		return
 	}
 
-	// Final Response
 	c.JSON(http.StatusOK, gin.H{
 		"message":   "Google authentication successful",
 		"jwtoken":   jwtToken,
