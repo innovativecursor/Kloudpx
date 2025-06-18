@@ -13,7 +13,7 @@ const Login = (props) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-const login = useGoogleLogin({
+  const login = useGoogleLogin({
     onSuccess: async (codeResponse) => {
       try {
         const tokenResponse = await axios.get(
