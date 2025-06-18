@@ -8,7 +8,6 @@ import { Menu } from "../../Constants/Conts";
 const { Panel } = Collapse;
 
 function Navbar() {
-
   const [open, setOpen] = useState(false);
   const [placement, setPlacement] = useState("left");
   const showDrawer = () => {
@@ -18,19 +17,23 @@ function Navbar() {
     setOpen(false);
   };
 
+  const handleLogout = () => {
+    googleLogout();
+    localStorage.removeItem("access_token");
+    props.loggedOut(); // Dispatch Redux action
+    window.location.href = "/"; // Navigate to login page
+  };
+
   return (
     <div className="bg-white shadow-md px-4 py-3">
       <nav className=" container mx-auto ">
         <div className="flex items-center justify-between">
           {/* Left */}
           <div className="flex items-center sm:space-x-4 space-x-2 w-full max-w-xl">
-            <button
-              type="primary"
-              onClick={showDrawer}
-            >
+            <button type="primary" onClick={showDrawer}>
               <i className="ri-menu-2-fill sm:text-3xl text-2xl rounded-full p-1"></i>
             </button>
-            <NavLink to="/">
+            <NavLink to="/home">
               <img
                 src={logo}
                 alt="Logo"
@@ -46,8 +49,8 @@ function Navbar() {
           {/* Right Side */}
           <div className="flex items-center space-x-3">
             <button
-              onClick={() => googleLogout()}
-              className=" text-lg text-red-600 font-medium"
+              onClick={handleLogout}
+              className="text-lg text-red-600 font-medium"
             >
               <i className="ri-logout-box-r-line font-semibold text-xl"></i>
             </button>
@@ -65,7 +68,6 @@ function Navbar() {
                 className="w-full h-full rounded-full object-cover"
               />
             </div>
-
           </div>
         </div>
         <Drawer
@@ -111,7 +113,7 @@ function Navbar() {
             onClick={() => googleLogout()}
             className="text-2xl  mx-6 text-red-600 font-medium"
           >
-            LogOut  <i className="ri-logout-box-r-line text-lg"></i>
+            LogOut <i className="ri-logout-box-r-line text-lg"></i>
           </button>
         </Drawer>
       </nav>
