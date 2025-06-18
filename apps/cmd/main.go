@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/oauth"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/database"
 	"github.com/innovativecursor/Kloudpx/apps/routes/admin"
 )
@@ -16,10 +15,6 @@ func main() {
 
 		return
 	}
-
-	providers := oauth.InitProviders()
-	_ = providers
-
 	var serviceName string
 
 	// Check if the SERVICE_NAME environment variable is set
