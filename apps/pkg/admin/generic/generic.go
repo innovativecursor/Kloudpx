@@ -34,7 +34,7 @@ func AddGeneric(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	newGeneric := models.Generic{
-		GenericName: payload.GenericData,
+		GenericName: payload.GenericName,
 		UpdatedBy:   userObj.ID,
 	}
 	if err := db.Create(&newGeneric).Error; err != nil {
