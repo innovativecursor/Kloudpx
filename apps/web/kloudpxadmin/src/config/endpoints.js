@@ -6,7 +6,7 @@ const baseUrl = isLive ? baseURLLive : baseURLDev;
 
 const endpoints = {
   auth: {
-    googleLogin: `${baseUrl}/v1/auth/google`,
+    googleLogin: `${baseUrl}/v1/auth/google/callback`,
     refresh: `${baseUrl}/v1/auth/refresh`,
   },
   protected: {

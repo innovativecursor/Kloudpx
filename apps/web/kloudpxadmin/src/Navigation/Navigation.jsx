@@ -64,9 +64,7 @@ function Navigation(props) {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/reset/:token" element={<ResetPassword />} />
-            <Route
-              element={<PrivateRoute />}
-            >
+            <Route element={<PrivateRoute />}>
               <Route>
                 <Route path="/home" element={<Home />} />
                 <Route path="/inquiries" element={<Inquiries />} />
@@ -76,7 +74,10 @@ function Navigation(props) {
                 <Route path="/orderHistory" element={<OrderHistory />} />
                 <Route path="/allmedicine" element={<AllMedicine />} />
                 <Route path="/addsupplier" element={<AddSupplier />} />
-                <Route path="/medicines/edit/:id" element={<UpdateMedicine />} />
+                <Route
+                  path="/medicines/edit/:id"
+                  element={<UpdateMedicine />}
+                />
 
                 <Route
                   path="/updateMedicines"

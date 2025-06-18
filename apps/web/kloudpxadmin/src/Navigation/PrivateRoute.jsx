@@ -4,15 +4,8 @@ import { Navigate, Outlet } from "react-router-dom";
 import Robots from "../Components/Robots/Robots";
 
 function PrivateRoute(props) {
-  let auth = props.isAuthenticated;
-  return (
-    <>
-      {
-        auth ? <Outlet /> : <Robots />
-        //  <Navigate to="/" />
-      }
-    </>
-  );
+  let auth = props.isAuthenticated || !!localStorage.getItem("access_token");
+  return auth ? <Outlet /> : <Navigate to="/" replace />;
 }
 const mapStateToProps = (state) => {
   return {
