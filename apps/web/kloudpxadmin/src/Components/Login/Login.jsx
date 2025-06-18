@@ -1,46 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import { useGoogleLogin } from "@react-oauth/google";
-import logo from "../../../public/kloudlogo.webp";
-import { useNavigate } from "react-router";
-import axios from "axios";
-import Swal from "sweetalert2";
-import { useState } from "react";
-
-const Login = () => {
 import { useGoogleLogin } from "@react-oauth/google";
 import logo from "../../../public/kloudlogo.webp";
 import { getAxiosCall } from "../../Axios/UniversalAxiosCalls";
@@ -50,24 +7,27 @@ import { connect } from "react-redux";
 import axios from "axios";
 import endpoints from "../../config/endpoints";
 import { fetchDataGet } from "../../utils/fetchData";
+import { useState } from "react";
 
 const Login = (props) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const login = useGoogleLogin({
+const login = useGoogleLogin({
     onSuccess: async (codeResponse) => {
       try {
-        const url = endpoints.auth.googleLogin;
-        const params = { code: codeResponse.code };
+        const tokenResponse = await axios.get(
+          // http://localhost:10001/v1/auth/google/callback?code=${codeResponse.code}
+          `http://localhost:10001/v1/auth/google/callback?code=${codeResponse.code}`
+        );
 
-        const { token, user } = await fetchDataGet(url, params);
+        const { token, user } = tokenResponse.data;
 
         if (token) {
-          // Store token
           localStorage.setItem("access_token", token);
+
           props.isLoggedIn(user);
-          // Navigate
+
           navigate("/home");
         } else {
           throw new Error("Invalid token response");
@@ -94,18 +54,11 @@ const Login = (props) => {
         <div className="mx-6">
           <button
             onClick={() => login()}
-
             disabled={loading}
             className="flex items-center justify-center gap-3 py-2 border border-gray-300 font-semibold rounded-md w-full text-lg hover:bg-gray-100 transition disabled:opacity-60"
           >
             <i className="ri-google-fill"></i>
             {loading ? "Signing in..." : "Continue with Google"}
-
-            className="flex items-center justify-center gap-3 py-2 border border-gray-300 font-semibold rounded-md w-full text-lg hover:bg-gray-100 transition"
-          >
-            <i className="ri-google-fill"></i>
-            Continue with Google
-
           </button>
         </div>
         <p className="mt-4 text-sm text-gray-500">
