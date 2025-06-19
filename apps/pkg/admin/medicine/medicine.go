@@ -43,8 +43,10 @@ func AddMedicine(c *gin.Context, db *gorm.DB) {
 		BrandName:             payload.BrandName,
 		GenericID:             payload.GenericID,
 		SupplierID:            payload.SupplierID,
+		SupplierDiscount:      payload.SupplierDiscount,
 		Description:           payload.Description,
 		UnitOfMeasurement:     payload.UnitOfMeasurement,
+		MeasurementUnitValue:  0, // Default, will override if "per box"
 		NumberOfPiecesPerBox:  payload.NumberOfPiecesPerBox,
 		SellingPricePerBox:    payload.SellingPricePerBox,
 		SellingPricePerPiece:  payload.SellingPricePerPiece,
@@ -59,6 +61,10 @@ func AddMedicine(c *gin.Context, db *gorm.DB) {
 		UpdatedBy:             userObj.ID,
 	}
 
+	if payload.UnitOfMeasurement == "per box" {
+		newMedicine.MeasurementUnitValue = payload.MeasurementUnitValue
+	}
+
 	if err := db.Create(&newMedicine).Error; err != nil {
 		logrus.WithError(err).Error("Failed to add medicine to database")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add medicine"})
@@ -69,7 +75,6 @@ func AddMedicine(c *gin.Context, db *gorm.DB) {
 		"message": "Medicine added successfully",
 	})
 }
-
 func GetAllMedicines(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -103,7 +108,6 @@ func GetAllMedicines(c *gin.Context, db *gorm.DB) {
 		"medicines": medicines,
 	})
 }
-
 func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -125,7 +129,6 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Get medicine ID from route param
 	idParam := c.Param("id")
 	medicineID, err := strconv.Atoi(idParam)
 	if err != nil {
@@ -134,7 +137,6 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Fetch existing record
 	var medicine models.Medicine
 	if err := db.First(&medicine, medicineID).Error; err != nil {
 		logrus.WithError(err).WithField("id", medicineID).Error("Medicine not found")
@@ -142,7 +144,6 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Bind new data
 	var payload config.UpdateMedicineData
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		logrus.WithError(err).Error("Failed to bind update payload")
@@ -150,12 +151,19 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Update fields
 	medicine.BrandName = payload.BrandName
 	medicine.GenericID = payload.GenericID
 	medicine.SupplierID = payload.SupplierID
+	medicine.SupplierDiscount = payload.SupplierDiscount
 	medicine.Description = payload.Description
 	medicine.UnitOfMeasurement = payload.UnitOfMeasurement
+
+	if payload.UnitOfMeasurement == "per box" {
+		medicine.MeasurementUnitValue = payload.MeasurementUnitValue
+	} else {
+		medicine.MeasurementUnitValue = 0
+	}
+
 	medicine.NumberOfPiecesPerBox = payload.NumberOfPiecesPerBox
 	medicine.SellingPricePerBox = payload.SellingPricePerBox
 	medicine.SellingPricePerPiece = payload.SellingPricePerPiece
@@ -169,7 +177,6 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 	medicine.Prescription = payload.Prescription
 	medicine.UpdatedBy = userObj.ID
 
-	// Save updates
 	if err := db.Save(&medicine).Error; err != nil {
 		logrus.WithError(err).Error("Failed to update medicine")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update medicine"})

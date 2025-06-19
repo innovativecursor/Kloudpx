@@ -21,7 +21,6 @@ type Generic struct {
 type Supplier struct {
 	gorm.Model
 	SupplierName string `gorm:"not null"`
-	Discount     string
 }
 type Medicine struct {
 	gorm.Model
@@ -30,8 +29,10 @@ type Medicine struct {
 	Generic               Generic `gorm:"foreignKey:GenericID"`
 	SupplierID            uint
 	Supplier              Supplier `gorm:"foreignKey:SupplierID"`
+	SupplierDiscount      string
 	Description           string
 	UnitOfMeasurement     string
+	MeasurementUnitValue  int
 	NumberOfPiecesPerBox  int
 	SellingPricePerBox    float64
 	SellingPricePerPiece  float64

@@ -35,7 +35,6 @@ func AddSupplier(c *gin.Context, db *gorm.DB) {
 
 	newSupplier := models.Supplier{
 		SupplierName: payload.SupplierName,
-		Discount:     payload.Discount,
 	}
 	if err := db.Create(&newSupplier).Error; err != nil {
 		logrus.WithError(err).Error("Failed to add supplier to database")

@@ -4,9 +4,11 @@ type MedicineData struct {
 	BrandName             string  `json:"brandname" binding:"required"`
 	GenericID             uint    `json:"genericid" binding:"required"`
 	SupplierID            uint    `json:"supplierid" binding:"required"`
+	SupplierDiscount      string  `json:"supplierdiscount"`
 	Description           string  `json:"description"`
 	UnitOfMeasurement     string  `json:"unitofmeasurement"`
-	NumberOfPiecesPerBox  int     `json:"numberofpieces_per_box"`
+	MeasurementUnitValue  int     `json:"measurementunitvalue"`
+	NumberOfPiecesPerBox  int     `json:"numberofpiecesperbox"`
 	SellingPricePerBox    float64 `json:"sellingpriceperbox"`
 	SellingPricePerPiece  float64 `json:"sellingpriceperpiece"`
 	CostPricePerBox       float64 `json:"costpriceperbox"`
@@ -16,16 +18,18 @@ type MedicineData struct {
 	MinimumThreshold      int     `json:"minimumthreshold"`
 	MaximumThreshold      int     `json:"maximumthreshold"`
 	EstimatedLeadTimeDays int     `json:"estimatedleadtimedays"`
-	Prescription          bool    `json:"prescription" binding:"required"`
+	Prescription          bool    `json:"prescription"`
 }
 
 type UpdateMedicineData struct {
 	BrandName             string  `json:"brandname" binding:"required"`
 	GenericID             uint    `json:"genericid" binding:"required"`
 	SupplierID            uint    `json:"supplierid" binding:"required"`
+	SupplierDiscount      string  `json:"supplierdiscount"`
 	Description           string  `json:"description"`
 	UnitOfMeasurement     string  `json:"unitofmeasurement"`
-	NumberOfPiecesPerBox  int     `json:"numberofpieces_per_box"`
+	MeasurementUnitValue  int     `json:"measurementunitvalue"`
+	NumberOfPiecesPerBox  int     `json:"numberofpiecesperbox"`
 	SellingPricePerBox    float64 `json:"sellingpriceperbox"`
 	SellingPricePerPiece  float64 `json:"sellingpriceperpiece"`
 	CostPricePerBox       float64 `json:"costpriceperbox"`
@@ -35,5 +39,5 @@ type UpdateMedicineData struct {
 	MinimumThreshold      int     `json:"minimumthreshold"`
 	MaximumThreshold      int     `json:"maximumthreshold"`
 	EstimatedLeadTimeDays int     `json:"estimatedleadtimedays"`
-	Prescription          bool    `json:"prescription" binding:"required"`
+	Prescription          bool    `json:"prescription"`
 }
