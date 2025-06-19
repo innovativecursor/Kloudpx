@@ -18,11 +18,18 @@ type Generic struct {
 	UpdatedBy   uint
 }
 
+type Supplier struct {
+	gorm.Model
+	SupplierName string `gorm:"not null"`
+	Discount     string
+}
 type Medicine struct {
 	gorm.Model
 	BrandName             string `gorm:"not null"`
 	GenericID             uint
 	Generic               Generic `gorm:"foreignKey:GenericID"`
+	SupplierID            uint
+	Supplier              Supplier `gorm:"foreignKey:SupplierID"`
 	Description           string
 	UnitOfMeasurement     string
 	NumberOfPiecesPerBox  int
@@ -31,10 +38,10 @@ type Medicine struct {
 	CostPricePerBox       float64
 	CostPricePerPiece     float64
 	Category              string
-	Supplier              string
 	TaxType               string
 	MinimumThreshold      int
 	MaximumThreshold      int
 	EstimatedLeadTimeDays int
+	Prescription          bool `gorm:"not null"`
 	UpdatedBy             uint
 }
