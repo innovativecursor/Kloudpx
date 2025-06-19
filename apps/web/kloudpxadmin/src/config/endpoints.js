@@ -9,6 +9,10 @@ const endpoints = {
     googleLogin: `${baseUrl}/v1/auth/google/callback`,
     refresh: `${baseUrl}/v1/auth/refresh`,
   },
+  generic: {
+    get: `${baseUrl}/v1/generic/get-generic`,
+    add: `${baseUrl}/v1/generic/add-generic`,
+  },
   protected: {
     basic: `${baseUrl}/api/v1/protected`,
     admin: `${baseUrl}/api/v1/admin`,

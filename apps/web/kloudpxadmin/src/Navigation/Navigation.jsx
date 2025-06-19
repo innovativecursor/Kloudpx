@@ -37,10 +37,12 @@ import AddOtcProduct from "../Components/OTC/AddOtcProduct";
 import AllMedicine from "../Components/addMedicine/AllMedicine";
 import AddSupplier from "../Components/supplier/AddSupplier";
 import UpdateMedicine from "../Components/addMedicine/UpdateMedicine";
+import { useAuthContext } from "../contexts/AuthContext";
 
 function Navigation(props) {
   const location = useLocation();
   const navigateTo = useNavigate();
+  const { isAuthenticated } = useAuthContext();
   useEffect(() => {
     if (location.pathname === "/") {
       window.localStorage.clear();
@@ -53,7 +55,7 @@ function Navigation(props) {
   return (
     <>
       <div>
-        {location.pathname !== "/" && props.loggedIn ? (
+        {location.pathname !== "/" && isAuthenticated ? (
           <div className="">
             <Navbar />
           </div>

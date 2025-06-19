@@ -5,10 +5,13 @@ import logo from "../../../public/kloudlogo.webp";
 import { googleLogout } from "@react-oauth/google";
 import { Button, Collapse, Drawer, Radio, Space } from "antd";
 import { Menu } from "../../Constants/Conts";
+import { useAuthContext } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 const { Panel } = Collapse;
 
 function Navbar() {
-
+  const { logoutUser } = useAuthContext();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [placement, setPlacement] = useState("left");
   const showDrawer = () => {
@@ -18,16 +21,19 @@ function Navbar() {
     setOpen(false);
   };
 
+  const handleLogout = () => {
+    googleLogout();
+    logoutUser();
+    navigate("/");
+  };
+
   return (
     <div className="bg-white shadow-md px-4 py-3">
       <nav className=" container mx-auto ">
         <div className="flex items-center justify-between">
           {/* Left */}
           <div className="flex items-center sm:space-x-4 space-x-2 w-full max-w-xl">
-            <button
-              type="primary"
-              onClick={showDrawer}
-            >
+            <button type="primary" onClick={showDrawer}>
               <i className="ri-menu-2-fill sm:text-3xl text-2xl rounded-full p-1"></i>
             </button>
             <NavLink to="/">
@@ -46,7 +52,7 @@ function Navbar() {
           {/* Right Side */}
           <div className="flex items-center space-x-3">
             <button
-              onClick={() => googleLogout()}
+              onClick={handleLogout}
               className=" text-lg text-red-600 font-medium"
             >
               <i className="ri-logout-box-r-line font-semibold text-xl"></i>
@@ -65,7 +71,6 @@ function Navbar() {
                 className="w-full h-full rounded-full object-cover"
               />
             </div>
-
           </div>
         </div>
         <Drawer
@@ -108,10 +113,10 @@ function Navbar() {
             ))}
           </Collapse>
           <button
-            onClick={() => googleLogout()}
+            onClick={handleLogout}
             className="text-2xl  mx-6 text-red-600 font-medium"
           >
-            LogOut  <i className="ri-logout-box-r-line text-lg"></i>
+            LogOut <i className="ri-logout-box-r-line text-lg"></i>
           </button>
         </Drawer>
       </nav>
