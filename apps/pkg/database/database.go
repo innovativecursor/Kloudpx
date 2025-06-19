@@ -35,7 +35,7 @@ func InitDB() (*gorm.DB, error) {
 	sqlDB.SetConnMaxLifetime(5 * time.Minute) // Maximum lifetime of a connection
 
 	// Create database tables
-	err = dbConn.AutoMigrate(&models.Admin{}, &models.Generic{})
+	err = dbConn.AutoMigrate(&models.Admin{}, &models.Generic{}, &models.Supplier{}, &models.Medicine{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to auto migrate User table: %v", err)
 	}
