@@ -1,33 +1,28 @@
 import { useGoogleLogin } from "@react-oauth/google";
+import { useAuthContext } from "../../contexts/AuthContext";
 import logo from "../../../public/kloudlogo.webp";
-import { getAxiosCall } from "../../Axios/UniversalAxiosCalls";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router";
-import { connect } from "react-redux";
 import axios from "axios";
 import endpoints from "../../config/endpoints";
-import { fetchDataGet } from "../../utils/fetchData";
 import { useState } from "react";
 
-const Login = (props) => {
+const Login = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const { loginUser } = useAuthContext();
 
-const login = useGoogleLogin({
+  const login = useGoogleLogin({
     onSuccess: async (codeResponse) => {
       try {
         const tokenResponse = await axios.get(
-          // http://localhost:10001/v1/auth/google/callback?code=${codeResponse.code}
-          `http://localhost:10001/v1/auth/google/callback?code=${codeResponse.code}`
+          `${endpoints.auth.googleLogin}?code=${codeResponse.code}`
         );
 
         const { token, user } = tokenResponse.data;
 
         if (token) {
-          localStorage.setItem("access_token", token);
-
-          props.isLoggedIn(user);
-
+          loginUser(user, token);
           navigate("/home");
         } else {
           throw new Error("Invalid token response");
@@ -69,11 +64,4 @@ const login = useGoogleLogin({
   );
 };
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    isLoggedIn: (sendUserInfo) =>
-      dispatch({ type: "LOGGEDIN", payload: sendUserInfo }),
-  };
-};
-
-export default connect(null, mapDispatchToProps)(Login);
+export default Login;
