@@ -16,11 +16,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
 
+	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/markbates/goth"
 )
@@ -57,7 +59,7 @@ as either "provider" or ":provider".
 BeginAuthHandler will redirect the user to the appropriate authentication end-point
 for the requested provider.
 
-See https://github.com/markbates/goth/blob/master/examples/main.go to see this in action.
+See https://github.com/markbates/goth/examples/main.go to see this in action.
 */
 func BeginAuthHandler(res http.ResponseWriter, req *http.Request) {
 	url, err := GetAuthURL(res, req)
@@ -154,7 +156,7 @@ process and fetches all the basic information about the user from the provider.
 It expects to be able to get the name of the provider from the query parameters
 as either "provider" or ":provider".
 
-See https://github.com/markbates/goth/blob/master/examples/main.go to see this in action.
+See https://github.com/markbates/goth/examples/main.go to see this in action.
 */
 var CompleteUserAuth = func(res http.ResponseWriter, req *http.Request) (goth.User, error) {
 	if !keySet && defaultStore == Store {
@@ -251,6 +253,55 @@ func Logout(res http.ResponseWriter, req *http.Request) error {
 	return nil
 }
 
+// GetProviderName is a function used to get the name of a provider
+// for a given request. By default, this provider is fetched from
+// the URL query string. If you provide it in a different way,
+// assign your own function to this variable that returns the provider
+// name for your request.
+var GetProviderName = getProviderName
+
+func getProviderName(req *http.Request) (string, error) {
+
+	// try to get it from the url param "provider"
+	if p := req.URL.Query().Get("provider"); p != "" {
+		return p, nil
+	}
+
+	// try to get it from the url param ":provider"
+	if p := req.URL.Query().Get(":provider"); p != "" {
+		return p, nil
+	}
+
+	// try to get it from the context's value of "provider" key
+	if p, ok := mux.Vars(req)["provider"]; ok {
+		return p, nil
+	}
+
+	//  try to get it from the go-context's value of "provider" key
+	if p, ok := req.Context().Value("provider").(string); ok {
+		return p, nil
+	}
+
+	// try to get it from the go-context's value of providerContextKey key
+	if p, ok := req.Context().Value(ProviderParamKey).(string); ok {
+		return p, nil
+	}
+
+	// As a fallback, loop over the used providers, if we already have a valid session for any provider (ie. user has already begun authentication with a provider), then return that provider name
+	providers := goth.GetProviders()
+	session, _ := Store.Get(req, SessionName)
+	for _, provider := range providers {
+		p := provider.Name()
+		value := session.Values[p]
+		if _, ok := value.(string); ok {
+			return p, nil
+		}
+	}
+
+	// if not found then return an empty string with the corresponding error
+	return "", errors.New("you must select a provider")
+}
+
 // GetContextWithProvider returns a new request context containing the provider
 func GetContextWithProvider(req *http.Request, provider string) *http.Request {
 	return req.WithContext(context.WithValue(req.Context(), ProviderParamKey, provider))
@@ -290,7 +341,7 @@ func getSessionValue(session *sessions.Session, key string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	s, err := io.ReadAll(r)
+	s, err := ioutil.ReadAll(r)
 	if err != nil {
 		return "", err
 	}
