@@ -7,6 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/adminhelper/admininformation"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/adminhelper/jwthelper"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"gorm.io/gorm"
@@ -44,13 +46,15 @@ func GoogleCallbackHandler(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// Extract values from map
 	email, _ := userInfo["email"].(string)
 	firstName, _ := userInfo["given_name"].(string)
 	lastName, _ := userInfo["family_name"].(string)
 
-	var existingAdmin admininformation.Admin
+	var existingAdmin models.Admin
 	if err := db.Where("email = ?", email).First(&existingAdmin).Error; err == nil {
-		jwtToken, err := admininformation.GenerateJWT(existingAdmin.Email, existingAdmin.ApplicationRole)
+		// User exists, generate JWT directly
+		jwtToken, err := jwthelper.GenerateJWTToken(email)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "JWT generation failed"})
 			return
@@ -58,7 +62,6 @@ func GoogleCallbackHandler(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusOK, gin.H{"token": jwtToken})
 		return
 	}
-
 	jwtToken, err := admininformation.AddAdminInfo(c, db, email, firstName, lastName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
