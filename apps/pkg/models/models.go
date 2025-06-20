@@ -22,6 +22,12 @@ type Supplier struct {
 	gorm.Model
 	SupplierName string `gorm:"not null"`
 }
+
+type Category struct {
+	gorm.Model
+	CategoryName string `gorm:"not null"`
+}
+
 type Medicine struct {
 	gorm.Model
 	BrandName             string `gorm:"not null"`
@@ -30,6 +36,8 @@ type Medicine struct {
 	SupplierID            uint
 	Supplier              Supplier `gorm:"foreignKey:SupplierID"`
 	SupplierDiscount      string
+	CategoryID            uint
+	Category              Category `gorm:"foreignKey:CategoryID"`
 	Description           string
 	UnitOfMeasurement     string
 	MeasurementUnitValue  int
@@ -38,7 +46,6 @@ type Medicine struct {
 	SellingPricePerPiece  float64
 	CostPricePerBox       float64
 	CostPricePerPiece     float64
-	Category              string
 	TaxType               string
 	MinimumThreshold      int
 	MaximumThreshold      int

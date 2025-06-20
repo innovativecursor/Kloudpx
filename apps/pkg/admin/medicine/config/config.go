@@ -4,6 +4,7 @@ type MedicineData struct {
 	BrandName             string  `json:"brandname" binding:"required"`
 	GenericID             uint    `json:"genericid" binding:"required"`
 	SupplierID            uint    `json:"supplierid" binding:"required"`
+	CategoryID            uint    `json:"categoryid"`
 	SupplierDiscount      string  `json:"supplierdiscount"`
 	Description           string  `json:"description"`
 	UnitOfMeasurement     string  `json:"unitofmeasurement"`
@@ -13,7 +14,6 @@ type MedicineData struct {
 	SellingPricePerPiece  float64 `json:"sellingpriceperpiece"`
 	CostPricePerBox       float64 `json:"costpriceperbox"`
 	CostPricePerPiece     float64 `json:"costpriceperpiece"`
-	Category              string  `json:"category"`
 	TaxType               string  `json:"taxtype"`
 	MinimumThreshold      int     `json:"minimumthreshold"`
 	MaximumThreshold      int     `json:"maximumthreshold"`
@@ -25,6 +25,7 @@ type UpdateMedicineData struct {
 	BrandName             string  `json:"brandname" binding:"required"`
 	GenericID             uint    `json:"genericid" binding:"required"`
 	SupplierID            uint    `json:"supplierid" binding:"required"`
+	CategoryID            uint    `json:"categoryid"`
 	SupplierDiscount      string  `json:"supplierdiscount"`
 	Description           string  `json:"description"`
 	UnitOfMeasurement     string  `json:"unitofmeasurement"`
@@ -34,7 +35,6 @@ type UpdateMedicineData struct {
 	SellingPricePerPiece  float64 `json:"sellingpriceperpiece"`
 	CostPricePerBox       float64 `json:"costpriceperbox"`
 	CostPricePerPiece     float64 `json:"costpriceperpiece"`
-	Category              string  `json:"category"`
 	TaxType               string  `json:"taxtype"`
 	MinimumThreshold      int     `json:"minimumthreshold"`
 	MaximumThreshold      int     `json:"maximumthreshold"`
