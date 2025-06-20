@@ -23,7 +23,6 @@ func init() {
 		Endpoint:     google.Endpoint,
 	}
 }
-
 func GoogleCallbackHandler(c *gin.Context, db *gorm.DB) {
 	code := c.Query("code")
 	if code == "" {
@@ -45,10 +44,20 @@ func GoogleCallbackHandler(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Extract values from map
 	email, _ := userInfo["email"].(string)
 	firstName, _ := userInfo["given_name"].(string)
 	lastName, _ := userInfo["family_name"].(string)
+
+	var existingAdmin admininformation.Admin
+	if err := db.Where("email = ?", email).First(&existingAdmin).Error; err == nil {
+		jwtToken, err := admininformation.GenerateJWT(existingAdmin.Email, existingAdmin.ApplicationRole)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "JWT generation failed"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"token": jwtToken})
+		return
+	}
 
 	jwtToken, err := admininformation.AddAdminInfo(c, db, email, firstName, lastName)
 	if err != nil {

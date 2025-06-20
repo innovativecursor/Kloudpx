@@ -44,6 +44,7 @@ func AddGeneric(c *gin.Context, db *gorm.DB) {
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Generic added successfully",
+		"generic": newGeneric,
 	})
 
 }

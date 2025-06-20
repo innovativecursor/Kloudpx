@@ -42,7 +42,10 @@ func AddSupplier(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "Supplier added successfully"})
+	c.JSON(http.StatusCreated, gin.H{
+		"message":  "Supplier added successfully",
+		"supplier": newSupplier,
+	})
 }
 
 func GetAllSuppliers(c *gin.Context, db *gorm.DB) {
