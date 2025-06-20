@@ -20,6 +20,10 @@ const AddMedicine = () => {
     supplierError,
     fetchSupplierOptions,
     createSupplierOption,
+    fetchCategoryOptions,
+    createCategoryOption,
+    categoryOptions,
+    categoryError,
     token,
     prescriptionRequired,
     setPrescriptionRequired,
@@ -38,7 +42,6 @@ const AddMedicine = () => {
     spPerPiece: "",
     cpPerBox: "",
     cpPerPiece: "",
-    category: "",
     supplierDiscount: "",
     minThreshold: "",
     maxThreshold: "",
@@ -73,6 +76,12 @@ const AddMedicine = () => {
     handleCreateOption: handleSupplierCreate,
   } = useCreatableSelect();
 
+  const {
+    value: category,
+    handleChange: handleCategoryChange,
+    handleCreateOption: handleCategoryCreate,
+  } = useCreatableSelect();
+
   const { value: taxType, handleChange: handleTaxTypeChange } =
     useCreatableSelect();
 
@@ -89,6 +98,7 @@ const AddMedicine = () => {
   useEffect(() => {
     fetchGenericOptions();
     fetchSupplierOptions();
+    fetchCategoryOptions();
   }, []);
 
   useEffect(() => {
@@ -124,6 +134,11 @@ const AddMedicine = () => {
       value: med.Supplier.ID,
       label: med.Supplier.SupplierName,
     });
+    handleCategoryChange({
+      value: med.Category?.ID,
+      label: med.Category?.CategoryName,
+    });
+
     handleUnitChangeLocal({
       value: med.UnitOfMeasurement,
       label: med.UnitOfMeasurement,
@@ -150,7 +165,12 @@ const AddMedicine = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!genericName?.value || !supplier?.value || !unitType?.value) {
+    if (
+      !genericName?.value ||
+      !supplier?.value ||
+      !unitType?.value ||
+      !category?.value
+    ) {
       alert("Please select Generic Name, Supplier, and Unit.");
       return;
     }
@@ -175,14 +195,14 @@ const AddMedicine = () => {
       sellingpriceperpiece: parseFloat(formData.spPerPiece),
       costpriceperbox: parseFloat(formData.cpPerBox),
       costpriceperpiece: parseFloat(formData.cpPerPiece),
-      category: formData.category,
+      categoryid: Number(category?.value),
       taxtype: taxType?.value || "GST",
       minimumthreshold: parseInt(formData.minThreshold),
       maximumthreshold: parseInt(formData.maxThreshold),
       estimatedleadtimedays: parseInt(formData.leadTime),
       prescription: prescriptionRequired,
     };
-    console.log(payload);
+    // console.log(payload);
     try {
       if (id) {
         await axios.put(endpoints.medicine.update(id), payload, {
@@ -196,6 +216,7 @@ const AddMedicine = () => {
         alert("Medicine added successfully!");
       }
       navigate("/allmedicine");
+      setPrescriptionRequired(false);
     } catch (err) {
       console.error("Error submitting:", err);
       alert("Failed to submit medicine data.");
@@ -205,9 +226,10 @@ const AddMedicine = () => {
   return (
     <div className="flex justify-center items-center mb-20">
       <div className="responsive-mx card">
-        <Title text={id ? "Edit Medicine" : "Add Medicine"} />
+        <Title text={id ? "Update Items" : "Add Items"} />
         {genericError && <p className="text-red-500 mb-2">{genericError}</p>}
         {supplierError && <p className="text-red-500 mb-2">{supplierError}</p>}
+        {categoryError && <p className="text-red-500 mb-2">{categoryError}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 px-5">
             <Input
@@ -248,12 +270,20 @@ const AddMedicine = () => {
             </div>
 
             <div className="flex flex-col md:col-span-2">
-              <Input
-                label="Category"
-                value={formData.category}
-                onChange={(e) => handleChange("category", e.target.value)}
-                disabled={!formData.genericName}
-                placeholder="Enter category"
+              <label className="mb-1 font-semibold text-gray-700">
+                Category
+              </label>
+              <CustomCreatableSelect
+                value={category}
+                onChange={(val) => {
+                  handleCategoryChange(val);
+                }}
+                onCreateOption={(inputValue) =>
+                  handleCategoryCreate(inputValue, createCategoryOption)
+                }
+                options={categoryOptions}
+                isDisabled={!formData.description}
+                placeholder="Select or create category"
               />
             </div>
 
@@ -265,7 +295,7 @@ const AddMedicine = () => {
                 value={unitType}
                 onChange={handleUnitChange}
                 options={unitOptions}
-                isDisabled={!formData.category}
+                isDisabled={!category?.value}
                 placeholder="Select or create unit"
               />
             </div>
@@ -384,7 +414,10 @@ const AddMedicine = () => {
             </div>
           </div>
 
-          <BooleanCheckbox label="Prescription Required" />
+          <BooleanCheckbox
+            label="Prescription Required"
+            disabled={!taxType?.value}
+          />
 
           <div className="flex justify-center items-center cursor-pointer my-6">
             <Button
