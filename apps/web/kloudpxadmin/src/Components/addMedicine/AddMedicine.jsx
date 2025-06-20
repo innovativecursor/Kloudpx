@@ -51,9 +51,9 @@ const AddMedicine = () => {
   const [showMeasurementValue, setShowMeasurementValue] = useState(false);
 
   const taxTypeOptions = [
-    { value: "GST 5%", label: "GST 5%" },
-    { value: "GST 12%", label: "GST 12%" },
-    { value: "GST 18%", label: "GST 18%" },
+    { value: "VAT 5%", label: "VAT 5%" },
+    { value: "VAT 12%", label: "VAT 12%" },
+    { value: "VAT 18%", label: "VAT 18%" },
   ];
 
   const unitOptions = [
@@ -149,19 +149,6 @@ const AddMedicine = () => {
     setShowMeasurementValue(med.UnitOfMeasurement === "per box");
   }, [id, medicines]);
 
-  // useEffect(() => {
-  //   const { spPerBox, measurementValue } = formData;
-  //   if (
-  //     spPerBox &&
-  //     measurementValue &&
-  //     !isNaN(spPerBox) &&
-  //     !isNaN(measurementValue)
-  //   ) {
-  //     const perPiece = parseFloat(spPerBox) / parseFloat(measurementValue);
-  //     setFormData((prev) => ({ ...prev, spPerPiece: perPiece.toFixed(2) }));
-  //   }
-  // }, [formData.spPerBox, formData.measurementValue]);
-
   useEffect(() => {
     const { spPerBox, cpPerBox, measurementValue, piecesPerBox } = formData;
 
@@ -226,7 +213,7 @@ const AddMedicine = () => {
       costpriceperbox: parseFloat(formData.cpPerBox),
       costpriceperpiece: parseFloat(formData.cpPerPiece),
       categoryid: Number(category?.value),
-      taxtype: taxType?.value || "GST",
+      taxtype: taxType?.value || "VAT",
       minimumthreshold: parseInt(formData.minThreshold),
       maximumthreshold: parseInt(formData.maxThreshold),
       estimatedleadtimedays: parseInt(formData.leadTime),
