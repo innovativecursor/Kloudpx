@@ -9,6 +9,7 @@ import (
 // User model for regular application users
 type User struct {
 	gorm.Model
+	Name          string     `gorm:"not null;default:'unknown'" json:"name"`
 	Username      string     `gorm:"not null;unique" json:"username"`
 	Password      string     `gorm:"not null" json:"-"`
 	Email         *string    `gorm:"type:varchar(100);uniqueIndex" json:"email,omitempty"`
