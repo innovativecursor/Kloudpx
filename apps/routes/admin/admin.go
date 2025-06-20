@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/category"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/generic"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/medicine"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/oauth"
@@ -57,6 +58,19 @@ func Admin(db *gorm.DB) {
 
 	apiV1.DELETE("/supplier/delete-supplier/:id", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		supplier.DeleteSupplier(c, db)
+	})
+
+	//category
+	apiV1.POST("/category/add-category", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		category.AddCategory(c, db)
+	})
+
+	apiV1.GET("/category/get-all-category", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		category.GetAllCategories(c, db)
+	})
+
+	apiV1.DELETE("/category/delete-category/:id", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		category.DeleteCategory(c, db)
 	})
 
 	//medicine

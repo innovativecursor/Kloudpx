@@ -43,6 +43,7 @@ func AddMedicine(c *gin.Context, db *gorm.DB) {
 		BrandName:             payload.BrandName,
 		GenericID:             payload.GenericID,
 		SupplierID:            payload.SupplierID,
+		CategoryID:            payload.CategoryID,
 		SupplierDiscount:      payload.SupplierDiscount,
 		Description:           payload.Description,
 		UnitOfMeasurement:     payload.UnitOfMeasurement,
@@ -52,7 +53,6 @@ func AddMedicine(c *gin.Context, db *gorm.DB) {
 		SellingPricePerPiece:  payload.SellingPricePerPiece,
 		CostPricePerBox:       payload.CostPricePerBox,
 		CostPricePerPiece:     payload.CostPricePerPiece,
-		Category:              payload.Category,
 		TaxType:               payload.TaxType,
 		MinimumThreshold:      payload.MinimumThreshold,
 		MaximumThreshold:      payload.MaximumThreshold,
@@ -97,7 +97,7 @@ func GetAllMedicines(c *gin.Context, db *gorm.DB) {
 	}
 
 	var medicines []models.Medicine
-	if err := db.Preload("Generic").Preload("Supplier").Find(&medicines).Error; err != nil {
+	if err := db.Preload("Generic").Preload("Supplier").Preload("Category").Find(&medicines).Error; err != nil {
 		logrus.WithError(err).Error("Failed to fetch medicines from database")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
 		return
@@ -154,6 +154,7 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 	medicine.BrandName = payload.BrandName
 	medicine.GenericID = payload.GenericID
 	medicine.SupplierID = payload.SupplierID
+	medicine.CategoryID = payload.CategoryID
 	medicine.SupplierDiscount = payload.SupplierDiscount
 	medicine.Description = payload.Description
 	medicine.UnitOfMeasurement = payload.UnitOfMeasurement
@@ -169,7 +170,6 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 	medicine.SellingPricePerPiece = payload.SellingPricePerPiece
 	medicine.CostPricePerBox = payload.CostPricePerBox
 	medicine.CostPricePerPiece = payload.CostPricePerPiece
-	medicine.Category = payload.Category
 	medicine.TaxType = payload.TaxType
 	medicine.MinimumThreshold = payload.MinimumThreshold
 	medicine.MaximumThreshold = payload.MaximumThreshold
