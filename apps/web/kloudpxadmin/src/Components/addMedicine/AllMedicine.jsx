@@ -226,7 +226,7 @@ const AllMedicine = () => {
         style={{ maxHeight: "600px" }}
       >
         <div className="mb-6">
-          <Title text="All Medicines" />
+          <Title text="All Items" />
         </div>
         {loading ? (
           <div className="flex justify-center py-32">

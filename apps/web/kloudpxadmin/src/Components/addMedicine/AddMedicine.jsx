@@ -149,18 +149,48 @@ const AddMedicine = () => {
     setShowMeasurementValue(med.UnitOfMeasurement === "per box");
   }, [id, medicines]);
 
+  // useEffect(() => {
+  //   const { spPerBox, measurementValue } = formData;
+  //   if (
+  //     spPerBox &&
+  //     measurementValue &&
+  //     !isNaN(spPerBox) &&
+  //     !isNaN(measurementValue)
+  //   ) {
+  //     const perPiece = parseFloat(spPerBox) / parseFloat(measurementValue);
+  //     setFormData((prev) => ({ ...prev, spPerPiece: perPiece.toFixed(2) }));
+  //   }
+  // }, [formData.spPerBox, formData.measurementValue]);
+
   useEffect(() => {
-    const { spPerBox, measurementValue } = formData;
-    if (
-      spPerBox &&
-      measurementValue &&
-      !isNaN(spPerBox) &&
-      !isNaN(measurementValue)
-    ) {
-      const perPiece = parseFloat(spPerBox) / parseFloat(measurementValue);
-      setFormData((prev) => ({ ...prev, spPerPiece: perPiece.toFixed(2) }));
+    const { spPerBox, cpPerBox, measurementValue, piecesPerBox } = formData;
+
+    const boxDivisor = showMeasurementValue
+      ? parseFloat(measurementValue)
+      : parseFloat(piecesPerBox);
+
+    if (spPerBox && boxDivisor && !isNaN(spPerBox) && !isNaN(boxDivisor)) {
+      const perPieceSP = parseFloat(spPerBox) / boxDivisor;
+      setFormData((prev) => ({
+        ...prev,
+        spPerPiece: perPieceSP.toFixed(2),
+      }));
     }
-  }, [formData.spPerBox, formData.measurementValue]);
+
+    if (cpPerBox && boxDivisor && !isNaN(cpPerBox) && !isNaN(boxDivisor)) {
+      const perPieceCP = parseFloat(cpPerBox) / boxDivisor;
+      setFormData((prev) => ({
+        ...prev,
+        cpPerPiece: perPieceCP.toFixed(2),
+      }));
+    }
+  }, [
+    formData.spPerBox,
+    formData.cpPerBox,
+    formData.measurementValue,
+    formData.piecesPerBox,
+    showMeasurementValue,
+  ]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
