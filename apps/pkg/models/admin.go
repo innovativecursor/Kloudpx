@@ -2,12 +2,10 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Admin struct {
-	gorm.Model
+	ID            uint       `gorm:"primaryKey" json:"id"`
 	FirstName     string     `json:"first_name"`
 	LastName      string     `json:"last_name"`
 	Email         string     `gorm:"unique;not null" json:"email"`
@@ -15,4 +13,5 @@ type Admin struct {
 	OAuthID       *string    `gorm:"uniqueIndex" json:"-"`
 	OAuthProvider *string    `gorm:"type:varchar(50)" json:"-"`
 	LastLogin     *time.Time `json:"last_login,omitempty"`
+	CreatedAt     time.Time  `json:"created_at"`
 }

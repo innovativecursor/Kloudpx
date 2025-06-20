@@ -18,6 +18,35 @@ func NewOrderHandler(db *gorm.DB) *OrderHandler {
 	return &OrderHandler{db: db}
 }
 
+// Define response structs locally
+type orderItemDetail struct {
+	ID           uint    `json:"id"`
+	MedicineID   uint    `json:"medicine_id"`
+	MedicineName string  `json:"medicine_name"`
+	GenericName  string  `json:"generic_name"`
+	Quantity     int     `json:"quantity"`
+	UnitPrice    float64 `json:"unit_price"`
+	TotalPrice   float64 `json:"total_price"`
+	Status       string  `json:"status"`
+}
+
+type orderDetails struct {
+	OrderID   uint              `json:"order_id"`
+	UserID    uint              `json:"user_id"`
+	Status    string            `json:"status"`
+	Total     float64           `json:"total"`
+	CreatedAt time.Time         `json:"created_at"`
+	UpdatedAt time.Time         `json:"updated_at"`
+	Items     []orderItemDetail `json:"items"`
+}
+
+type orderSummary struct {
+	ID        uint      `json:"id"`
+	Status    string    `json:"status"`
+	Total     float64   `json:"total"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 // CreateOrder creates a new order from a cart (typically called during checkout)
 func (h *OrderHandler) CreateOrder(c *gin.Context) {
 	userID := c.MustGet("userID").(uint)
@@ -54,33 +83,38 @@ func (h *OrderHandler) GetOrder(c *gin.Context) {
 	userID := c.MustGet("userID").(uint)
 
 	var order models.Order
-	if err := h.db.Preload("Items").Preload("Items.Medicine").
-		Where("id = ? AND user_id = ?", orderID, userID).
-		First(&order).Error; err != nil {
+	if err := h.db.Where("id = ? AND user_id = ?", orderID, userID).First(&order).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
 		return
 	}
 
+	// Get order items separately
+	var orderItems []models.OrderItem
+	if err := h.db.Preload("Medicine").Where("order_id = ?", orderID).Find(&orderItems).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch order items"})
+		return
+	}
+
 	// Prepare detailed response
-	var orderItems []models.OrderItemDetail
+	var items []orderItemDetail
 	var total float64
 
-	for _, item := range order.Items {
-		var medicine models.Medicine
-		if err := h.db.First(&medicine, item.MedicineID).Error; err != nil {
-			continue // Skip if medicine not found
-		}
-
-		// Get generic name
-		var generic models.GenericMedicine
+	for _, item := range orderItems {
+		// Get medicine details
+		medicine := item.Medicine
 		genericName := ""
-		if err := h.db.First(&generic, medicine.GenericID).Error; err == nil {
-			genericName = generic.Name
+		
+		if medicine.ID != 0 {
+			// Get generic name
+			var generic models.GenericMedicine
+			if err := h.db.First(&generic, medicine.GenericID).Error; err == nil {
+				genericName = generic.Name
+			}
 		}
 
-		orderItems = append(orderItems, models.OrderItemDetail{
+		items = append(items, orderItemDetail{
 			ID:           item.ID,
-			MedicineID:   medicine.ID,
+			MedicineID:   item.MedicineID,
 			MedicineName: medicine.BrandName,
 			GenericName:  genericName,
 			Quantity:     item.Quantity,
@@ -92,14 +126,14 @@ func (h *OrderHandler) GetOrder(c *gin.Context) {
 		total += item.TotalPrice
 	}
 
-	response := models.OrderDetails{
+	response := orderDetails{
 		OrderID:   order.ID,
 		UserID:    order.UserID,
 		Status:    order.Status,
 		Total:     total,
 		CreatedAt: order.CreatedAt,
 		UpdatedAt: order.UpdatedAt,
-		Items:     orderItems,
+		Items:     items,
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -189,7 +223,7 @@ func (h *OrderHandler) GetUserOrders(c *gin.Context) {
 	}
 
 	// Get pagination parameters
-	page, pageSize := getPaginationParams(c)
+	page, pageSize := getOrderPaginationParams(c)
 	offset := (page - 1) * pageSize
 
 	// Build query
@@ -221,9 +255,9 @@ func (h *OrderHandler) GetUserOrders(c *gin.Context) {
 	query.Count(&totalCount)
 
 	// Prepare simplified response
-	var orderSummaries []models.OrderSummary
+	var orderSummaries []orderSummary
 	for _, order := range orders {
-		orderSummaries = append(orderSummaries, models.OrderSummary{
+		orderSummaries = append(orderSummaries, orderSummary{
 			ID:        order.ID,
 			Status:    order.Status,
 			Total:     order.TotalPrice,
@@ -232,7 +266,7 @@ func (h *OrderHandler) GetUserOrders(c *gin.Context) {
 	}
 
 	response := struct {
-		Orders     []models.OrderSummary `json:"orders"`
+		Orders     []orderSummary `json:"orders"`
 		Pagination struct {
 			Page       int   `json:"page"`
 			PageSize   int   `json:"page_size"`
@@ -397,9 +431,10 @@ func (h *OrderHandler) processOrderFromCart(userID uint, cart models.Cart) (*mod
 	tx := h.db.Begin()
 
 	// Create order
+	cartID := cart.ID // Copy value for pointer
 	order := models.Order{
 		UserID:     userID,
-		CartID:     &cart.ID,
+		CartID:     &cartID,
 		Status:     "processing",
 		TotalPrice: 0,
 	}
@@ -479,9 +514,7 @@ func (h *OrderHandler) processOrderFromCart(userID uint, cart models.Cart) (*mod
 
 	tx.Commit()
 
-	// Attach items to order for response
-	order.Items = orderItems
-
+	// Return just the order without items
 	return &order, nil
 }
 
@@ -565,7 +598,7 @@ func getAllowedTransitions(current string) []string {
 }
 
 // Helper function for pagination
-func getPaginationParams(c *gin.Context) (int, int) {
+func getOrderPaginationParams(c *gin.Context) (int, int) {
 	page := 1
 	if p := c.Query("page"); p != "" {
 		if pInt, err := strconv.Atoi(p); err == nil && pInt > 0 {

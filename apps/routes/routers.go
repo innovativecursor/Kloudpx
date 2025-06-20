@@ -28,15 +28,6 @@ func RegisterRoutes(router *gin.Engine, db *gorm.DB) {
 		userRoutes.GET("/profile", userHandler.GetProfile)
 		userRoutes.PUT("/profile", userHandler.UpdateProfile)
 	}
-	// User routes
-	userRoutes := api.Group("/users")
-	{
-		userRoutes.POST("/register", userHandler.Register)
-		userRoutes.POST("/login", userHandler.Login)
-		userRoutes.POST("/refresh", userHandler.RefreshToken)
-		userRoutes.GET("/profile", userHandler.GetProfile)
-		userRoutes.PUT("/profile", userHandler.UpdateProfile)
-	}
 
 	// Admin routes
 	adminRoutes := api.Group("/admin")

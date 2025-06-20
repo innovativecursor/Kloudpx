@@ -1,5 +1,70 @@
 package models
 
+import (
+	"time"
+	
+	"gorm.io/gorm"
+)
+/*
+type Order struct {
+	gorm.Model
+	UserID     uint
+	CartID     *uint  // Pointer to allow null for direct orders
+	TotalPrice float64
+	Status     string
+	Items      []OrderItem // Add this relationship
+}
+*/
+
+
+type Order struct {
+	gorm.Model
+	UserID     uint
+	CartID     *uint  // Pointer to allow null for direct orders
+	TotalPrice float64
+	Status     string
+}
+type OrderItem struct {
+	gorm.Model
+	Medicine   
+	OrderID    uint
+	MedicineID uint
+	Quantity   int
+	UnitPrice  float64
+	TotalPrice float64
+	Status     string
+}
+
+// Add these response structs
+type OrderItemDetail struct {
+	ID           uint
+	MedicineID   uint
+	MedicineName string
+	GenericName  string
+	Quantity     int
+	UnitPrice    float64
+	TotalPrice   float64
+	Status       string
+}
+
+type OrderDetails struct {
+	OrderID   uint
+	UserID    uint
+	Status    string
+	Total     float64
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Items     []OrderItemDetail
+}
+
+type OrderSummary struct {
+	ID        uint
+	Status    string
+	Total     float64
+	CreatedAt time.Time
+}
+/*package models
+
 import "gorm.io/gorm"
 
 type Order struct {
@@ -26,3 +91,4 @@ type OrderDetails struct {
 	Items   []OrderItem `json:"items"`
 	Total   float64     `json:"total"`
 }
+*/

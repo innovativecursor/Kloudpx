@@ -1,36 +1,44 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
+// Main medicine model
+type Medicine struct {
+	gorm.Model
+	BrandName            string          `gorm:"not null"`
+	GenericID            uint            `gorm:"not null"`
+	Generic              GenericMedicine `gorm:"foreignKey:GenericID"` // belongs to GenericMedicine
+	Description          string
+	Category             string
+	QuantityInPieces     int `gorm:"default:0"`
+	Supplier             string
+	PurchasePrice        float64
+	SellingPrice         float64 `gorm:"not null"`
+	TaxType              string
+	TaxVAT               float64
+	MinimumThreshold     int
+	MaximumThreshold     int
+	EstimatedLeadTime    int
+	PrescriptionRequired bool `gorm:"default:false"`
+}
+
+// Generic medicine definition (no duplicate ID)
 type GenericMedicine struct {
 	gorm.Model
+	ID          uint   `gorm:"primaryKey"`
 	Name        string `gorm:"uniqueIndex;not null" json:"name"`
 	Description string `json:"description"`
 }
 
+// Optional Tax wrapper if used in DTOs or API
 type Tax struct {
 	VAT float64 `json:"vat"`
 }
 
-type Medicine struct {
-	gorm.Model
-	BrandName            string  `json:"brand_name"`
-	GenericID            uint    `json:"generic_id"`
-	Description          string  `json:"description"`
-	Category             string  `json:"category"`
-	QuantityInPieces     int     `json:"stock"`
-	Supplier             string  `json:"supplier"`
-	PurchasePrice        float64 `json:"purchase_price"`
-	SellingPrice         float64 `json:"price"`
-	TaxType              string  `json:"tax_type"`
-	TaxVAT               float64 `json:"tax_vat"`
-	MinimumThreshold     int     `json:"minimum_threshold"`
-	MaximumThreshold     int     `json:"maximum_threshold"`
-	EstimatedLeadTime    int     `json:"estimated_lead_time"`
-	PrescriptionRequired bool    `json:"prescription_required"`
-}
-
+// Optional DTO to include full generic details with medicine
 type MedicineWithGeneric struct {
 	Medicine
-	Generic GenericMedicine `gorm:"foreignKey:GenericID" json:"generic"`
+	Generic GenericMedicine `json:"generic"`
 }

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
@@ -23,6 +24,12 @@ func (h *SupplierHandler) CreateSupplier(c *gin.Context) {
 		return
 	}
 
+	// Validate required fields
+	if supplier.SupplierName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Supplier name is required"})
+		return
+	}
+
 	if err := h.db.Create(&supplier).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create supplier"})
 		return
@@ -33,28 +40,78 @@ func (h *SupplierHandler) CreateSupplier(c *gin.Context) {
 
 func (h *SupplierHandler) GetSupplier(c *gin.Context) {
 	id := c.Param("id")
-
-	var supplier models.Supplier
-	if err := h.db.Preload("Medicines").First(&supplier, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Supplier not found"})
+	supplierID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid supplier ID"})
 		return
 	}
 
-	c.JSON(http.StatusOK, supplier)
+	var supplier models.Supplier
+	if err := h.db.First(&supplier, supplierID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Supplier not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch supplier"})
+		return
+	}
+
+	// Get medicines for this supplier
+	var medicines []models.Medicine
+	if err := h.db.Where("supplier_id = ?", supplierID).Find(&medicines).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
+		return
+	}
+
+	// Calculate total value
+	var totalValue float64
+	for _, medicine := range medicines {
+		totalValue += medicine.SellingPrice * float64(medicine.QuantityInPieces)
+	}
+
+	response := struct {
+		Supplier           models.Supplier `json:"supplier"`
+		Medicines          []models.Medicine `json:"medicines"`
+		TotalMedicineValue float64          `json:"total_medicine_value"`
+		MedicineCount      int              `json:"medicine_count"`
+	}{
+		Supplier:           supplier,
+		Medicines:          medicines,
+		TotalMedicineValue: totalValue,
+		MedicineCount:      len(medicines),
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *SupplierHandler) UpdateSupplier(c *gin.Context) {
 	id := c.Param("id")
+	supplierID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid supplier ID"})
+		return
+	}
 
-	var updateData models.Supplier
+	var updateData struct {
+		SupplierName     string  `json:"supplier_name"`
+		Cost             float64 `json:"cost"`
+		DiscountProvided float64 `json:"discount_provided"`
+		CostPrice        float64 `json:"cost_price"`
+		Taxes            float64 `json:"taxes"`
+	}
+
 	if err := c.ShouldBindJSON(&updateData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var supplier models.Supplier
-	if err := h.db.First(&supplier, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Supplier not found"})
+	if err := h.db.First(&supplier, supplierID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Supplier not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch supplier"})
 		return
 	}
 
@@ -64,6 +121,15 @@ func (h *SupplierHandler) UpdateSupplier(c *gin.Context) {
 	}
 	if updateData.Cost > 0 {
 		supplier.Cost = updateData.Cost
+	}
+	if updateData.DiscountProvided >= 0 {
+		supplier.DiscountProvided = updateData.DiscountProvided
+	}
+	if updateData.CostPrice > 0 {
+		supplier.CostPrice = updateData.CostPrice
+	}
+	if updateData.Taxes >= 0 {
+		supplier.Taxes = updateData.Taxes
 	}
 
 	if err := h.db.Save(&supplier).Error; err != nil {
@@ -76,21 +142,122 @@ func (h *SupplierHandler) UpdateSupplier(c *gin.Context) {
 
 func (h *SupplierHandler) DeleteSupplier(c *gin.Context) {
 	id := c.Param("id")
+	supplierID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid supplier ID"})
+		return
+	}
 
-	if err := h.db.Delete(&models.Supplier{}, id).Error; err != nil {
+	// Check if supplier has associated medicines
+	var medicineCount int64
+	h.db.Model(&models.Medicine{}).Where("supplier_id = ?", supplierID).Count(&medicineCount)
+	if medicineCount > 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":          "Cannot delete supplier with associated medicines",
+			"medicine_count": medicineCount,
+		})
+		return
+	}
+
+	result := h.db.Delete(&models.Supplier{}, supplierID)
+	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete supplier"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Supplier deleted"})
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Supplier not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Supplier deleted successfully"})
 }
 
 func (h *SupplierHandler) GetSuppliers(c *gin.Context) {
+	// Get pagination parameters
+	page, pageSize := getSupplierPaginationParams(c)
+	offset := (page - 1) * pageSize
+
+	// Initialize query
+	query := h.db.Model(&models.Supplier{})
+
+	// Apply name filter if provided
+	if name := c.Query("name"); name != "" {
+		query = query.Where("supplier_name ILIKE ?", "%"+name+"%")
+	}
+
+	// Apply min_discount filter
+	if minDiscount := c.Query("min_discount"); minDiscount != "" {
+		if minDiscountVal, err := strconv.ParseFloat(minDiscount, 64); err == nil {
+			query = query.Where("discount_provided >= ?", minDiscountVal)
+		}
+	}
+
+	// Apply sorting
+	sortBy := c.DefaultQuery("sort", "created_at")
+	order := c.DefaultQuery("order", "desc")
+	query = query.Order(sortBy + " " + order)
+
+	// Execute query
 	var suppliers []models.Supplier
-	if err := h.db.Find(&suppliers).Error; err != nil {
+	if err := query.Offset(offset).Limit(pageSize).Find(&suppliers).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch suppliers"})
 		return
 	}
 
-	c.JSON(http.StatusOK, suppliers)
+	// Get total count for pagination
+	var totalCount int64
+	query.Count(&totalCount)
+
+	// Calculate total pages
+	totalPages := (totalCount + int64(pageSize) - 1) / int64(pageSize)
+
+	// Prepare response
+	response := struct {
+		Suppliers  []models.Supplier `json:"suppliers"`
+		Pagination struct {
+			Page       int   `json:"page"`
+			PageSize   int   `json:"page_size"`
+			Total      int64 `json:"total"`
+			TotalPages int64 `json:"total_pages"`
+		} `json:"pagination"`
+	}{
+		Suppliers: suppliers,
+		Pagination: struct {
+			Page       int   `json:"page"`
+			PageSize   int   `json:"page_size"`
+			Total      int64 `json:"total"`
+			TotalPages int64 `json:"total_pages"`
+		}{
+			Page:       page,
+			PageSize:   pageSize,
+			Total:      totalCount,
+			TotalPages: totalPages,
+		},
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+// Unique pagination helper for suppliers
+func getSupplierPaginationParams(c *gin.Context) (int, int) {
+	page := 1
+	if p := c.Query("page"); p != "" {
+		if pInt, err := strconv.Atoi(p); err == nil && pInt > 0 {
+			page = pInt
+		}
+	}
+
+	pageSize := 20
+	if ps := c.Query("page_size"); ps != "" {
+		if psInt, err := strconv.Atoi(ps); err == nil && psInt > 0 {
+			// Limit page size to prevent abuse
+			if psInt > 100 {
+				psInt = 100
+			}
+			pageSize = psInt
+		}
+	}
+
+	return page, pageSize
 }

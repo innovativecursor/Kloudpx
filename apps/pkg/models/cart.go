@@ -4,6 +4,42 @@ import "gorm.io/gorm"
 
 type Cart struct {
 	gorm.Model
+	UserID uint
+	Status string
+	Items  []CartItem // Add this relationship
+}
+
+
+type CartItem struct {
+	gorm.Model
+	CartID     uint
+	MedicineID uint
+	Quantity   int
+}
+
+
+/*package models
+
+import "gorm.io/gorm"
+
+type CartItem struct {
+	gorm.Model
+	CartID     uint
+	MedicineID uint
+	Quantity   int
+}
+type CartItem struct {
+	gorm.Model
+	CartID     uint
+	MedicineID uint
+	Quantity   int
+}*/
+/*package models
+
+import "gorm.io/gorm"
+
+type Cart struct {
+	gorm.Model
 	UserID uint   `gorm:"index" json:"user_id"`
 	Status string `json:"status"`
 }
@@ -35,3 +71,4 @@ type CartResponse struct {
 	Items  []CartItemDetail `json:"items"`
 	Total  float64          `json:"total"`
 }
+*/
