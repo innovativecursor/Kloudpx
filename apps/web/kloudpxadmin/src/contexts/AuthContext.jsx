@@ -21,6 +21,9 @@ const AuthProvider = ({ children }) => {
   const [supplierOptions, setSupplierOptions] = useState([]);
   const [supplierError, setSupplierError] = useState("");
 
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [categoryError, setCategoryError] = useState("");
+
   const [medicines, setMedicines] = useState([]);
   const [medicineError, setMedicineError] = useState("");
 
@@ -129,7 +132,7 @@ const AuthProvider = ({ children }) => {
         { headers: { Authorization: `${token}` } }
       );
 
-      console.log("Supplier create response:", res.data);
+      // console.log("Supplier create response:", res.data);
 
       const createdSupplier = res.data.supplier;
 
@@ -144,6 +147,62 @@ const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error("Error creating supplier:", err);
       setSupplierError("Failed to add new supplier.");
+      return null;
+    }
+  };
+
+  // ---------------- Category FUNCTIONS ------------------
+
+  const fetchCategoryOptions = async () => {
+    if (!token) {
+      setCategoryError("No token found, please login.");
+      return;
+    }
+
+    try {
+      const res = await axios.get(endpoints.category.get, {
+        headers: { Authorization: `${token}` },
+      });
+
+      const formatted = res.data.categories.map((item) => ({
+        label: item.CategoryName,
+        value: item.ID,
+      }));
+
+      setCategoryOptions(formatted);
+      setCategoryError("");
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+      setCategoryError("Failed to load categories.");
+    }
+  };
+
+  const createCategoryOption = async (inputValue) => {
+    if (!token) {
+      setCategoryError("Token missing, please login again.");
+      return null;
+    }
+
+    try {
+      const res = await axios.post(
+        endpoints.category.add,
+        { category: inputValue },
+        { headers: { Authorization: `${token}` } }
+      );
+
+      const createdCategory = res.data.category; 
+
+      const newOption = {
+        value: createdCategory.ID,
+        label: createdCategory.CategoryName,
+      };
+
+      setCategoryOptions((prev) => [...prev, newOption]);
+      setCategoryError("");
+      return newOption;
+    } catch (err) {
+      console.error("Error creating category:", err);
+      setCategoryError("Failed to add new category.");
       return null;
     }
   };
@@ -187,6 +246,10 @@ const AuthProvider = ({ children }) => {
         supplierError,
         fetchSupplierOptions,
         createSupplierOption,
+        fetchCategoryOptions,
+        createCategoryOption,
+        categoryOptions,
+        categoryError,
         medicines,
         medicineError,
         getAllMedicines,

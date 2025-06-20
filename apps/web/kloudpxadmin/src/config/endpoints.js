@@ -17,6 +17,10 @@ const endpoints = {
     get: `${baseUrl}/v1/supplier/get-all-supplier`,
     add: `${baseUrl}/v1/supplier/add-supplier`,
   },
+  category: {
+    get: `${baseUrl}/v1/category/get-all-category`,
+    add: `${baseUrl}/v1/category/add-category`,
+  },
   medicine: {
     getAll: `${baseUrl}/v1/medicine/get-all-medicine`,
     add: `${baseUrl}/v1/medicine/add-medicine`,
