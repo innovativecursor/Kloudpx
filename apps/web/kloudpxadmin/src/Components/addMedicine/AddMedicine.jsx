@@ -1,14 +1,37 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
 import Title from "../comman/Title";
-import CreatableSelect from "react-select/creatable";
 import Button from "../comman/Button";
+import BooleanCheckbox from "../comman/BooleanCheckbox";
+import CustomCreatableSelect from "../comman/CustomCreatableSelect";
+import Input from "../comman/Input";
+import { useAuthContext } from "../../contexts/AuthContext";
+import useCreatableSelect from "../../hooks/useCreatableSelect";
+import endpoints from "../../config/endpoints";
 
 const AddMedicine = () => {
+  const {
+    genericOptions,
+    genericError,
+    fetchGenericOptions,
+    createGenericOption,
+    supplierOptions,
+    supplierError,
+    fetchSupplierOptions,
+    createSupplierOption,
+    token,
+    prescriptionRequired,
+    setPrescriptionRequired,
+    medicines,
+  } = useAuthContext();
+
+  const { id } = useParams();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     brandName: "",
-    genericName: null,
     description: "",
-    unitType: null,
     measurementValue: "",
     piecesPerBox: "",
     spPerBox: "",
@@ -16,40 +39,18 @@ const AddMedicine = () => {
     cpPerBox: "",
     cpPerPiece: "",
     category: "",
-    supplier: null,
-    taxType: null,
+    supplierDiscount: "",
     minThreshold: "",
     maxThreshold: "",
-    leadTime: ""
+    leadTime: "",
   });
 
   const [showMeasurementValue, setShowMeasurementValue] = useState(false);
 
-  const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  useEffect(() => {
-    const { spPerBox, measurementValue } = formData;
-    if (spPerBox && measurementValue && !isNaN(spPerBox) && !isNaN(measurementValue)) {
-      const perPiece = parseFloat(spPerBox) / parseFloat(measurementValue);
-      setFormData(prev => ({ ...prev, spPerPiece: perPiece.toFixed(2) }));
-    }
-  }, [formData.spPerBox, formData.measurementValue]);
-
-  const genericNameOptions = [
-    { value: "Paracetamol", label: "Paracetamol" },
-    { value: "Ibuprofen", label: "Ibuprofen" },
-  ];
-
   const taxTypeOptions = [
     { value: "GST 5%", label: "GST 5%" },
     { value: "GST 12%", label: "GST 12%" },
-  ];
-
-  const supplierOptions = [
-    { value: "Supplier A", label: "Supplier A" },
-    { value: "Supplier B", label: "Supplier B" },
+    { value: "GST 18%", label: "GST 18%" },
   ];
 
   const unitOptions = [
@@ -57,110 +58,341 @@ const AddMedicine = () => {
     { value: "per piece", label: "per piece" },
   ];
 
-  const handleUnitChange = (newValue) => {
-    handleChange("unitType", newValue);
-    setShowMeasurementValue(newValue?.value === "per box");
+  const {
+    value: genericName,
+    handleChange: handleGenericChange,
+    handleCreateOption: handleGenericCreate,
+  } = useCreatableSelect();
+
+  const { value: unitType, handleChange: handleUnitChangeLocal } =
+    useCreatableSelect();
+
+  const {
+    value: supplier,
+    handleChange: handleSupplierChange,
+    handleCreateOption: handleSupplierCreate,
+  } = useCreatableSelect();
+
+  const { value: taxType, handleChange: handleTaxTypeChange } =
+    useCreatableSelect();
+
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleUnitChange = (val) => {
+    handleUnitChangeLocal(val);
+    handleChange("unitType", val);
+    setShowMeasurementValue(val?.value === "per box");
+  };
+
+  useEffect(() => {
+    fetchGenericOptions();
+    fetchSupplierOptions();
+  }, []);
+
+  useEffect(() => {
+    if (!id || !medicines.length) return;
+
+    const med = medicines.find((m) => m.ID === Number(id));
+    if (!med) {
+      alert("Medicine not found");
+      return;
+    }
+
+    setFormData({
+      brandName: med.BrandName || "",
+      description: med.Description || "",
+      measurementValue: med.MeasurementUnitValue || "",
+      piecesPerBox: med.NumberOfPiecesPerBox || "",
+      spPerBox: med.SellingPricePerBox || "",
+      spPerPiece: med.SellingPricePerPiece || "",
+      cpPerBox: med.CostPricePerBox || "",
+      cpPerPiece: med.CostPricePerPiece || "",
+      category: med.Category || "",
+      supplierDiscount: med.SupplierDiscount?.replace("%", "") || "",
+      minThreshold: med.MinimumThreshold || "",
+      maxThreshold: med.MaximumThreshold || "",
+      leadTime: med.EstimatedLeadTimeDays || "",
+    });
+
+    handleGenericChange({
+      value: med.Generic.ID,
+      label: med.Generic.GenericName,
+    });
+    handleSupplierChange({
+      value: med.Supplier.ID,
+      label: med.Supplier.SupplierName,
+    });
+    handleUnitChangeLocal({
+      value: med.UnitOfMeasurement,
+      label: med.UnitOfMeasurement,
+    });
+    handleTaxTypeChange({ value: med.TaxType, label: med.TaxType });
+
+    setPrescriptionRequired(med.Prescription);
+    setShowMeasurementValue(med.UnitOfMeasurement === "per box");
+  }, [id, medicines]);
+
+  useEffect(() => {
+    const { spPerBox, measurementValue } = formData;
+    if (
+      spPerBox &&
+      measurementValue &&
+      !isNaN(spPerBox) &&
+      !isNaN(measurementValue)
+    ) {
+      const perPiece = parseFloat(spPerBox) / parseFloat(measurementValue);
+      setFormData((prev) => ({ ...prev, spPerPiece: perPiece.toFixed(2) }));
+    }
+  }, [formData.spPerBox, formData.measurementValue]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!genericName?.value || !supplier?.value || !unitType?.value) {
+      alert("Please select Generic Name, Supplier, and Unit.");
+      return;
+    }
+
+    if (!prescriptionRequired) {
+      alert("Please check 'Prescription Required' to proceed.");
+      return;
+    }
+
+    const payload = {
+      brandname: formData.brandName,
+      genericid: Number(genericName.value),
+      supplierid: Number(supplier.value),
+      supplierdiscount: `${formData.supplierDiscount}%`,
+      description: formData.description,
+      unitofmeasurement: unitType.value,
+      ...(unitType.value === "per box" && {
+        measurementunitvalue: parseFloat(formData.measurementValue),
+      }),
+      numberofpiecesperbox: parseInt(formData.piecesPerBox),
+      sellingpriceperbox: parseFloat(formData.spPerBox),
+      sellingpriceperpiece: parseFloat(formData.spPerPiece),
+      costpriceperbox: parseFloat(formData.cpPerBox),
+      costpriceperpiece: parseFloat(formData.cpPerPiece),
+      category: formData.category,
+      taxtype: taxType?.value || "GST",
+      minimumthreshold: parseInt(formData.minThreshold),
+      maximumthreshold: parseInt(formData.maxThreshold),
+      estimatedleadtimedays: parseInt(formData.leadTime),
+      prescription: prescriptionRequired,
+    };
+    console.log(payload);
+    try {
+      if (id) {
+        await axios.put(endpoints.medicine.update(id), payload, {
+          headers: { Authorization: `${token}` },
+        });
+        alert("Medicine updated successfully!");
+      } else {
+        await axios.post(endpoints.medicine.add, payload, {
+          headers: { Authorization: `${token}` },
+        });
+        alert("Medicine added successfully!");
+      }
+      navigate("/allmedicine");
+    } catch (err) {
+      console.error("Error submitting:", err);
+      alert("Failed to submit medicine data.");
+    }
   };
 
   return (
     <div className="flex justify-center items-center mb-20">
       <div className="responsive-mx card">
-        <Title text="Add Medicine" />
-        <form >
+        <Title text={id ? "Edit Medicine" : "Add Medicine"} />
+        {genericError && <p className="text-red-500 mb-2">{genericError}</p>}
+        {supplierError && <p className="text-red-500 mb-2">{supplierError}</p>}
+        <form onSubmit={handleSubmit}>
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 px-5">
-            {/* Row 1 */}
-            <div className="flex flex-col">
-              <label className="mb-2 font-semibold text-gray-700">Brand Name</label>
-              <input type="text" value={formData.brandName} onChange={(e) => handleChange("brandName", e.target.value)} placeholder="Enter brand name" className="p-3 border border-gray-300 rounded-md" />
-            </div>
+            <Input
+              label="Brand Name"
+              value={formData.brandName}
+              onChange={(e) => handleChange("brandName", e.target.value)}
+              placeholder="Enter brand name"
+            />
 
             <div className="flex flex-col">
-              <label className="mb-2 font-semibold text-gray-700">Generic Name</label>
-              <CreatableSelect isClearable isDisabled={!formData.brandName} value={formData.genericName} onChange={(val) => handleChange("genericName", val)} options={genericNameOptions} placeholder="Select or create generic name" classNamePrefix="react-select" />
+              <label className="mb-1 font-semibold text-gray-700">
+                Generic Name
+              </label>
+              <CustomCreatableSelect
+                value={genericName}
+                onChange={(val) => {
+                  handleGenericChange(val);
+                  handleChange("genericName", val);
+                }}
+                onCreateOption={(inputValue) =>
+                  handleGenericCreate(inputValue, createGenericOption)
+                }
+                options={genericOptions}
+                isDisabled={!formData.brandName}
+                placeholder="Select or create generic name"
+              />
             </div>
 
-            {/* Row 2 */}
             <div className="flex flex-col md:col-span-2">
-              <label className="mb-2 font-semibold text-gray-700">Description</label>
-              <textarea rows="4" value={formData.description} onChange={(e) => handleChange("description", e.target.value)} disabled={!formData.genericName} placeholder="Enter description" className="p-3 border border-gray-300 rounded-md resize-none" />
+              <Input
+                label="Description"
+                value={formData.description}
+                onChange={(e) => handleChange("description", e.target.value)}
+                disabled={!genericName}
+                placeholder="Enter description"
+                textarea
+              />
             </div>
 
-            {/* Row 3 */}
             <div className="flex flex-col md:col-span-2">
-              <label className="mb-2 font-semibold text-gray-700">Unit of Measurement</label>
-              <CreatableSelect isClearable isDisabled={!formData.description} value={formData.unitType} onChange={handleUnitChange} options={unitOptions} placeholder="Select or create unit" classNamePrefix="react-select" />
+              <Input
+                label="Category"
+                value={formData.category}
+                onChange={(e) => handleChange("category", e.target.value)}
+                disabled={!formData.genericName}
+                placeholder="Enter category"
+              />
             </div>
 
-            {/* Row 4 */}
-            {showMeasurementValue && (
-              <div className="flex flex-col">
-                <label className="mb-2 font-semibold text-gray-700">Measurement Unit Value</label>
-                <input type="number" step="0.01" value={formData.measurementValue} onChange={(e) => handleChange("measurementValue", e.target.value)} placeholder="Enter measurement value" className="p-3 border border-gray-300 rounded-md" />
-              </div>
-            )}
-
-            <div className="flex flex-col">
-              <label className="mb-2 font-semibold text-gray-700">Number of Pieces per Box</label>
-              <input type="number" value={formData.piecesPerBox} onChange={(e) => handleChange("piecesPerBox", e.target.value)} placeholder="Enter number of pieces per box" disabled={!formData.unitType} className="p-3 border border-gray-300 rounded-md" />
+            <div className="flex flex-col md:col-span-2">
+              <label className="mb-1 font-semibold text-gray-700">
+                Unit of Measurement
+              </label>
+              <CustomCreatableSelect
+                value={unitType}
+                onChange={handleUnitChange}
+                options={unitOptions}
+                isDisabled={!formData.category}
+                placeholder="Select or create unit"
+              />
+            </div>
+            <div className="flex flex-col md:col-span-2">
+              {showMeasurementValue && (
+                <Input
+                  label="Measurement Unit Value"
+                  type="number"
+                  step="0.01"
+                  value={formData.measurementValue}
+                  onChange={(e) =>
+                    handleChange("measurementValue", e.target.value)
+                  }
+                  placeholder="Enter measurement value"
+                />
+              )}
             </div>
 
-            {/* Row 5 - Reordered */}
-            <div className="flex flex-col">
-              <label className="mb-2 font-semibold text-gray-700">Selling Price (per box)</label>
-              <input type="number" step="0.01" value={formData.spPerBox} onChange={(e) => handleChange("spPerBox", e.target.value)} disabled={!formData.piecesPerBox} placeholder="Enter SP per box" className="p-3 border border-gray-300 rounded-md" />
+            <div className="flex flex-col md:col-span-2">
+              <Input
+                label="Number of Pieces per Box"
+                type="number"
+                value={formData.piecesPerBox}
+                onChange={(e) => handleChange("piecesPerBox", e.target.value)}
+                disabled={!unitType}
+                placeholder="Enter number of pieces per box"
+              />
             </div>
 
-            <div className="flex flex-col">
-              <label className="mb-2 font-semibold text-gray-700">Selling Price (per piece)</label>
-              <input type="number" step="0.01" value={formData.spPerPiece} onChange={(e) => handleChange("spPerPiece", e.target.value)} disabled={!formData.spPerBox} placeholder="Enter SP per piece" className="p-3 border border-gray-300 rounded-md" />
-            </div>
+            {[
+              ["spPerBox", "Selling Price (per box)"],
+              ["spPerPiece", "Selling Price (per piece)"],
+              ["cpPerBox", "Cost Price (per box)"],
+              ["cpPerPiece", "Cost Price (per piece)"],
+            ].map(([key, label]) => (
+              <Input
+                key={key}
+                label={label}
+                type="number"
+                step="0.01"
+                value={formData[key]}
+                onChange={(e) => handleChange(key, e.target.value)}
+                disabled={
+                  (key === "spPerBox" && !formData.piecesPerBox) ||
+                  (key === "spPerPiece" && !formData.spPerBox) ||
+                  (key === "cpPerBox" && !formData.spPerPiece) ||
+                  (key === "cpPerPiece" && !formData.cpPerBox)
+                }
+                placeholder={`Enter ${label}`}
+              />
+            ))}
 
             <div className="flex flex-col">
-              <label className="mb-2 font-semibold text-gray-700">Cost Price (per box)</label>
-              <input type="number" step="0.01" value={formData.cpPerBox} onChange={(e) => handleChange("cpPerBox", e.target.value)} disabled={!formData.spPerPiece} placeholder="Enter CP per box" className="p-3 border border-gray-300 rounded-md" />
+              <label className="mb-1 font-semibold text-gray-700">
+                Supplier
+              </label>
+              <CustomCreatableSelect
+                value={supplier}
+                onChange={(val) => {
+                  handleSupplierChange(val);
+                  handleChange("supplier", val);
+                }}
+                onCreateOption={(inputValue) =>
+                  handleSupplierCreate(inputValue, createSupplierOption)
+                }
+                options={supplierOptions}
+                isDisabled={!formData.cpPerPiece}
+                placeholder="Select or create supplier"
+              />
             </div>
 
-            <div className="flex flex-col">
-              <label className="mb-2 font-semibold text-gray-700">Cost Price (per piece)</label>
-              <input type="number" step="0.01" value={formData.cpPerPiece} onChange={(e) => handleChange("cpPerPiece", e.target.value)} disabled={!formData.cpPerBox} placeholder="Enter CP per piece" className="p-3 border border-gray-300 rounded-md" />
-            </div>
+            <Input
+              label="Supplier Discount (%)"
+              type="number"
+              step="0.01"
+              value={formData.supplierDiscount}
+              onChange={(e) => handleChange("supplierDiscount", e.target.value)}
+              disabled={!supplier}
+              placeholder="Enter supplier discount"
+            />
 
-            {/* Row 6 */}
-            <div className="flex flex-col">
-              <label className="mb-2 font-semibold text-gray-700">Category</label>
-              <input type="text" value={formData.category} onChange={(e) => handleChange("category", e.target.value)} disabled={!formData.cpPerPiece} placeholder="Enter category" className="p-3 border border-gray-300 rounded-md" />
-            </div>
-
-            <div className="flex flex-col">
-              <label className="mb-2 font-semibold text-gray-700">Supplier</label>
-              <CreatableSelect isClearable isDisabled={!formData.category} value={formData.supplier} onChange={(val) => handleChange("supplier", val)} options={supplierOptions} placeholder="Select or create supplier" classNamePrefix="react-select" />
-            </div>
-
-            {/* Row 7 */}
-            <div className="flex flex-col">
-              <label className="mb-2 font-semibold text-gray-700">Tax Type</label>
-              <CreatableSelect isClearable isDisabled={!formData.supplier} value={formData.taxType} onChange={(val) => handleChange("taxType", val)} options={taxTypeOptions} placeholder="Select or create tax type" classNamePrefix="react-select" />
-            </div>
-
-            <div className="flex flex-col">
-              <label className="mb-2 font-semibold text-gray-700">Minimum Threshold</label>
-              <input type="number" value={formData.minThreshold} onChange={(e) => handleChange("minThreshold", e.target.value)} disabled={!formData.taxType} placeholder="Enter minimum threshold" className="p-3 border border-gray-300 rounded-md" />
-            </div>
-
-            {/* Row 8 */}
-            <div className="flex flex-col">
-              <label className="mb-2 font-semibold text-gray-700">Maximum Threshold</label>
-              <input type="number" value={formData.maxThreshold} onChange={(e) => handleChange("maxThreshold", e.target.value)} disabled={!formData.minThreshold} placeholder="Enter maximum threshold" className="p-3 border border-gray-300 rounded-md" />
-            </div>
+            {[
+              ["minThreshold", "Minimum Threshold"],
+              ["maxThreshold", "Maximum Threshold"],
+              ["leadTime", "Estimated Lead Time (days)"],
+            ].map(([key, label]) => (
+              <Input
+                key={key}
+                label={label}
+                type="number"
+                value={formData[key]}
+                onChange={(e) => handleChange(key, e.target.value)}
+                disabled={
+                  (key === "minThreshold" && !supplier) ||
+                  (key === "maxThreshold" && !formData.minThreshold) ||
+                  (key === "leadTime" && !formData.maxThreshold)
+                }
+                placeholder={`Enter ${label}`}
+              />
+            ))}
 
             <div className="flex flex-col">
-              <label className="mb-2 font-semibold text-gray-700">Estimated Lead Time (days)</label>
-              <input type="number" value={formData.leadTime} onChange={(e) => handleChange("leadTime", e.target.value)} disabled={!formData.maxThreshold} placeholder="Enter estimated lead time" className="p-3 border border-gray-300 rounded-md" />
+              <label className="mb-1 font-semibold text-gray-700">
+                Tax Type
+              </label>
+              <CustomCreatableSelect
+                value={taxType}
+                onChange={(val) => {
+                  handleTaxTypeChange(val);
+                  handleChange("taxType", val);
+                }}
+                options={taxTypeOptions}
+                isDisabled={!formData.leadTime}
+                placeholder="Select or create tax type"
+              />
             </div>
           </div>
-          {/* Submit Button */}
+
+          <BooleanCheckbox label="Prescription Required" />
+
           <div className="flex justify-center items-center cursor-pointer my-6">
-            <Button className="w-72 " text="Submit" disabled={!formData.leadTime} />
+            <Button
+              className="w-72"
+              text={id ? "Update Medicine" : "Add Medicine"}
+              type="submit"
+              disabled={!taxType}
+            />
           </div>
         </form>
       </div>

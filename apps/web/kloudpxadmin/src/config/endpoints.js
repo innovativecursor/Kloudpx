@@ -9,6 +9,20 @@ const endpoints = {
     googleLogin: `${baseUrl}/v1/auth/google/callback`,
     refresh: `${baseUrl}/v1/auth/refresh`,
   },
+  generic: {
+    get: `${baseUrl}/v1/generic/get-generic`,
+    add: `${baseUrl}/v1/generic/add-generic`,
+  },
+  supplier: {
+    get: `${baseUrl}/v1/supplier/get-all-supplier`,
+    add: `${baseUrl}/v1/supplier/add-supplier`,
+  },
+  medicine: {
+    getAll: `${baseUrl}/v1/medicine/get-all-medicine`,
+    add: `${baseUrl}/v1/medicine/add-medicine`,
+    update: (id) => `${baseUrl}/v1/medicine/update-medicine/${id}`,
+    delete: (id) => `${baseUrl}/v1/medicine/delete-medicine/${id}`,
+  },
   protected: {
     basic: `${baseUrl}/api/v1/protected`,
     admin: `${baseUrl}/api/v1/admin`,
