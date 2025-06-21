@@ -16,8 +16,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// Setup in-memory DB and handler
-func setupCartTest() (*gorm.DB, *gin.Engine, *handlers.CartHandler) {
+// Setup in-memory DB and handler with routes pre-registered
+func setupCartTest() (*gorm.DB, *gin.Engine) {
 	gin.SetMode(gin.TestMode)
 	db, _ := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 
@@ -27,10 +27,17 @@ func setupCartTest() (*gorm.DB, *gin.Engine, *handlers.CartHandler) {
 	router := gin.Default()
 	handler := handlers.NewCartHandler(db)
 
-	return db, router, handler
+	// Register routes up front
+	router.POST("/cart", withUserID(1, handler.CreateCart))
+	router.POST("/cart/:id/item", withUserID(1, handler.AddItem))
+	router.PUT("/cart/item/:itemId", withUserID(1, handler.UpdateItem))
+	router.GET("/cart/:id", withUserID(1, handler.GetCart))
+	router.DELETE("/cart/item/:itemId", withUserID(1, handler.RemoveItem))
+
+	return db, router
 }
 
-// Helper to attach fake userID
+// Inject fake userID into request context
 func withUserID(userID uint, h gin.HandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("userID", userID)
@@ -39,9 +46,9 @@ func withUserID(userID uint, h gin.HandlerFunc) gin.HandlerFunc {
 }
 
 func TestCartCRUD(t *testing.T) {
-	db, r, h := setupCartTest()
+	db, r := setupCartTest()
 
-	// Seed medicine
+	// ---- Seed medicine ----
 	medicine := models.Medicine{
 		BrandName:            "Paracetamol",
 		SellingPrice:         10.0,
@@ -51,19 +58,19 @@ func TestCartCRUD(t *testing.T) {
 	db.Create(&medicine)
 
 	// ---- 1. Create Cart ----
-	r.POST("/cart", withUserID(1, h.CreateCart))
-
 	req := httptest.NewRequest(http.MethodPost, "/cart", nil)
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusCreated, w.Code)
 
 	var createdCart models.Cart
-	json.Unmarshal(w.Body.Bytes(), &createdCart)
+	err := json.Unmarshal(w.Body.Bytes(), &createdCart)
+	assert.NoError(t, err)
 	assert.Equal(t, uint(1), createdCart.UserID)
+	assert.NotZero(t, createdCart.ID)
+	t.Logf("Created Cart ID: %d", createdCart.ID)
 
 	// ---- 2. Add Item to Cart ----
-	r.POST("/cart/:id/item", withUserID(1, h.AddItem))
 	itemPayload := map[string]interface{}{
 		"medicine_id": medicine.ID,
 		"quantity":    2,
@@ -77,8 +84,9 @@ func TestCartCRUD(t *testing.T) {
 
 	// ---- 3. Update Cart Item ----
 	var item models.CartItem
-	db.First(&item, "cart_id = ? AND medicine_id = ?", createdCart.ID, medicine.ID)
-	r.PUT("/cart/item/:itemId", withUserID(1, h.UpdateItem))
+	err = db.First(&item, "cart_id = ? AND medicine_id = ?", createdCart.ID, medicine.ID).Error
+	assert.NoError(t, err)
+
 	updateBody := map[string]interface{}{
 		"quantity": 5,
 	}
@@ -94,23 +102,23 @@ func TestCartCRUD(t *testing.T) {
 	assert.Equal(t, 5, updatedItem.Quantity)
 
 	// ---- 4. Get Cart ----
-	r.GET("/cart/:id", withUserID(1, h.GetCart))
 	req = httptest.NewRequest(http.MethodGet, "/cart/"+toStr(createdCart.ID), nil)
 	w = httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	// ---- 5. Remove Cart Item ----
-	r.DELETE("/cart/item/:itemId", withUserID(1, h.RemoveItem))
 	req = httptest.NewRequest(http.MethodDelete, "/cart/item/"+toStr(item.ID), nil)
 	w = httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	var deletedItem models.CartItem
-	err := db.First(&deletedItem, item.ID).Error
-	assert.Error(t, err) // should be not found
+	err = db.First(&deletedItem, item.ID).Error
+	assert.Error(t, err) // Expect record not found
 }
+
+// Helper function to convert uint to string
 func toStr(n uint) string {
 	return fmt.Sprintf("%d", n)
 }
