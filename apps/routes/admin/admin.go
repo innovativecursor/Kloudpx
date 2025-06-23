@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/category"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/generic"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/itemimage"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/medicine"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/oauth"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/supplier"
@@ -73,6 +74,10 @@ func Admin(db *gorm.DB) {
 		category.DeleteCategory(c, db)
 	})
 
+	//upload images
+	apiV1.POST("/itemimage/add-itemimage", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		itemimage.UploadMedicineImages(c, db)
+	})
 	//medicine
 	apiV1.POST("/medicine/add-medicine", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		medicine.AddMedicine(c, db)

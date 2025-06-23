@@ -71,6 +71,15 @@ func AddMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// Assign uploaded image records to this medicine
+	for _, imgID := range payload.ImageIDs {
+		if err := db.Model(&models.ItemImage{}).
+			Where("id = ?", imgID).
+			Update("medicine_id", newMedicine.ID).Error; err != nil {
+			logrus.WithError(err).Warnf("Failed to associate image ID %d", imgID)
+		}
+	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Medicine added successfully",
 	})
@@ -97,7 +106,7 @@ func GetAllMedicines(c *gin.Context, db *gorm.DB) {
 	}
 
 	var medicines []models.Medicine
-	if err := db.Preload("Generic").Preload("Supplier").Preload("Category").Find(&medicines).Error; err != nil {
+	if err := db.Preload("Generic").Preload("Supplier").Preload("ItemImages").Preload("Category").Find(&medicines).Error; err != nil {
 		logrus.WithError(err).Error("Failed to fetch medicines from database")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
 		return
@@ -138,7 +147,7 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 	}
 
 	var medicine models.Medicine
-	if err := db.First(&medicine, medicineID).Error; err != nil {
+	if err := db.Preload("ItemImages").First(&medicine, medicineID).Error; err != nil {
 		logrus.WithError(err).WithField("id", medicineID).Error("Medicine not found")
 		c.JSON(http.StatusNotFound, gin.H{"error": "Medicine not found"})
 		return
@@ -151,6 +160,7 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// Update fields
 	medicine.BrandName = payload.BrandName
 	medicine.GenericID = payload.GenericID
 	medicine.SupplierID = payload.SupplierID
@@ -176,6 +186,17 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 	medicine.EstimatedLeadTimeDays = payload.EstimatedLeadTimeDays
 	medicine.Prescription = payload.Prescription
 	medicine.UpdatedBy = userObj.ID
+
+	// ⬇️ Handle image association if any new image IDs are provided
+	if len(payload.ImageIDs) > 0 {
+		if err := db.Model(&models.ItemImage{}).
+			Where("id IN ?", payload.ImageIDs).
+			Update("medicine_id", medicine.ID).Error; err != nil {
+			logrus.WithError(err).Error("Failed to associate images with medicine")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update images"})
+			return
+		}
+	}
 
 	if err := db.Save(&medicine).Error; err != nil {
 		logrus.WithError(err).Error("Failed to update medicine")
