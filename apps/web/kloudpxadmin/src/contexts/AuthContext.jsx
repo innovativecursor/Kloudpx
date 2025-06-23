@@ -27,6 +27,12 @@ const AuthProvider = ({ children }) => {
   const [medicines, setMedicines] = useState([]);
   const [medicineError, setMedicineError] = useState("");
 
+  const [images, setImages] = useState([]);
+  const [previewUrls, setPreviewUrls] = useState([]);
+  const [message, setMessage] = useState("");
+  const [imageIds, setImageIds] = useState([]);
+  const [uploadedImageIds, setUploadedImageIds] = useState([]);
+
   // ---------------- AUTH FUNCTIONS ------------------
   const loginUser = (userData, token) => {
     localStorage.setItem("access_token", token);
@@ -68,7 +74,7 @@ const AuthProvider = ({ children }) => {
   const createGenericOption = async (inputValue) => {
     if (!token) {
       setGenericError("Token missing, please login again.");
-      return;
+      return null;
     }
 
     try {
@@ -132,8 +138,6 @@ const AuthProvider = ({ children }) => {
         { headers: { Authorization: `${token}` } }
       );
 
-      // console.log("Supplier create response:", res.data);
-
       const createdSupplier = res.data.supplier;
 
       const newOption = {
@@ -190,7 +194,7 @@ const AuthProvider = ({ children }) => {
         { headers: { Authorization: `${token}` } }
       );
 
-      const createdCategory = res.data.category; 
+      const createdCategory = res.data.category;
 
       const newOption = {
         value: createdCategory.ID,
@@ -207,7 +211,7 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // ---------------- get dedicine FUNCTIONS ------------------
+  // ---------------- get medicine FUNCTIONS ------------------
 
   const getAllMedicines = async () => {
     if (!token) {
@@ -225,6 +229,51 @@ const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error("Error fetching medicines:", err);
       setMedicineError("Failed to fetch medicines.");
+    }
+  };
+
+  // ---------------- images FUNCTIONS ------------------
+
+  const handleImageChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+
+    if (images.length + selectedFiles.length > 5) {
+      setMessage("❌ Max 5 images allowed.");
+      return;
+    }
+
+    const newImages = [...images, ...selectedFiles];
+    setImages(newImages);
+
+    const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
+    setPreviewUrls((prev) => [...prev, ...newPreviews]);
+
+    setMessage("");
+  };
+
+  const handleUpload = async (e, itemId) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append("item_id", itemId || "0");
+      images.forEach((image) => formData.append("images", image));
+
+      const response = await axios.post(endpoints.itemimage.add, formData, {
+        headers: {
+          Authorization: `${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      const uploadedIds = response.data.image_ids;
+      setUploadedImageIds((prev) => [...prev, ...uploadedIds]);
+      setMessage("✅ Images uploaded successfully!");
+
+      setImages([]);
+      setPreviewUrls([]);
+    } catch (error) {
+      console.error(error);
+      setMessage("❌ Image upload failed.");
     }
   };
 
@@ -253,6 +302,15 @@ const AuthProvider = ({ children }) => {
         medicines,
         medicineError,
         getAllMedicines,
+        handleUpload,
+        handleImageChange,
+        images,
+        previewUrls,
+        message,
+        imageIds,
+        uploadedImageIds,
+        setUploadedImageIds,
+        setPreviewUrls,
       }}
     >
       {children}

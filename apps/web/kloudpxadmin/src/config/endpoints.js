@@ -27,6 +27,9 @@ const endpoints = {
     update: (id) => `${baseUrl}/v1/medicine/update-medicine/${id}`,
     delete: (id) => `${baseUrl}/v1/medicine/delete-medicine/${id}`,
   },
+  itemimage: {
+    add: `${baseUrl}/v1/itemimage/add-itemimage`,
+  },
   protected: {
     basic: `${baseUrl}/api/v1/protected`,
     admin: `${baseUrl}/api/v1/admin`,

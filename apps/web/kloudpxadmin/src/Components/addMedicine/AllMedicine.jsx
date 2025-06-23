@@ -19,6 +19,8 @@ const AllMedicine = () => {
     getAllMedicines();
   }, []);
 
+  // console.log(medicines);
+
   useEffect(() => {
     if (medicines && medicines.length > 0) {
       const formatted = medicines.map((item) => ({
@@ -54,6 +56,12 @@ const AllMedicine = () => {
         maxThreshold: item.MaximumThreshold,
         leadTime: item.EstimatedLeadTimeDays,
         taxType: { value: item.TaxType, label: item.TaxType },
+        images:
+          item.ItemImages?.map(
+            (img) =>
+              `http://localhost:10001/v1/${encodeURIComponent(img.FileName)}`
+          ) || [],
+
         prescription: item.Prescription,
       }));
       setFormattedMedicines(formatted);
@@ -182,6 +190,23 @@ const AllMedicine = () => {
     { title: "Tax Type", dataIndex: ["taxType", "label"], key: "taxType" },
 
     {
+      title: "Image Names",
+      dataIndex: "images",
+      key: "images",
+      render: (images) =>
+        images.length > 0 ? (
+          <ul className="text-xs text-gray-700 list-disc pl-4">
+            {images.map((url, idx) => {
+              const fileName = decodeURIComponent(url.split("/").pop());
+              return <li key={idx}>{fileName}</li>;
+            })}
+          </ul>
+        ) : (
+          <span className="text-gray-400 text-xs">No Image</span>
+        ),
+    },
+
+    {
       title: "Prescription",
       dataIndex: "prescription",
       key: "prescription",
@@ -245,7 +270,7 @@ const AllMedicine = () => {
             rowKey="_id"
             scroll={{ x: "max-content" }}
             bordered
-            pagination={{ pageSize: 5 }}
+            pagination={{ pageSize: 6 }}
             rowClassName={() =>
               "cursor-pointer hover:bg-blue-50 transition duration-200"
             }
