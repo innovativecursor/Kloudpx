@@ -239,6 +239,12 @@ func DeleteMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// Delete associated item images first
+	if err := db.Unscoped().Where("medicine_id = ?", medicineID).Delete(&models.ItemImage{}).Error; err != nil {
+		logrus.WithError(err).WithField("id", medicineID).Error("Failed to delete associated item images")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete associated item images"})
+		return
+	}
 	// Perform soft delete (or hard delete using Unscoped)
 	if err := db.Unscoped().Delete(&models.Medicine{}, medicineID).Error; err != nil {
 		logrus.WithError(err).WithField("id", medicineID).Error("Failed to delete medicine")
