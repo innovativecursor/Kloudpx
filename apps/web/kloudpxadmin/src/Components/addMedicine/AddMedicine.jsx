@@ -28,6 +28,14 @@ const AddMedicine = () => {
     prescriptionRequired,
     setPrescriptionRequired,
     medicines,
+    handleUpload,
+    handleImageChange,
+    images,
+    previewUrls,
+    message,
+    uploadedImageIds,
+    setUploadedImageIds,
+    setPreviewUrls,
   } = useAuthContext();
 
   const { id } = useParams();
@@ -147,6 +155,19 @@ const AddMedicine = () => {
 
     setPrescriptionRequired(med.Prescription);
     setShowMeasurementValue(med.UnitOfMeasurement === "per box");
+
+    if (med.ItemImages && med.ItemImages.length > 0) {
+      const baseURL = "http://localhost:10001/uploads/";
+      const urls = med.ItemImages.map(
+        (img) => baseURL + encodeURIComponent(img.FileName)
+      );
+
+      setUploadedImageIds(med.ItemImages.map((img) => img.ID));
+      setPreviewUrls(urls);
+    } else {
+      setUploadedImageIds([]);
+      setPreviewUrls([]);
+    }
   }, [id, medicines]);
 
   useEffect(() => {
@@ -217,9 +238,10 @@ const AddMedicine = () => {
       minimumthreshold: parseInt(formData.minThreshold),
       maximumthreshold: parseInt(formData.maxThreshold),
       estimatedleadtimedays: parseInt(formData.leadTime),
+      imageids: uploadedImageIds,
       prescription: prescriptionRequired,
     };
-    // console.log(payload);
+    console.log(payload);
     try {
       if (id) {
         await axios.put(endpoints.medicine.update(id), payload, {
@@ -431,6 +453,46 @@ const AddMedicine = () => {
             </div>
           </div>
 
+          <div className="p-4 border rounded-md mt-4 flex flex-col md:col-span-2">
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleImageChange}
+              disabled={images.length >= 5 || !taxType?.value}
+              className="mb-4"
+            />
+            <button
+              type="button"
+              onClick={(e) => handleUpload(e, id)}
+              className={`px-4 py-2 rounded text-white ${
+                images.length === 0
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-500"
+              }`}
+              disabled={images.length === 0}
+            >
+              Upload Images
+            </button>
+
+            {previewUrls.length > 0 && (
+              <div className="mt-4 flex gap-4 flex-wrap">
+                {previewUrls.map((url, idx) => (
+                  <img
+                    key={idx}
+                    src={url}
+                    alt={`preview-${idx}`}
+                    className="w-24 h-24 object-cover rounded border"
+                  />
+                ))}
+              </div>
+            )}
+
+            {message && (
+              <p className="mt-3 text-sm font-medium text-red-600">{message}</p>
+            )}
+          </div>
+
           <BooleanCheckbox
             label="Prescription Required"
             disabled={!taxType?.value}
@@ -441,7 +503,7 @@ const AddMedicine = () => {
               className="w-72"
               text={id ? "Update Medicine" : "Add Medicine"}
               type="submit"
-              disabled={!taxType}
+              disabled={!prescriptionRequired || uploadedImageIds.length === 0}
             />
           </div>
         </form>
