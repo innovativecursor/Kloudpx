@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 
-import useCreatableSelect from "./useCreatableSelect";
+import useCreatableSelect from "../hooks/useCreatableSelect";
 
 import { constructMedicinePayload } from "./constructMedicinePayload";
 import { calculatePricePerPiece } from "./calculatePricePerPiece";
@@ -36,6 +36,7 @@ export default function useMedicineForm() {
     uploadedImageIds,
     setUploadedImageIds,
     setPreviewUrls,
+    setMessage,
   } = useAuthContext();
 
   const { id } = useParams();
@@ -73,22 +74,21 @@ export default function useMedicineForm() {
     value: genericName,
     handleChange: handleGenericChange,
     handleCreateOption: handleGenericCreate,
-  } = useCreatableSelect();
+  } = useCreatableSelect(createGenericOption);
 
   const { value: unitType, handleChange: handleUnitChangeLocal } =
     useCreatableSelect();
-
   const {
     value: supplier,
     handleChange: handleSupplierChange,
     handleCreateOption: handleSupplierCreate,
-  } = useCreatableSelect();
+  } = useCreatableSelect(createSupplierOption);
 
   const {
     value: category,
     handleChange: handleCategoryChange,
     handleCreateOption: handleCategoryCreate,
-  } = useCreatableSelect();
+  } = useCreatableSelect(createCategoryOption);
 
   const { value: taxType, handleChange: handleTaxTypeChange } =
     useCreatableSelect();
@@ -176,6 +176,7 @@ export default function useMedicineForm() {
       uploadedImageIds,
       prescriptionRequired,
     });
+    console.log(payload);
 
     try {
       if (id) {
@@ -191,6 +192,8 @@ export default function useMedicineForm() {
       }
       navigate("/allmedicine");
       setPrescriptionRequired(false);
+      setMessage("");
+      setPreviewUrls([]);
     } catch (err) {
       console.error("Error submitting:", err);
       alert("Failed to submit medicine data.");

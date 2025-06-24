@@ -83,7 +83,9 @@ const AuthProvider = ({ children }) => {
         { genericname: inputValue },
         { headers: { Authorization: `${token}` } }
       );
+
       const createdGeneric = res.data.generic;
+
       const newOption = {
         value: createdGeneric.ID,
         label: createdGeneric.GenericName,
@@ -311,6 +313,7 @@ const AuthProvider = ({ children }) => {
         uploadedImageIds,
         setUploadedImageIds,
         setPreviewUrls,
+        setMessage
       }}
     >
       {children}
