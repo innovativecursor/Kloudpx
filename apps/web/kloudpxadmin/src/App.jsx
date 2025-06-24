@@ -2,6 +2,7 @@ import { connect } from "react-redux";
 import "./App.css";
 import Navigation from "./Navigation/Navigation";
 import { Spin } from "antd";
+// import { Toaster } from "react-hot-toast";
 
 function App(props) {
   return (
@@ -13,6 +14,7 @@ function App(props) {
       >
         <Navigation />
       </Spin>
+      {/* <Toaster position="top-right" reverseOrder={false} /> */}
     </>
   );
 }
