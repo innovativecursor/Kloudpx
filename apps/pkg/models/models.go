@@ -60,3 +60,14 @@ type Medicine struct {
 	Prescription          bool `gorm:"not null"`
 	UpdatedBy             uint
 }
+
+// Pharmacist
+type Pharmacist struct {
+	gorm.Model
+
+	FirstName       string
+	LastName        string
+	Email           string `gorm:"unique;not null" json:"email"`
+	EmailVerified   bool
+	ApplicationRole string
+}
