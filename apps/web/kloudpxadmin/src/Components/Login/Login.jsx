@@ -40,24 +40,26 @@ const Login = () => {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-homexbg bg-opacity-30">
-      <div className="bg-white py-6 border rounded-xl shadow-2xl w-full max-w-md text-center">
+    <div className="min-h-screen bg-gradient-to-br from-blue-200 via-sky-300 to-purple-200 flex items-center justify-center px-4">
+      <div className="backdrop-blur-md bg-white/70 border border-white/30 shadow-lg rounded-3xl p-6 sm:p-10 w-full max-w-md text-center">
         <div className="flex justify-center mb-4">
-          <img src={logo} alt="Logo" className="w-20" />
+          <img src={logo} alt="Logo" className="w-20 h-20 object-contain" />
         </div>
-        <h2 className="text-2xl font-semibold mb-4">kloud</h2>
-        <div className="mx-6">
+        <h2 className="text-3xl font-bold text-gray-800 mb-6">
+          Welcome to Kloud
+        </h2>
+        <div className="px-4">
           <button
             onClick={() => login()}
             disabled={loading}
-            className="flex items-center justify-center gap-3 py-2 border border-gray-300 font-semibold rounded-md w-full text-lg hover:bg-gray-100 transition disabled:opacity-60"
+            className="flex items-center justify-center gap-3 w-full py-3 px-6 bg-white text-gray-800 border border-gray-300 rounded-xl shadow-md hover:bg-gray-100 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed text-base font-medium"
           >
-            <i className="ri-google-fill"></i>
+            <i className="ri-google-fill text-xl text-[#0070BA]"></i>
             {loading ? "Signing in..." : "Continue with Google"}
           </button>
         </div>
-        <p className="mt-4 text-sm text-gray-500">
-          Only authorized administrators can access this panel
+        <p className="mt-6 text-sm text-gray-500">
+          Only authorized administrators can access this panel.
         </p>
       </div>
     </div>
