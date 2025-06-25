@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import { Navigation } from 'swiper/modules';
-import useSwiperNavigation from '@/hooks/useSwiperNavigation';
+import React from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/navigation";
+import { Navigation } from "swiper/modules";
+import useSwiperNavigation from "@/hooks/useSwiperNavigation";
+import Link from "next/link";
 
 const TopItems = () => {
   const { prevRef, nextRef, setSwiperInstance } = useSwiperNavigation();
@@ -32,20 +33,29 @@ const TopItems = () => {
           prevEl: prevRef.current,
           nextEl: nextRef.current,
         }}
+        spaceBetween={15}
         breakpoints={{
-          0: { slidesPerView: 2, spaceBetween: 10 },
-          640: { slidesPerView: 5, spaceBetween: 15 },
-          768: { slidesPerView: 6, spaceBetween: 20 },
-          1024: { slidesPerView: 7, spaceBetween: 0 },
+          0: { slidesPerView: 2.5 },
+          640: { slidesPerView: 4 },
+          768: { slidesPerView: 5 },
+          1024: { slidesPerView: 7 },
         }}
         className="w-full"
       >
         {items.map((item, index) => (
           <SwiperSlide key={index}>
-            <div className="flex gap-1 items-center justify-center p-2">
-              <img src={item.image} alt={item.name} className="w-6 h-6 object-contain" />
-              <p className="text-[10px] font-medium text-center">{item.name}</p>
-            </div>
+            <Link href="/Products">
+              <div className="flex cursor-pointer hover:text-[#0070ba]  transition-all duration-300 ease-in-out gap-2 items-center justify-center whitespace-nowrap z-[999]">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="sm:w-8 sm:h-8 w-5 h-5 object-contain"
+                />
+                <p className="sm:text-xs text-[11px] font-medium tracking-wide">
+                  {item.name}
+                </p>
+              </div>
+            </Link>
           </SwiperSlide>
         ))}
       </Swiper>
