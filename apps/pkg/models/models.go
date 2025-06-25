@@ -71,3 +71,31 @@ type Pharmacist struct {
 	EmailVerified   bool
 	ApplicationRole string
 }
+
+// user
+// User who uploads prescriptions
+type User struct {
+	gorm.Model
+	FirstName string
+	LastName  string
+	Email     string `gorm:"unique"`
+}
+
+// Prescription uploaded by a user
+type Prescription struct {
+	gorm.Model
+	UserID        uint
+	User          User   `gorm:"foreignKey:UserID"`
+	UploadedImage string // URL to prescription image (e.g., S3)
+	Status        string // "unsettled", "fulfilled"
+}
+
+// Many-to-many (cart) between prescription and medicines
+type PrescriptionMedicine struct {
+	gorm.Model
+	PrescriptionID uint
+	Prescription   Prescription
+	MedicineID     uint
+	Medicine       Medicine
+	Quantity       int
+}
