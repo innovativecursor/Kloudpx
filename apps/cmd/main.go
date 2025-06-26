@@ -7,6 +7,7 @@ import (
 	"github.com/innovativecursor/Kloudpx/apps/pkg/database"
 	"github.com/innovativecursor/Kloudpx/apps/routes/admin"
 	"github.com/innovativecursor/Kloudpx/apps/routes/pharmacist"
+	"github.com/innovativecursor/Kloudpx/apps/routes/user"
 )
 
 func main() {
@@ -35,5 +36,7 @@ func main() {
 		admin.Admin(dbConn)
 	case "pharmacist":
 		pharmacist.Pharmacist(dbConn)
+	case "user":
+		user.User(dbConn)
 	}
 }

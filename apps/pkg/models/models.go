@@ -76,17 +76,19 @@ type Pharmacist struct {
 // User who uploads prescriptions
 type User struct {
 	gorm.Model
-	FirstName string
-	LastName  string
-	Email     string `gorm:"unique"`
+	FirstName       string
+	LastName        string
+	Email           string `gorm:"unique"`
+	EmailVerified   bool
+	ApplicationRole string
 }
 
 // Prescription uploaded by a user
 type Prescription struct {
 	gorm.Model
 	UserID        uint
-	User          User   `gorm:"foreignKey:UserID"`
-	UploadedImage string // URL to prescription image (e.g., S3)
+	User          User `gorm:"foreignKey:UserID"`
+	UploadedImage string
 	Status        string // "unsettled", "fulfilled"
 }
 
