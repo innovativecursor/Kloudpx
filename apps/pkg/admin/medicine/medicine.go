@@ -187,7 +187,6 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 	medicine.Prescription = payload.Prescription
 	medicine.UpdatedBy = userObj.ID
 
-	// ⬇️ Handle image association if any new image IDs are provided
 	if len(payload.ImageIDs) > 0 {
 		if err := db.Model(&models.ItemImage{}).
 			Where("id IN ?", payload.ImageIDs).
