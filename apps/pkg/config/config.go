@@ -21,6 +21,12 @@ type Config struct {
 	JWT struct {
 		Secret string `yaml:"secret"`
 	} `yaml:"jwt"`
+	S3 struct {
+		AccessKey  string `yaml:"accessKey"`
+		SecretKey  string `yaml:"secretKey"`
+		Region     string `yaml:"region"`
+		BucketName string `yaml:"bucketName"`
+	} `yaml:"s3"`
 }
 
 func Env() (Config, error) {
