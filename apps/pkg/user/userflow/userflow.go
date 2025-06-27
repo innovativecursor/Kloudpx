@@ -25,6 +25,31 @@ func GetMedicinesForUser(c *gin.Context, db *gorm.DB) {
 	})
 }
 
+func GetCurrentUserInfo(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		logrus.Warn("Unauthorized access: user not found in context")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	userObj, ok := user.(*models.User)
+	if !ok {
+		logrus.Warn("Invalid user object")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"id":               userObj.ID,
+		"first_name":       userObj.FirstName,
+		"last_name":        userObj.LastName,
+		"email":            userObj.Email,
+		"email_verified":   userObj.EmailVerified,
+		"application_role": userObj.ApplicationRole,
+		"created_at":       userObj.CreatedAt,
+	})
+}
+
 // add to cart
 func AddOTCToCart(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
