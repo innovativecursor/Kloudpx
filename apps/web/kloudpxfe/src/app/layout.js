@@ -1,7 +1,9 @@
 import "./globals.css";
 import Footer from "./components/Footer/Footer";
 import Header from "./components/Header/Header";
-import { AppProvider } from "./contexts/AppContext";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ProductProvider } from "./contexts/ProductContext";
 
 export const metadata = {
   title: "Kloud Pharma",
@@ -18,11 +20,15 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className={`antialiased min-h-screen flex flex-col`}>
-        <AppProvider>
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        </AppProvider>
+        <GoogleOAuthProvider clientId="573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com">
+          <AuthProvider>
+            <ProductProvider>
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            </ProductProvider>
+          </AuthProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

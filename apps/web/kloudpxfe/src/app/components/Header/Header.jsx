@@ -1,10 +1,14 @@
+"use client";
 import React from "react";
 import Logo from "@/app/components/logo/Logo";
 import SearchBar from "@/app/components/searchbar/SearchBar";
 import TopItems from "@/app/components/topitems/TopItems";
 import Hamburger from "@/app/components/modal/Hamburger";
+import { useAuthContext } from "@/app/contexts/AuthContext";
 
 const Header = () => {
+  const { login, loading } = useAuthContext();
+
   return (
     <div className="">
       <div className="flex-between-center responsive-mx mt-3">
@@ -13,7 +17,13 @@ const Header = () => {
           <SearchBar />
         </div>
         <div className="flex-between-center sm:gap-6 gap-3">
-          <div className="font-semibold sm:text-xs text-xs">Login/SignUp</div>
+          <div
+            onClick={login}
+            className="font-semibold sm:text-xs text-xs cursor-pointer"
+          >
+            {" "}
+            {loading ? "Signin In..." : "Login/SignUp"}
+          </div>
           <div className="flex gap-3 sm:gap-6 items-center text-color">
             <div className="relative">
               <i className="ri-heart-3-line text-xl font-medium"></i>

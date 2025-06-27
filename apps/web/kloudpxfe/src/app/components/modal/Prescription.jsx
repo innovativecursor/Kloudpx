@@ -92,17 +92,7 @@ const Prescription = () => {
                     </label>
 
                     {/* Past Prescription () */}
-                    <div className="flex flex-col items-center justify-center border-2 border-dashed border-[#0070BA]/40 rounded-lg p-4 w-1/2 h-44 cursor-pointer hover:border-[#0070BA]">
-                      <img
-                        src="https://cdn-icons-png.flaticon.com/512/4147/4147103.png"
-                        alt="Past Prescription"
-                        className="w-20 h-20 mb-2"
-                      />
-
-                      <p className="text-base font-semibold dark-text ">
-                        Past Prescription
-                      </p>
-                    </div>
+                 
                   </div>
 
                   <hr className="border opacity-70  border-gray-300 mt-14 mb-10" />

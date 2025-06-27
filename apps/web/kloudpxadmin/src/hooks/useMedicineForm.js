@@ -60,9 +60,9 @@ export default function useMedicineForm() {
   const [showMeasurementValue, setShowMeasurementValue] = useState(false);
 
   const taxTypeOptions = [
-    { value: "VAT 5%", label: "VAT 5%" },
-    { value: "VAT 12%", label: "VAT 12%" },
-    { value: "VAT 18%", label: "VAT 18%" },
+    { value: "VAT", label: "VAT" },
+    { value: "NON VAT", label: "NON VAT" },
+    // { value: "VAT 18%", label: "VAT 18%" },
   ];
 
   const unitOptions = [

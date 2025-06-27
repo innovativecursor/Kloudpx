@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import { useParams } from "next/navigation";
 import SubTitle from "@/app/components/Titles/SubTitle";
@@ -7,117 +8,48 @@ import QuantitySelector from "@/app/components/QuantitySelector/QuantitySelector
 import SocialIcons from "@/app/components/SocialIcons/SocialIcons";
 import Title from "@/app/components/Titles/Title";
 import ProductsCard from "@/app/components/cards/ProductsCard";
-
-const productsData = [
-  {
-    id: 1,
-    title: "Complete Health Kit",
-    subtitle: "Immunity Boost Collection",
-    description: "Fast and effective relief",
-    images: [
-      "/assets/product1.png",
-      "/assets/product1.png",
-      "/assets/product1.png",
-      "/assets/product1.png",
-      "/assets/product1.png",
-    ],
-    likes: 32,
-  },
-  {
-    id: 2,
-    title: "Ayurvedic Cough Syrup",
-    subtitle: "Respiratory Care",
-    description: "Soothes sore throat quickly",
-    images: [
-      "/assets/product2.png",
-      "/assets/product2.png",
-      "/assets/product2.png",
-      "/assets/product2.png",
-      "/assets/product2.png",
-    ],
-    likes: 15,
-  },
-];
-
-const products = [
-  {
-    id: 1,
-    title: "Complete Health Kit",
-    subtitle: "Immunity Boost Collection",
-    description: "Fast and effective relief",
-    image: "/assets/product1.png",
-    likes: 32,
-  },
-  {
-    id: 2,
-    title: "Ayurvedic Cough Syrup",
-    subtitle: "Respiratory Care",
-    description: "Soothes sore throat quickly",
-    image: "/assets/product2.png",
-    likes: 15,
-  },
-  {
-    id: 3,
-    title: "Joint Pain Relief Oil",
-    subtitle: "Pain Relief Essentials",
-    description: "Effective for muscle & joint pain",
-    image: "/assets/product3.png",
-    likes: 21,
-  },
-  {
-    id: 4,
-    title: "Diabetes Care Combo",
-    subtitle: "Sugar Control",
-    description: "Helps manage blood sugar ",
-    image: "/assets/product4.png",
-    likes: 18,
-  },
-  {
-    id: 5,
-    title: "Joint Pain Relief Oil",
-    subtitle: "Pain Relief Essentials",
-    description: "Effective for muscle & joint pain",
-    image: "/assets/product5.png",
-    likes: 21,
-  },
-  {
-    id: 6,
-    title: "Diabetes Care Combo",
-    subtitle: "Sugar Control",
-    description: "Helps manage blood sugar ",
-    image: "/assets/product4.png",
-    likes: 18,
-  },
-];
+import { useProductContext } from "@/app/contexts/ProductContext";
 
 const ProductDetails = () => {
-  const params = useParams();
-  const { id } = params;
+  const { id } = useParams();
+  const { allMedicine } = useProductContext();
 
-  const product = productsData.find((item) => item.id === parseInt(id));
+  const product = allMedicine.data.find((item) => String(item.ID) === id);
+
+  const fallbackImage = "/assets/demo.jpg";
+
+  if (allMedicine.loading) {
+    return <div className="text-center p-10">Loading product...</div>;
+  }
 
   if (!product) {
     return (
       <div className="p-10 text-red-600 text-center">Product Not Found</div>
     );
   }
+  // console.log(product);
 
   return (
     <div className="bg-gray-100 pb-10 min-h-screen">
       <div className="responsive-mx pt-7 md:pt-11">
-        <SubTitle paths={["Home", "Medicine", product.title]} />
+        <SubTitle paths={["Home", "Medicine", product?.BrandName]} />
 
         <div className="md:flex gap-10 mt-6 sm:mt-12">
-          <ImageSwiper images={product.images} />
+          {/* Image Swiper */}
+          <ImageSwiper
+            images={
+              product.ItemImages?.map((img) => img.url) || [fallbackImage]
+            }
+          />
 
           {/* Right side - product info */}
           <div className="w-full md:w-1/2 mt-8 md:mt-0 flex flex-col px-4 sm:px-6 md:px-0">
             <h1 className="sm:text-4xl text-2xl font-extrabold text-gray-900 mb-3">
-              {product.title}
+              {product?.BrandName}
             </h1>
 
             <h2 className="text-xl font-semibold text-gray-700 mb-2">
-              {product.subtitle}
+              {product?.Generic?.GenericName || "General Medicine"}
             </h2>
 
             <div className="flex items-center gap-3 mb-6">
@@ -132,20 +64,19 @@ const ProductDetails = () => {
             </div>
 
             <p className="text-gray-700 leading-relaxed mb-6 text-base md:text-lg">
-              {product.description}
+              {product?.Description || "No description available."}
             </p>
 
             <div className="flex items-end gap-4 mb-2">
               <span className="text-3xl font-bold text-green-600 leading-none">
-                ₹8999
-              </span>
-              <span className="text-base text-gray-500 line-through relative -top-1">
-                ₹10000
+                ₹{product?.SellingPricePerBox || "N/A"}
               </span>
             </div>
 
             <div className="text-gray-700 font-semibold text-sm mb-6">
-              Size: 6 Tablets Packs
+              {product?.MeasurementUnitValue} Box /
+              {product?.NumberOfPiecesPerBox}
+              {product?.UnitOfMeasurement}
             </div>
 
             <QuantitySelector />
@@ -175,7 +106,7 @@ const ProductDetails = () => {
         {/* Related Products */}
         <div className="md:mt-20 mt-10">
           <Title text="Related Products" />
-          <ProductsCard productsData={products} />
+          <ProductsCard productsData={{ data: allMedicine.data }} />
         </div>
       </div>
     </div>

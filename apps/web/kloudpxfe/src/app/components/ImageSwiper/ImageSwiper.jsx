@@ -9,7 +9,7 @@ import "swiper/css/thumbs";
 
 const ImageSwiper = ({ images }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
-
+  const fallbackImage = "/assets/demo.jpg";
   return (
     <div className="md:w-1/2">
       <div className="relative rounded-xl overflow-hidden ">
@@ -26,7 +26,8 @@ const ImageSwiper = ({ images }) => {
           {images.map((img, index) => (
             <SwiperSlide key={index}>
               <Image
-                src={img}
+                // src={img}
+                 src={fallbackImage}
                 alt={`product-${index}`}
                 width={300}
                 height={300}
@@ -70,7 +71,8 @@ const ImageSwiper = ({ images }) => {
             {images.map((img, index) => (
               <SwiperSlide key={index}>
                 <Image
-                  src={img}
+                  // src={img}
+                   src={fallbackImage}
                   alt={`thumb-${index}`}
                   width={120}
                   height={120}
