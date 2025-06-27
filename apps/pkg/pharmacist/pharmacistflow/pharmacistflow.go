@@ -109,7 +109,6 @@ func SearchMedicine(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, medicines)
 }
 
-// add medicine to prescription
 func AddMedicineToPrescription(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -126,27 +125,41 @@ func AddMedicineToPrescription(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	id := c.Param("id")
-	var req config.AddMedicineRequest
+	// Get prescription ID from path param
+	prescriptionID := c.Param("id")
 
+	var req config.AddMedicineRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		logrus.WithError(err).Warn("Invalid AddMedicineRequest payload")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid payload"})
 		return
 	}
 
-	entry := models.PrescriptionMedicine{
-		PrescriptionID: parseUint(id),
-		MedicineID:     req.MedicineID,
-		Quantity:       req.Quantity,
-	}
-
-	if err := db.Create(&entry).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add medicine"})
+	// Fetch prescription to get user ID
+	var prescription models.Prescription
+	if err := db.First(&prescription, prescriptionID).Error; err != nil {
+		logrus.WithField("prescription_id", prescriptionID).WithError(err).Warn("Prescription not found")
+		c.JSON(http.StatusNotFound, gin.H{"error": "Prescription not found"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Medicine added to cart"})
+	// Parse and get pointer to prescription ID
+	id := parseUint(prescriptionID)
+
+	entry := models.Cart{
+		PrescriptionID: &id,
+		UserID:         prescription.UserID,
+		MedicineID:     req.MedicineID,
+		Quantity:       req.Quantity,
+		IsOTC:          false, // Marked as prescribed
+	}
+
+	if err := db.Create(&entry).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add medicine to prescription"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Medicine added to prescription"})
 }
 
 // get cart
@@ -165,8 +178,9 @@ func GetCart(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Access denied: Pharmacist only"})
 		return
 	}
-	id := c.Param("id")
-	var cart []models.PrescriptionMedicine
+
+	prescriptionID := c.Param("id")
+	var cart []models.Cart
 
 	if err := db.
 		Preload("Prescription.User").
@@ -175,14 +189,14 @@ func GetCart(c *gin.Context, db *gorm.DB) {
 		Preload("Medicine.Supplier").
 		Preload("Medicine.Category").
 		Preload("Medicine.ItemImages").
-		Where("prescription_id = ?", id).
+		Where("prescription_id = ? AND is_otc = false", prescriptionID). // Only prescribed items
 		Find(&cart).Error; err != nil {
-		logrus.WithError(err).WithField("prescription_id", id).Error("Failed to fetch cart")
+		logrus.WithError(err).WithField("prescription_id", prescriptionID).Error("Failed to fetch cart")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart"})
 		return
 	}
 
-	logrus.WithField("prescription_id", id).Infof("Fetched %d items in cart", len(cart))
+	logrus.WithField("prescription_id", prescriptionID).Infof("Fetched %d prescribed items", len(cart))
 	c.JSON(http.StatusOK, cart)
 }
 

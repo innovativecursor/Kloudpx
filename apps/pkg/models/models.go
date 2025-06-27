@@ -93,11 +93,13 @@ type Prescription struct {
 }
 
 // Many-to-many (cart) between prescription and medicines
-type PrescriptionMedicine struct {
+type Cart struct {
 	gorm.Model
-	PrescriptionID uint
-	Prescription   Prescription
+	UserID         uint
+	PrescriptionID *uint         // Nullable — present only for prescribed medicines
+	Prescription   *Prescription // Nullable
 	MedicineID     uint
 	Medicine       Medicine
 	Quantity       int
+	IsOTC          bool // NEW: explicitly marks whether it’s OTC
 }

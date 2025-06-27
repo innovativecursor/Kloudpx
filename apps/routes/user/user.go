@@ -9,6 +9,7 @@ import (
 	"github.com/innovativecursor/Kloudpx/apps/pkg/middleware"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/oauthuser"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/uploadprescription"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/user/userflow"
 	"github.com/innovativecursor/Kloudpx/apps/routes/getapiroutes"
 	"gorm.io/gorm"
 )
@@ -35,6 +36,21 @@ func User(db *gorm.DB) {
 		uploadprescription.UploadPrescription(c, db)
 	})
 
+	apiV1.GET("/user/get-medicines", func(c *gin.Context) {
+		userflow.GetMedicinesForUser(c, db)
+	})
+
+	apiV1.POST("/user/add-to-cart", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		userflow.AddOTCToCart(c, db)
+	})
+
+	apiV1.GET("/user/get-cart", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		userflow.GetUserCart(c, db)
+	})
+
+	apiV1.DELETE("/user/remove-item-cart/:id", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		userflow.RemoveItemFromCart(c, db)
+	})
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
 	router.Run(":" + port)
