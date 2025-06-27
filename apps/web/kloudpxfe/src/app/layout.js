@@ -1,6 +1,7 @@
 import "./globals.css";
 import Footer from "./components/Footer/Footer";
 import Header from "./components/Header/Header";
+import { AppProvider } from "./contexts/AppContext";
 
 export const metadata = {
   title: "Kloud Pharma",
@@ -17,10 +18,11 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className={`antialiased min-h-screen flex flex-col`}>
+        <AppProvider>
         <Header />
-
         <main className="flex-1">{children}</main>
         <Footer />
+        </AppProvider>
       </body>
     </html>
   );
