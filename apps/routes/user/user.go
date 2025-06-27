@@ -40,6 +40,10 @@ func User(db *gorm.DB) {
 		userflow.GetMedicinesForUser(c, db)
 	})
 
+	apiV1.GET("/user/get-current-userinfo", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		userflow.GetCurrentUserInfo(c, db)
+	})
+
 	apiV1.POST("/user/add-to-cart", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
 		userflow.AddOTCToCart(c, db)
 	})
