@@ -5,7 +5,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
-import useSwiperNavigation from "@/hooks/useSwiperNavigation";
+import useSwiperNavigation from "@/app/hooks/useSwiperNavigation";
 import Link from "next/link";
 
 const TopItems = () => {

@@ -7,7 +7,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { Navigation } from 'swiper/modules';
 import TitleSlider from '../titleslider/TitleSlider';
-import useSwiperNavigation from '@/hooks/useSwiperNavigation';
+import useSwiperNavigation from '@/app/hooks/useSwiperNavigation';
 
 const Testimonial = ({ testimonials }) => {
     const { prevRef, nextRef, setSwiperInstance } = useSwiperNavigation();

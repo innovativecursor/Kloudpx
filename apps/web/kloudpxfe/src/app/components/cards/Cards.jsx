@@ -9,7 +9,7 @@ import { Navigation } from 'swiper/modules';
 import TitleSlider from '../titleslider/TitleSlider';
 import AddToCart from '../button/AddToCart';
 import DetailsCard from './DetailsCard';
-import useSwiperNavigation from "@/hooks/useSwiperNavigation"
+import useSwiperNavigation from "@/app/hooks/useSwiperNavigation"
 
 
 const SwiperSlider = ({ data, title }) => {

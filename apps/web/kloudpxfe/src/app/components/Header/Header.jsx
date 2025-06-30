@@ -4,10 +4,10 @@ import Logo from "@/app/components/logo/Logo";
 import SearchBar from "@/app/components/searchbar/SearchBar";
 import TopItems from "@/app/components/topitems/TopItems";
 import Hamburger from "@/app/components/modal/Hamburger";
-import { useAuthContext } from "@/app/contexts/AuthContext";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 const Header = () => {
-  const { login, loading } = useAuthContext();
+  const { login, loading, user } = useAuth();
 
   return (
     <div className="">
@@ -18,11 +18,14 @@ const Header = () => {
         </div>
         <div className="flex-between-center sm:gap-6 gap-3">
           <div
-            onClick={login}
+            onClick={!user && !loading ? login : undefined}
             className="font-semibold sm:text-xs text-xs cursor-pointer"
           >
-            {" "}
-            {loading ? "Signin In..." : "Login/SignUp"}
+            {loading
+              ? "Signing In..."
+              : user
+              ? `Hi, ${user.first_name} ${user.last_name}`
+              : "Login/Signup"}
           </div>
           <div className="flex gap-3 sm:gap-6 items-center text-color">
             <div className="relative">
