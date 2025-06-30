@@ -10,13 +10,19 @@ const ProductsCard = ({ productsData }) => {
 
   const handleCardClick = (id) => {
     router.push(`/Products/${id}`);
+    console.log(id);
   };
+
+  // console.log(handleCardClick);
+
+  const medicines = productsData?.data?.medicines || [];
+  console.log(medicines);
 
   return (
     <div>
       <div className="grid lg:grid-cols-3 sm:gap-7 gap-10 md:grid-cols-2 sm:grid-cols-2 grid-cols-1 mt-7 sm:mt-11 sm:mb-20 mb-12">
-        {Array.isArray(productsData?.data) && productsData?.data.length > 0 ? (
-          productsData?.data.map((item) => (
+        {medicines.length > 0 ? (
+          medicines.map((item) => (
             <div
               key={item.ID}
               onClick={() => handleCardClick(item.ID)}
@@ -29,11 +35,6 @@ const ProductsCard = ({ productsData }) => {
               <div className="flex justify-evenly mt-4 w-full mx-2">
                 <div>
                   <Image
-                    // src={
-                    //   item.ItemImages && item.ItemImages.length > 0
-                    //     ? item.ItemImages[0].url
-                    //     : fallbackImage
-                    // }
                     src={fallbackImage}
                     alt={item.BrandName}
                     width={160}
@@ -44,11 +45,6 @@ const ProductsCard = ({ productsData }) => {
 
                 <div className="flex flex-col justify-center space-y-3">
                   <Image
-                    // src={
-                    //   item.ItemImages && item.ItemImages.length > 0
-                    //     ? item.ItemImages[0].url
-                    //     : fallbackImage
-                    // }\
                     src={fallbackImage}
                     alt="thumb"
                     width={48}
@@ -56,11 +52,6 @@ const ProductsCard = ({ productsData }) => {
                     className="rounded"
                   />
                   <Image
-                    // src={
-                    //   item.ItemImages && item.ItemImages.length > 0
-                    //     ? item.ItemImages[0].url
-                    //     : fallbackImage
-                    // }
                     src={fallbackImage}
                     alt="thumb"
                     width={48}
@@ -69,11 +60,6 @@ const ProductsCard = ({ productsData }) => {
                   />
                   <div className="relative w-12 h-12 rounded overflow-hidden">
                     <Image
-                      // src={
-                      //   item.ItemImages && item.ItemImages.length > 0
-                      //     ? item.ItemImages[0].url
-                      //     : fallbackImage
-                      // }
                       src={fallbackImage}
                       alt="thumb"
                       fill
