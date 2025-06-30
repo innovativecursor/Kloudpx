@@ -2,6 +2,7 @@ package userflow
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
@@ -144,4 +145,47 @@ func RemoveItemFromCart(c *gin.Context, db *gorm.DB) {
 
 	logrus.Info("Item permanently removed from cart")
 	c.JSON(http.StatusOK, gin.H{"message": "Item permanently removed from cart"})
+}
+
+func GetAllCategoriesForUser(c *gin.Context, db *gorm.DB) {
+
+	var categories []models.Category
+	if err := db.Find(&categories).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch categories from database")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch categories"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":    "Categories fetched successfully",
+		"categories": categories,
+	})
+}
+
+func GetItemsByCategory(c *gin.Context, db *gorm.DB) {
+
+	categoryIDParam := c.Param("category_id")
+	categoryID, err := strconv.Atoi(categoryIDParam)
+	if err != nil {
+		logrus.WithField("param", categoryIDParam).Warn("Invalid category ID format")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID"})
+		return
+	}
+
+	var medicines []models.Medicine
+	if err := db.Preload("Generic").
+		Preload("Supplier").
+		Preload("ItemImages").
+		Preload("Category").
+		Where("category_id = ?", categoryID).
+		Find(&medicines).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch medicines by category")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "Medicines fetched successfully by category",
+		"medicines": medicines,
+	})
 }

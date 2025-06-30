@@ -55,6 +55,15 @@ func User(db *gorm.DB) {
 	apiV1.DELETE("/user/remove-item-cart/:id", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
 		userflow.RemoveItemFromCart(c, db)
 	})
+
+	apiV1.GET("/user/get-categories-for-user", func(c *gin.Context) {
+		userflow.GetAllCategoriesForUser(c, db)
+	})
+
+	apiV1.GET("/user/get-items-by-categories", func(c *gin.Context) {
+		userflow.GetItemsByCategory(c, db)
+	})
+
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
 	router.Run(":" + port)
