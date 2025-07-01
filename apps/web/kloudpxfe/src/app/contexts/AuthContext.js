@@ -2,10 +2,10 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
-import Swal from "sweetalert2";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import endpoints from "@/app/config/endpoints";
+import DashboardLoading from "../components/Loader/DashboardLoader";
 
 const AuthContext = createContext(null);
 AuthContext.displayName = "AuthContext";
@@ -44,6 +44,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
         if (!codeResponse?.code)
           throw new Error("Authorization code not found");
+
         const encodedCode = encodeURIComponent(codeResponse.code);
         const res = await axios.get(
           endpoints.auth.googleLogin + `?code=${encodedCode}`
@@ -51,19 +52,19 @@ export const AuthProvider = ({ children }) => {
 
         const { token } = res.data;
         if (!token) throw new Error("Token missing from server");
+
         localStorage.setItem("access_token", token);
         setToken(token);
-        Swal.fire("Success", "Login successful", "success");
+
         router.push("/");
       } catch (error) {
-        console.error(error);
-        Swal.fire("Error", error.message || "Login failed", "error");
+        console.error("Login failed", error.message);
       } finally {
         setLoading(false);
       }
     },
     onError: () => {
-      Swal.fire("Error", "Google login failed", "error");
+      console.error("Google login failed");
     },
   });
 
@@ -71,7 +72,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("access_token");
     setToken(null);
     setUser(null);
-    Swal.fire("Logged Out", "You have been logged out", "info");
     router.push("/");
   };
 
@@ -86,6 +86,7 @@ export const AuthProvider = ({ children }) => {
         user,
       }}
     >
+      {loading && <DashboardLoading />}
       {children}
     </AuthContext.Provider>
   );
