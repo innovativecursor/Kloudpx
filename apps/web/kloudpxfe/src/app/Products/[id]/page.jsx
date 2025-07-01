@@ -6,13 +6,16 @@ import SubTitle from "@/app/components/Titles/SubTitle";
 import ImageSwiper from "@/app/components/ImageSwiper/ImageSwiper";
 import QuantitySelector from "@/app/components/QuantitySelector/QuantitySelector";
 import SocialIcons from "@/app/components/SocialIcons/SocialIcons";
-import Title from "@/app/components/Titles/Title";
-import ProductsCard from "@/app/components/cards/ProductsCard";
+// import Title from "@/app/components/Titles/Title";
+// import ProductsCard from "@/app/components/cards/ProductsCard";
 import { useProductContext } from "@/app/contexts/ProductContext";
 
 const ProductDetails = () => {
   const { id } = useParams();
-  const { allMedicine } = useProductContext();
+
+  const { allMedicine, selectedCategoryName, filteredItems } =
+    useProductContext();
+  console.log(filteredItems);
 
   const product = allMedicine.data.find((item) => String(item.ID) === id);
 
@@ -27,12 +30,11 @@ const ProductDetails = () => {
       <div className="p-10 text-red-600 text-center">Product Not Found</div>
     );
   }
-  // console.log(product);
 
   return (
     <div className="bg-gray-100 pb-10 min-h-screen">
       <div className="responsive-mx pt-7 md:pt-11">
-        <SubTitle paths={["Home", "Medicine", product?.BrandName]} />
+        <SubTitle paths={["Home", selectedCategoryName, product?.BrandName]} />
 
         <div className="md:flex gap-10 mt-6 sm:mt-12">
           {/* Image Swiper */}
@@ -104,10 +106,10 @@ const ProductDetails = () => {
         </div>
 
         {/* Related Products */}
-        <div className="md:mt-20 mt-10">
+        {/* <div className="md:mt-20 mt-10">
           <Title text="Related Products" />
           <ProductsCard productsData={{ data: allMedicine.data }} />
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -1,12 +1,14 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import endpoints from "@/app/config/endpoints";
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
+AuthContext.displayName = "AuthContext";
 
 export const AuthProvider = ({ children }) => {
   const router = useRouter();
@@ -14,6 +16,26 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(
     typeof window !== "undefined" ? localStorage.getItem("access_token") : null
   );
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (!token) return;
+      try {
+        const res = await axios.get(endpoints.auth.getCurrentUser, {
+          headers: {
+            Authorization: `${token}`,
+          },
+        });
+        setUser(res.data);
+      } catch (err) {
+        console.error("Error fetching user info", err);
+        setUser(null);
+      }
+    };
+
+    fetchUser();
+  }, [token]);
 
   const login = useGoogleLogin({
     flow: "auth-code",
@@ -22,15 +44,13 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
         if (!codeResponse?.code)
           throw new Error("Authorization code not found");
-
         const encodedCode = encodeURIComponent(codeResponse.code);
         const res = await axios.get(
-          `http://localhost:10003/v1/auth/google/callback/user?code=${encodedCode}`
+          endpoints.auth.googleLogin + `?code=${encodedCode}`
         );
 
         const { token } = res.data;
         if (!token) throw new Error("Token missing from server");
-
         localStorage.setItem("access_token", token);
         setToken(token);
         Swal.fire("Success", "Login successful", "success");
@@ -50,6 +70,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("access_token");
     setToken(null);
+    setUser(null);
     Swal.fire("Logged Out", "You have been logged out", "info");
     router.push("/");
   };
@@ -62,6 +83,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         loading,
         isAuthenticated: !!token,
+        user,
       }}
     >
       {children}
@@ -69,4 +91,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuthContext = () => useContext(AuthContext);
+export const useAuth = () => useContext(AuthContext);

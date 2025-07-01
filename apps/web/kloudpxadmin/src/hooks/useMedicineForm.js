@@ -161,10 +161,10 @@ export default function useMedicineForm() {
       return;
     }
 
-    if (!prescriptionRequired) {
-      alert("Please check 'Prescription Required' to proceed.");
-      return;
-    }
+    // if (!prescriptionRequired) {
+    //   alert("Please check 'Prescription Required' to proceed.");
+    //   return;
+    // }
 
     const payload = constructMedicinePayload({
       formData,

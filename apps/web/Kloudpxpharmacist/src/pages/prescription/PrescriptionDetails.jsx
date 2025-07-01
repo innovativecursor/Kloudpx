@@ -13,6 +13,7 @@ const PrescriptionDetails = () => {
     prescriptionsCart,
     getPrescriptionDetails,
     submitPrescriptions,
+    isCartUpdated,
   } = usePrescriptionContext();
 
   useEffect(() => {
@@ -92,13 +93,11 @@ const PrescriptionDetails = () => {
       </div>
 
       {/* Prescriptions Cart */}
-      <div className="mt-10 max-w-6xl mx-auto">
-        <h3 className="text-xl font-semibold mb-4">User's Cart</h3>
-        {prescriptionsCart.loading && <p>Loading cart...</p>}
-        {prescriptionsCart.error && (
-          <p className="text-red-600">Error: {prescriptionsCart.error}</p>
-        )}
-        {prescriptionsCart.data && prescriptionsCart.data.length > 0 ? (
+
+      {prescriptionsCart.data && prescriptionsCart.data.length > 0 && (
+        <div className="mt-10 max-w-6xl mx-auto">
+          <h3 className="text-xl font-semibold mb-4">User's Cart</h3>
+
           <table className="w-full border border-gray-300 rounded-md overflow-hidden text-left text-sm shadow-sm">
             <thead className="bg-gray-100">
               <tr>
@@ -129,20 +128,24 @@ const PrescriptionDetails = () => {
               ))}
             </tbody>
           </table>
-        ) : (
-          <p className="text-gray-600">No items in cart.</p>
-        )}
 
-        {/* Submit Button */}
-        <div className="flex justify-center mt-8">
-          <button
-            onClick={submitPrescriptions}
-            className="bg-[#0070ba] text-white font-semibold py-3 px-8 rounded-md shadow-md hover:bg-[#005f8d] transition duration-300"
-          >
-            Submit Prescriptions
-          </button>
+          {/* Submit Button */}
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={submitPrescriptions}
+              disabled={!isCartUpdated} 
+              className={`font-semibold py-3 px-8 rounded-md shadow-md transition duration-300 ${
+                !isCartUpdated
+                  ? "bg-gray-400 text-white cursor-not-allowed"
+                  : "bg-[#0070ba] text-white hover:bg-[#005f8d]"
+              }`}
+            >
+              Submit Prescriptions
+            </button>
+          </div>
         </div>
-      </div>
+      )}
+
       <CustomModal />
     </div>
   );

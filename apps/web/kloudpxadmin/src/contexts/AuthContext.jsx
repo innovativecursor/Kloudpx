@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import endpoints from "../config/endpoints";
+import { getAxiosCall } from "../Axios/UniversalAxiosCalls";
 
 export const AuthContext = createContext();
 
@@ -215,21 +216,37 @@ const AuthProvider = ({ children }) => {
 
   // ---------------- get medicine FUNCTIONS ------------------
 
+  // const getAllMedicines = async () => {
+  //   if (!token) {
+  //     setMedicineError("Token missing, please login.");
+  //     return;
+  //   }
+
+  //   try {
+  //     const res = await axios.get(endpoints.medicine.getAll, {
+  //       headers: { Authorization: `${token}` },
+  //     });
+
+  //     setMedicines(res.data.medicines || []);
+  //     setMedicineError("");
+  //   } catch (err) {
+  //     console.error("Error fetching medicines:", err);
+  //     setMedicineError("Failed to fetch medicines.");
+  //   }
+  // };
+
   const getAllMedicines = async () => {
     if (!token) {
       setMedicineError("Token missing, please login.");
       return;
     }
 
-    try {
-      const res = await axios.get(endpoints.medicine.getAll, {
-        headers: { Authorization: `${token}` },
-      });
+    const res = await getAxiosCall(`/v1/medicine/get-all-medicine`);
 
-      setMedicines(res.data.medicines || []);
+    if (res?.data?.medicines) {
+      setMedicines(res.data.medicines);
       setMedicineError("");
-    } catch (err) {
-      console.error("Error fetching medicines:", err);
+    } else {
       setMedicineError("Failed to fetch medicines.");
     }
   };
@@ -313,7 +330,7 @@ const AuthProvider = ({ children }) => {
         uploadedImageIds,
         setUploadedImageIds,
         setPreviewUrls,
-        setMessage
+        setMessage,
       }}
     >
       {children}

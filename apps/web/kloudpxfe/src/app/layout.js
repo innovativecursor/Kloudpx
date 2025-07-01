@@ -4,6 +4,7 @@ import Header from "./components/Header/Header";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProductProvider } from "./contexts/ProductContext";
+import { CartProvider } from "./contexts/CartContext";
 
 export const metadata = {
   title: "Kloud Pharma",
@@ -23,9 +24,11 @@ export default function RootLayout({ children }) {
         <GoogleOAuthProvider clientId="573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com">
           <AuthProvider>
             <ProductProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
+              <CartProvider>
+                <Header />
+                <main className="flex-1">{children}</main>
+                <Footer />
+              </CartProvider>
             </ProductProvider>
           </AuthProvider>
         </GoogleOAuthProvider>

@@ -10,7 +10,7 @@ export let postAxiosCall = async (endpoint, data) => {
     store.dispatch({ type: "LOADING", payload: true });
     const _headers = {
       Accept: "*/*",
-      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      Authorization: `${localStorage.getItem("access_token")}`,
     };
     // Create an Axios instance with default configuration
     const instance = axios.create({
@@ -45,7 +45,7 @@ export let getAxiosCall = async (endpoint, params = {}) => {
     const _headers = {
       "Content-Type": "application/x-www-form-urlencoded",
       Accept: "*/*",
-      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      Authorization: `${localStorage.getItem("access_token")}`,
     };
     const request = {
       headers: _headers,
@@ -88,7 +88,7 @@ export let updateAxiosCall = async (endpoint, id, data) => {
     store.dispatch({ type: "LOADING", payload: true });
     const _headers = {
       Accept: "*/*",
-      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      Authorization: `${localStorage.getItem("access_token")}`,
     };
     // Create an Axios instance with default configuration
     const instance = axios.create({
@@ -123,7 +123,7 @@ export let deleteAxiosCall = async (endpoint, id) => {
     store.dispatch({ type: "LOADING", payload: true });
     const _headers = {
       Accept: "*/*",
-      Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      Authorization: `${localStorage.getItem("access_token")}`,
     };
     // Create an Axios instance with default configuration
     const instance = axios.create({

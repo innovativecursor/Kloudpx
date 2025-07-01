@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useAuthContext } from "./AuthContext";
 import endpoints from "../config/endpoints";
@@ -34,6 +34,9 @@ const PrescriptionProvider = ({ children }) => {
   const [selectedMedicineId, setSelectedMedicineId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalInput, setModalInput] = useState("");
+
+  const initialLengthRef = useRef(0);
+  const [isCartUpdated, setIsCartUpdated] = useState(false);
 
   const userId = prescriptionDetails?.data?.User?.ID;
 
@@ -232,6 +235,8 @@ const PrescriptionProvider = ({ children }) => {
         Swal.fire("Success", "Prescriptions submitted successfully", "success");
         navigate("/findprescription");
         fetchPrescriptions();
+        setIsCartUpdated(false);
+        initialLengthRef.current = 0;
       } else {
         Swal.fire("Error", "Failed to submit prescriptions", "error");
       }
@@ -244,6 +249,21 @@ const PrescriptionProvider = ({ children }) => {
   useEffect(() => {
     fetchPrescriptionsCart();
   }, [userId]);
+
+  useEffect(() => {
+    if (Array.isArray(prescriptionsCart.data)) {
+      const currentLength = prescriptionsCart.data.length;
+
+      if (initialLengthRef.current === 0 && currentLength > 0) {
+        initialLengthRef.current = currentLength;
+        setIsCartUpdated(false);
+      } else if (currentLength > initialLengthRef.current) {
+        setIsCartUpdated(true);
+      } else {
+        setIsCartUpdated(false);
+      }
+    }
+  }, [prescriptionsCart.data]);
 
   return (
     <PrescriptionContext.Provider
@@ -270,6 +290,7 @@ const PrescriptionProvider = ({ children }) => {
         prescriptionsCart,
         fetchPrescriptionsCart,
         submitPrescriptions,
+        isCartUpdated,
       }}
     >
       {children}
