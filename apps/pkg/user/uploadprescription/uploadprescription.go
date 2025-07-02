@@ -2,6 +2,7 @@ package uploadprescription
 
 import (
 	"encoding/base64"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -55,8 +56,8 @@ func UploadPrescription(c *gin.Context, db *gorm.DB) {
 	userType := "user"
 	uniqueUUID := s3helper.GenerateUniqueID()
 	uuidString := uniqueUUID.String()
-	userIDString := string(rune(userObj.ID))
-	imageName := "prescription"
+	userIDString := fmt.Sprintf("%d", userObj.ID)
+	imageName := userObj.FirstName
 
 	// Upload to S3
 	if err := s3helper.UploadToS3(
@@ -82,7 +83,8 @@ func UploadPrescription(c *gin.Context, db *gorm.DB) {
 	}
 
 	// Construct image URL
-	imageURL := profileType + "/" + userType + "/" + uuidString + "/" + userIDString + "/" + imageName + extension
+	imageURL := "https://" + cfg.S3.BucketName + ".s3." + cfg.S3.Region + ".amazonaws.com/" +
+		profileType + "/" + userType + "/" + uuidString + "/" + userIDString + "/" + imageName + "." + extension
 
 	// Save in database
 	prescription := models.Prescription{

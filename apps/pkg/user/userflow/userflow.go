@@ -73,6 +73,19 @@ func AddOTCToCart(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	var medicine models.Medicine
+	if err := db.First(&medicine, req.MedicineID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Medicine not found"})
+		return
+	}
+
+	if medicine.Prescription {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Prescription required for this medicine. Please upload a prescription",
+		})
+		return
+	}
+
 	entry := models.Cart{
 		UserID:     userObj.ID,
 		MedicineID: req.MedicineID,

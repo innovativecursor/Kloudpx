@@ -76,7 +76,7 @@ func Admin(db *gorm.DB) {
 
 	//upload images
 	apiV1.POST("/itemimage/add-itemimage", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
-		itemimage.UploadMedicineImages(c, db)
+		itemimage.UploadProdutImages(c, db)
 	})
 	//medicine
 	apiV1.POST("/medicine/add-medicine", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
