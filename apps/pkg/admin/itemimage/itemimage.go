@@ -251,12 +251,13 @@ func UploadProdutImages(c *gin.Context, db *gorm.DB) {
 			}
 
 			imagePath := fmt.Sprintf(
-				"https://%s.s3.%s.amazonaws.com/%s/%s/%s/%s.%s",
+				"https://%s.s3.%s.amazonaws.com/%s/%s/%s/%s/%s.%s",
 				envCfg.S3.BucketName,
 				envCfg.S3.Region,
 				profileType,
 				userType,
 				uniqueUUID,
+				userIDString,
 				imageName,
 				extension,
 			)

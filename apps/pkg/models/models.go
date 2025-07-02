@@ -25,7 +25,9 @@ type Supplier struct {
 
 type Category struct {
 	gorm.Model
-	CategoryName string `gorm:"not null"`
+	CategoryName   string `gorm:"not null"`
+	CategoryIconID uint
+	CategoryIcon   CategoryIcon `gorm:"foreignKey:CategoryIconID"`
 }
 
 type ItemImage struct {
@@ -34,9 +36,15 @@ type ItemImage struct {
 	MedicineID *uint // nullable foreign key
 }
 
+type CategoryIcon struct {
+	gorm.Model
+	Icon string `gorm:"not null"` // e.g., S3 URL
+}
+
 type Medicine struct {
 	gorm.Model
 	BrandName             string `gorm:"not null"`
+	Power                 string
 	GenericID             uint
 	Generic               Generic `gorm:"foreignKey:GenericID"`
 	SupplierID            uint
