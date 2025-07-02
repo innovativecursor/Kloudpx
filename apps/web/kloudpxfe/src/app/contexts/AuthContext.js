@@ -13,10 +13,18 @@ AuthContext.displayName = "AuthContext";
 export const AuthProvider = ({ children }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState(
-    typeof window !== "undefined" ? localStorage.getItem("access_token") : null
-  );
+  const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const t = localStorage.getItem("access_token");
+      setToken(t);
+    }
+  }, []);
+
+  // const [token, setToken] = useState(
+  //   typeof window !== "undefined" ? localStorage.getItem("access_token") : null
+  // );
 
   useEffect(() => {
     const fetchUser = async () => {
