@@ -41,6 +41,7 @@ func AddMedicine(c *gin.Context, db *gorm.DB) {
 
 	newMedicine := models.Medicine{
 		BrandName:             payload.BrandName,
+		Power:                 payload.Power,
 		GenericID:             payload.GenericID,
 		SupplierID:            payload.SupplierID,
 		CategoryID:            payload.CategoryID,
@@ -175,6 +176,7 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 		medicine.MeasurementUnitValue = 0
 	}
 
+	medicine.Power = payload.Power
 	medicine.NumberOfPiecesPerBox = payload.NumberOfPiecesPerBox
 	medicine.SellingPricePerBox = payload.SellingPricePerBox
 	medicine.SellingPricePerPiece = payload.SellingPricePerPiece
