@@ -1,7 +1,14 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
+import { createContext, useContext, useState } from "react";
+import {
+  getAxiosCall,
+  postAxiosCall,
+  updateAxiosCall,
+  deleteAxiosCall,
+} from "../Axios/UniversalAxiosCalls";
 import endpoints from "../config/endpoints";
-import { getAxiosCall } from "../Axios/UniversalAxiosCalls";
+import axios from "axios";
+import Swal from "sweetalert2";
+import { store } from "@store";
 
 export const AuthContext = createContext();
 
@@ -31,10 +38,9 @@ const AuthProvider = ({ children }) => {
   const [images, setImages] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
   const [message, setMessage] = useState("");
-  const [imageIds, setImageIds] = useState([]);
   const [uploadedImageIds, setUploadedImageIds] = useState([]);
 
-  // ---------------- AUTH FUNCTIONS ------------------
+  // --------- AUTH FUNCTIONS ---------
   const loginUser = (userData, token) => {
     localStorage.setItem("access_token", token);
     setUser(userData);
@@ -49,210 +55,198 @@ const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
-  // ---------------- GENERIC FUNCTIONS ------------------
-  const fetchGenericOptions = async () => {
+  // --------- HELPER: check token ---------
+  const checkToken = () => {
     if (!token) {
+      Swal.fire({
+        title: "Error",
+        text: "Authentication token missing, please login again.",
+        icon: "error",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+      return false;
+    }
+    return true;
+  };
+
+  // --------- GENERIC OPTIONS ---------
+  const fetchGenericOptions = async () => {
+    if (!checkToken()) {
       setGenericError("No token found, please login.");
       return;
     }
-
     try {
-      const res = await axios.get(endpoints.generic.get, {
-        headers: { Authorization: `${token}` },
-      });
-      const formatted = res.data.generics.map((item) => ({
-        label: item.GenericName,
-        value: item.ID,
-      }));
-      setGenericOptions(formatted);
-      setGenericError("");
-    } catch (err) {
-      console.error("Error fetching generics:", err);
+      const res = await getAxiosCall("/v1/generic/get-generic");
+      if (res?.data?.generics) {
+        const formatted = res.data.generics.map((item) => ({
+          label: item.GenericName,
+          value: item.ID,
+        }));
+        setGenericOptions(formatted);
+        setGenericError("");
+      } else {
+        setGenericError("Failed to load generics.");
+      }
+    } catch (error) {
       setGenericError("Failed to load generics.");
     }
   };
 
   const createGenericOption = async (inputValue) => {
-    if (!token) {
+    if (!checkToken()) {
       setGenericError("Token missing, please login again.");
       return null;
     }
-
     try {
-      const res = await axios.post(
-        endpoints.generic.add,
-        { genericname: inputValue },
-        { headers: { Authorization: `${token}` } }
-      );
+      const res = await postAxiosCall("/v1/generic/add-generic", {
+        genericname: inputValue,
+      });
+      // console.log("createGenericOption response:", res);
 
-      const createdGeneric = res.data.generic;
-
-      const newOption = {
-        value: createdGeneric.ID,
-        label: createdGeneric.GenericName,
-      };
-
-      setGenericOptions((prev) => [...prev, newOption]);
-      setGenericError("");
-      return newOption;
-    } catch (err) {
-      console.error("Error creating generic:", err);
+      if (res?.generic) {
+        const createdGeneric = res.generic;
+        const newOption = {
+          value: createdGeneric.ID,
+          label: createdGeneric.GenericName,
+        };
+        setGenericOptions((prev) => [...prev, newOption]);
+        setGenericError("");
+        return newOption;
+      } else {
+        setGenericError("Failed to add new generic.");
+        return null;
+      }
+    } catch (error) {
       setGenericError("Failed to add new generic.");
       return null;
     }
   };
 
-  // ---------------- SUPPLIER FUNCTIONS ------------------
-
+  // --------- SUPPLIER OPTIONS ---------
   const fetchSupplierOptions = async () => {
-    if (!token) {
+    if (!checkToken()) {
       setSupplierError("No token found, please login.");
       return;
     }
-
     try {
-      const res = await axios.get(endpoints.supplier.get, {
-        headers: { Authorization: `${token}` },
-      });
-
-      const formatted = res.data.suppliers.map((item) => ({
-        label: item.SupplierName,
-        value: item.ID,
-      }));
-
-      setSupplierOptions(formatted);
-      setSupplierError("");
-    } catch (err) {
-      console.error("Error fetching suppliers:", err);
+      const res = await getAxiosCall("/v1/supplier/get-all-supplier");
+      if (res?.data?.suppliers) {
+        const formatted = res.data.suppliers.map((item) => ({
+          label: item.SupplierName,
+          value: item.ID,
+        }));
+        setSupplierOptions(formatted);
+        setSupplierError("");
+      } else {
+        setSupplierError("Failed to load suppliers.");
+      }
+    } catch (error) {
       setSupplierError("Failed to load suppliers.");
     }
   };
 
   const createSupplierOption = async (inputValue) => {
-    if (!token) {
+    if (!checkToken()) {
       setSupplierError("Token missing, please login again.");
       return null;
     }
-
     try {
-      const res = await axios.post(
-        endpoints.supplier.add,
-        { suppliername: inputValue },
-        { headers: { Authorization: `${token}` } }
-      );
-
-      const createdSupplier = res.data.supplier;
-
-      const newOption = {
-        value: createdSupplier.ID,
-        label: createdSupplier.SupplierName,
-      };
-
-      setSupplierOptions((prev) => [...prev, newOption]);
-      setSupplierError("");
-      return newOption;
-    } catch (err) {
-      console.error("Error creating supplier:", err);
+      const res = await postAxiosCall("/v1/supplier/add-supplier", {
+        suppliername: inputValue,
+      });
+      if (res?.supplier) {
+        const createdSupplier = res.supplier;
+        const newOption = {
+          value: createdSupplier.ID,
+          label: createdSupplier.SupplierName,
+        };
+        setSupplierOptions((prev) => [...prev, newOption]);
+        setSupplierError("");
+        return newOption;
+      } else {
+        setSupplierError("Failed to add new supplier.");
+        return null;
+      }
+    } catch (error) {
       setSupplierError("Failed to add new supplier.");
       return null;
     }
   };
 
-  // ---------------- Category FUNCTIONS ------------------
-
+  // --------- CATEGORY OPTIONS ---------
   const fetchCategoryOptions = async () => {
-    if (!token) {
+    if (!checkToken()) {
       setCategoryError("No token found, please login.");
       return;
     }
-
     try {
-      const res = await axios.get(endpoints.category.get, {
-        headers: { Authorization: `${token}` },
-      });
+      const res = await getAxiosCall("/v1/category/get-all-category");
 
-      const formatted = res.data.categories.map((item) => ({
-        label: item.CategoryName,
-        value: item.ID,
-      }));
-
-      setCategoryOptions(formatted);
-      setCategoryError("");
-    } catch (err) {
-      console.error("Error fetching categories:", err);
+      if (res?.data?.categories) {
+        const formatted = res.data.categories.map((item) => ({
+          label: item.CategoryName,
+          value: item.ID,
+        }));
+        setCategoryOptions(formatted);
+        setCategoryError("");
+      } else {
+        setCategoryError("Failed to load categories.");
+      }
+    } catch (error) {
       setCategoryError("Failed to load categories.");
     }
   };
 
   const createCategoryOption = async (inputValue) => {
-    if (!token) {
+    if (!checkToken()) {
       setCategoryError("Token missing, please login again.");
       return null;
     }
-
     try {
-      const res = await axios.post(
-        endpoints.category.add,
-        { category: inputValue },
-        { headers: { Authorization: `${token}` } }
-      );
+      const res = await postAxiosCall("/v1/category/add-category", {
+        category: inputValue,
+      });
 
-      const createdCategory = res.data.category;
-
-      const newOption = {
-        value: createdCategory.ID,
-        label: createdCategory.CategoryName,
-      };
-
-      setCategoryOptions((prev) => [...prev, newOption]);
-      setCategoryError("");
-      return newOption;
-    } catch (err) {
-      console.error("Error creating category:", err);
+      if (res?.category) {
+        const createdCategory = res.category;
+        const newOption = {
+          value: createdCategory.ID,
+          label: createdCategory.CategoryName,
+        };
+        setCategoryOptions((prev) => [...prev, newOption]);
+        setCategoryError("");
+        return newOption;
+      } else {
+        setCategoryError("Failed to add new category.");
+        return null;
+      }
+    } catch (error) {
       setCategoryError("Failed to add new category.");
       return null;
     }
   };
 
-  // ---------------- get medicine FUNCTIONS ------------------
-
-  // const getAllMedicines = async () => {
-  //   if (!token) {
-  //     setMedicineError("Token missing, please login.");
-  //     return;
-  //   }
-
-  //   try {
-  //     const res = await axios.get(endpoints.medicine.getAll, {
-  //       headers: { Authorization: `${token}` },
-  //     });
-
-  //     setMedicines(res.data.medicines || []);
-  //     setMedicineError("");
-  //   } catch (err) {
-  //     console.error("Error fetching medicines:", err);
-  //     setMedicineError("Failed to fetch medicines.");
-  //   }
-  // };
-
+  // --------- MEDICINES ---------
   const getAllMedicines = async () => {
-    if (!token) {
+    if (!checkToken()) {
       setMedicineError("Token missing, please login.");
       return;
     }
-
-    const res = await getAxiosCall(`/v1/medicine/get-all-medicine`);
-
-    if (res?.data?.medicines) {
-      setMedicines(res.data.medicines);
-      setMedicineError("");
-    } else {
+    try {
+      const res = await getAxiosCall("/v1/medicine/get-all-medicine");
+      if (res?.data?.medicines) {
+        setMedicines(res.data.medicines);
+        setMedicineError("");
+      } else {
+        setMedicineError("Failed to fetch medicines.");
+      }
+    } catch (error) {
       setMedicineError("Failed to fetch medicines.");
     }
   };
 
-  // ---------------- images FUNCTIONS ------------------
-
+  // --------- IMAGE UPLOAD (multipart/form-data) ---------
   const handleImageChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
 
@@ -272,19 +266,33 @@ const AuthProvider = ({ children }) => {
 
   const handleUpload = async (e, itemId) => {
     e.preventDefault();
+
+    if (!checkToken()) {
+      setMessage("Authentication token missing. Please login again.");
+      return;
+    }
+
     try {
+      store.dispatch({ type: "LOADING", payload: true });
       const formData = new FormData();
       formData.append("item_id", itemId || "0");
       images.forEach((image) => formData.append("images", image));
 
-      const response = await axios.post(endpoints.itemimage.add, formData, {
+      const token = localStorage.getItem("access_token");
+      const instance = axios.create({
+        baseURL: process.env.REACT_APP_UAT_URL,
         headers: {
-          Authorization: `${token}`,
+          Authorization: token,
           "Content-Type": "multipart/form-data",
         },
       });
 
-      const uploadedIds = response.data.image_ids;
+      const response = await instance.post(
+        "/v1/itemimage/add-itemimage",
+        formData
+      );
+
+      const uploadedIds = response.data.image_ids || [];
       setUploadedImageIds((prev) => [...prev, ...uploadedIds]);
       setMessage("✅ Images uploaded successfully!");
 
@@ -293,6 +301,15 @@ const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error(error);
       setMessage("❌ Image upload failed.");
+      Swal.fire({
+        title: "Error",
+        text: error?.response?.data?.message || error.message,
+        icon: "error",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+    } finally {
+      store.dispatch({ type: "LOADING", payload: false });
     }
   };
 
@@ -306,28 +323,33 @@ const AuthProvider = ({ children }) => {
         prescriptionRequired,
         setPrescriptionRequired,
         token,
+
         genericOptions,
         genericError,
         fetchGenericOptions,
         createGenericOption,
+
         supplierOptions,
         supplierError,
         fetchSupplierOptions,
         createSupplierOption,
-        fetchCategoryOptions,
-        createCategoryOption,
+
         categoryOptions,
         categoryError,
+        fetchCategoryOptions,
+        createCategoryOption,
+
         medicines,
         medicineError,
         getAllMedicines,
-        handleUpload,
-        handleImageChange,
+
         images,
         previewUrls,
         message,
-        imageIds,
         uploadedImageIds,
+
+        handleImageChange,
+        handleUpload,
         setUploadedImageIds,
         setPreviewUrls,
         setMessage,

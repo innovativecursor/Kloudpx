@@ -1,24 +1,22 @@
 "use client";
 
 import React from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import SubTitle from "@/app/components/Titles/SubTitle";
 import ImageSwiper from "@/app/components/ImageSwiper/ImageSwiper";
 import QuantitySelector from "@/app/components/QuantitySelector/QuantitySelector";
 import SocialIcons from "@/app/components/SocialIcons/SocialIcons";
-// import Title from "@/app/components/Titles/Title";
-// import ProductsCard from "@/app/components/cards/ProductsCard";
 import { useProductContext } from "@/app/contexts/ProductContext";
+import { useCartContext } from "@/app/contexts/CartContext";
 
 const ProductDetails = () => {
   const { id } = useParams();
 
-  const { allMedicine, selectedCategoryName, filteredItems } =
-    useProductContext();
-  console.log(filteredItems);
-
+  const { allMedicine, selectedCategoryName } = useProductContext();
+  const { isInCart } = useCartContext();
+  const router = useRouter();
+  const { quantity, addToCart } = useCartContext();
   const product = allMedicine.data.find((item) => String(item.ID) === id);
-
   const fallbackImage = "/assets/demo.jpg";
 
   if (allMedicine.loading) {
@@ -30,6 +28,19 @@ const ProductDetails = () => {
       <div className="p-10 text-red-600 text-center">Product Not Found</div>
     );
   }
+
+  const medicineid = product.ID;
+  const handleAddToCart = () => {
+    addToCart(medicineid, quantity);
+  };
+
+  const isAlreadyInCart = isInCart(medicineid);
+
+  const handleGoToCart = () => {
+    router.push("/Cart");
+  };
+
+  // console.log(product);
 
   return (
     <div className="bg-gray-100 pb-10 min-h-screen">
@@ -46,11 +57,13 @@ const ProductDetails = () => {
 
           {/* Right side - product info */}
           <div className="w-full md:w-1/2 mt-8 md:mt-0 flex flex-col px-4 sm:px-6 md:px-0">
-            <h1 className="sm:text-4xl text-2xl font-extrabold text-gray-900 mb-3">
-              {product?.BrandName}
-            </h1>
-
-            <h2 className="text-xl font-semibold text-gray-700 mb-2">
+            <div className="flex items-start gap-8">
+              <h1 className="sm:text-4xl text-2xl font-extrabold text-gray-900 mb-3">
+                {product?.BrandName}
+              </h1>
+              <SocialIcons />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-700 mb-2 ">
               {product?.Generic?.GenericName || "General Medicine"}
             </h2>
 
@@ -65,32 +78,48 @@ const ProductDetails = () => {
               </span>
             </div>
 
-            <p className="text-gray-700 leading-relaxed mb-6 text-base md:text-lg">
+            <p className="text-gray-700 leading-relaxed mb-6 text-base md:text-lg text-justify">
               {product?.Description || "No description available."}
             </p>
-
-            <div className="flex items-end gap-4 mb-2">
-              <span className="text-3xl font-bold text-green-600 leading-none">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-2xl font-bold text-green-600">
                 ₹{product?.SellingPricePerBox || "N/A"}
+              </span>
+              <span className="text-sm text-gray-500 line-through -mt-2">
+                MRP ₹{product?.CostPricePerBox || "N/A"}
               </span>
             </div>
 
             <div className="text-gray-700 font-semibold text-sm mb-6">
-              {product?.MeasurementUnitValue} Box /
-              {product?.NumberOfPiecesPerBox}
-              {product?.UnitOfMeasurement}
+              <span>
+                {product?.UnitOfMeasurement} {product?.MeasurementUnitValue}
+              </span>
+              <span className="mx-1">/</span>
+              <span>{product?.NumberOfPiecesPerBox} per piece</span>
             </div>
 
             <QuantitySelector />
 
             <div className="mt-8 flex flex-col sm:flex-row gap-4 sm:gap-6 w-full">
-              <button
-                type="button"
-                className="w-full sm:flex-1 flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold text-base px-8 py-3 rounded-full shadow-lg transition-transform transform hover:scale-105 active:scale-95"
-              >
-                <i className="ri-shopping-cart-line text-xl"></i>
-                Add to Cart
-              </button>
+              {isAlreadyInCart ? (
+                <button
+                  onClick={handleGoToCart}
+                  type="button"
+                  className="w-full sm:flex-1 flex items-center justify-center gap-3 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold text-base px-8 py-3 rounded-full shadow-sm transition-colors hover:border-blue-700 active:scale-95"
+                >
+                  <i className="ri-shopping-cart-2-line text-xl"></i>
+                  Go to Cart
+                </button>
+              ) : (
+                <button
+                  onClick={handleAddToCart}
+                  type="button"
+                  className="w-full sm:flex-1 flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold text-base px-8 py-3 rounded-full shadow-lg transition-transform transform hover:scale-105 active:scale-95"
+                >
+                  <i className="ri-shopping-cart-line text-xl"></i>
+                  Add to Cart
+                </button>
+              )}
 
               <button
                 type="button"
@@ -100,16 +129,8 @@ const ProductDetails = () => {
                 Wishlist
               </button>
             </div>
-
-            <SocialIcons />
           </div>
         </div>
-
-        {/* Related Products */}
-        {/* <div className="md:mt-20 mt-10">
-          <Title text="Related Products" />
-          <ProductsCard productsData={{ data: allMedicine.data }} />
-        </div> */}
       </div>
     </div>
   );
