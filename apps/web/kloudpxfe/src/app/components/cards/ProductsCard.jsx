@@ -31,6 +31,8 @@ const ProductCardItem = ({ item, fallbackImage }) => {
     }
   };
 
+  console.log(item);
+
   return (
     <div
       onClick={() => handleCardClick(item.ID)}

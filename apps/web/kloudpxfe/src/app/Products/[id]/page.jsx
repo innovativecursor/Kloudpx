@@ -8,12 +8,13 @@ import QuantitySelector from "@/app/components/QuantitySelector/QuantitySelector
 import SocialIcons from "@/app/components/SocialIcons/SocialIcons";
 import { useProductContext } from "@/app/contexts/ProductContext";
 import { useCartContext } from "@/app/contexts/CartContext";
+import { usePrescriptionContext } from "@/app/contexts/PrescriptionContext";
 
 const ProductDetails = () => {
   const { id } = useParams();
-
   const { allMedicine, selectedCategoryName } = useProductContext();
   const { isInCart } = useCartContext();
+  const { uploadedImage } = usePrescriptionContext();
   const router = useRouter();
   const { quantity, addToCart } = useCartContext();
   const product = allMedicine.data.find((item) => String(item.ID) === id);
@@ -30,8 +31,10 @@ const ProductDetails = () => {
   }
 
   const medicineid = product.ID;
+  console.log(product.Prescription);
+
   const handleAddToCart = () => {
-    addToCart(medicineid, quantity);
+    addToCart(medicineid, quantity, product?.Prescription, uploadedImage);
   };
 
   const isAlreadyInCart = isInCart(medicineid);
@@ -40,7 +43,7 @@ const ProductDetails = () => {
     router.push("/Cart");
   };
 
-  // console.log(product);
+  console.log(product);
 
   return (
     <div className="bg-gray-100 pb-10 min-h-screen">
