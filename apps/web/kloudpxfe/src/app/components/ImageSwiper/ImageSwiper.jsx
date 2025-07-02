@@ -12,15 +12,18 @@ import "react-inner-image-zoom/lib/InnerImageZoom/styles.css";
 
 const ImageSwiper = ({ images }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
+
   const fallbackImage =
     "https://5.imimg.com/data5/SELLER/Default/2023/7/327286162/LK/TW/UM/123268409/paracetamol-500-mg.jpg";
+
+  const safeImages = images?.length > 0 ? images : [fallbackImage];
 
   return (
     <div className="md:w-1/2">
       {/* Discount Badge */}
       <div className="relative rounded-xl overflow-hidden">
-        <div className="absolute top-2 right-2 bg-red-600 text-white text-xs px-3 py-1 rounded-full font-semibold z-10">
-          10% OFF
+        <div className="absolute top-2 right-2 bg-[#0070ba] text-white text-xs px-3 py-1 rounded-full font-semibold z-10">
+          -10%
         </div>
 
         <div className="flex justify-center items-center w-full h-full">
@@ -31,7 +34,7 @@ const ImageSwiper = ({ images }) => {
             modules={[Navigation, Thumbs]}
             className="w-full"
           >
-            {images.map((img, index) => (
+            {safeImages.map((img, index) => (
               <SwiperSlide
                 key={index}
                 className="flex justify-center items-center"
@@ -81,7 +84,7 @@ const ImageSwiper = ({ images }) => {
             }}
             className="w-full mx-2"
           >
-            {images.map((img, index) => (
+            {safeImages.map((img, index) => (
               <SwiperSlide key={index}>
                 <img
                   src={img || fallbackImage}

@@ -13,7 +13,7 @@ export const PrescriptionProvider = ({ children }) => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  console.log(uploadedImage);
+  // console.log(uploadedImage);
 
   const uploadPrescription = (file) => {
     if (!file) return;

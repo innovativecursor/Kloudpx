@@ -1,13 +1,12 @@
-
 import { createContext, useContext, useState } from "react";
 import { getAxiosCall, postAxiosCall } from "../Axios/UniversalAxiosCalls";
 import Swal from "sweetalert2";
+import { useAuthContext } from "./AuthContext";
 
 export const DropdownContext = createContext();
 
 const DropdownProvider = ({ children }) => {
-  const token = localStorage.getItem("access_token");
-
+  const { token, checkToken } = useAuthContext();
   // Dropdown States
   const [genericOptions, setGenericOptions] = useState([]);
   const [genericError, setGenericError] = useState("");
@@ -17,20 +16,6 @@ const DropdownProvider = ({ children }) => {
 
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [categoryError, setCategoryError] = useState("");
-
-  const checkToken = () => {
-    if (!token) {
-      Swal.fire({
-        title: "Error",
-        text: "Authentication token missing, please login again.",
-        icon: "error",
-        confirmButtonText: "OK",
-        allowOutsideClick: false,
-      });
-      return false;
-    }
-    return true;
-  };
 
   // --------- GENERIC ---------
   const fetchGenericOptions = async () => {
@@ -160,6 +145,8 @@ const DropdownProvider = ({ children }) => {
       const res = await postAxiosCall("/v1/category/add-category", {
         category: inputValue,
       });
+      console.log(res);
+
       if (res?.category) {
         const created = res.category;
         const newOption = { value: created.ID, label: created.CategoryName };

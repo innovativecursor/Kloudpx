@@ -54,7 +54,7 @@ const ProductDetails = () => {
           {/* Image Swiper */}
           <ImageSwiper
             images={
-              product.ItemImages?.map((img) => img.url) || [fallbackImage]
+              product.ItemImages?.map((img) => img.FileName) || [fallbackImage]
             }
           />
 

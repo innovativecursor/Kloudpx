@@ -77,6 +77,7 @@ const AuthProvider = ({ children }) => {
         prescriptionRequired,
         setPrescriptionRequired,
         token,
+        checkToken,
         medicines,
         medicineError,
         getAllMedicines,

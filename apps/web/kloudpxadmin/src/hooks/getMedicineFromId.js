@@ -33,9 +33,6 @@ export const getMedicineFromId = (id, medicines) => {
     prescriptionRequired: med.Prescription,
     showMeasurementValue: med.UnitOfMeasurement === "per box",
     uploadedImageIds: med.ItemImages?.map((img) => img.ID) || [],
-    previewUrls:
-      med.ItemImages?.map(
-        (img) => baseURL + encodeURIComponent(img.FileName)
-      ) || [],
+    previewUrls: med.ItemImages?.map((img) => img.FileName) || [],
   };
 };

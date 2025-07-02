@@ -2,6 +2,7 @@ import { createContext, useContext, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { store } from "@store";
+import { useAuthContext } from "./AuthContext";
 
 export const ImageContext = createContext();
 
@@ -10,22 +11,7 @@ const ImageProvider = ({ children }) => {
   const [previewUrls, setPreviewUrls] = useState([]);
   const [message, setMessage] = useState("");
   const [uploadedImageIds, setUploadedImageIds] = useState([]);
-  const [token, setToken] = useState(
-    localStorage.getItem("access_token") || null
-  );
-  const checkToken = () => {
-    if (!token) {
-      Swal.fire({
-        title: "Error",
-        text: "Authentication token missing, please login again.",
-        icon: "error",
-        confirmButtonText: "OK",
-        allowOutsideClick: false,
-      });
-      return false;
-    }
-    return true;
-  };
+  const { token, checkToken } = useAuthContext();
 
   // Handle image file selection (max 5)
   const handleImageChange = (e) => {
