@@ -9,27 +9,14 @@ import { calculatePricePerPiece } from "./calculatePricePerPiece";
 import { getMedicineFromId } from "./getMedicineFromId";
 import { useAuthContext } from "../contexts/AuthContext";
 import endpoints from "../config/endpoints";
+import { useImageContext } from "../contexts/ImageContext";
+import { useDropdownContext } from "../contexts/DropdownContext";
 
 export default function useMedicineForm() {
+  const { token, prescriptionRequired, setPrescriptionRequired, medicines } =
+    useAuthContext();
+
   const {
-    genericOptions,
-    genericError,
-    fetchGenericOptions,
-    createGenericOption,
-    supplierOptions,
-    supplierError,
-    fetchSupplierOptions,
-    createSupplierOption,
-    fetchCategoryOptions,
-    createCategoryOption,
-    categoryOptions,
-    categoryError,
-    token,
-    prescriptionRequired,
-    setPrescriptionRequired,
-    medicines,
-    handleUpload,
-    handleImageChange,
     images,
     previewUrls,
     message,
@@ -37,7 +24,26 @@ export default function useMedicineForm() {
     setUploadedImageIds,
     setPreviewUrls,
     setMessage,
-  } = useAuthContext();
+    handleImageChange,
+    handleUpload,
+  } = useImageContext();
+
+  const {
+    genericOptions,
+    genericError,
+    fetchGenericOptions,
+    createGenericOption,
+
+    supplierOptions,
+    supplierError,
+    fetchSupplierOptions,
+    createSupplierOption,
+
+    categoryOptions,
+    categoryError,
+    fetchCategoryOptions,
+    createCategoryOption,
+  } = useDropdownContext();
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -160,11 +166,6 @@ export default function useMedicineForm() {
       alert("Please select Generic Name, Supplier, and Unit.");
       return;
     }
-
-    // if (!prescriptionRequired) {
-    //   alert("Please check 'Prescription Required' to proceed.");
-    //   return;
-    // }
 
     const payload = constructMedicinePayload({
       formData,
