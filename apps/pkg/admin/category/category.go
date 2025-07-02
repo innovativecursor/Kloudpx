@@ -34,7 +34,8 @@ func AddCategory(c *gin.Context, db *gorm.DB) {
 	}
 
 	newCategory := models.Category{
-		CategoryName: payload.Category,
+		CategoryName:   payload.Category,
+		CategoryIconID: payload.IconID,
 	}
 	if err := db.Create(&newCategory).Error; err != nil {
 		logrus.WithError(err).Error("Failed to add category to database")
@@ -102,5 +103,40 @@ func DeleteCategory(c *gin.Context, db *gorm.DB) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Category deleted successfully",
+	})
+}
+
+// category icons
+func AddCategoryIcon(c *gin.Context, db *gorm.DB) {
+	var payload config.CategoryIconRequest
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	icon := models.CategoryIcon{
+		Icon: payload.Icon,
+	}
+	if err := db.Create(&icon).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save icon"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Category icon added",
+		"icon":    icon,
+	})
+}
+
+func GetAllCategoryIcons(c *gin.Context, db *gorm.DB) {
+	var icons []models.CategoryIcon
+	if err := db.Find(&icons).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch icons"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Category icons fetched successfully",
+		"icons":   icons,
 	})
 }

@@ -2,6 +2,7 @@ package config
 
 type MedicineData struct {
 	BrandName             string  `json:"brandname" binding:"required"`
+	Power                 string  `json:"power"`
 	GenericID             uint    `json:"genericid" binding:"required"`
 	SupplierID            uint    `json:"supplierid" binding:"required"`
 	CategoryID            uint    `json:"categoryid"`
@@ -24,6 +25,7 @@ type MedicineData struct {
 
 type UpdateMedicineData struct {
 	BrandName             string  `json:"brandname" binding:"required"`
+	Power                 string  `json:"power"`
 	GenericID             uint    `json:"genericid" binding:"required"`
 	SupplierID            uint    `json:"supplierid" binding:"required"`
 	CategoryID            uint    `json:"categoryid"`
