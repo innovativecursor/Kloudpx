@@ -223,9 +223,8 @@ func RemoveItemFromCart(c *gin.Context, db *gorm.DB) {
 }
 
 func GetAllCategoriesForUser(c *gin.Context, db *gorm.DB) {
-
 	var categories []models.Category
-	if err := db.Find(&categories).Error; err != nil {
+	if err := db.Preload("CategoryIcon").Find(&categories).Error; err != nil {
 		logrus.WithError(err).Error("Failed to fetch categories from database")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch categories"})
 		return
