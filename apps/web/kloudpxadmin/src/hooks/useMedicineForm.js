@@ -70,6 +70,7 @@ export default function useMedicineForm() {
     minThreshold: "",
     maxThreshold: "",
     leadTime: "",
+    power: "",
   });
 
   const [showMeasurementValue, setShowMeasurementValue] = useState(false);
@@ -110,9 +111,6 @@ export default function useMedicineForm() {
     handleCreateOption: handleCategoryIconCreate,
   } = useCreatableSelect(createICategoryIcon);
 
-  console.log(genericName, "djalsdal");
-  console.log(categoryIcons);
-
   const handleCategoryIconChange = (val) => {
     handleCategoryIconChangeLocal(val);
     handleSelectCategoryIcon(val);
@@ -145,8 +143,13 @@ export default function useMedicineForm() {
       alert("Medicine not found");
       return;
     }
+    console.log("Loaded medicine data for edit:", medData);
+    // setFormData(medData.formData);
+    setFormData((prev) => ({
+      ...medData.formData,
+      power: medData.formData.power || "",
+    }));
 
-    setFormData(medData.formData);
     handleGenericChange(medData.dropdownValues.generic);
     handleSupplierChange(medData.dropdownValues.supplier);
     handleCategoryChange(medData.dropdownValues.category);
@@ -156,6 +159,8 @@ export default function useMedicineForm() {
     setShowMeasurementValue(medData.showMeasurementValue);
     setUploadedImageIds(medData.uploadedImageIds);
     setPreviewUrls(medData.previewUrls);
+    setFormData((prev) => ({ ...prev, power: medData.formData.power || "" }));
+    handleCategoryIconChange(medData.dropdownValues.categoryIcons);
   }, [id, medicines]);
 
   useEffect(() => {

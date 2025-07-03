@@ -41,6 +41,12 @@ const MedicineFormInputs = ({
         onChange={(e) => handleChange("brandName", e.target.value)}
         placeholder="Enter brand name"
       />
+      <LabeledInput
+        label="Power"
+        value={formData.power}
+        onChange={(e) => handleChange("power", e.target.value)}
+        placeholder="Enter power (e.g., 500mg)"
+      />
 
       <LabeledSelect
         label="Generic Name"
