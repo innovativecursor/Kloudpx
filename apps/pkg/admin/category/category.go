@@ -43,6 +43,13 @@ func AddCategory(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// Reload the category with CategoryIcon populated
+	if err := db.Preload("CategoryIcon").First(&newCategory, newCategory.ID).Error; err != nil {
+		logrus.WithError(err).Error("Failed to preload category icon")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load category icon"})
+		return
+	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		"message":  "Category added successfully",
 		"category": newCategory,
