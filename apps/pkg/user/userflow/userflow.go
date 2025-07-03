@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/itemscalculation"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/userflow/config"
 	"github.com/sirupsen/logrus"
@@ -13,16 +14,62 @@ import (
 
 // get all medicine, otc for user publically
 func GetMedicinesForUser(c *gin.Context, db *gorm.DB) {
-	var medicines []models.Medicine
-	if err := db.Preload("Generic").Preload("Supplier").Preload("ItemImages").Preload("Category").Find(&medicines).Error; err != nil {
-		logrus.WithError(err).Error("Failed to fetch medicines from database for user")
+	var uniqueMedicineIDs []uint
+
+	// Subquery: Get the first entry (lowest ID) for each unique brand name
+	if err := db.
+		Model(&models.Medicine{}).
+		Select("MIN(id)").
+		Group("brand_name").
+		Scan(&uniqueMedicineIDs).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch distinct medicine IDs by brand name")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
 		return
 	}
 
+	var medicines []models.Medicine
+	if err := db.Preload("Generic").
+		Preload("ItemImages").
+		Preload("Category").
+		Where("id IN ?", uniqueMedicineIDs).
+		Find(&medicines).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch medicines by ID list")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
+		return
+	}
+
+	var response []config.UserFacingMedicine
+	for _, med := range medicines {
+		var imageFilenames []string
+		for _, img := range med.ItemImages {
+			imageFilenames = append(imageFilenames, img.FileName)
+		}
+
+		price := med.SellingPricePerBox
+		if med.UnitOfMeasurement == "per piece" {
+			price = med.SellingPricePerPiece
+		}
+
+		response = append(response, config.UserFacingMedicine{
+			ID:                   med.ID,
+			BrandName:            med.BrandName,
+			Power:                med.Power,
+			GenericName:          med.Generic.GenericName,
+			Category:             med.Category.CategoryName,
+			Description:          med.Description,
+			Unit:                 med.UnitOfMeasurement,
+			MeasurementUnitValue: med.MeasurementUnitValue,
+			NumberOfPiecesPerBox: med.NumberOfPiecesPerBox,
+			Price:                price,
+			TaxType:              med.TaxType,
+			Prescription:         med.Prescription,
+			Images:               imageFilenames,
+		})
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message":   "Medicines fetched successfully",
-		"medicines": medicines,
+		"medicines": response,
 	})
 }
 
@@ -82,6 +129,21 @@ func AddOTCToCart(c *gin.Context, db *gorm.DB) {
 	if medicine.Prescription {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Prescription required for this medicine. Please upload a prescription",
+		})
+		return
+	}
+
+	// Check total stock across suppliers
+	availableStock, err := itemscalculation.CalculateTotalStockByBrandName(db, medicine.BrandName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to calculate stock"})
+		return
+	}
+
+	if req.Quantity > availableStock {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":     "Insufficient stock",
+			"available": availableStock,
 		})
 		return
 	}
@@ -176,7 +238,6 @@ func GetAllCategoriesForUser(c *gin.Context, db *gorm.DB) {
 }
 
 func GetItemsByCategory(c *gin.Context, db *gorm.DB) {
-
 	categoryIDParam := c.Param("category_id")
 	categoryID, err := strconv.Atoi(categoryIDParam)
 	if err != nil {
@@ -185,20 +246,63 @@ func GetItemsByCategory(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	var uniqueMedicineIDs []uint
+
+	// Get the first entry (lowest ID) for each unique brand name in the selected category
+	if err := db.
+		Model(&models.Medicine{}).
+		Select("MIN(id)").
+		Where("category_id = ?", categoryID).
+		Group("brand_name").
+		Scan(&uniqueMedicineIDs).Error; err != nil {
+		logrus.WithError(err).Error("Failed to get distinct medicine IDs by category")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
+		return
+	}
+
 	var medicines []models.Medicine
 	if err := db.Preload("Generic").
 		Preload("Supplier").
 		Preload("ItemImages").
 		Preload("Category").
-		Where("category_id = ?", categoryID).
+		Where("id IN ?", uniqueMedicineIDs).
 		Find(&medicines).Error; err != nil {
-		logrus.WithError(err).Error("Failed to fetch medicines by category")
+		logrus.WithError(err).Error("Failed to fetch distinct medicines by category")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
 		return
 	}
 
+	var response []config.UserFacingMedicine
+	for _, med := range medicines {
+		var imageFilenames []string
+		for _, img := range med.ItemImages {
+			imageFilenames = append(imageFilenames, img.FileName)
+		}
+
+		price := med.SellingPricePerBox
+		if med.UnitOfMeasurement == "per piece" {
+			price = med.SellingPricePerPiece
+		}
+
+		response = append(response, config.UserFacingMedicine{
+			ID:                   med.ID,
+			BrandName:            med.BrandName,
+			Power:                med.Power,
+			GenericName:          med.Generic.GenericName,
+			Category:             med.Category.CategoryName,
+			Description:          med.Description,
+			Unit:                 med.UnitOfMeasurement,
+			MeasurementUnitValue: med.MeasurementUnitValue,
+			NumberOfPiecesPerBox: med.NumberOfPiecesPerBox,
+			Price:                price,
+			TaxType:              med.TaxType,
+			Prescription:         med.Prescription,
+			Images:               imageFilenames,
+		})
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message":   "Medicines fetched successfully by category",
-		"medicines": medicines,
+		"medicines": response,
 	})
 }

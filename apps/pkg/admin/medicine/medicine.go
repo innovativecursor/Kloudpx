@@ -107,7 +107,7 @@ func GetAllMedicines(c *gin.Context, db *gorm.DB) {
 	}
 
 	var medicines []models.Medicine
-	if err := db.Preload("Generic").Preload("Supplier").Preload("ItemImages").Preload("Category").Find(&medicines).Error; err != nil {
+	if err := db.Preload("Generic").Preload("Supplier").Preload("ItemImages").Preload("Category").Preload("Category.CategoryIcon").Find(&medicines).Error; err != nil {
 		logrus.WithError(err).Error("Failed to fetch medicines from database")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
 		return
