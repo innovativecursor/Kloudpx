@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
@@ -10,6 +9,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import AuthProvider from "./contexts/AuthContext.jsx";
 import ImageProvider from "./contexts/ImageContext.jsx";
 import DropdownProvider from "./contexts/DropdownContext.jsx";
+import CategoryProvider from "./contexts/CategoryContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <GoogleOAuthProvider clientId="573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com">
@@ -18,9 +18,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <BrowserRouter>
           <AuthProvider>
             <ImageProvider>
-              <DropdownProvider>
-                <App />
-              </DropdownProvider>
+              <CategoryProvider>
+                <DropdownProvider>
+                  <App />
+                </DropdownProvider>
+              </CategoryProvider>
             </ImageProvider>
           </AuthProvider>
         </BrowserRouter>

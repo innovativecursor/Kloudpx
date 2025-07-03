@@ -8,6 +8,7 @@ export default function LabeledSelect({
   options,
   disabled,
   placeholder,
+  formatOptionLabel,
 }) {
   return (
     <div className="flex flex-col md:col-span-2">
@@ -19,6 +20,7 @@ export default function LabeledSelect({
         options={options}
         isDisabled={disabled}
         placeholder={placeholder}
+        formatOptionLabel={formatOptionLabel}
       />
     </div>
   );

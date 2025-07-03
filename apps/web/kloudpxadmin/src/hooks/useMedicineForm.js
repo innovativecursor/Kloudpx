@@ -11,10 +11,19 @@ import { useAuthContext } from "../contexts/AuthContext";
 import endpoints from "../config/endpoints";
 import { useImageContext } from "../contexts/ImageContext";
 import { useDropdownContext } from "../contexts/DropdownContext";
+import { useCategoryContext } from "../contexts/CategoryContext";
 
 export default function useMedicineForm() {
   const { token, prescriptionRequired, setPrescriptionRequired, medicines } =
     useAuthContext();
+
+  const {
+    categoryIconOptions,
+    categoryIconError,
+    fetchCategoryIconOptions,
+    createICategoryIcon,
+    handleSelectCategoryIcon,
+  } = useCategoryContext();
 
   const {
     images,
@@ -68,7 +77,6 @@ export default function useMedicineForm() {
   const taxTypeOptions = [
     { value: "VAT", label: "VAT" },
     { value: "NON VAT", label: "NON VAT" },
-    // { value: "VAT 18%", label: "VAT 18%" },
   ];
 
   const unitOptions = [
@@ -96,6 +104,20 @@ export default function useMedicineForm() {
     handleCreateOption: handleCategoryCreate,
   } = useCreatableSelect(createCategoryOption);
 
+  const {
+    value: categoryIcons,
+    handleChange: handleCategoryIconChangeLocal,
+    handleCreateOption: handleCategoryIconCreate,
+  } = useCreatableSelect(createICategoryIcon);
+
+  console.log(genericName, "djalsdal");
+  console.log(categoryIcons);
+
+  const handleCategoryIconChange = (val) => {
+    handleCategoryIconChangeLocal(val);
+    handleSelectCategoryIcon(val);
+  };
+
   const { value: taxType, handleChange: handleTaxTypeChange } =
     useCreatableSelect();
 
@@ -113,6 +135,7 @@ export default function useMedicineForm() {
     fetchGenericOptions();
     fetchSupplierOptions();
     fetchCategoryOptions();
+    fetchCategoryIconOptions();
   }, []);
 
   useEffect(() => {
@@ -237,5 +260,12 @@ export default function useMedicineForm() {
     message,
     id,
     uploadedImageIds,
+    categoryIcons,
+    handleCategoryIconChange,
+    handleCategoryIconCreate,
+    categoryIconOptions,
+    categoryIconError,
+    categoryIcons,
+    handleCategoryIconChange,
   };
 }

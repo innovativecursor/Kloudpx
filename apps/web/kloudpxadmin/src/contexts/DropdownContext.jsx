@@ -2,11 +2,13 @@ import { createContext, useContext, useState } from "react";
 import { getAxiosCall, postAxiosCall } from "../Axios/UniversalAxiosCalls";
 import Swal from "sweetalert2";
 import { useAuthContext } from "./AuthContext";
+import { useCategoryContext } from "./CategoryContext";
 
 export const DropdownContext = createContext();
 
 const DropdownProvider = ({ children }) => {
-  const { token, checkToken } = useAuthContext();
+  const { checkToken } = useAuthContext();
+  const { iconid } = useCategoryContext();
   // Dropdown States
   const [genericOptions, setGenericOptions] = useState([]);
   const [genericError, setGenericError] = useState("");
@@ -144,6 +146,7 @@ const DropdownProvider = ({ children }) => {
     try {
       const res = await postAxiosCall("/v1/category/add-category", {
         category: inputValue,
+        iconid,
       });
       console.log(res);
 
