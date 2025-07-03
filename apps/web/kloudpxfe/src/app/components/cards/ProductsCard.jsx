@@ -14,15 +14,18 @@ const ProductCardItem = ({ item, fallbackImage }) => {
     router.push(`/Products/${id}`);
   };
 
-  const images = item.ItemImages || [];
-  const slides = images.length > 0 ? images : [{ FileName: fallbackImage }];
-  // console.log(images);
+  const validImages = (item.images || []).filter(
+    (img) => typeof img === "string" && img.trim() !== ""
+  );
+
+  const slides =
+    validImages.length > 0
+      ? validImages.map((url) => ({ FileName: url }))
+      : [{ FileName: fallbackImage }];
 
   const onMouseEnter = () => {
-    if (swiperRef.current && swiperRef.current.swiper) {
-      if (slides.length > 1) {
-        swiperRef.current.swiper.slideNext();
-      }
+    if (swiperRef.current && swiperRef.current.swiper && slides.length > 1) {
+      swiperRef.current.swiper.slideNext();
     }
   };
 
@@ -34,11 +37,11 @@ const ProductCardItem = ({ item, fallbackImage }) => {
 
   return (
     <div
-      onClick={() => handleCardClick(item.ID)}
+      onClick={() => handleCardClick(item.id)}
       className="w-full bg-white h-[340px] rounded cursor-pointer transform transition-transform duration-300 hover:scale-105 hover:shadow-xl overflow-hidden"
     >
       <h1 className="mx-3.5 lg:text-xl mt-4 md:text-xl text-lg font-light">
-        {item?.BrandName}
+        {item.brandname}
       </h1>
 
       <div
@@ -58,8 +61,8 @@ const ProductCardItem = ({ item, fallbackImage }) => {
             <SwiperSlide key={index}>
               <div className="relative w-full h-full rounded overflow-hidden">
                 <Image
-                  src={img.FileName || fallbackImage}
-                  alt={item.BrandName}
+                  src={img.FileName}
+                  alt={item.brandname}
                   fill
                   className="object-cover rounded"
                 />
@@ -72,22 +75,19 @@ const ProductCardItem = ({ item, fallbackImage }) => {
       <div className="flex justify-between items-start mt-5 mx-3.5 mb-2">
         <div>
           <h1 className="text-xs font-medium">
-            {item.Category?.CategoryName || "No Category"}
+            {item.category || "No Category"}
           </h1>
           <p className="text-[12px] font-light opacity-70 mt-1">
-            {item.Description
-              ? item.Description.split(" ").slice(0, 5).join(" ")
+            {item.description
+              ? item.description.split(" ").slice(0, 5).join(" ")
               : "No description"}
-            {item.Description && item.Description.split(" ").length > 5 && (
+            {item.description && item.description.split(" ").length > 5 && (
               <span className="text-color"> ...more</span>
             )}
           </p>
         </div>
 
         <div className="flex gap-5 z-20">
-          {/* <div className="bg-white shadow-md flex items-center justify-center -mt-8 w-9 h-9 rounded-full">
-            <i className="ri-heart-2-line text-2xl text-rose-600"></i>
-          </div> */}
           <div className="bg-white shadow-md flex items-center justify-center -mt-8 w-9 h-9 rounded-full">
             <i className="ri-whatsapp-line text-2xl text-green-600"></i>
           </div>
@@ -109,7 +109,7 @@ const ProductsCard = ({ productsData }) => {
         {medicines.length > 0 ? (
           medicines.map((item) => (
             <ProductCardItem
-              key={item.ID}
+              key={item.id}
               item={item}
               fallbackImage={fallbackImage}
             />

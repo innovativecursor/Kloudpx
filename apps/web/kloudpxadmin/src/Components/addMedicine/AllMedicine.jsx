@@ -44,7 +44,7 @@ const AllMedicine = () => {
       const formatted = medicines.map((item) => ({
         _id: item.ID,
         brandName: item.BrandName,
-        power: item.Power, // ✅ Power added
+        power: item.Power,
         genericName: {
           value: item.Generic.ID,
           label: item.Generic.GenericName,
@@ -54,7 +54,7 @@ const AllMedicine = () => {
           value: item.Category?.ID,
           label: item.Category?.CategoryName,
         },
-        categoryIcon: item.Category?.CategoryIcon?.Icon || null, // ✅ Icon added
+        categoryIcon: item.Category?.CategoryIcon?.Icon || null,
         unitType: {
           value: item.UnitOfMeasurement,
           label: item.UnitOfMeasurement,
@@ -236,11 +236,11 @@ const AllMedicine = () => {
           <Tooltip title="Edit">
             <Button
               type="primary"
-              onClick={() => navigate(`/addMedicine/edit/${record._id}`)}
-              // onClick={() => {
-              //   console.log("User clicked Edit — Medicine data:", record);
-              //   navigate(`/addMedicine/edit/${record._id}`);
-              // }}
+              // onClick={() => navigate(`/addMedicine/edit/${record._id}`)}
+              onClick={() => {
+                console.log("User clicked Edit — Medicine data:", record);
+                navigate(`/addMedicine/edit/${record._id}`);
+              }}
               icon={<RiEditLine className="text-white" />}
               size="small"
               className="bg-blue-600 hover:bg-blue-700 border-none"

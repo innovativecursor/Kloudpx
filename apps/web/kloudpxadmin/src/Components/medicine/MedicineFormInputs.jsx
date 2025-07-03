@@ -10,10 +10,6 @@ const MedicineFormInputs = ({
   handleGenericChange,
   handleGenericCreate,
   genericOptions,
-  categoryIcon,
-  handleCategoryIconChange,
-  handleCategoryIconCreate,
-  categoryIconOptions,
   category,
   handleCategoryChange,
   handleCategoryCreate,
@@ -22,6 +18,10 @@ const MedicineFormInputs = ({
   handleUnitChange,
   unitOptions,
   showMeasurementValue,
+  categoryIcon,
+  handleCategoryIconChange,
+  handleCategoryIconCreate,
+  categoryIconOptions,
 }) => {
   const formatOptionLabel = ({ label }) => {
     const Icon = FaIcons[label];

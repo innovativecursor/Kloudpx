@@ -6,7 +6,6 @@ import TopItems from "@/app/components/topitems/TopItems";
 import Hamburger from "@/app/components/modal/Hamburger";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useCartContext } from "@/app/contexts/CartContext";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -42,12 +41,12 @@ const Header = () => {
               : "Login/Signup"}
           </div>
           <div className="flex gap-3 sm:gap-6 items-center text-color">
-            <div className="relative">
+            {/* <div className="relative">
               <i className="ri-heart-3-line text-xl font-medium"></i>
               <span className=" absolute -top-0 -right-1 text-[8px] bg-red-600 text-white rounded-full w-3 h-3 flex items-center justify-center">
                 0
               </span>
-            </div>
+            </div> */}
             <div onClick={handleCartClick} className="relative cursor-pointer">
               <i className="ri-shopping-cart-line text-xl font-medium"></i>
               <span className="absolute -top-0 -right-1 text-[8px] bg-red-600 text-white rounded-full w-3 h-3 flex items-center justify-center">

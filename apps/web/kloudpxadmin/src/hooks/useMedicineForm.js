@@ -106,7 +106,7 @@ export default function useMedicineForm() {
   } = useCreatableSelect(createCategoryOption);
 
   const {
-    value: categoryIcons,
+    value: categoryIcon,
     handleChange: handleCategoryIconChangeLocal,
     handleCreateOption: handleCategoryIconCreate,
   } = useCreatableSelect(createICategoryIcon);
@@ -116,6 +116,9 @@ export default function useMedicineForm() {
     handleSelectCategoryIcon(val);
   };
 
+
+  console.log(categoryIcon);
+  
   const { value: taxType, handleChange: handleTaxTypeChange } =
     useCreatableSelect();
 
@@ -159,8 +162,8 @@ export default function useMedicineForm() {
     setShowMeasurementValue(medData.showMeasurementValue);
     setUploadedImageIds(medData.uploadedImageIds);
     setPreviewUrls(medData.previewUrls);
+    handleCategoryIconChange(medData.dropdownValues.categoryIcon);
     setFormData((prev) => ({ ...prev, power: medData.formData.power || "" }));
-    handleCategoryIconChange(medData.dropdownValues.categoryIcons);
   }, [id, medicines]);
 
   useEffect(() => {
@@ -204,7 +207,7 @@ export default function useMedicineForm() {
       taxType,
       uploadedImageIds,
       prescriptionRequired,
-      categoryIcon: categoryIcons,
+      categoryIcon: categoryIcon,
     });
     console.log(payload);
 
@@ -266,12 +269,10 @@ export default function useMedicineForm() {
     message,
     id,
     uploadedImageIds,
-    categoryIcons,
+    categoryIcon,
     handleCategoryIconChange,
     handleCategoryIconCreate,
     categoryIconOptions,
     categoryIconError,
-    categoryIcons,
-    handleCategoryIconChange,
   };
 }

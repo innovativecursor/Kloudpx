@@ -32,7 +32,7 @@ export const getMedicineFromId = (id, medicines) => {
       taxType: { value: med.TaxType, label: med.TaxType },
 
       categoryIcon: {
-        value: med.Category?.CategoryIcon?.ID || "",
+        value: med.Category?.CategoryIcon?.Icon || "",
         label: med.Category?.CategoryIcon?.Icon || "",
       },
     },
