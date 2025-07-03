@@ -205,6 +205,22 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	if payload.CategoryIconID != 0 {
+		var category models.Category
+		if err := db.First(&category, medicine.CategoryID).Error; err != nil {
+			logrus.WithError(err).WithField("category_id", medicine.CategoryID).Error("Failed to find category")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to find related category"})
+			return
+		}
+
+		category.CategoryIconID = payload.CategoryIconID
+		if err := db.Save(&category).Error; err != nil {
+			logrus.WithError(err).Error("Failed to update category icon")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update category icon"})
+			return
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Medicine updated successfully",
 	})
