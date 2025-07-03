@@ -16,6 +16,7 @@ const ProductCardItem = ({ item, fallbackImage }) => {
 
   const images = item.ItemImages || [];
   const slides = images.length > 0 ? images : [{ FileName: fallbackImage }];
+  // console.log(images);
 
   const onMouseEnter = () => {
     if (swiperRef.current && swiperRef.current.swiper) {
@@ -55,13 +56,9 @@ const ProductCardItem = ({ item, fallbackImage }) => {
         >
           {slides.map((img, index) => (
             <SwiperSlide key={index}>
-              <div className="relative w-full h-full  rounded overflow-hidden">
+              <div className="relative w-full h-full rounded overflow-hidden">
                 <Image
-                  src={
-                    img.FileName.startsWith("/uploads")
-                      ? img.FileName
-                      : fallbackImage
-                  }
+                  src={img.FileName || fallbackImage}
                   alt={item.BrandName}
                   fill
                   className="object-cover rounded"
@@ -88,9 +85,9 @@ const ProductCardItem = ({ item, fallbackImage }) => {
         </div>
 
         <div className="flex gap-5 z-20">
-          <div className="bg-white shadow-md flex items-center justify-center -mt-8 w-9 h-9 rounded-full">
+          {/* <div className="bg-white shadow-md flex items-center justify-center -mt-8 w-9 h-9 rounded-full">
             <i className="ri-heart-2-line text-2xl text-rose-600"></i>
-          </div>
+          </div> */}
           <div className="bg-white shadow-md flex items-center justify-center -mt-8 w-9 h-9 rounded-full">
             <i className="ri-whatsapp-line text-2xl text-green-600"></i>
           </div>
@@ -103,6 +100,8 @@ const ProductCardItem = ({ item, fallbackImage }) => {
 const ProductsCard = ({ productsData }) => {
   const fallbackImage = "/assets/paracetamol.jpeg";
   const medicines = productsData?.data?.medicines || [];
+
+  console.log(productsData);
 
   return (
     <div>

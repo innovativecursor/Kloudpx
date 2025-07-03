@@ -14,6 +14,12 @@ const nextConfig = {
         port: "",
         pathname: "/merchandising/images/**",
       },
+      {
+        protocol: "https",
+        hostname: "kloud-px.s3.ap-southeast-1.amazonaws.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 };

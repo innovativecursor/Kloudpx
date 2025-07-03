@@ -1,20 +1,13 @@
 import { createContext, useContext, useState } from "react";
 import { getAxiosCall, postAxiosCall } from "../Axios/UniversalAxiosCalls";
 import Swal from "sweetalert2";
+import { useAuthContext } from "./AuthContext";
 
-export const AuthContext = createContext();
+export const DropdownContext = createContext();
 
-const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    !!localStorage.getItem("access_token")
-  );
-  const [token, setToken] = useState(
-    localStorage.getItem("access_token") || null
-  );
-
-  const [prescriptionRequired, setPrescriptionRequired] = useState(false);
-
+const DropdownProvider = ({ children }) => {
+  const { token, checkToken } = useAuthContext();
+  // Dropdown States
   const [genericOptions, setGenericOptions] = useState([]);
   const [genericError, setGenericError] = useState("");
 
@@ -24,40 +17,7 @@ const AuthProvider = ({ children }) => {
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [categoryError, setCategoryError] = useState("");
 
-  const [medicines, setMedicines] = useState([]);
-  const [medicineError, setMedicineError] = useState("");
-
-  // --------- AUTH FUNCTIONS ---------
-  const loginUser = (userData, token) => {
-    localStorage.setItem("access_token", token);
-    setUser(userData);
-    setToken(token);
-    setIsAuthenticated(true);
-  };
-
-  const logoutUser = () => {
-    localStorage.removeItem("access_token");
-    setUser(null);
-    setToken(null);
-    setIsAuthenticated(false);
-  };
-
-  // --------- HELPER: check token ---------
-  const checkToken = () => {
-    if (!token) {
-      Swal.fire({
-        title: "Error",
-        text: "Authentication token missing, please login again.",
-        icon: "error",
-        confirmButtonText: "OK",
-        allowOutsideClick: false,
-      });
-      return false;
-    }
-    return true;
-  };
-
-  // --------- GENERIC OPTIONS ---------
+  // --------- GENERIC ---------
   const fetchGenericOptions = async () => {
     if (!checkToken()) {
       setGenericError("No token found, please login.");
@@ -89,13 +49,9 @@ const AuthProvider = ({ children }) => {
       const res = await postAxiosCall("/v1/generic/add-generic", {
         genericname: inputValue,
       });
-
       if (res?.generic) {
-        const createdGeneric = res.generic;
-        const newOption = {
-          value: createdGeneric.ID,
-          label: createdGeneric.GenericName,
-        };
+        const created = res.generic;
+        const newOption = { value: created.ID, label: created.GenericName };
         setGenericOptions((prev) => [...prev, newOption]);
         setGenericError("");
         return newOption;
@@ -103,13 +59,13 @@ const AuthProvider = ({ children }) => {
         setGenericError("Failed to add new generic.");
         return null;
       }
-    } catch (error) {
+    } catch {
       setGenericError("Failed to add new generic.");
       return null;
     }
   };
 
-  // --------- SUPPLIER OPTIONS ---------
+  // --------- SUPPLIER ---------
   const fetchSupplierOptions = async () => {
     if (!checkToken()) {
       setSupplierError("No token found, please login.");
@@ -127,7 +83,7 @@ const AuthProvider = ({ children }) => {
       } else {
         setSupplierError("Failed to load suppliers.");
       }
-    } catch (error) {
+    } catch {
       setSupplierError("Failed to load suppliers.");
     }
   };
@@ -142,11 +98,8 @@ const AuthProvider = ({ children }) => {
         suppliername: inputValue,
       });
       if (res?.supplier) {
-        const createdSupplier = res.supplier;
-        const newOption = {
-          value: createdSupplier.ID,
-          label: createdSupplier.SupplierName,
-        };
+        const created = res.supplier;
+        const newOption = { value: created.ID, label: created.SupplierName };
         setSupplierOptions((prev) => [...prev, newOption]);
         setSupplierError("");
         return newOption;
@@ -154,13 +107,13 @@ const AuthProvider = ({ children }) => {
         setSupplierError("Failed to add new supplier.");
         return null;
       }
-    } catch (error) {
+    } catch {
       setSupplierError("Failed to add new supplier.");
       return null;
     }
   };
 
-  // --------- CATEGORY OPTIONS ---------
+  // --------- CATEGORY ---------
   const fetchCategoryOptions = async () => {
     if (!checkToken()) {
       setCategoryError("No token found, please login.");
@@ -168,7 +121,6 @@ const AuthProvider = ({ children }) => {
     }
     try {
       const res = await getAxiosCall("/v1/category/get-all-category");
-
       if (res?.data?.categories) {
         const formatted = res.data.categories.map((item) => ({
           label: item.CategoryName,
@@ -179,7 +131,7 @@ const AuthProvider = ({ children }) => {
       } else {
         setCategoryError("Failed to load categories.");
       }
-    } catch (error) {
+    } catch {
       setCategoryError("Failed to load categories.");
     }
   };
@@ -193,13 +145,11 @@ const AuthProvider = ({ children }) => {
       const res = await postAxiosCall("/v1/category/add-category", {
         category: inputValue,
       });
+      console.log(res);
 
       if (res?.category) {
-        const createdCategory = res.category;
-        const newOption = {
-          value: createdCategory.ID,
-          label: createdCategory.CategoryName,
-        };
+        const created = res.category;
+        const newOption = { value: created.ID, label: created.CategoryName };
         setCategoryOptions((prev) => [...prev, newOption]);
         setCategoryError("");
         return newOption;
@@ -207,42 +157,15 @@ const AuthProvider = ({ children }) => {
         setCategoryError("Failed to add new category.");
         return null;
       }
-    } catch (error) {
+    } catch {
       setCategoryError("Failed to add new category.");
       return null;
     }
   };
 
-  // --------- MEDICINES ---------
-  const getAllMedicines = async () => {
-    if (!checkToken()) {
-      setMedicineError("Token missing, please login.");
-      return;
-    }
-    try {
-      const res = await getAxiosCall("/v1/medicine/get-all-medicine");
-      if (res?.data?.medicines) {
-        setMedicines(res.data.medicines);
-        setMedicineError("");
-      } else {
-        setMedicineError("Failed to fetch medicines.");
-      }
-    } catch (error) {
-      setMedicineError("Failed to fetch medicines.");
-    }
-  };
-
   return (
-    <AuthContext.Provider
+    <DropdownContext.Provider
       value={{
-        user,
-        isAuthenticated,
-        loginUser,
-        logoutUser,
-        prescriptionRequired,
-        setPrescriptionRequired,
-        token,
-
         genericOptions,
         genericError,
         fetchGenericOptions,
@@ -257,18 +180,12 @@ const AuthProvider = ({ children }) => {
         categoryError,
         fetchCategoryOptions,
         createCategoryOption,
-
-        medicines,
-        medicineError,
-        getAllMedicines,
       }}
     >
       {children}
-    </AuthContext.Provider>
+    </DropdownContext.Provider>
   );
 };
 
-export default AuthProvider;
-export const useAuthContext = () => useContext(AuthContext);  
-eska  GENERIC OPTIONS, SUPPLIER OPTIONS, CATEGORY OPTIONS 
-ka sara code dropdownContext me rkh
+export default DropdownProvider;
+export const useDropdownContext = () => useContext(DropdownContext);

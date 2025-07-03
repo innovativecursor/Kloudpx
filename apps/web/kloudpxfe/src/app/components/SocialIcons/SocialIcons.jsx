@@ -1,9 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
+import useModal from "@/app/hooks/useModal";
 
 const SocialIcons = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const {
+    isOpen: isModalOpen,
+    setIsOpen: setIsModalOpen,
+    modalRef,
+  } = useModal();
 
   const shareOptions = [
     {
@@ -47,7 +52,6 @@ const SocialIcons = () => {
 
   return (
     <div className="relative">
-      {/* Share Button */}
       <button
         onClick={() => setIsModalOpen(true)}
         className="w-10 h-10 rounded-full cursor-pointer flex items-center justify-center border border-gray-300 bg-white shadow-sm text-gray-600 hover:bg-gray-100"
@@ -56,10 +60,12 @@ const SocialIcons = () => {
         <i className="ri-share-fill text-xl"></i>
       </button>
 
-      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg py-9 px-10 shadow-lg lg:w-[30%] sm:w-[40%]">
+          <div
+            ref={modalRef}
+            className="bg-white rounded-lg py-9 px-10 shadow-lg lg:w-[30%] sm:w-[40%]"
+          >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-normal opacity-70">
                 Share Product With

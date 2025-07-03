@@ -147,7 +147,6 @@ const AddMedicine = () => {
               type="submit"
               // disabled={!prescriptionRequired || uploadedImageIds.length === 0}
               disabled={uploadedImageIds.length === 0}
-
             />
           </div>
         </FormSectionWrapper>
