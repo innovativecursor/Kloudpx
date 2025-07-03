@@ -7,6 +7,7 @@ export const constructMedicinePayload = ({
   taxType,
   uploadedImageIds,
   prescriptionRequired,
+  categoryIcon,
 }) => {
   return {
     brandname: formData.brandName,
@@ -19,7 +20,7 @@ export const constructMedicinePayload = ({
     ...(unitType.value === "per box" && {
       measurementunitvalue: parseFloat(formData.measurementValue),
     }),
-    // categoryiconid: categoryIcons?.value ? Number(categoryIcon.value) : null,
+    categoryiconid: categoryIcon?.value ? Number(categoryIcon.value) : null,
     numberofpiecesperbox: parseInt(formData.piecesPerBox),
     sellingpriceperbox: parseFloat(formData.spPerBox),
     sellingpriceperpiece: parseFloat(formData.spPerPiece),

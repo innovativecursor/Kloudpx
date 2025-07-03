@@ -10,7 +10,7 @@ const MedicineFormInputs = ({
   handleGenericChange,
   handleGenericCreate,
   genericOptions,
-  categoryIcons,
+  categoryIcon,
   handleCategoryIconChange,
   handleCategoryIconCreate,
   categoryIconOptions,
@@ -73,7 +73,7 @@ const MedicineFormInputs = ({
 
       <LabeledSelect
         label="Category Icon"
-        value={categoryIcons}
+        value={categoryIcon}
         onChange={handleCategoryIconChange}
         onCreate={handleCategoryIconCreate}
         options={categoryIconOptions}

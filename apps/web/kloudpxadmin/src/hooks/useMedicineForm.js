@@ -204,6 +204,7 @@ export default function useMedicineForm() {
       taxType,
       uploadedImageIds,
       prescriptionRequired,
+      categoryIcon: categoryIcons,
     });
     console.log(payload);
 

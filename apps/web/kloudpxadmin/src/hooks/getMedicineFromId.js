@@ -31,19 +31,19 @@ export const getMedicineFromId = (id, medicines) => {
       unit: { value: med.UnitOfMeasurement, label: med.UnitOfMeasurement },
       taxType: { value: med.TaxType, label: med.TaxType },
 
-      // ✅ Add this line to fix edit icon issue
       categoryIcon: {
-        value: med.Category?.CategoryIcon?.Icon || "",
+        value: med.Category?.CategoryIcon?.ID || "",
         label: med.Category?.CategoryIcon?.Icon || "",
       },
     },
     prescriptionRequired: med.Prescription,
     showMeasurementValue: med.UnitOfMeasurement === "per box",
     uploadedImageIds: med.ItemImages?.map((img) => img.ID) || [],
-    previewUrls: med.ItemImages?.map((img) =>
-      img.FileName?.startsWith("http")
-        ? img.FileName
-        : `${baseURL}${img.FileName}`
-    ) || [],
+    previewUrls:
+      med.ItemImages?.map((img) =>
+        img.FileName?.startsWith("http")
+          ? img.FileName
+          : `${baseURL}${img.FileName}`
+      ) || [],
   };
 };

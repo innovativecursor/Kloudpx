@@ -98,7 +98,7 @@ const AddMedicine = () => {
             handleGenericChange={handleGenericChange}
             handleGenericCreate={handleGenericCreate}
             genericOptions={genericOptions}
-            categoryIcons={categoryIcons}
+            categoryIcon={categoryIcons}
             handleCategoryIconChange={handleCategoryIconChange}
             handleCategoryIconCreate={handleCategoryIconCreate}
             categoryIconOptions={categoryIconOptions}
