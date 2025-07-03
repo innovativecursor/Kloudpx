@@ -74,6 +74,13 @@ func Admin(db *gorm.DB) {
 		category.DeleteCategory(c, db)
 	})
 
+	apiV1.POST("/category/add-category-icon", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		category.AddCategoryIcon(c, db)
+	})
+
+	apiV1.GET("/category/get-all-category-icon", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		category.GetAllCategoryIcons(c, db)
+	})
 	//upload images
 	apiV1.POST("/itemimage/add-itemimage", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		itemimage.UploadProdutImages(c, db)
