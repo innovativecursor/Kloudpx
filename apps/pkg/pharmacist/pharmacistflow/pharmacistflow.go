@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/itemscalculation"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/pharmacist/pharmacistflow/config"
 	"github.com/sirupsen/logrus"
@@ -140,6 +141,28 @@ func AddMedicineToPrescription(c *gin.Context, db *gorm.DB) {
 	if err := db.First(&prescription, prescriptionID).Error; err != nil {
 		logrus.WithField("prescription_id", prescriptionID).WithError(err).Warn("Prescription not found")
 		c.JSON(http.StatusNotFound, gin.H{"error": "Prescription not found"})
+		return
+	}
+
+	// Fetch medicine to check stock
+	var medicine models.Medicine
+	if err := db.First(&medicine, req.MedicineID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Medicine not found"})
+		return
+	}
+
+	// Check total stock across suppliers
+	availableStock, err := itemscalculation.CalculateTotalStockByBrandName(db, medicine.BrandName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to calculate stock"})
+		return
+	}
+
+	if req.Quantity > availableStock {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":     "Insufficient stock",
+			"available": availableStock,
+		})
 		return
 	}
 
