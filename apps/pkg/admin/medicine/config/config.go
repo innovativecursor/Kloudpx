@@ -29,6 +29,7 @@ type UpdateMedicineData struct {
 	GenericID             uint    `json:"genericid" binding:"required"`
 	SupplierID            uint    `json:"supplierid" binding:"required"`
 	CategoryID            uint    `json:"categoryid"`
+	CategoryIconID        uint    `json:"categoryiconid"`
 	SupplierDiscount      string  `json:"supplierdiscount"`
 	Description           string  `json:"description"`
 	UnitOfMeasurement     string  `json:"unitofmeasurement"`
