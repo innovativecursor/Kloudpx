@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import Logo from "@/app/components/logo/Logo";
 import SearchBar from "@/app/components/searchbar/SearchBar";
@@ -8,19 +9,15 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useCartContext } from "@/app/contexts/CartContext";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import CartModal from "@/app/components/modal/CartModal";
+import useModal from "@/app/hooks/useModal";
 
 const Header = () => {
   const router = useRouter();
   const { login, loading, user, token } = useAuth();
   const { cartLength } = useCartContext();
-
-  const handleCartClick = () => {
-    if (token) {
-      router.push("/Cart");
-    } else {
-      toast.error("Please login to access your cart");
-    }
-  };
+  const { isOpen, setIsOpen, modalRef } = useModal();
+    // const { isOpen, setIsOpen } = useModal(); 
 
   return (
     <div className="">
@@ -40,26 +37,31 @@ const Header = () => {
               ? `Hi, ${user.first_name} ${user.last_name}`
               : "Login/Signup"}
           </div>
-          <div className="flex gap-3 sm:gap-6 items-center text-color">
-            {/* <div className="relative">
-              <i className="ri-heart-3-line text-xl font-medium"></i>
-              <span className=" absolute -top-0 -right-1 text-[8px] bg-red-600 text-white rounded-full w-3 h-3 flex items-center justify-center">
-                0
-              </span>
-            </div> */}
-            <div onClick={handleCartClick} className="relative cursor-pointer">
+
+          {/* Cart Icon with Hover */}
+          <div
+            className="relative cursor-pointer"
+            onMouseEnter={() => setIsOpen(true)}
+            onMouseLeave={() => setIsOpen(false)}
+          >
+            <div>
               <i className="ri-shopping-cart-line text-xl font-medium"></i>
               <span className="absolute -top-0 -right-1 text-[8px] bg-red-600 text-white rounded-full w-3 h-3 flex items-center justify-center">
                 {cartLength}
               </span>
             </div>
+
+            {/* Cart Modal */}
+            <CartModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
           </div>
         </div>
       </div>
+
+      {/* Hamburger & Top Items */}
       <div className="mt-4">
-        <div className="flex-between-center  border-t border-b border-gray-200">
+        <div className="flex-between-center border-t border-b border-gray-200">
           <div className="w-full px-3 md:px-[8vw] py-3 sm:py-4">
-            <div className="flex items-center justify-center  w-full">
+            <div className="flex items-center justify-center w-full">
               <div className="w-fit bg-white">
                 <Hamburger />
               </div>
@@ -75,3 +77,23 @@ const Header = () => {
 };
 
 export default Header;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

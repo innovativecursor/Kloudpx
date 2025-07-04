@@ -4,81 +4,16 @@ import axios from "axios";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 import toast from "react-hot-toast";
-import endpoints from "../config/endpoints";
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const { token } = useAuth();
   const [cartItems, setCartItems] = useState([]);
-  const [quantity, setQuantity] = useState(1);
+
   const [getCartData, setGetCartData] = useState({ data: [], loading: false });
   const [prescriptionCheckedItems, setPrescriptionCheckedItems] =
     React.useState(new Set());
-
-  const increase = () => setQuantity((prev) => prev + 1);
-  const decrease = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
-
-  // const addToCart = async (
-  //   medicineid,
-  //   quantity,
-  //   prescriptionRequired = false,
-  //   uploadedImage = null
-  // ) => {
-  //   if (!token) {
-  //     toast.error("Please login first");
-  //     return null;
-  //   }
-
-  //   if (prescriptionRequired && !uploadedImage) {
-  //     toast.error("Please upload the prescription, pharmacist will check");
-  //     return;
-  //   }
-
-  //   if (prescriptionRequired && uploadedImage) {
-  //     toast.success(
-  //       "Pharmacist will check your prescription and then add to cart"
-  //     );
-  //   }
-
-  //   try {
-  //     const addedItem = { medicineid, quantity };
-
-  //     const response = await axios.post(
-  //       `http://localhost:10003/v1/user/add-to-cart`,
-  //       { medicineid, quantity },
-  //       {
-  //         headers: {
-  //           Authorization: `${token}`,
-  //         },
-  //       }
-  //     );
-
-  //     if (response.status === 200 || response.status === 201) {
-  //       setCartItems((prevItems) => {
-  //         const existingItem = prevItems.find(
-  //           (item) => item.medicineid === medicineid
-  //         );
-  //         if (existingItem) {
-  //           return prevItems.map((item) =>
-  //             item.medicineid === medicineid
-  //               ? { ...item, quantity: item.quantity + quantity }
-  //               : item
-  //           );
-  //         } else {
-  //           return [...prevItems, addedItem];
-  //         }
-  //       });
-
-  //       toast.success("Item added to cart!");
-  //       getAllCartData();
-  //     }
-  //   } catch (error) {
-  //     console.error("Add to Cart failed:", error);
-  //     toast.error("Failed to add to cart");
-  //     throw error;
-  //   }
-  // };
 
   const addToCart = async (
     medicineid,
@@ -139,14 +74,27 @@ export const CartProvider = ({ children }) => {
           toast.success("Item added to cart!");
         }
         getAllCartData();
+
+        return { success: true };
       }
     } catch (error) {
+      if (
+        error.response?.status === 400 &&
+        error.response?.data?.error === "Insufficient stock"
+      ) {
+        return {
+          error: "insufficient_stock",
+          available: error.response.data.available || 0,
+        };
+      }
+
       if (error.response?.status === 400 && prescriptionRequired) {
         toast.success(
           "Item already added! Pharmacist is still checking your prescription."
         );
         return;
       }
+
       console.error("Add to Cart failed:", error);
       toast.error("Failed to add to cart");
       throw error;
@@ -174,6 +122,7 @@ export const CartProvider = ({ children }) => {
       );
       if (status === 200) {
         setGetCartData({ data: data || [], loading: false });
+        setCartItems(data || []);
       }
     } catch (error) {
       console.log(error.message);
@@ -207,6 +156,39 @@ export const CartProvider = ({ children }) => {
 
   const cartLength = getCartData?.data?.length || 0;
 
+  const increaseQuantity = (medicineid) => {
+    setCartItems((prev) => {
+      const exists = prev.find((item) => item.medicineid === medicineid);
+      if (!exists) {
+        return [...prev, { medicineid, quantity: 2 }];
+      }
+      return prev.map((item) =>
+        item.medicineid === medicineid
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      );
+    });
+  };
+
+  const decreaseQuantity = (medicineid) => {
+    setCartItems((prev) => {
+      const exists = prev.find((item) => item.medicineid === medicineid);
+      if (!exists) {
+        return prev;
+      }
+      return prev.map((item) =>
+        item.medicineid === medicineid && item.quantity > 1
+          ? { ...item, quantity: item.quantity - 1 }
+          : item
+      );
+    });
+  };
+
+  const getQuantity = (medicineid) => {
+    const item = cartItems.find((item) => item.medicineid === medicineid);
+    return item ? item.quantity : 1;
+  };
+
   useEffect(() => {
     getAllCartData();
   }, []);
@@ -217,9 +199,9 @@ export const CartProvider = ({ children }) => {
         cartItems,
         addToCart,
         isInCart,
-        quantity,
-        increase,
-        decrease,
+        getQuantity,
+        increaseQuantity,
+        decreaseQuantity,
         getCartData,
         removeFromCart,
         cartLength,

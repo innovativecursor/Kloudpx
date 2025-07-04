@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Input, Button } from "antd";
-import { usePrescriptionContext } from "../../contexts/PrescriptionContext";
+import { useCartpresciContext } from "../../contexts/CartpresciContext";
+// import { usePrescriptionContext } from "../../contexts/PrescriptionContext";
 
 const CustomModal = () => {
   const {
@@ -11,7 +12,7 @@ const CustomModal = () => {
     modalInput,
     setModalInput,
     handleModalSubmit,
-  } = usePrescriptionContext();
+  } = useCartpresciContext();
 
   useEffect(() => {
     if (selectedMedicineId) {

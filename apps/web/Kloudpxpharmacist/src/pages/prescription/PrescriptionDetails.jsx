@@ -3,18 +3,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import Searchbar from "../../Components/searchbar/Searchbar";
 import { usePrescriptionContext } from "../../contexts/PrescriptionContext";
 import CustomModal from "../../Components/modal/CustomModal";
+import UserCart from "../../Components/usercart/UserCart";
 
 const PrescriptionDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const {
-    prescriptionDetails,
-    prescriptionsCart,
-    getPrescriptionDetails,
-    submitPrescriptions,
-    isCartUpdated,
-  } = usePrescriptionContext();
+  const { prescriptionDetails, getPrescriptionDetails } =
+    usePrescriptionContext();
 
   useEffect(() => {
     if (id) {
@@ -26,12 +22,13 @@ const PrescriptionDetails = () => {
   if (!details) return null;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6 pb-32">
+    <div className="max-w-6xl mx-auto px-6 py-8 pb-32">
       {/* Top Bar */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-3">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <button
           onClick={() => navigate(-1)}
-          className="text-blue-600 font-medium text-sm hover:underline"
+          className="text-blue-600 font-semibold text-sm hover:underline transition"
+          aria-label="Go back to all prescriptions"
         >
           ← Back to all prescriptions
         </button>
@@ -39,113 +36,71 @@ const PrescriptionDetails = () => {
       </div>
 
       {/* Main Prescription Info Card */}
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden grid md:grid-cols-2">
-        <div className="h-[24rem] relative group bg-gray-50">
+      <div className="bg-white rounded-3xl shadow-xl overflow-hidden grid md:grid-cols-2 gap-8">
+        {/* Image section */}
+        <div className="h-96 relative bg-gray-100 rounded-l-3xl overflow-hidden group shadow-md">
           <img
             src={details.UploadedImage}
             alt="Prescription"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
           />
-          <span className="absolute top-4 right-4 bg-white border shadow px-3 py-1 rounded-full text-sm font-semibold text-gray-800">
+          <span className="absolute top-5 right-5 bg-white border border-gray-300 shadow-md px-4 py-1 rounded-full text-sm font-semibold text-gray-700 select-none">
             ID: #{details.ID}
           </span>
         </div>
 
-        <div className="p-6 space-y-6 text-gray-800">
+        {/* Details section */}
+        <div className="p-8 space-y-8 text-gray-900">
+          {/* Patient Name */}
           <div>
-            <h4 className="text-xs text-gray-500 uppercase mb-1">
+            <h4 className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-1">
               Patient Name
             </h4>
-            <p className="text-lg font-semibold capitalize">
+            <p className="text-2xl font-bold capitalize">
               {details.User?.FirstName || "N/A"}
             </p>
           </div>
 
+          {/* Status */}
           <div>
-            <h4 className="text-xs text-gray-500 uppercase mb-1">Status</h4>
+            <h4 className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-1">
+              Status
+            </h4>
             <span
-              className={`inline-block px-3 py-1 rounded-full text-sm font-semibold capitalize ${
+              className={`inline-block px-4 py-1 rounded-full text-sm font-semibold capitalize ${
                 details.Status === "past"
-                  ? "bg-green-100 text-green-700"
+                  ? "bg-green-100 text-green-800"
                   : details.Status === "unsettled"
-                  ? "bg-yellow-100 text-yellow-700"
-                  : "bg-blue-100 text-blue-700"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : "bg-blue-100 text-blue-800"
               }`}
             >
               {details.Status}
             </span>
           </div>
 
+          {/* Uploaded On */}
           <div>
-            <h4 className="text-xs text-gray-500 uppercase mb-1">
+            <h4 className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-1">
               Uploaded On
             </h4>
-            <p className="text-base font-medium">
+            <p className="text-lg font-medium">
               {new Date(details.CreatedAt).toLocaleDateString()}
             </p>
           </div>
 
+          {/* User ID */}
           <div>
-            <h4 className="text-xs text-gray-500 uppercase mb-1">User ID</h4>
-            <p className="text-base font-medium">{details.UserID}</p>
+            <h4 className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-1">
+              User ID
+            </h4>
+            <p className="text-lg font-medium">{details.UserID}</p>
           </div>
         </div>
       </div>
 
-      {/* Prescriptions Cart */}
-
-      {prescriptionsCart.data && prescriptionsCart.data.length > 0 && (
-        <div className="mt-10 max-w-6xl mx-auto">
-          <h3 className="text-xl font-semibold mb-4">User's Cart</h3>
-
-          <table className="w-full border border-gray-300 rounded-md overflow-hidden text-left text-sm shadow-sm">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-3 border-b border-gray-300">Medicine Name</th>
-                <th className="p-3 border-b border-gray-300">Quantity</th>
-                <th className="p-3 border-b border-gray-300">Created At</th>
-                <th className="p-3 border-b border-gray-300">Updated At</th>
-              </tr>
-            </thead>
-            <tbody>
-              {prescriptionsCart.data.map((item) => (
-                <tr key={item.ID} className="hover:bg-gray-50">
-                  <td className="p-3 border-b border-gray-300">
-                    {item.Medicine?.BrandName || "N/A"}
-                  </td>
-                  <td className="p-3 border-b border-gray-300">
-                    {item.Quantity}
-                  </td>
-                  <td className="p-3 border-b border-gray-300">
-                    {new Date(item.CreatedAt).toLocaleString()}
-                  </td>
-                  <td className="p-3 border-b border-gray-300">
-                    {item.UpdatedAt && item.UpdatedAt !== "0001-01-01T00:00:00Z"
-                      ? new Date(item.UpdatedAt).toLocaleString()
-                      : "N/A"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Submit Button */}
-          <div className="flex justify-center mt-8">
-            <button
-              onClick={submitPrescriptions}
-              disabled={!isCartUpdated} 
-              className={`font-semibold py-3 px-8 rounded-md shadow-md transition duration-300 ${
-                !isCartUpdated
-                  ? "bg-gray-400 text-white cursor-not-allowed"
-                  : "bg-[#0070ba] text-white hover:bg-[#005f8d]"
-              }`}
-            >
-              Submit Prescriptions
-            </button>
-          </div>
-        </div>
-      )}
-
+      {/* User Cart & Modal */}
+      <UserCart details={details} />
       <CustomModal />
     </div>
   );
