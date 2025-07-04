@@ -41,6 +41,8 @@ func AddMedicine(c *gin.Context, db *gorm.DB) {
 
 	newMedicine := models.Medicine{
 		BrandName:             payload.BrandName,
+		IsBrand:               payload.IsBrand,
+		Discount:              payload.Discount,
 		Power:                 payload.Power,
 		GenericID:             payload.GenericID,
 		SupplierID:            payload.SupplierID,
@@ -163,6 +165,8 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 
 	// Update fields
 	medicine.BrandName = payload.BrandName
+	medicine.IsBrand = payload.IsBrand
+	medicine.Discount = payload.Discount
 	medicine.GenericID = payload.GenericID
 	medicine.SupplierID = payload.SupplierID
 	medicine.CategoryID = payload.CategoryID

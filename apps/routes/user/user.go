@@ -64,6 +64,10 @@ func User(db *gorm.DB) {
 		userflow.GetItemsByCategory(c, db)
 	})
 
+	apiV1.GET("/user/get-carousel-img-user", func(c *gin.Context) {
+		userflow.GetAllActiveCarouselImages(c, db)
+	})
+
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
 	router.Run(":" + port)

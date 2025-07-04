@@ -2,6 +2,8 @@ package config
 
 type MedicineData struct {
 	BrandName             string  `json:"brandname" binding:"required"`
+	IsBrand               bool    `json:"isbrand"`
+	Discount              string  `json:"discount"`
 	Power                 string  `json:"power"`
 	GenericID             uint    `json:"genericid" binding:"required"`
 	SupplierID            uint    `json:"supplierid" binding:"required"`
@@ -25,6 +27,8 @@ type MedicineData struct {
 
 type UpdateMedicineData struct {
 	BrandName             string  `json:"brandname" binding:"required"`
+	IsBrand               bool    `json:"isbrand"`
+	Discount              string  `json:"discount"`
 	Power                 string  `json:"power"`
 	GenericID             uint    `json:"genericid" binding:"required"`
 	SupplierID            uint    `json:"supplierid" binding:"required"`

@@ -180,7 +180,13 @@ func GetUserCart(c *gin.Context, db *gorm.DB) {
 	}
 
 	var cart []models.Cart
-	if err := db.Preload("Medicine").Preload("Medicine.ItemImages").Where("user_id = ?", userObj.ID).Find(&cart).Error; err != nil {
+	if err := db.
+		Preload("Medicine").
+		Preload("Medicine.ItemImages").
+		Preload("Prescription").
+		Preload("Prescription.User").
+		Where("user_id = ?", userObj.ID).
+		Find(&cart).Error; err != nil {
 		logrus.WithError(err).Error("Failed to fetch user cart")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart"})
 		return
@@ -303,5 +309,21 @@ func GetItemsByCategory(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, gin.H{
 		"message":   "Medicines fetched successfully by category",
 		"medicines": response,
+	})
+}
+
+func GetAllActiveCarouselImages(c *gin.Context, db *gorm.DB) {
+	var images []models.CarouselImage
+
+	// Fetch only active images, optionally you can sort by created_at or position
+	if err := db.Where("is_active = ?", true).Find(&images).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch carousel images from DB")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch images"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Carousel images fetched successfully",
+		"data":    images,
 	})
 }

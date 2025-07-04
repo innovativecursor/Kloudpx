@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/category"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/cms"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/generic"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/itemimage"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/medicine"
@@ -100,6 +101,23 @@ func Admin(db *gorm.DB) {
 
 	apiV1.DELETE("/medicine/delete-medicine/:id", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		medicine.DeleteMedicine(c, db)
+	})
+
+	//cms
+	apiV1.POST("/carousel/add-carousel-img", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		cms.CarouselImageUpload(c, db)
+	})
+
+	apiV1.GET("/carousel/get-all-carousel-img", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		cms.GetAllCarouselImagesForAdmin(c, db)
+	})
+
+	apiV1.PUT("/carousel/update-status/:id", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		cms.ToggleCarouselImageStatus(c, db)
+	})
+
+	apiV1.DELETE("/carousel/delete-carousel-img/:id", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		cms.DeleteCarouselImage(c, db)
 	})
 
 	// Listen and serve on defined port
