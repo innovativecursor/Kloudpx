@@ -18,6 +18,7 @@ func main() {
 		return
 	}
 	var serviceName string
+	//Need to write for all services in one go
 
 	// Check if the SERVICE_NAME environment variable is set
 	if envServiceName := os.Getenv("SERVICE_NAME"); envServiceName != "" {
