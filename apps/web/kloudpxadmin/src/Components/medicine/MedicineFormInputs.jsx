@@ -1,4 +1,5 @@
 import React from "react";
+import * as FaIcons from "react-icons/fa";
 import LabeledInput from "../labelInput/LabelInput";
 import LabeledSelect from "../labeledSelect/LabeledSelect";
 
@@ -17,7 +18,21 @@ const MedicineFormInputs = ({
   handleUnitChange,
   unitOptions,
   showMeasurementValue,
+  categoryIcon,
+  handleCategoryIconChange,
+  handleCategoryIconCreate,
+  categoryIconOptions,
 }) => {
+  const formatOptionLabel = ({ label }) => {
+    const Icon = FaIcons[label];
+    return (
+      <div className="flex items-center gap-2">
+        {Icon ? <Icon /> : null}
+        <span>{label}</span>
+      </div>
+    );
+  };
+
   return (
     <>
       <LabeledInput
@@ -25,6 +40,12 @@ const MedicineFormInputs = ({
         value={formData.brandName}
         onChange={(e) => handleChange("brandName", e.target.value)}
         placeholder="Enter brand name"
+      />
+      <LabeledInput
+        label="Power"
+        value={formData.power}
+        onChange={(e) => handleChange("power", e.target.value)}
+        placeholder="Enter power (e.g., 500mg)"
       />
 
       <LabeledSelect
@@ -48,6 +69,16 @@ const MedicineFormInputs = ({
         placeholder="Enter description"
         textarea
         className="md:col-span-2"
+      />
+
+      <LabeledSelect
+        label="Category Icon"
+        value={categoryIcon}
+        onChange={handleCategoryIconChange}
+        onCreate={handleCategoryIconCreate}
+        options={categoryIconOptions}
+        disabled={!formData.description}
+        placeholder="Select or create category icon"
       />
 
       <LabeledSelect

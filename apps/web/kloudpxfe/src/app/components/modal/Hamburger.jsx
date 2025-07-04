@@ -1,10 +1,23 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { useProductContext } from "@/app/contexts/ProductContext";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 const Hamburger = () => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
+  const { user } = useAuth();
+  const { category, getItemsByCategory } = useProductContext();
+  const router = useRouter();
+
+  const handleCategoryClick = async (id) => {
+    await getItemsByCategory(id);
+    setIsOpen(false);
+    router.push(`/Products?category=${id}`);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -42,6 +55,7 @@ const Hamburger = () => {
             ref={menuRef}
             className="fixed top-32 max-w-md bg-white rounded-sm z-50"
           >
+            {/* User Info */}
             <div className="p-6">
               <div className="flex items-center gap-3">
                 <img
@@ -50,36 +64,28 @@ const Hamburger = () => {
                   className="w-8 h-8 rounded-full"
                 />
                 <div className="text-[10px] tracking-wider font-normal">
-                  <p className="">
+                  <p>
                     <span className="opacity-70">Welcome back,</span>{" "}
-                    <span className="font-semibold text-[#0070BA]">Laxman</span>
+                    <span className="font-semibold text-[#0070BA]">
+                      {user?.first_name}
+                      {user?.last_name}
+                    </span>
                   </p>
-                  <p className=" ">laxman’screativity@artist.com</p>
+                  <p>{user?.email}</p>
                 </div>
               </div>
             </div>
 
-            {/* Menu Items */}
+            {/* Menu Items from API */}
             <div>
-              <ul className="space-y-1 font-normal text-xs ">
-                {[
-                  " Shop By Department",
-                  "Medicines",
-                  "Personal Care",
-                  "Healthcare Devices",
-                  "Baby",
-                  "Vitamins & Supplements",
-                  "Pets",
-                  "Herbs",
-                  "Help and Settings",
-                  "Orders",
-                  "Account details",
-                ].map((item, index) => (
+              <ul className="space-y-1 font-normal text-xs">
+                {category?.data?.map((item, index) => (
                   <li
                     key={index}
-                    className="px-6 py-2 hover:bg-[#0070BA]/20 hover:font-medium  transition-all cursor-pointer"
+                    onClick={() => handleCategoryClick(item.ID)}
+                    className="px-6 py-2 hover:bg-[#0070BA]/20 hover:font-medium transition-all cursor-pointer"
                   >
-                    {item}
+                    {item.CategoryName}
                   </li>
                 ))}
               </ul>

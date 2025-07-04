@@ -11,10 +11,19 @@ import { useAuthContext } from "../contexts/AuthContext";
 import endpoints from "../config/endpoints";
 import { useImageContext } from "../contexts/ImageContext";
 import { useDropdownContext } from "../contexts/DropdownContext";
+import { useCategoryContext } from "../contexts/CategoryContext";
 
 export default function useMedicineForm() {
   const { token, prescriptionRequired, setPrescriptionRequired, medicines } =
     useAuthContext();
+
+  const {
+    categoryIconOptions,
+    categoryIconError,
+    fetchCategoryIconOptions,
+    createICategoryIcon,
+    handleSelectCategoryIcon,
+  } = useCategoryContext();
 
   const {
     images,
@@ -61,6 +70,7 @@ export default function useMedicineForm() {
     minThreshold: "",
     maxThreshold: "",
     leadTime: "",
+    power: "",
   });
 
   const [showMeasurementValue, setShowMeasurementValue] = useState(false);
@@ -68,7 +78,6 @@ export default function useMedicineForm() {
   const taxTypeOptions = [
     { value: "VAT", label: "VAT" },
     { value: "NON VAT", label: "NON VAT" },
-    // { value: "VAT 18%", label: "VAT 18%" },
   ];
 
   const unitOptions = [
@@ -96,6 +105,20 @@ export default function useMedicineForm() {
     handleCreateOption: handleCategoryCreate,
   } = useCreatableSelect(createCategoryOption);
 
+  const {
+    value: categoryIcon,
+    handleChange: handleCategoryIconChangeLocal,
+    handleCreateOption: handleCategoryIconCreate,
+  } = useCreatableSelect(createICategoryIcon);
+
+  const handleCategoryIconChange = (val) => {
+    handleCategoryIconChangeLocal(val);
+    handleSelectCategoryIcon(val);
+  };
+
+
+  console.log(categoryIcon);
+  
   const { value: taxType, handleChange: handleTaxTypeChange } =
     useCreatableSelect();
 
@@ -113,6 +136,7 @@ export default function useMedicineForm() {
     fetchGenericOptions();
     fetchSupplierOptions();
     fetchCategoryOptions();
+    fetchCategoryIconOptions();
   }, []);
 
   useEffect(() => {
@@ -122,8 +146,13 @@ export default function useMedicineForm() {
       alert("Medicine not found");
       return;
     }
+    console.log("Loaded medicine data for edit:", medData);
+    // setFormData(medData.formData);
+    setFormData((prev) => ({
+      ...medData.formData,
+      power: medData.formData.power || "",
+    }));
 
-    setFormData(medData.formData);
     handleGenericChange(medData.dropdownValues.generic);
     handleSupplierChange(medData.dropdownValues.supplier);
     handleCategoryChange(medData.dropdownValues.category);
@@ -133,6 +162,8 @@ export default function useMedicineForm() {
     setShowMeasurementValue(medData.showMeasurementValue);
     setUploadedImageIds(medData.uploadedImageIds);
     setPreviewUrls(medData.previewUrls);
+    handleCategoryIconChange(medData.dropdownValues.categoryIcon);
+    setFormData((prev) => ({ ...prev, power: medData.formData.power || "" }));
   }, [id, medicines]);
 
   useEffect(() => {
@@ -176,6 +207,7 @@ export default function useMedicineForm() {
       taxType,
       uploadedImageIds,
       prescriptionRequired,
+      categoryIcon: categoryIcon,
     });
     console.log(payload);
 
@@ -237,5 +269,10 @@ export default function useMedicineForm() {
     message,
     id,
     uploadedImageIds,
+    categoryIcon,
+    handleCategoryIconChange,
+    handleCategoryIconCreate,
+    categoryIconOptions,
+    categoryIconError,
   };
 }

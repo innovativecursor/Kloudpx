@@ -7,6 +7,7 @@ export const getMedicineFromId = (id, medicines) => {
   return {
     formData: {
       brandName: med.BrandName || "",
+      power: med.Power || "",
       description: med.Description || "",
       measurementValue: med.MeasurementUnitValue || "",
       piecesPerBox: med.NumberOfPiecesPerBox || "",
@@ -29,10 +30,20 @@ export const getMedicineFromId = (id, medicines) => {
       },
       unit: { value: med.UnitOfMeasurement, label: med.UnitOfMeasurement },
       taxType: { value: med.TaxType, label: med.TaxType },
+
+      categoryIcon: {
+        value: med.Category?.CategoryIcon?.Icon || "",
+        label: med.Category?.CategoryIcon?.Icon || "",
+      },
     },
     prescriptionRequired: med.Prescription,
     showMeasurementValue: med.UnitOfMeasurement === "per box",
     uploadedImageIds: med.ItemImages?.map((img) => img.ID) || [],
-    previewUrls: med.ItemImages?.map((img) => img.FileName) || [],
+    previewUrls:
+      med.ItemImages?.map((img) =>
+        img.FileName?.startsWith("http")
+          ? img.FileName
+          : `${baseURL}${img.FileName}`
+      ) || [],
   };
 };

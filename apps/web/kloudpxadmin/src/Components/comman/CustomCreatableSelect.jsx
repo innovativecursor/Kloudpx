@@ -1,6 +1,13 @@
 import React from "react";
 import CreatableSelect from "react-select/creatable";
 
+import * as FaIcons from "react-icons/fa";
+import * as AiIcons from "react-icons/ai";
+import * as TbIcons from "react-icons/tb";
+import * as MdIcons from "react-icons/md";
+import * as BiIcons from "react-icons/bi";
+import * as GiIcons from "react-icons/gi";
+
 const customStyles = {
   control: (provided, state) => ({
     ...provided,
@@ -34,6 +41,28 @@ const customStyles = {
   }),
 };
 
+const getIconComponent = (iconName) => {
+  if (!iconName) return null;
+  const prefix = iconName.substring(0, 2);
+
+  switch (prefix) {
+    case "Fa":
+      return FaIcons[iconName] || null;
+    case "Ai":
+      return AiIcons[iconName] || null;
+    case "Tb":
+      return TbIcons[iconName] || null;
+    case "Md":
+      return MdIcons[iconName] || null;
+    case "Bi":
+      return BiIcons[iconName] || null;
+    case "Gi":
+      return GiIcons[iconName] || null;
+    default:
+      return null;
+  }
+};
+
 const CustomCreatableSelect = ({
   value,
   onChange,
@@ -42,6 +71,26 @@ const CustomCreatableSelect = ({
   isDisabled,
   placeholder,
 }) => {
+  const formatOptionLabel = ({ label }) => {
+    const IconComponent = getIconComponent(label);
+
+    if (IconComponent) {
+      return (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "start",
+            justifyContent: "start",
+          }}
+        >
+          <IconComponent />
+        </div>
+      );
+    } else {
+      return <span>{label}</span>;
+    }
+  };
+
   return (
     <CreatableSelect
       isClearable
@@ -53,6 +102,7 @@ const CustomCreatableSelect = ({
       placeholder={placeholder}
       classNamePrefix="react-select"
       styles={customStyles}
+      formatOptionLabel={formatOptionLabel}
     />
   );
 };

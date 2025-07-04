@@ -7,6 +7,24 @@ import { useAuthContext } from "../../contexts/AuthContext";
 import axios from "axios";
 import endpoints from "../../config/endpoints";
 
+// Icon sets
+import * as FaIcons from "react-icons/fa";
+import * as AiIcons from "react-icons/ai";
+import * as TbIcons from "react-icons/tb";
+import * as MdIcons from "react-icons/md";
+import * as BiIcons from "react-icons/bi";
+import * as GiIcons from "react-icons/gi";
+
+// Combine all icons
+const allIcons = {
+  ...FaIcons,
+  ...AiIcons,
+  ...TbIcons,
+  ...MdIcons,
+  ...BiIcons,
+  ...GiIcons,
+};
+
 const AllMedicine = () => {
   const { getAllMedicines, medicines, medicineError, token, loading } =
     useAuthContext();
@@ -26,6 +44,7 @@ const AllMedicine = () => {
       const formatted = medicines.map((item) => ({
         _id: item.ID,
         brandName: item.BrandName,
+        power: item.Power,
         genericName: {
           value: item.Generic.ID,
           label: item.Generic.GenericName,
@@ -35,6 +54,7 @@ const AllMedicine = () => {
           value: item.Category?.ID,
           label: item.Category?.CategoryName,
         },
+        categoryIcon: item.Category?.CategoryIcon?.Icon || null,
         unitType: {
           value: item.UnitOfMeasurement,
           label: item.UnitOfMeasurement,
@@ -56,9 +76,7 @@ const AllMedicine = () => {
         maxThreshold: item.MaximumThreshold,
         leadTime: item.EstimatedLeadTimeDays,
         taxType: { value: item.TaxType, label: item.TaxType },
-
         images: item.ItemImages?.map((img) => img.FileName) || [],
-
         prescription: item.Prescription,
       }));
       setFormattedMedicines(formatted);
@@ -102,90 +120,85 @@ const AllMedicine = () => {
       key: "brandName",
       sorter: (a, b) => a.brandName.localeCompare(b.brandName),
     },
+    {
+      title: "Power",
+      dataIndex: "power",
+      key: "power",
+    },
+    {
+      title: "Category Icon",
+      dataIndex: "categoryIcon",
+      key: "categoryIcon",
+      render: (iconName) => {
+        if (!iconName)
+          return <span className="text-gray-400 italic">No Data</span>;
+        const IconComponent = allIcons[iconName];
+        return IconComponent ? (
+          <IconComponent className="text-xl" />
+        ) : (
+          <span className="text-gray-500 italic">{iconName}</span>
+        );
+      },
+    },
 
     {
       title: "Generic Name",
       dataIndex: ["genericName", "label"],
       key: "genericName",
-      sorter: (a, b) => a.genericName.label.localeCompare(b.genericName.label),
     },
-
     {
       title: "Description",
       dataIndex: "description",
       key: "description",
       ellipsis: true,
     },
-
     { title: "Category", dataIndex: ["category", "label"], key: "category" },
-
     { title: "Unit", dataIndex: ["unitType", "label"], key: "unitType" },
-
     {
       title: "Measurement Value",
       dataIndex: "measurementValue",
       key: "measurementValue",
     },
-
     {
       title: "Pieces/Box",
       dataIndex: "piecesPerBox",
       key: "piecesPerBox",
-      sorter: (a, b) => a.piecesPerBox - b.piecesPerBox,
     },
-
     {
       title: "SP/Box",
       dataIndex: "spPerBox",
       key: "spPerBox",
-      sorter: (a, b) => a.spPerBox - b.spPerBox,
     },
-
     {
       title: "SP/Piece",
       dataIndex: "spPerPiece",
       key: "spPerPiece",
-      sorter: (a, b) => a.spPerPiece - b.spPerPiece,
     },
-
     {
       title: "CP/Box",
       dataIndex: "cpPerBox",
       key: "cpPerBox",
-      sorter: (a, b) => a.cpPerBox - b.cpPerBox,
     },
-
     {
       title: "CP/Piece",
       dataIndex: "cpPerPiece",
       key: "cpPerPiece",
-      sorter: (a, b) => a.cpPerPiece - b.cpPerPiece,
     },
-
     { title: "Supplier", dataIndex: ["supplier", "label"], key: "supplier" },
-
     {
       title: "Supplier Discount (%)",
       dataIndex: "supplierDiscount",
       key: "supplierDiscount",
-      sorter: (a, b) =>
-        parseFloat(a.supplierDiscount) - parseFloat(b.supplierDiscount),
       render: (val) => `${val}%`,
     },
-
     { title: "Min Threshold", dataIndex: "minThreshold", key: "minThreshold" },
-
     { title: "Max Threshold", dataIndex: "maxThreshold", key: "maxThreshold" },
-
     {
       title: "Lead Time (days)",
       dataIndex: "leadTime",
       key: "leadTime",
-      sorter: (a, b) => a.leadTime - b.leadTime,
     },
-
     { title: "Tax Type", dataIndex: ["taxType", "label"], key: "taxType" },
-
     {
       title: "Images",
       dataIndex: "images",
@@ -206,14 +219,12 @@ const AllMedicine = () => {
           <span className="text-gray-400 text-xs">No Image</span>
         ),
     },
-
     {
       title: "Prescription",
       dataIndex: "prescription",
       key: "prescription",
       render: (val) => (val ? "✔️" : "❌"),
     },
-
     {
       title: "Actions",
       key: "actions",
@@ -225,7 +236,11 @@ const AllMedicine = () => {
           <Tooltip title="Edit">
             <Button
               type="primary"
-              onClick={() => navigate(`/addMedicine/edit/${record._id}`)}
+              // onClick={() => navigate(`/addMedicine/edit/${record._id}`)}
+              onClick={() => {
+                console.log("User clicked Edit — Medicine data:", record);
+                navigate(`/addMedicine/edit/${record._id}`);
+              }}
               icon={<RiEditLine className="text-white" />}
               size="small"
               className="bg-blue-600 hover:bg-blue-700 border-none"

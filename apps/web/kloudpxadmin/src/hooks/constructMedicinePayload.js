@@ -7,9 +7,11 @@ export const constructMedicinePayload = ({
   taxType,
   uploadedImageIds,
   prescriptionRequired,
+  categoryIcon,
 }) => {
   return {
     brandname: formData.brandName,
+    power: formData.power,
     genericid: Number(genericName.value),
     supplierid: Number(supplier.value),
     supplierdiscount: `${formData.supplierDiscount}%`,
@@ -18,6 +20,7 @@ export const constructMedicinePayload = ({
     ...(unitType.value === "per box" && {
       measurementunitvalue: parseFloat(formData.measurementValue),
     }),
+    categoryiconid: categoryIcon?.value ? Number(categoryIcon.value) : null,
     numberofpiecesperbox: parseInt(formData.piecesPerBox),
     sellingpriceperbox: parseFloat(formData.spPerBox),
     sellingpriceperpiece: parseFloat(formData.spPerPiece),
