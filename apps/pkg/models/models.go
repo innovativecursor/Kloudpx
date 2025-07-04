@@ -44,6 +44,8 @@ type CategoryIcon struct {
 type Medicine struct {
 	gorm.Model
 	BrandName             string `gorm:"not null"`
+	IsBrand               bool
+	Discount              string
 	Power                 string
 	GenericID             uint
 	Generic               Generic `gorm:"foreignKey:GenericID"`
@@ -110,4 +112,10 @@ type Cart struct {
 	Medicine       Medicine
 	Quantity       int
 	IsOTC          bool // NEW: explicitly marks whether it’s OTC
+}
+
+type CarouselImage struct {
+	gorm.Model
+	ImageURL string `json:"imageurl"`
+	IsActive bool   `json:"isactive"`
 }
