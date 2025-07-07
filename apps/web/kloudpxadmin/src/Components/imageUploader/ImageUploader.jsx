@@ -6,7 +6,31 @@ export default function ImageUploader({
   message,
   id,
   disabled,
+  setImages,
+  setUploadedImageIds,
+  setPreviewUrls,
 }) {
+  const handleRemoveImage = (index) => {
+    setImages((prevImages) => {
+      const newImages = [...prevImages];
+      newImages.splice(index, 1);
+      return newImages;
+    });
+    setPreviewUrls((prevPreviewUrls) => {
+      const newPreviewUrls = [...prevPreviewUrls];
+      newPreviewUrls.splice(index, 1);
+      return newPreviewUrls;
+    });
+    setUploadedImageIds((prevUploadedIds) => {
+      if (prevUploadedIds && prevUploadedIds.length > index) {
+        const newUploadedIds = [...prevUploadedIds];
+        newUploadedIds.splice(index, 1);
+        return newUploadedIds;
+      }
+      return prevUploadedIds;
+    });
+  };
+
   return (
     <div className="p-4 border rounded-md mt-4 flex flex-col md:col-span-2">
       <input
@@ -31,12 +55,20 @@ export default function ImageUploader({
       {previewUrls.length > 0 && (
         <div className="mt-4 flex gap-4 flex-wrap">
           {previewUrls.map((url, idx) => (
-            <img
-              key={idx}
-              src={url}
-              alt={`preview-${idx}`}
-              className="w-24 h-24 object-cover rounded border"
-            />
+            <div key={idx} className="relative w-24 h-24">
+              <img
+                src={url}
+                alt={`preview-${idx}`}
+                className="w-24 h-24 object-cover rounded border"
+              />
+              <button
+                type="button"
+                onClick={() => handleRemoveImage(idx)}
+                className="absolute top-0 right-0 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-700"
+              >
+                ×
+              </button>
+            </div>
           ))}
         </div>
       )}

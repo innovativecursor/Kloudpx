@@ -3,6 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { store } from "@store";
 import { useAuthContext } from "./AuthContext";
+import imageCompression from "browser-image-compression";
 
 export const ImageContext = createContext();
 
@@ -13,8 +14,7 @@ const ImageProvider = ({ children }) => {
   const [uploadedImageIds, setUploadedImageIds] = useState([]);
   const { token, checkToken } = useAuthContext();
 
-  // Handle image file selection (max 5)
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const selectedFiles = Array.from(e.target.files);
 
     if (images.length + selectedFiles.length > 5) {
@@ -22,12 +22,29 @@ const ImageProvider = ({ children }) => {
       return;
     }
 
-    const newImages = [...images, ...selectedFiles];
-    setImages(newImages);
+    const compressedFiles = [];
+    const previews = [];
 
-    const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
-    setPreviewUrls((prev) => [...prev, ...newPreviews]);
+    for (const file of selectedFiles) {
+      try {
+        const options = {
+          maxSizeMB: 0.05,
+          maxWidthOrHeight: 800,
+          useWebWorker: true,
+        };
 
+        const compressedFile = await imageCompression(file, options);
+        compressedFiles.push(compressedFile);
+        const previewUrl = URL.createObjectURL(compressedFile);
+        previews.push(previewUrl);
+      } catch (error) {
+        console.error("Compression Error:", error);
+        setMessage("❌ Failed to compress some image.");
+      }
+    }
+
+    setImages([...images, ...compressedFiles]);
+    setPreviewUrls([...previewUrls, ...previews]);
     setMessage("");
   };
 
@@ -102,6 +119,7 @@ const ImageProvider = ({ children }) => {
         setUploadedImageIds,
         setPreviewUrls,
         setMessage,
+        setImages,
       }}
     >
       {children}

@@ -3,6 +3,7 @@ import * as FaIcons from "react-icons/fa";
 import LabeledInput from "../labelInput/LabelInput";
 import LabeledSelect from "../labeledSelect/LabeledSelect";
 
+
 const MedicineFormInputs = ({
   formData,
   handleChange,
@@ -35,18 +36,36 @@ const MedicineFormInputs = ({
 
   return (
     <>
-      <LabeledInput
-        label="Brand Name"
-        value={formData.brandName}
-        onChange={(e) => handleChange("brandName", e.target.value)}
-        placeholder="Enter brand name"
-      />
-      <LabeledInput
-        label="Power"
-        value={formData.power}
-        onChange={(e) => handleChange("power", e.target.value)}
-        placeholder="Enter power (e.g., 500mg)"
-      />
+      <div className="flex gap-4">
+        <div className="w-full ">
+          <LabeledInput
+            label="Brand Name"
+            value={formData.brandName}
+            onChange={(e) => handleChange("brandName", e.target.value)}
+            placeholder="Enter brand name"
+          />
+        </div>
+
+        <div className="w-full">
+          <LabeledInput
+            label="Power"
+            value={formData.power}
+            onChange={(e) => handleChange("power", e.target.value)}
+            placeholder="Enter power (e.g., 500mg)"
+            disabled={!formData.brandName}
+          />
+        </div>
+      </div>
+
+      <div className="w-full">
+        <LabeledInput
+          label="Product Discount"
+          value={formData.discount}
+          onChange={(e) => handleChange("discount", e.target.value)}
+          placeholder="Enter discount"
+          disabled={!formData.power}
+        />
+      </div>
 
       <LabeledSelect
         label="Generic Name"
@@ -57,7 +76,7 @@ const MedicineFormInputs = ({
         }}
         onCreate={handleGenericCreate}
         options={genericOptions}
-        disabled={!formData.brandName}
+        disabled={!formData.discount}
         placeholder="Select or create generic name"
       />
 
@@ -68,29 +87,34 @@ const MedicineFormInputs = ({
         disabled={!genericName}
         placeholder="Enter description"
         textarea
-        className="md:col-span-2"
+        // className="md:col-span-2"
+        className="w-full bg-green-200"
       />
 
-      <LabeledSelect
-        label="Category Icon"
-        value={categoryIcon}
-        onChange={handleCategoryIconChange}
-        onCreate={handleCategoryIconCreate}
-        options={categoryIconOptions}
-        disabled={!formData.description}
-        placeholder="Select or create category icon"
-      />
-
-      <LabeledSelect
-        label="Category"
-        value={category}
-        onChange={handleCategoryChange}
-        onCreate={handleCategoryCreate}
-        options={categoryOptions}
-        disabled={!formData.description}
-        placeholder="Select or create category"
-      />
-
+      <div className="flex gap-4">
+        <div className="w-full">
+          <LabeledSelect
+            label="Category Icon"
+            value={categoryIcon}
+            onChange={handleCategoryIconChange}
+            onCreate={handleCategoryIconCreate}
+            options={categoryIconOptions}
+            disabled={!formData.description}
+            placeholder="Select or create category icon"
+          />
+        </div>
+        <div className="w-full">
+          <LabeledSelect
+            label="Category"
+            value={category}
+            onChange={handleCategoryChange}
+            onCreate={handleCategoryCreate}
+            options={categoryOptions}
+            disabled={!formData.description}
+            placeholder="Select or create category"
+          />
+        </div>
+      </div>
       <LabeledSelect
         label="Unit of Measurement"
         value={unitType}

@@ -15,8 +15,10 @@ const PrescriptionSection = ({
   previewUrls,
   message,
   id,
+  setImages,
   uploadedImageIds,
-  prescriptionRequired,
+  setUploadedImageIds,
+  setPreviewUrls,
 }) => {
   return (
     <>
@@ -39,6 +41,10 @@ const PrescriptionSection = ({
         message={message}
         id={id}
         disabled={images.length >= 5 || !taxType?.value}
+        uploadedImageIds={uploadedImageIds}
+        setUploadedImageIds={setUploadedImageIds}
+        setPreviewUrls={setPreviewUrls}
+        setImages={setImages}
       />
       <BooleanCheckbox
         label="Prescription Required"

@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import { useProductContext } from "@/app/contexts/ProductContext";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/contexts/AuthContext";
+import useModal from "@/app/hooks/useModal";
 
 const Hamburger = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef(null);
+  const { isOpen, setIsOpen, modalRef } = useModal();
   const { user } = useAuth();
   const { category, getItemsByCategory } = useProductContext();
   const router = useRouter();
@@ -17,24 +17,6 @@ const Hamburger = () => {
     setIsOpen(false);
     router.push(`/Products?category=${id}`);
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
 
   return (
     <>
@@ -52,7 +34,7 @@ const Hamburger = () => {
           <div className="fixed inset-0 bg-black/60 z-40"></div>
 
           <div
-            ref={menuRef}
+            ref={modalRef}
             className="fixed top-32 max-w-md bg-white rounded-sm z-50"
           >
             {/* User Info */}

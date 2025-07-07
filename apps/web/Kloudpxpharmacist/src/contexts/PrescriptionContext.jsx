@@ -31,16 +31,10 @@ const PrescriptionProvider = ({ children }) => {
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState(null);
 
-  const [selectedMedicineId, setSelectedMedicineId] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalInput, setModalInput] = useState("");
-
   const initialLengthRef = useRef(0);
   const [isCartUpdated, setIsCartUpdated] = useState(false);
 
   const userId = prescriptionDetails?.data?.User?.ID;
-
-  // console.log(selectedMedicineId);
 
   // get all prescriptions
   const fetchPrescriptions = async (status) => {
@@ -128,58 +122,6 @@ const PrescriptionProvider = ({ children }) => {
     }
   };
 
-  // modal code ...
-  const openModal = (id) => {
-    setSelectedMedicineId(id);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setSelectedMedicineId(null);
-    setModalInput("");
-    setIsModalOpen(false);
-  };
-
-  const handleModalSubmit = async () => {
-    if (!modalInput.trim()) {
-      return Swal.fire("Warning", "Quantity is required", "warning");
-    }
-
-    // console.log(userId);
-
-    if (!selectedMedicineId || !userId) {
-      return Swal.fire(
-        "Error",
-        "Missing medicine or user information",
-        "error"
-      );
-    }
-
-    try {
-      await axios.post(
-        `http://localhost:10002/v1/pharmacist/add-medicine-to-prescriptions/${userId}`,
-        {
-          medicineId: selectedMedicineId,
-          quantity: Number(modalInput),
-        },
-        {
-          headers: { Authorization: token },
-        }
-      );
-
-      Swal.fire(
-        "Success",
-        "Medicine added successfully to prescription",
-        "success"
-      );
-      fetchPrescriptionsCart();
-      closeModal();
-    } catch (error) {
-      console.error("Error adding medicine:", error);
-      Swal.fire("Error", "Failed to add medicine", "error");
-    }
-  };
-
   const fetchPrescriptionsCart = async () => {
     if (!userId) {
       setPrescriptionsCart({
@@ -215,37 +157,6 @@ const PrescriptionProvider = ({ children }) => {
     }
   };
 
-  const submitPrescriptions = async () => {
-    if (!prescriptionDetails?.data?.User?.ID) {
-      return Swal.fire("Error", "User ID is missing", "error");
-    }
-
-    try {
-      const response = await axios.post(
-        `http://localhost:10002/v1/pharmacist/submit-prescriptions/${userId}`,
-        {},
-        {
-          headers: {
-            Authorization: `${token}`,
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        Swal.fire("Success", "Prescriptions submitted successfully", "success");
-        navigate("/findprescription");
-        fetchPrescriptions();
-        setIsCartUpdated(false);
-        initialLengthRef.current = 0;
-      } else {
-        Swal.fire("Error", "Failed to submit prescriptions", "error");
-      }
-    } catch (error) {
-      console.error("Submit error:", error);
-      Swal.fire("Error", "Something went wrong during submission", "error");
-    }
-  };
-
   useEffect(() => {
     fetchPrescriptionsCart();
   }, [userId]);
@@ -278,18 +189,10 @@ const PrescriptionProvider = ({ children }) => {
         searchLoading,
         searchError,
         searchMedicine,
-        selectedMedicineId,
-        setSelectedMedicineId,
-        isModalOpen,
-        modalInput,
-        setModalInput,
-        openModal,
-        closeModal,
-        handleModalSubmit,
-        setIsModalOpen,
+
         prescriptionsCart,
         fetchPrescriptionsCart,
-        submitPrescriptions,
+
         isCartUpdated,
       }}
     >

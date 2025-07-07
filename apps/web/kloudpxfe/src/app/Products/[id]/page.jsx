@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import SubTitle from "@/app/components/Titles/SubTitle";
 import ImageSwiper from "@/app/components/ImageSwiper/ImageSwiper";
@@ -9,16 +9,17 @@ import SocialIcons from "@/app/components/SocialIcons/SocialIcons";
 import { useProductContext } from "@/app/contexts/ProductContext";
 import { useCartContext } from "@/app/contexts/CartContext";
 import { usePrescriptionContext } from "@/app/contexts/PrescriptionContext";
+import toast from "react-hot-toast";
 
 const ProductDetails = () => {
   const { id } = useParams();
-  const { allMedicine, selectedCategoryName } = useProductContext();
-  const { isInCart, addToCart, quantity } = useCartContext();
-  const { uploadedImage } = usePrescriptionContext();
   const router = useRouter();
+  const { allMedicine, selectedCategoryName } = useProductContext();
+  const { addToCart, getQuantity } = useCartContext();
+  const { uploadedImage } = usePrescriptionContext();
+  const [addedToCart, setAddedToCart] = useState(false);
 
   const product = allMedicine.data.find((item) => String(item.id) === id);
-  const fallbackImage = "/assets/demo.jpg";
 
   if (allMedicine.loading) {
     return <div className="text-center p-10">Loading product...</div>;
@@ -30,18 +31,34 @@ const ProductDetails = () => {
     );
   }
 
-  const medicineid = product.id;
-  const isAlreadyInCart = isInCart(medicineid);
+  const handleAddToCart = async () => {
+    const quantity = getQuantity(product.id);
+    try {
+      const res = await addToCart(
+        medicineid,
+        quantity,
+        product?.prescription,
+        uploadedImage
+      );
 
-  const handleAddToCart = () => {
-    addToCart(medicineid, quantity, product?.prescription, uploadedImage);
+      if (res?.error === "insufficient_stock") {
+        toast.error(`Only ${res.available} items are available in stock.`);
+
+        return;
+      }
+
+      setAddedToCart(true);
+    } catch (error) {
+      toast.error("Cart me add karne me problem aayi");
+    }
   };
 
   const handleGoToCart = () => {
     router.push("/Cart");
   };
-
+  const fallbackImage = "/assets/demo.jpg";
   const images = product.images?.length > 0 ? product.images : [fallbackImage];
+  const medicineid = product.id;
 
   return (
     <div className="bg-gray-100 pb-10 min-h-screen">
@@ -65,7 +82,7 @@ const ProductDetails = () => {
               {product?.genericname || "General Medicine"}
             </h2>
 
-            <div className="flex items-center gap-3 mb-6">
+            {/* <div className="flex items-center gap-3 mb-6">
               <div className="flex gap-[3px] text-yellow-400 text-xl">
                 {[...Array(5)].map((_, i) => (
                   <i key={i} className="ri-star-fill"></i>
@@ -74,7 +91,7 @@ const ProductDetails = () => {
               <span className="text-red-800 font-medium text-base">
                 120 Reviews
               </span>
-            </div>
+            </div> */}
 
             <p className="text-gray-700 leading-relaxed mb-6 text-base md:text-lg text-justify">
               {product?.description || "No description available."}
@@ -82,24 +99,25 @@ const ProductDetails = () => {
 
             <div className="flex items-center gap-3 mb-2">
               <span className="text-2xl font-bold text-green-600">
-                ₹{product?.price?.toFixed(2) || "N/A"}
+                	₱{product?.price?.toFixed(2) || "N/A"}
               </span>
               <span className="text-sm text-gray-500 line-through -mt-2">
                 MRP ₹{(product?.price * 1.1).toFixed(2)}
               </span>
             </div>
 
-            <div className="text-gray-700 font-semibold text-sm mb-6">
+            {/* <div className="text-gray-700 font-semibold text-sm mb-6">
               <span>{product?.measurementunitvalue || 1}</span>
               <span className="mx-1">{product?.unit || "unit"}</span>
               <span className="mx-1">/</span>
               <span>{product?.numberofpiecesperbox || "?"} per box</span>
-            </div>
+            </div> */}
 
-            <QuantitySelector />
+            <QuantitySelector medicineid={product.id} />
 
+            {/* Buttons */}
             <div className="mt-8 flex flex-col sm:flex-row gap-4 sm:gap-6 w-full">
-              {isAlreadyInCart ? (
+              {addedToCart ? (
                 <button
                   onClick={handleGoToCart}
                   type="button"
@@ -118,14 +136,6 @@ const ProductDetails = () => {
                   Add to Cart
                 </button>
               )}
-
-              <button
-                type="button"
-                className="w-full sm:flex-1 flex items-center justify-center gap-3 border-2 border-pink-500 text-pink-500 hover:bg-pink-50 font-semibold text-base cursor-pointer px-8 py-3 rounded-full shadow-sm transition-colors hover:border-pink-600 active:scale-95"
-              >
-                <i className="ri-heart-line text-xl"></i>
-                Wishlist
-              </button>
             </div>
           </div>
         </div>

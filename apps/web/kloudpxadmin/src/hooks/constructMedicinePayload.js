@@ -8,10 +8,12 @@ export const constructMedicinePayload = ({
   uploadedImageIds,
   prescriptionRequired,
   categoryIcon,
+  isBrand,
 }) => {
   return {
     brandname: formData.brandName,
     power: formData.power,
+    discount: formData.discount,
     genericid: Number(genericName.value),
     supplierid: Number(supplier.value),
     supplierdiscount: `${formData.supplierDiscount}%`,
@@ -33,5 +35,6 @@ export const constructMedicinePayload = ({
     estimatedleadtimedays: parseInt(formData.leadTime),
     imageids: uploadedImageIds,
     prescription: prescriptionRequired,
+    isbrand: isBrand,
   };
 };
