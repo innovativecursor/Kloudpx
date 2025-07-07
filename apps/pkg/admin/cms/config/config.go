@@ -6,4 +6,5 @@ type CarouselImageData struct {
 
 type Gallery struct {
 	GalleryImg string `json:"galleryimg"`
+	ButtonText string `json:"buttontext"`
 }
