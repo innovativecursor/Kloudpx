@@ -8,7 +8,7 @@ export const getMedicineFromId = (id, medicines) => {
     formData: {
       brandName: med.BrandName || "",
       power: med.Power || "",
-      discount: med.discount || "",
+      discount: med.Discount || "",
       description: med.Description || "",
       measurementValue: med.MeasurementUnitValue || "",
       piecesPerBox: med.NumberOfPiecesPerBox || "",

@@ -11,13 +11,13 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import CartModal from "@/app/components/modal/CartModal";
 import useModal from "@/app/hooks/useModal";
+import UserProfile from "../Profile/UserProfile";
 
 const Header = () => {
   const router = useRouter();
-  const { login, loading, user, token } = useAuth();
+  const { login, loading, user, token, logout } = useAuth();
   const { cartLength } = useCartContext();
   const { isOpen, setIsOpen, modalRef } = useModal();
-    // const { isOpen, setIsOpen } = useModal(); 
 
   return (
     <div className="">
@@ -27,15 +27,17 @@ const Header = () => {
           <SearchBar />
         </div>
         <div className="flex-between-center sm:gap-6 gap-3">
-          <div
-            onClick={!user && !loading ? login : undefined}
-            className="font-semibold sm:text-xs text-xs cursor-pointer"
-          >
-            {loading
-              ? "Signing In..."
-              : user
-              ? `Hi, ${user.first_name} ${user.last_name}`
-              : "Login/Signup"}
+          <div>
+            {!loading && user ? (
+              <UserProfile user={user} logout={logout} />
+            ) : (
+              <div
+                onClick={!loading ? login : undefined}
+                className="font-semibold sm:text-xs text-xs cursor-pointer"
+              >
+                {loading ? "Signing In..." : "Login/Signup"}
+              </div>
+            )}
           </div>
 
           {/* Cart Icon with Hover */}
@@ -77,23 +79,3 @@ const Header = () => {
 };
 
 export default Header;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
