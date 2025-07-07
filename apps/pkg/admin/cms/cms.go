@@ -281,8 +281,9 @@ func GalleryImageUpload(c *gin.Context, db *gorm.DB) {
 		profileType + "/" + userType + "/" + uuid + "/" + userID + "/" + imageName + "." + ext
 
 	gallery := models.GalleryImage{
-		IsActive: false,
-		ImageURL: imageURL,
+		ButtonText: uploadReq.ButtonText,
+		IsActive:   false,
+		ImageURL:   imageURL,
 	}
 
 	if err := db.Create(&gallery).Error; err != nil {

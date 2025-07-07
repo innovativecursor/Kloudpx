@@ -122,6 +122,7 @@ type CarouselImage struct {
 
 type GalleryImage struct {
 	gorm.Model
-	ImageURL string
-	IsActive bool
+	ImageURL   string
+	IsActive   bool
+	ButtonText string
 }
