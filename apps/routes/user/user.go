@@ -72,6 +72,9 @@ func User(db *gorm.DB) {
 		userflow.GetAllActiveGalleryImages(c, db)
 	})
 
+	apiV1.GET("/user/get-branded-medicine", func(c *gin.Context) {
+		userflow.GetBrandedMedicinesForUser(c, db)
+	})
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
 	router.Run(":" + port)
