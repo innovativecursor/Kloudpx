@@ -1,12 +1,13 @@
 "use client";
-import React, { useEffect } from "react";
+
+import React, { useEffect, Suspense } from "react";
 import ProductsFilter from "../components/filter/ProductsFilter";
 import AllProducts from "../components/AllProducts/AllProducts";
 import SubTitle from "../components/Titles/SubTitle";
 import { useSearchParams } from "next/navigation";
 import { useProductContext } from "../contexts/ProductContext";
 
-const page = () => {
+const ProductPageContent = () => {
   const searchParams = useSearchParams();
   const categoryId = searchParams.get("category");
 
@@ -33,4 +34,12 @@ const page = () => {
   );
 };
 
-export default page;
+const Page = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ProductPageContent />
+    </Suspense>
+  );
+};
+
+export default Page;
