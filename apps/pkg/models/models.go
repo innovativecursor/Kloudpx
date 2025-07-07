@@ -116,6 +116,12 @@ type Cart struct {
 
 type CarouselImage struct {
 	gorm.Model
-	ImageURL string `json:"imageurl"`
-	IsActive bool   `json:"isactive"`
+	ImageURL string
+	IsActive bool
+}
+
+type GalleryImage struct {
+	gorm.Model
+	ImageURL string
+	IsActive bool
 }

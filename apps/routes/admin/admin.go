@@ -104,6 +104,7 @@ func Admin(db *gorm.DB) {
 	})
 
 	//cms
+	//carousel
 	apiV1.POST("/carousel/add-carousel-img", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		cms.CarouselImageUpload(c, db)
 	})
@@ -118,6 +119,23 @@ func Admin(db *gorm.DB) {
 
 	apiV1.DELETE("/carousel/delete-carousel-img/:id", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		cms.DeleteCarouselImage(c, db)
+	})
+
+	//gallery
+	apiV1.POST("/gallery/add-gallery-img", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		cms.GalleryImageUpload(c, db)
+	})
+
+	apiV1.GET("/gallery/get-all-gallery-img", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		cms.GetAllGalleryImagesForAdmin(c, db)
+	})
+
+	apiV1.PUT("/gallery/update-status/:id", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		cms.ToggleGalleryImageStatus(c, db)
+	})
+
+	apiV1.DELETE("/gallery/delete-gallery-img/:id", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		cms.DeleteGalleryImage(c, db)
 	})
 
 	// Listen and serve on defined port
