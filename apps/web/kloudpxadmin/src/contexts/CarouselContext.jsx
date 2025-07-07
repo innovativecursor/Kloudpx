@@ -1,52 +1,77 @@
-import { createContext, useContext } from "react";
-import axios from "axios";
+import { createContext, useContext, useState } from "react";
 import Swal from "sweetalert2";
 import useBase64Converter from "../hooks/useBase64Converter";
-import { useAuthContext } from "./AuthContext";  // import your AuthContext
+import {
+  getAxiosCall,
+  postAxiosCall,
+  updateAxiosCall,
+  deleteAxiosCall,
+} from "../Axios/UniversalAxiosCalls";
 
 export const CarouselContext = createContext();
 
 const CarouselProvider = ({ children }) => {
   const { convertToBase64 } = useBase64Converter();
-  const { token } = useAuthContext();
+  const [carouselImages, setCarouselImages] = useState([]);
+
+  const getAllCarouselImages = async () => {
+    const res = await getAxiosCall("/v1/carousel/get-all-carousel-img");
+    if (res?.data?.data) {
+      setCarouselImages(res.data.data);
+    }
+  };
 
   const uploadCarouselImage = async (file) => {
     try {
-      if (!token) {
-        Swal.fire("Error", "Authentication token missing, please login.", "error");
-        return;
-      }
-
       const base64 = await convertToBase64(file);
       const payload = { carouselimage: base64 };
 
-      const response = await axios.post(
-        `http://localhost:10001/v1/carousel/add-carousel-img`,
-        payload,
-        {
-          headers: {
-            Authorization: token,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        Swal.fire("Success", response.data.message || "Image uploaded successfully", "success");
+      const res = await postAxiosCall("/v1/carousel/add-carousel-img", payload);
+      if (res?.message) {
+        Swal.fire("Success", res.message, "success");
+        getAllCarouselImages(); // refresh
       } else {
         Swal.fire("Error", "Image upload failed", "error");
       }
     } catch (error) {
-      Swal.fire(
-        "Error",
-        error.response?.data?.error || error.message || "Something went wrong",
-        "error"
-      );
+      Swal.fire("Error", error?.message || "Something went wrong", "error");
+    }
+  };
+
+  const toggleCarouselStatus = async (id) => {
+    try {
+      const res = await updateAxiosCall(`/v1/carousel/update-status`, id, {});
+      if (res?.message) {
+        Swal.fire("Success", res.message, "success");
+        await getAllCarouselImages();
+      }
+    } catch (error) {
+      console.error("Status toggle failed", error);
+    }
+  };
+
+  const deleteCarouselImage = async (id) => {
+    try {
+      const res = await deleteAxiosCall(`/v1/carousel/delete-carousel-img`, id);
+      if (res?.message) {
+        Swal.fire("Success", res.message, "success");
+        await getAllCarouselImages();
+      }
+    } catch (error) {
+      console.error("Failed to delete carousel image", error);
     }
   };
 
   return (
-    <CarouselContext.Provider value={{ uploadCarouselImage }}>
+    <CarouselContext.Provider
+      value={{
+        carouselImages,
+        getAllCarouselImages,
+        uploadCarouselImage,
+        toggleCarouselStatus,
+        deleteCarouselImage,
+      }}
+    >
       {children}
     </CarouselContext.Provider>
   );

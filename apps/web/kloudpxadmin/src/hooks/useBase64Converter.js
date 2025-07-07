@@ -19,7 +19,6 @@ const useBase64Converter = () => {
         const reader = new FileReader();
         reader.readAsDataURL(compressedFile);
         reader.onload = () => {
-          // **Important**: Backend expects base64 string WITHOUT "data:image/xxx;base64," prefix
           const base64String = reader.result.split(",")[1];
           resolve(base64String);
         };

@@ -11,6 +11,7 @@ import { LoadingProvider } from "./contexts/LoadingContext";
 import GlobalLoaderHandler from "./components/Loader/GlobalLoaderHandler";
 import { Toaster } from "react-hot-toast";
 import { PrescriptionProvider } from "./contexts/PrescriptionContext";
+import { ImageProvider } from "./contexts/ImagesContext";
 
 export default function RootLayout({ children }) {
   return (
@@ -29,10 +30,12 @@ export default function RootLayout({ children }) {
               <ProductProvider>
                 <CartProvider>
                   <PrescriptionProvider>
-                    <Header />
-                    <main className="flex-1">{children}</main>
-                    <Footer />
-                    <Toaster position="top-right" reverseOrder={false} />
+                    <ImageProvider>
+                      <Header />
+                      <main className="flex-1">{children}</main>
+                      <Footer />
+                      <Toaster position="top-right" reverseOrder={false} />
+                    </ImageProvider>
                   </PrescriptionProvider>
                 </CartProvider>
               </ProductProvider>
