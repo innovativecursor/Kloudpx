@@ -221,3 +221,180 @@ func DeleteCarouselImage(c *gin.Context, db *gorm.DB) {
 		"image_url":   image.ImageURL,
 	})
 }
+
+func GalleryImageUpload(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		logrus.Warn("Unauthorized access: user not found in context")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+
+	userObj, ok := user.(*models.Admin)
+	if !ok || userObj.ApplicationRole != "admin" {
+		logrus.WithField("user", user).Warn("Unauthorized user")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Only admins can upload gallery image"})
+		return
+	}
+
+	var uploadReq config.Gallery
+	if err := c.ShouldBindJSON(&uploadReq); err != nil {
+		logrus.WithError(err).Error("Invalid request")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
+		return
+	}
+
+	decodedImage, err := base64.StdEncoding.DecodeString(uploadReq.GalleryImg)
+	if err != nil {
+		logrus.WithError(err).Error("Base64 decode failed")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid base64 image"})
+		return
+	}
+
+	cfg, err := cfg.Env()
+	if err != nil {
+		logrus.WithError(err).Error("Failed to load config")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Config error"})
+		return
+	}
+
+	profileType := "gallery"
+	userType := "admin"
+	uuid := s3helper.GenerateUniqueID().String()
+	userID := fmt.Sprintf("%d", userObj.ID)
+	imageName := "gallery"
+
+	if err := s3helper.UploadToS3(c.Request.Context(), profileType, userType, cfg.S3.BucketName, uuid, userID, imageName, decodedImage); err != nil {
+		logrus.WithError(err).Error("S3 upload failed")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload failed"})
+		return
+	}
+
+	ext, err := getfileextension.GetFileExtension(decodedImage)
+	if err != nil {
+		logrus.WithError(err).Error("File extension error")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid image"})
+		return
+	}
+
+	imageURL := "https://" + cfg.S3.BucketName + ".s3." + cfg.S3.Region + ".amazonaws.com/" +
+		profileType + "/" + userType + "/" + uuid + "/" + userID + "/" + imageName + "." + ext
+
+	gallery := models.GalleryImage{
+		IsActive: false,
+		ImageURL: imageURL,
+	}
+
+	if err := db.Create(&gallery).Error; err != nil {
+		logrus.WithError(err).Error("DB save failed")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":    "Gallery image uploaded successfully",
+		"image_url":  imageURL,
+		"gallery_id": gallery.ID,
+	})
+}
+
+func GetAllGalleryImagesForAdmin(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+	userObj, ok := user.(*models.Admin)
+	if !ok || userObj.ApplicationRole != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Only admins can access gallery images"})
+		return
+	}
+
+	var images []models.GalleryImage
+	if err := db.Order("created_at desc").Find(&images).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch gallery images"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Gallery images fetched successfully",
+		"data":    images,
+	})
+}
+
+func ToggleGalleryImageStatus(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+	userObj, ok := user.(*models.Admin)
+	if !ok || userObj.ApplicationRole != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Only admins can toggle status"})
+		return
+	}
+
+	id := c.Param("id")
+	var image models.GalleryImage
+
+	if err := db.First(&image, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Gallery image not found"})
+		return
+	}
+
+	image.IsActive = !image.IsActive
+
+	if err := db.Save(&image).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update gallery status"})
+		return
+	}
+
+	status := "deactivated"
+	if image.IsActive {
+		status = "activated"
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":    fmt.Sprintf("Gallery image %s successfully", status),
+		"gallery_id": image.ID,
+		"image_url":  image.ImageURL,
+		"is_active":  image.IsActive,
+	})
+}
+
+func DeleteGalleryImage(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+	userObj, ok := user.(*models.Admin)
+	if !ok || userObj.ApplicationRole != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Only admins can delete gallery images"})
+		return
+	}
+
+	id := c.Param("id")
+	var image models.GalleryImage
+
+	if err := db.First(&image, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Gallery image not found"})
+		return
+	}
+
+	if image.IsActive {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Please deactivate the image before deletion"})
+		return
+	}
+
+	if err := db.Unscoped().Delete(&image).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete gallery image"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":    "Gallery image deleted successfully",
+		"gallery_id": image.ID,
+		"image_url":  image.ImageURL,
+	})
+}
