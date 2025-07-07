@@ -16,7 +16,7 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "kloud-px.s3.ap-southeast-1.amazonaws.com",
+        hostname: "kloudpx.s3.ap-southeast-1.amazonaws.com",
         port: "",
         pathname: "/**",
       },

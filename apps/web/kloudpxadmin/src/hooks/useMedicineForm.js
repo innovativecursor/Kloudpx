@@ -12,11 +12,12 @@ import endpoints from "../config/endpoints";
 import { useImageContext } from "../contexts/ImageContext";
 import { useDropdownContext } from "../contexts/DropdownContext";
 import { useCategoryContext } from "../contexts/CategoryContext";
+// import toast from "react-hot-toast";
 
 export default function useMedicineForm() {
   const { token, prescriptionRequired, setPrescriptionRequired, medicines } =
     useAuthContext();
-
+  const [isBrand, setIsBrand] = useState(false);
   const {
     categoryIconOptions,
     categoryIconError,
@@ -35,6 +36,7 @@ export default function useMedicineForm() {
     setMessage,
     handleImageChange,
     handleUpload,
+    setImages,
   } = useImageContext();
 
   const {
@@ -71,6 +73,7 @@ export default function useMedicineForm() {
     maxThreshold: "",
     leadTime: "",
     power: "",
+    discount: "",
   });
 
   const [showMeasurementValue, setShowMeasurementValue] = useState(false);
@@ -116,9 +119,8 @@ export default function useMedicineForm() {
     handleSelectCategoryIcon(val);
   };
 
-
   console.log(categoryIcon);
-  
+
   const { value: taxType, handleChange: handleTaxTypeChange } =
     useCreatableSelect();
 
@@ -141,6 +143,9 @@ export default function useMedicineForm() {
 
   useEffect(() => {
     if (!id || !medicines.length) return;
+    setUploadedImageIds([]);
+    setPreviewUrls([]);
+    setMessage("");
     const medData = getMedicineFromId(id, medicines);
     if (!medData) {
       alert("Medicine not found");
@@ -151,6 +156,10 @@ export default function useMedicineForm() {
     setFormData((prev) => ({
       ...medData.formData,
       power: medData.formData.power || "",
+    }));
+    setFormData((prev) => ({
+      ...medData.formData,
+      discount: medData.formData.discount || "",
     }));
 
     handleGenericChange(medData.dropdownValues.generic);
@@ -164,6 +173,11 @@ export default function useMedicineForm() {
     setPreviewUrls(medData.previewUrls);
     handleCategoryIconChange(medData.dropdownValues.categoryIcon);
     setFormData((prev) => ({ ...prev, power: medData.formData.power || "" }));
+    setFormData((prev) => ({
+      ...prev,
+      discount: medData.formData.discount || "",
+    }));
+    setIsBrand(medData.isBrand || false);
   }, [id, medicines]);
 
   useEffect(() => {
@@ -208,6 +222,7 @@ export default function useMedicineForm() {
       uploadedImageIds,
       prescriptionRequired,
       categoryIcon: categoryIcon,
+      isBrand,
     });
     console.log(payload);
 
@@ -274,5 +289,9 @@ export default function useMedicineForm() {
     handleCategoryIconCreate,
     categoryIconOptions,
     categoryIconError,
+    isBrand,
+    setIsBrand,
+    setPreviewUrls,
+    setImages,
   };
 }

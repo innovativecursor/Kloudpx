@@ -8,6 +8,7 @@ export const getMedicineFromId = (id, medicines) => {
     formData: {
       brandName: med.BrandName || "",
       power: med.Power || "",
+      discount: med.discount || "",
       description: med.Description || "",
       measurementValue: med.MeasurementUnitValue || "",
       piecesPerBox: med.NumberOfPiecesPerBox || "",
@@ -36,6 +37,7 @@ export const getMedicineFromId = (id, medicines) => {
         label: med.Category?.CategoryIcon?.Icon || "",
       },
     },
+    isBrand: med.IsBrand || false,
     prescriptionRequired: med.Prescription,
     showMeasurementValue: med.UnitOfMeasurement === "per box",
     uploadedImageIds: med.ItemImages?.map((img) => img.ID) || [],

@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { usePrescriptionContext } from "../../contexts/PrescriptionContext";
+import { useCartpresciContext } from "../../contexts/CartpresciContext";
 
 const Searchbar = () => {
   const [input, setInput] = useState("");
-  const {
-    searchMedicine,
-    searchResults,
-    searchLoading,
-    setSelectedMedicineId,
-  } = usePrescriptionContext();
+  const { searchMedicine, searchResults, searchLoading } =
+    usePrescriptionContext();
+  const { setSelectedMedicineId } = useCartpresciContext();
   const [showResults, setShowResults] = useState(false);
   const wrapperRef = useRef(null);
 

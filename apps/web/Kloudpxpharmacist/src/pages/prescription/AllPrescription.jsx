@@ -3,6 +3,8 @@ import CommonButton from "../../Components/button/CommanButton";
 import { Link } from "react-router-dom";
 
 const AllPrescription = ({ loading, prescriptions, handleClick }) => {
+  console.log(prescriptions);
+  
   return (
     <div>
       <div className="flex justify-between items-center mb-6">

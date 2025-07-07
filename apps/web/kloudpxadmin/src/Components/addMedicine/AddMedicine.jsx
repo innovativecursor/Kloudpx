@@ -11,6 +11,8 @@ import ThresholdSection from "../medicine/ThresholdSection";
 import PrescriptionSection from "../medicine/PrescriptionSection";
 
 import useMedicineForm from "../../hooks/useMedicineForm";
+import IsBrandItem from "./IsBrandItem";
+import { useNavigate } from "react-router-dom";
 
 const AddMedicine = () => {
   const {
@@ -49,11 +51,15 @@ const AddMedicine = () => {
     handleUpload,
     handleImageChange,
     images,
+    setImages,
     previewUrls,
     message,
     id,
     uploadedImageIds,
-
+    setPreviewUrls,
+    setUploadedImageIds,
+    isBrand,
+    setIsBrand,
     categoryIcons,
     handleCategoryIconChange,
     handleCategoryIconCreate,
@@ -61,7 +67,7 @@ const AddMedicine = () => {
     categoryIconError,
     categoryIconOptions,
   } = useMedicineForm();
-
+  const navigate = useNavigate();
   const createGenericOption = (inputValue) => ({
     label: inputValue,
     value: inputValue.toLowerCase().replace(/\s+/g, "-"),
@@ -78,7 +84,7 @@ const AddMedicine = () => {
   });
 
   return (
-    <div className="flex justify-center items-center mb-20">
+    <div className="flex justify-center items-center mb-20 ">
       <div className="responsive-mx card">
         <Title text={id ? "Update Items" : "Add Items"} />
 
@@ -98,7 +104,7 @@ const AddMedicine = () => {
             handleGenericChange={handleGenericChange}
             handleGenericCreate={handleGenericCreate}
             genericOptions={genericOptions}
-             categoryIcon={categoryIcon}
+            categoryIcon={categoryIcon}
             handleCategoryIconChange={handleCategoryIconChange}
             handleCategoryIconCreate={handleCategoryIconCreate}
             categoryIconOptions={categoryIconOptions}
@@ -111,37 +117,48 @@ const AddMedicine = () => {
             unitOptions={unitOptions}
             showMeasurementValue={showMeasurementValue}
           />
+          <IsBrandItem
+            label="Mark as Branded Product"
+            isBrand={isBrand}
+            setIsBrand={setIsBrand}
+          />
 
           {/* Price Section */}
           <PriceSection formData={formData} handleChange={handleChange} />
 
-          {/* Supplier Select */}
-          <LabeledSelect
-            label="Supplier"
-            value={supplier}
-            onChange={(val) => {
-              handleSupplierChange(val);
-              handleChange("supplier", val);
-            }}
-            onCreate={(inputValue) =>
-              handleSupplierCreate(inputValue, createSupplierOption)
-            }
-            options={supplierOptions}
-            disabled={!formData.cpPerPiece}
-            placeholder="Select or create supplier"
-          />
-
-          {/* Supplier Discount Input */}
-          <LabeledInput
-            label="Supplier Discount (%)"
-            type="number"
-            step="0.01"
-            value={formData.supplierDiscount}
-            onChange={(e) => handleChange("supplierDiscount", e.target.value)}
-            disabled={!supplier}
-            placeholder="Enter supplier discount"
-          />
-
+          <div className="flex gap-4">
+            <div className="w-full">
+              {/* Supplier Select */}
+              <LabeledSelect
+                label="Supplier"
+                value={supplier}
+                onChange={(val) => {
+                  handleSupplierChange(val);
+                  handleChange("supplier", val);
+                }}
+                onCreate={(inputValue) =>
+                  handleSupplierCreate(inputValue, createSupplierOption)
+                }
+                options={supplierOptions}
+                disabled={!formData.cpPerPiece}
+                placeholder="Select or create supplier"
+              />
+            </div>
+            <div className="w-full">
+              {/* Supplier Discount Input */}
+              <LabeledInput
+                label="Supplier Discount (%)"
+                type="number"
+                step="0.01"
+                value={formData.supplierDiscount}
+                onChange={(e) =>
+                  handleChange("supplierDiscount", e.target.value)
+                }
+                disabled={!supplier}
+                placeholder="Enter supplier discount"
+              />
+            </div>
+          </div>
           {/* Threshold Section */}
           <ThresholdSection
             formData={formData}
@@ -163,16 +180,25 @@ const AddMedicine = () => {
             message={message}
             id={id}
             uploadedImageIds={uploadedImageIds}
+            setUploadedImageIds={setUploadedImageIds}
+            setPreviewUrls={setPreviewUrls}
             prescriptionRequired={prescriptionRequired}
+            setImages={setImages}
           />
 
           {/* Submit Button */}
-          <div className="flex justify-center items-center cursor-pointer my-6">
+          <div className="flex justify-center items-center gap-6 my-8 pb-8">
             <Button
               className="w-72"
               text={id ? "Update Medicine" : "Add Medicine"}
               type="submit"
               disabled={uploadedImageIds.length === 0}
+            />
+            <Button
+              className="w-60 bg-red-400 hover:bg-red-500 text-white"
+              text="Cancel"
+              type="button"
+              onClick={() => navigate(-1)}
             />
           </div>
         </FormSectionWrapper>
