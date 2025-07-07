@@ -1,21 +1,23 @@
 export const calculatePricePerPiece = ({
   spPerBox,
   cpPerBox,
-  measurementValue,
   piecesPerBox,
-  showMeasurementValue,
+  // measurementValue,
+  // showMeasurementValue,
 }) => {
-  const divisor = showMeasurementValue
-    ? parseFloat(measurementValue)
-    : parseFloat(piecesPerBox);
+  const divisor = parseFloat(piecesPerBox);
+
+  if (!divisor || isNaN(divisor) || divisor <= 0) {
+    return { spPerPiece: "", cpPerPiece: "" };
+  }
 
   const spPerPiece =
-    spPerBox && divisor && !isNaN(spPerBox) && !isNaN(divisor)
+    spPerBox && !isNaN(spPerBox)
       ? (parseFloat(spPerBox) / divisor).toFixed(2)
       : "";
 
   const cpPerPiece =
-    cpPerBox && divisor && !isNaN(cpPerBox) && !isNaN(divisor)
+    cpPerBox && !isNaN(cpPerBox)
       ? (parseFloat(cpPerBox) / divisor).toFixed(2)
       : "";
 

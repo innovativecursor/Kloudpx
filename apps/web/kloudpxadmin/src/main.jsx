@@ -11,6 +11,7 @@ import ImageProvider from "./contexts/ImageContext.jsx";
 import DropdownProvider from "./contexts/DropdownContext.jsx";
 import CategoryProvider from "./contexts/CategoryContext.jsx";
 import CarouselProvider from "./contexts/CarouselContext.jsx";
+import GalleryProvider from "./contexts/GalleryContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <GoogleOAuthProvider clientId="573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com">
@@ -22,7 +23,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               <CategoryProvider>
                 <DropdownProvider>
                   <CarouselProvider>
-                    <App />
+                    <GalleryProvider>
+                      <App />
+                    </GalleryProvider>
                   </CarouselProvider>
                 </DropdownProvider>
               </CategoryProvider>

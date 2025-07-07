@@ -19,7 +19,7 @@ export default function Hero() {
     setIsHeroPart(true);
   }, []);
 
-  console.log(carousel);
+  // console.log(carousel);
 
   return (
     <div className="responsive-mx mt-8 md:mt-10">

@@ -35,6 +35,9 @@ const PrescriptionProvider = ({ children }) => {
   const [isCartUpdated, setIsCartUpdated] = useState(false);
 
   const userId = prescriptionDetails?.data?.User?.ID;
+  const presId = prescriptionDetails?.data?.ID;
+
+  console.log(presId);
 
   // get all prescriptions
   const fetchPrescriptions = async (status) => {
@@ -94,7 +97,13 @@ const PrescriptionProvider = ({ children }) => {
       }
     } catch (error) {
       console.error(error.message);
-      Swal.fire("Error", "Failed to load prescription details", "error");
+      await Swal.fire({
+        title: "Error",
+        text: "Failed to load prescription details",
+        icon: "error",
+        confirmButtonText: "OK",
+        focusConfirm: true,
+      });
       setPrescriptionDetails((prev) => ({ ...prev, loading: false }));
     }
   };
@@ -123,7 +132,7 @@ const PrescriptionProvider = ({ children }) => {
   };
 
   const fetchPrescriptionsCart = async () => {
-    if (!userId) {
+    if (!presId) {
       setPrescriptionsCart({
         data: null,
         loading: false,
@@ -135,7 +144,7 @@ const PrescriptionProvider = ({ children }) => {
 
     try {
       const response = await axios.get(
-        `http://localhost:10002/v1/pharmacist/get-prescriptions-cart/${userId}`,
+        `http://localhost:10002/v1/pharmacist/get-prescriptions-cart/${presId}`,
         {
           headers: { Authorization: token },
         }
@@ -159,7 +168,7 @@ const PrescriptionProvider = ({ children }) => {
 
   useEffect(() => {
     fetchPrescriptionsCart();
-  }, [userId]);
+  }, [presId]);
 
   useEffect(() => {
     if (Array.isArray(prescriptionsCart.data)) {

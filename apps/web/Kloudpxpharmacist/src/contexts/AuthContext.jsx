@@ -34,7 +34,7 @@ const AuthProvider = ({ children }) => {
         localStorage.setItem("access_token", token);
         setToken(token);
         Swal.fire("Success", "Login successful", "success");
-        navigate("/home");
+        navigate("/findprescription");
       } catch (error) {
         console.error(error);
         Swal.fire("Error", error.message || "Login failed", "error");

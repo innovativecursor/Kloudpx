@@ -116,7 +116,10 @@ const Carousel = () => {
           <tbody className="bg-white divide-y divide-gray-100">
             {carouselImages.length === 0 ? (
               <tr>
-                <td colSpan="4" className="text-center py-8 text-gray-400 italic">
+                <td
+                  colSpan="4"
+                  className="text-center py-8 text-gray-400 italic"
+                >
                   No carousel images found.
                 </td>
               </tr>
@@ -155,7 +158,9 @@ const Carousel = () => {
                           ? "bg-red-600 hover:bg-red-700"
                           : "bg-green-600 hover:bg-green-700"
                       } focus:outline-none focus:ring-2 focus:ring-offset-1 ${
-                        item.IsActive ? "focus:ring-red-500" : "focus:ring-green-500"
+                        item.IsActive
+                          ? "focus:ring-red-500"
+                          : "focus:ring-green-500"
                       }`}
                     >
                       {item.IsActive ? "Deactivate" : "Activate"}

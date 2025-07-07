@@ -63,12 +63,13 @@ const UserCart = ({ details }) => {
             <div className="flex justify-center mt-8">
               <button
                 onClick={submitPrescriptions}
-                disabled={!isCartUpdated}
-                className={`inline-block px-10 py-3 rounded-md text-white font-semibold shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                  isCartUpdated
-                    ? "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                    : "bg-gray-400 cursor-not-allowed"
-                }`}
+                // disabled={!isCartUpdated}
+                // className={`inline-block px-10 py-3 rounded-md text-white font-semibold shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                //   isCartUpdated
+                //     ? "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                //     : "bg-gray-400 cursor-not-allowed"
+                // }`}
+                className="inline-block px-10 py-3 rounded-md text-white font-semibold shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 bg-blue-600 hover:bg-blue-700 cursor-pointer"
               >
                 Submit
               </button>

@@ -1,82 +1,114 @@
-'use client'
-import React from 'react'
-import PrimaryButton from '../button/PrimaryButton'
+// 'use client'
+// import React from 'react'
+// import PrimaryButton from '../button/PrimaryButton'
+// import { useImageContext } from '@/app/contexts/ImagesContext'
+
+// const Category7 = () => {
+//   const { galleryImages } = useImageContext();
+
+//   // Safely extract image data
+//   const allImages = Array.isArray(galleryImages?.data?.data) ? galleryImages.data.data : [];
+
+//   const imagesToShow = allImages.slice(0, 5);
+//   const leftImages = imagesToShow.slice(0, 4);
+//   const rightImage = imagesToShow[4];
+
+//   return (
+//     <div className='responsive-mx flex flex-col md:flex-row gap-3 md:gap-4 mt-8 md:mt-20'>
+//       {/* Left 4 Images Grid */}
+//       <div className='grid grid-cols-2 gap-3 md:gap-4 md:w-[70%]'>
+//         {leftImages.map((item, index) => (
+//           <div
+//             key={item.ID}
+//             className={`col-span-2 sm:col-span-1 ${index < 2 ? 'h-[160px] sm:h-[220px]' : 'h-[160px] sm:h-[250px]'} relative`}
+//           >
+//             <img
+//               src={item.ImageURL}
+//               alt={item.ButtonText || `Gallery ${index + 1}`}
+//               className="w-full h-full rounded-md object-cover"
+//             />
+//             <div className="absolute bottom-4 left-4">
+//               <PrimaryButton title={item.ButtonText || "View"} />
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+
+//       {/* Right-side 5th Image */}
+//       {rightImage && (
+//         <div className='h-[300px] md:h-auto md:w-[30%] relative'>
+//           <img
+//             src={rightImage.ImageURL}
+//             alt={rightImage.ButtonText || "Gallery"}
+//             className="w-full h-full rounded-md object-cover"
+//           />
+//           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+//             <PrimaryButton title={rightImage.ButtonText || "View"} />
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default Category7;
+
+"use client";
+import React from "react";
+import PrimaryButton from "../button/PrimaryButton";
+import { useImageContext } from "@/app/contexts/ImagesContext";
 
 const Category7 = () => {
-    return (
-        <div className='responsive-mx flex flex-col md:flex-row gap-3 md:gap-4 mt-8 md:mt-20'>
-            <div className='grid grid-cols-2 gap-3 md:gap-4 md:w-[70%]'>
+  const { galleryImages } = useImageContext();
 
-                <div className='col-span-2 sm:col-span-1 h-[160px] sm:h-[220px] relative'>
-                    <img src="/assets/category1.png"
-                        alt="Category 1" className="w-full h-full  rounded-md" />
-                    <div className="absolute top-1/2 left-6 transform -translate-y-1/2 text-sm tracking-wide">
-                        <p className='text-[12px] font-normal'>Big Sale 45% OFF</p>
-                        <p className="md:mt-1 font-semibold text-base">OmegaBoost 3X Formula</p>
-                        <p className='text-[13px] text-red-600 font-medium mt-1'>Heart Health</p>
-                        <p className='text-[10px] mt-2 w-48 opacity-50'>Support healthy cholesterol and brain function.</p>
+  const allImages = Array.isArray(galleryImages?.data?.data)
+    ? galleryImages.data.data
+    : [];
+  const imagesToShow = allImages.slice(0, 5);
+  const leftImages = imagesToShow.slice(0, 4);
+  const rightImage = imagesToShow[4];
 
-                        <PrimaryButton title="Buy Now" className="sm:mt-4 mt-1" />
-                    </div>
-                </div>
+  const ImageCard = ({ image, index }) => (
+    <div
+      className={`relative group overflow-hidden col-span-2 sm:col-span-1 ${
+        index < 2 ? "h-[160px] sm:h-[220px]" : "h-[160px] sm:h-[250px]"
+      }`}
+    >
+      <img
+        src={image.ImageURL}
+        alt={image.ButtonText || `Gallery ${index + 1}`}
+        className="w-full h-full object-cover rounded-md transition duration-300 group-hover:opacity-60"
+      />
+      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+        <PrimaryButton title={image.ButtonText || "View"} />
+      </div>
+    </div>
+  );
 
+  return (
+    <div className="responsive-mx flex flex-col md:flex-row gap-3 md:gap-4 mt-8 md:mt-20">
+      {/* Left Grid */}
+      <div className="grid grid-cols-2 gap-3 md:gap-4 md:w-[70%]">
+        {leftImages.map((img, i) => (
+          <ImageCard key={img.ID} image={img} index={i} />
+        ))}
+      </div>
 
-                <div className='col-span-2 sm:col-span-1 h-[160px] sm:h-[220px] text-white  relative'>
-                    <img src="/assets/category2.png"
-                        alt="Category 1" className="w-full h-full  rounded-md" />
-                    <div className="absolute top-1/2 left-6 transform -translate-y-1/2 text-sm tracking-wide">
-                        <p className='text-[13px] font-normal'>New Arrival</p>
-                        <p className="md:mt-1 font-semibold text-xl">Vitalpack Daily Tabs</p>
-                        <p className='text-[14px] font-medium '>Multivitamins</p>
-                        <p className='text-[10px] mt-2 w-32'>Complete daily wellness in one pill</p>
-
-                        <PrimaryButton title="Buy Now" className="sm:mt-4 mt-1" />
-                    </div>
-                </div>
-
-
-                <div className='col-span-2 sm:col-span-1 h-[160px] sm:h-[250px] relative'>
-                    <img src="/assets/category3.png"
-                        alt="Category 1" className="w-full h-full  rounded-md" />
-                    <div className="absolute top-1/2 left-6 sm:mt-12 mt-7 transform -translate-y-1/2 text-sm tracking-wide">
-                        <p className='text-[13px] font-normal'>Big sale <span className='text-green-500'>65% OFF</span></p>
-                        <p className="md:mt-1 font-semibold text-lg text-red-800">NeuroMax B Complex</p>
-                        <p className='text-[10px] opacity-60'>Boosts memory, energy & focus.</p>
-
-                        <PrimaryButton title="Buy Now" className="sm:mt-3 mt-1" />
-                    </div>
-                </div>
-
-                <div className='col-span-2 sm:col-span-1 h-[160px] text-white sm:h-[250px] relative'>
-                    <img src="/assets/catgory4.png"
-                        alt="Category 1" className="w-full h-full  rounded-md" />
-                    <div className="absolute top-1/2 lg:right-6 right-2 transform -translate-y-1/2 text-sm tracking-wide">
-                        <p className='text-[13px] font-normal'>Big sale 65% OFF</p>
-                        <p className="md:mt-1 font-semibold text-base">GreenLife Detox Elixir</p>
-                        <p className="font-semibold ">Herbal Care</p>
-                        <p className='text-[10px] opacity-60 mt-1'>Cleanses liver and boosts metabolism.</p>
-                        <PrimaryButton title="Buy Now" className="sm:mt-3 mt-1" />
-                    </div>
-                </div>
-            </div>
-
-            <div className='h-[300px] md:h-auto md:w-[30%] relative'>
-                <img
-                    src="/assets/category5.png"
-                    alt="Category 1"
-                    className="w-full h-full rounded-md object-cover"
-                />
-                <div className="absolute md:top-32 top-20 left-1/2  w-full transform -translate-x-1/2 -translate-y-1/2 text-center text-sm tracking-wide px-2">
-                    <p className='text-[13px] font-normal'>Limited Time Deal</p>
-                    <p className="md:mt-1 font-semibold text-base">FlexiJoint Support+</p>
-                    <p className="font-semibold text-red-600">Joint Care</p>
-                    <p className='text-[11px] opacity-60 mt-1'>Relieves stiffness and strengthens joints</p>
-                    <PrimaryButton title="Buy Now" className="sm:mt-3 mt-1" />
-                </div>
-            </div>
-
+      {/* Right Image */}
+      {rightImage && (
+        <div className="relative group overflow-hidden md:w-[30%] h-[300px] md:h-auto">
+          <img
+            src={rightImage.ImageURL}
+            alt={rightImage.ButtonText || "Gallery"}
+            className="w-full h-full object-cover rounded-md transition duration-300 group-hover:opacity-60"
+          />
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+            <PrimaryButton title={rightImage.ButtonText || "View"} />
+          </div>
         </div>
-    )
-}
+      )}
+    </div>
+  );
+};
 
-export default Category7
+export default Category7;

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useRef } from "react";
-import Swal from "sweetalert2";
+import { showAlert } from "../config/alertUtils";
 import axios from "axios";
 import { usePrescriptionContext } from "./PrescriptionContext";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +22,10 @@ const CartpresciProvider = ({ children }) => {
   const [modalInput, setModalInput] = useState("");
 
   const initialLengthRef = useRef(0);
-  const userId = prescriptionDetails?.data?.User?.ID;
+  const userId = prescriptionDetails?.data?.UserID;
+  const presId = prescriptionDetails?.data?.ID;
+
+  console.log(presId);
 
   const openModal = (id) => {
     setSelectedMedicineId(id);
@@ -37,11 +40,11 @@ const CartpresciProvider = ({ children }) => {
 
   const handleModalSubmit = async () => {
     if (!modalInput.trim()) {
-      return Swal.fire("Warning", "Quantity is required", "warning");
+      return showAlert("Warning", "Quantity is required", "warning");
     }
 
-    if (!selectedMedicineId || !userId) {
-      return Swal.fire(
+    if (!selectedMedicineId || !presId) {
+      return showAlert(
         "Error",
         "Missing medicine or user information",
         "error"
@@ -50,7 +53,7 @@ const CartpresciProvider = ({ children }) => {
 
     try {
       await axios.post(
-        `http://localhost:10002/v1/pharmacist/add-medicine-to-prescriptions/${userId}`,
+        `http://localhost:10002/v1/pharmacist/add-medicine-to-prescriptions/${presId}`,
         {
           medicineId: selectedMedicineId,
           quantity: Number(modalInput),
@@ -59,8 +62,7 @@ const CartpresciProvider = ({ children }) => {
           headers: { Authorization: token },
         }
       );
-
-      Swal.fire(
+      await showAlert(
         "Success",
         "Medicine added successfully to prescription",
         "success"
@@ -72,25 +74,24 @@ const CartpresciProvider = ({ children }) => {
       const available = error?.response?.data?.available;
 
       if (errorMessage === "Insufficient stock") {
-        return Swal.fire(
+        return showAlert(
           "Insufficient Stock",
           `Only ${available} items are available.`,
           "error"
         );
       }
-
-      Swal.fire("Error", "Failed to add medicine", "error");
+      showAlert("Error", "Failed to add medicine", "error");
     }
   };
 
   const submitPrescriptions = async () => {
-    if (!userId) {
-      return Swal.fire("Error", "User ID is missing", "error");
+    if (!presId) {
+      return showAlert("Error", "User ID is missing", "error");
     }
 
     try {
       const response = await axios.post(
-        `http://localhost:10002/v1/pharmacist/submit-prescriptions/${userId}`,
+        `http://localhost:10002/v1/pharmacist/submit-prescriptions/${presId}`,
         {},
         {
           headers: { Authorization: token },
@@ -98,17 +99,21 @@ const CartpresciProvider = ({ children }) => {
       );
 
       if (response.status === 200) {
-        Swal.fire("Success", "Prescriptions submitted successfully", "success");
+        await showAlert(
+          "Success",
+          "Prescriptions submitted successfully",
+          "success"
+        );
         navigate("/findprescription");
         fetchPrescriptions?.();
         setIsCartUpdated?.(false);
         initialLengthRef.current = 0;
       } else {
-        Swal.fire("Error", "Failed to submit prescriptions", "error");
+        showAlert("Error", "Failed to submit prescriptions", "error");
       }
     } catch (error) {
       console.error("Submit error:", error);
-      Swal.fire("Error", "Something went wrong during submission", "error");
+      showAlert("Error", "Something went wrong during submission", "error");
     }
   };
 

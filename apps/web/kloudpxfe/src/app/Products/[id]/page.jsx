@@ -31,6 +31,8 @@ const ProductDetails = () => {
     );
   }
 
+  console.log(product);
+
   const handleAddToCart = async () => {
     const quantity = getQuantity(product.id);
     try {
@@ -54,7 +56,7 @@ const ProductDetails = () => {
   };
 
   const handleGoToCart = () => {
-    router.push("/Cart");
+    router.push("/Checkout");
   };
   const fallbackImage = "/assets/demo.jpg";
   const images = product.images?.length > 0 ? product.images : [fallbackImage];
@@ -73,13 +75,13 @@ const ProductDetails = () => {
           <div className="w-full md:w-1/2 mt-8 md:mt-0 flex flex-col px-4 sm:px-6 md:px-0">
             <div className="flex items-start gap-8">
               <h1 className="sm:text-4xl text-2xl font-extrabold text-gray-900 mb-3">
-                {product?.brandname}
+                {product?.brandname} {product?.power}
               </h1>
               <SocialIcons />
             </div>
 
             <h2 className="text-xl font-semibold text-gray-700 mb-2">
-              {product?.genericname || "General Medicine"}
+              Generic: {product?.genericname || "General Medicine"}
             </h2>
 
             {/* <div className="flex items-center gap-3 mb-6">
@@ -99,11 +101,11 @@ const ProductDetails = () => {
 
             <div className="flex items-center gap-3 mb-2">
               <span className="text-2xl font-bold text-green-600">
-                	₱{product?.price?.toFixed(2) || "N/A"}
+                ₱{product?.price?.toFixed(2) || "N/A"}
               </span>
-              <span className="text-sm text-gray-500 line-through -mt-2">
+              {/* <span className="text-sm text-gray-500 line-through -mt-2">
                 MRP ₹{(product?.price * 1.1).toFixed(2)}
-              </span>
+              </span> */}
             </div>
 
             {/* <div className="text-gray-700 font-semibold text-sm mb-6">
