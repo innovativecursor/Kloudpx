@@ -327,3 +327,17 @@ func GetAllActiveCarouselImages(c *gin.Context, db *gorm.DB) {
 		"data":    images,
 	})
 }
+
+func GetAllActiveGalleryImages(c *gin.Context, db *gorm.DB) {
+	var images []models.GalleryImage
+
+	if err := db.Where("is_active = ?", true).Find(&images).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch active gallery images"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Active gallery images fetched successfully",
+		"data":    images,
+	})
+}
