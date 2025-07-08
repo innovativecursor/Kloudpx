@@ -6,13 +6,13 @@ import Navbar from "./Components/Navbar";
 
 const App = () => {
   const location = useLocation();
-  const { token } = useAuthContext();
+  const { isUserLoggedIn } = useAuthContext();
 
-  const hideNavbar = location.pathname === "/login";
+  const onLoginPage = location.pathname === "/login";
 
   return (
     <>
-      {!hideNavbar && token && <Navbar />}
+      {isUserLoggedIn && !onLoginPage && <Navbar />}
       <RoutePage />
     </>
   );

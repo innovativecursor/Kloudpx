@@ -10,8 +10,11 @@ export const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  // const [token, setToken] = useState(
+  //   localStorage.getItem("access_token") || null
+  // );
   const [token, setToken] = useState(
-    localStorage.getItem("access_token") || null
+    sessionStorage.getItem("access_token") || null
   );
 
   const login = useGoogleLogin({
@@ -31,7 +34,8 @@ const AuthProvider = ({ children }) => {
         const { token } = res.data;
         if (!token) throw new Error("Token missing from server");
 
-        localStorage.setItem("access_token", token);
+        // localStorage.setItem("access_token", token);
+        sessionStorage.setItem("access_token", token);
         setToken(token);
         Swal.fire("Success", "Login successful", "success");
         navigate("/findprescription");
@@ -48,11 +52,14 @@ const AuthProvider = ({ children }) => {
   });
 
   const logout = () => {
-    localStorage.removeItem("access_token");
+    // localStorage.removeItem("access_token");
+    sessionStorage.removeItem("access_token");
     setToken(null);
     Swal.fire("Logged Out", "You have been logged out", "info");
     navigate("/");
   };
+
+  const isUserLoggedIn = !!token;
 
   return (
     <AuthContext.Provider
@@ -61,7 +68,9 @@ const AuthProvider = ({ children }) => {
         login,
         logout,
         loading,
-        isAuthenticated: !!token,
+        // isAuthenticated: !!token,
+        // isAuthenticated: isUserLoggedIn,
+        isUserLoggedIn,
       }}
     >
       {children}
