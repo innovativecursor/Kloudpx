@@ -8,12 +8,20 @@ import classNames from "classnames";
 const CartDrawer = ({ isOpen, onClose }) => {
   const { token } = useAuth();
   const router = useRouter();
-  const { getCartData, removeFromCart } = useCartContext();
+  const { getCartData, removeFromCart, getAllCartData } = useCartContext();
   const { data, loading } = getCartData;
-  console.log(data);
+
+  // useEffect(() => {
+  //   if (!token) {
+  //     router.push("/");
+  //     // console.log("home");
+
+  //   }
+  // }, [token]);
 
   useEffect(() => {
-    if (!token) {
+    const storedToken = localStorage.getItem("access_token");
+    if (token === null && !storedToken) {
       router.push("/");
     }
   }, [token]);
@@ -27,7 +35,11 @@ const CartDrawer = ({ isOpen, onClose }) => {
     removeFromCart(id);
   };
 
-  // conse data  
+  useEffect(() => {
+    getAllCartData();
+  }, []);
+
+  // conse data
 
   return (
     <>
@@ -70,7 +82,8 @@ const CartDrawer = ({ isOpen, onClose }) => {
                 const imageUrl =
                   medicine?.ItemImages?.[0]?.FileName ||
                   "https://via.placeholder.com/50";
-                const prescriptionImage = item?.Prescription?.UploadedImage || null;
+                const prescriptionImage =
+                  item?.Prescription?.UploadedImage || null;
                 const createdAt =
                   item?.Prescription?.CreatedAt || item?.CreatedAt;
                 const formattedDate = new Date(createdAt).toLocaleDateString(
@@ -108,9 +121,12 @@ const CartDrawer = ({ isOpen, onClose }) => {
                             <p className="font-medium text-sm">
                               {medicine?.BrandName || "N/A"}
                             </p>
-                            <p className="text-xs">
+                            {/* <p className="text-xs">
                               {medicine?.Generic?.GenericName ||
                                 "No Generic Name"}
+                            </p> */}
+                            <p className="text-xs text-gray-600">
+                              Qty: {item.Quantity}
                             </p>
                           </div>
                           <div>
@@ -152,20 +168,3 @@ const CartDrawer = ({ isOpen, onClose }) => {
 };
 
 export default CartDrawer;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

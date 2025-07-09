@@ -140,7 +140,7 @@ const AddMedicine = () => {
                   handleSupplierCreate(inputValue, createSupplierOption)
                 }
                 options={supplierOptions}
-                disabled={!formData.cpPerPiece}
+                // disabled={!formData.cpPerPiece}
                 placeholder="Select or create supplier"
               />
             </div>
@@ -154,7 +154,7 @@ const AddMedicine = () => {
                 onChange={(e) =>
                   handleChange("supplierDiscount", e.target.value)
                 }
-                disabled={!supplier}
+                // disabled={!supplier}
                 placeholder="Enter supplier discount"
               />
             </div>

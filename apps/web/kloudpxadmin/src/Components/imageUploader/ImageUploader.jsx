@@ -41,16 +41,6 @@ export default function ImageUploader({
         disabled={disabled}
         className="mb-4"
       />
-      <button
-        type="button"
-        onClick={(e) => handleUpload(e, id)}
-        className={`px-4 py-2 rounded text-white ${
-          images.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500"
-        }`}
-        disabled={images.length === 0}
-      >
-        Upload Images
-      </button>
 
       {previewUrls.length > 0 && (
         <div className="mt-4 flex gap-4 flex-wrap">
@@ -72,7 +62,16 @@ export default function ImageUploader({
           ))}
         </div>
       )}
-
+      <button
+        type="button"
+        onClick={(e) => handleUpload(e, id)}
+        className={`px-4 py-2 rounded text-white mt-4 ${
+          images.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500"
+        }`}
+        disabled={images.length === 0}
+      >
+        Upload Images
+      </button>
       {message && (
         <p className="mt-3 text-sm font-medium text-red-600">{message}</p>
       )}

@@ -12,7 +12,7 @@ const ThresholdSection = ({ formData, handleChange, supplier }) => {
             type="number"
             value={formData.minThreshold}
             onChange={(e) => handleChange("minThreshold", e.target.value)}
-            disabled={!supplier}
+            // disabled={!supplier}
             placeholder="Enter Minimum Threshold"
           />
         </div>
@@ -23,7 +23,7 @@ const ThresholdSection = ({ formData, handleChange, supplier }) => {
             type="number"
             value={formData.maxThreshold}
             onChange={(e) => handleChange("maxThreshold", e.target.value)}
-            disabled={!formData.minThreshold}
+            // disabled={!formData.minThreshold}
             placeholder="Enter Maximum Threshold"
           />
         </div>
@@ -35,7 +35,7 @@ const ThresholdSection = ({ formData, handleChange, supplier }) => {
         type="number"
         value={formData.leadTime}
         onChange={(e) => handleChange("leadTime", e.target.value)}
-        disabled={!formData.maxThreshold}
+        // disabled={!formData.maxThreshold}
         placeholder="Enter Estimated Lead Time (days)"
       />
     </>

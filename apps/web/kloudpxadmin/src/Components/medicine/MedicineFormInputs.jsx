@@ -3,7 +3,6 @@ import * as FaIcons from "react-icons/fa";
 import LabeledInput from "../labelInput/LabelInput";
 import LabeledSelect from "../labeledSelect/LabeledSelect";
 
-
 const MedicineFormInputs = ({
   formData,
   handleChange,
@@ -52,18 +51,18 @@ const MedicineFormInputs = ({
             value={formData.power}
             onChange={(e) => handleChange("power", e.target.value)}
             placeholder="Enter power (e.g., 500mg)"
-            disabled={!formData.brandName}
+            // disabled={!formData.brandName}
           />
         </div>
       </div>
 
       <div className="w-full">
         <LabeledInput
-          label="Product Discount"
+          label="Product Discount%"
           value={formData.discount}
           onChange={(e) => handleChange("discount", e.target.value)}
           placeholder="Enter discount"
-          disabled={!formData.power}
+          // disabled={!formData.power}
         />
       </div>
 
@@ -76,7 +75,7 @@ const MedicineFormInputs = ({
         }}
         onCreate={handleGenericCreate}
         options={genericOptions}
-        disabled={!formData.discount}
+        // disabled={!formData.discount}
         placeholder="Select or create generic name"
       />
 
@@ -84,7 +83,7 @@ const MedicineFormInputs = ({
         label="Description"
         value={formData.description}
         onChange={(e) => handleChange("description", e.target.value)}
-        disabled={!genericName}
+        // disabled={!genericName}
         placeholder="Enter description"
         textarea
         // className="md:col-span-2"
@@ -99,7 +98,7 @@ const MedicineFormInputs = ({
             onChange={handleCategoryIconChange}
             onCreate={handleCategoryIconCreate}
             options={categoryIconOptions}
-            disabled={!formData.description}
+            // disabled={!formData.description}
             placeholder="Select or create category icon"
           />
         </div>
@@ -110,7 +109,7 @@ const MedicineFormInputs = ({
             onChange={handleCategoryChange}
             onCreate={handleCategoryCreate}
             options={categoryOptions}
-            disabled={!formData.description}
+            // disabled={!formData.description}
             placeholder="Select or create category"
           />
         </div>
@@ -120,7 +119,7 @@ const MedicineFormInputs = ({
         value={unitType}
         onChange={handleUnitChange}
         options={unitOptions}
-        disabled={!category?.value}
+        // disabled={!category?.value}
         placeholder="Select or create unit"
       />
 
@@ -140,7 +139,7 @@ const MedicineFormInputs = ({
         type="number"
         value={formData.piecesPerBox}
         onChange={(e) => handleChange("piecesPerBox", e.target.value)}
-        disabled={!unitType}
+        // disabled={!unitType}
         placeholder="Enter number of pieces per box"
       />
     </>

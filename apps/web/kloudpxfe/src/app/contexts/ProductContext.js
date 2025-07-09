@@ -1,93 +1,139 @@
+// "use client";
+
+// import { createContext, useContext, useState, useEffect } from "react";
+// import endpoints from "../config/endpoints";
+// import { getAxiosCall } from "@/app/lib/axios";
+
+// const ProductContext = createContext();
+
+// export const ProductProvider = ({ children }) => {
+//   const [allMedicine, setAllMedicine] = useState([]);
+//   const [category, setCategory] = useState([]);
+//   const [filteredItems, setFilteredItems] = useState([]);
+//   const [selectedCategoryName, setSelectedCategoryName] = useState("");
+//   const [loading, setLoading] = useState(true);
+
+//   const getAllMedicine = async () => {
+//     try {
+//       const res = await getAxiosCall(endpoints.medicine.get, {}, false);
+//       setAllMedicine(res?.data?.medicines || []);
+//     } catch (error) {
+//       setAllMedicine([]);
+//     }
+//   };
+
+//   const getCategory = async () => {
+//     try {
+//       const res = await getAxiosCall(endpoints.category.getAll, {}, false);
+//       setCategory(res?.data?.categories || []);
+//     } catch (error) {
+//       setCategory([]);
+//     }
+//   };
+
+//   const getItemsByCategory = async (id) => {
+//     setFilteredItems([]);
+//     try {
+//       const res = await getAxiosCall(
+//         endpoints.category.getItemsByCategory(id),
+//         {},
+//         false
+//       );
+//       setFilteredItems(res?.data?.medicines || []); // medicines array
+
+//       const matched = category.find((cat) => cat.ID === Number(id));
+//       setSelectedCategoryName(matched?.CategoryName || "Unknown Category");
+//     } catch (error) {
+//       setFilteredItems([]);
+//       setSelectedCategoryName("");
+//     }
+//   };
+
+//   useEffect(() => {
+//     Promise.all([getAllMedicine(), getCategory()]).finally(() =>
+//       setLoading(false)
+//     );
+//   }, []);
+
+//   return (
+//     <ProductContext.Provider
+//       value={{
+//         allMedicine,
+//         category,
+//         filteredItems,
+//         getItemsByCategory,
+//         selectedCategoryName,
+//         getAllMedicine,
+//         getCategory,
+//         loading,
+//       }}
+//     >
+//       {children}
+//     </ProductContext.Provider>
+//   );
+// };
+
+// export const useProductContext = () => useContext(ProductContext);
+
+
+
+
+
 "use client";
 
-import axios from "axios";
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 import endpoints from "../config/endpoints";
-import { useLoading } from "./LoadingContext";
-import DashboardLoading from "../components/Loader/DashboardLoader";
+import { getAxiosCall } from "@/app/lib/axios";
 
 const ProductContext = createContext();
 
 export const ProductProvider = ({ children }) => {
-  const { loading, setLoading } = useLoading();
-
-  const [allMedicine, setAllMedicine] = useState({ data: [], loading: false });
-  const [category, setCategory] = useState({ data: [], loading: false });
-  const [filteredItems, setFilteredItems] = useState({
-    data: [],
-    loading: false,
-  });
+  const [allMedicine, setAllMedicine] = useState([]);
+  const [category, setCategory] = useState([]);
   const [selectedCategoryName, setSelectedCategoryName] = useState("");
 
   const getAllMedicine = async () => {
-    setLoading(true);
     try {
-      const res = await axios.get(endpoints.medicine.get);
-      setAllMedicine({
-        data: res?.data?.medicines || [],
-        loading: false,
-      });
+      const res = await getAxiosCall(endpoints.medicine.get, {}, false, true);
+      setAllMedicine(res?.data?.medicines || []);
     } catch (error) {
-      console.error("Medicine error:", error.message);
-      setAllMedicine({ data: [], loading: false });
-    } finally {
-      setLoading(false);
+      setAllMedicine([]);
     }
   };
 
   const getCategory = async () => {
-    setLoading(true);
     try {
-      const res = await axios.get(endpoints.category.getAll);
-      setCategory({
-        data: res?.data?.categories || [],
-        loading: false,
-      });
+      const res = await getAxiosCall(endpoints.category.getAll, {}, false, true);
+      setCategory(res?.data?.categories || []);
     } catch (error) {
-      console.error("Category error:", error.message);
-      setCategory({ data: [], loading: false });
-    } finally {
-      setLoading(false);
+      setCategory([]);
     }
   };
 
   const getItemsByCategory = async (id) => {
-    setFilteredItems({ data: [], loading: true });
     try {
-      const res = await axios.get(endpoints.category.getItemsByCategory(id));
-      setFilteredItems({ data: res?.data || [], loading: false });
-
-      const matched = category.data.find((cat) => cat.ID === Number(id));
+      const res = await getAxiosCall(endpoints.category.getItemsByCategory(id), {}, false, true);
+      const matched = category.find((cat) => cat.ID === Number(id));
       setSelectedCategoryName(matched?.CategoryName || "Unknown Category");
+      return res?.data?.medicines || [];
     } catch (error) {
-      console.error("Filtered error:", error.message);
-      setFilteredItems({ data: [], loading: false });
+      setSelectedCategoryName("");
+      return [];
     }
   };
-
-  useEffect(() => {
-    if (!allMedicine.data || allMedicine.data.length === 0) {
-      getAllMedicine();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!category.data || category.data.length === 0) {
-      getCategory();
-    }
-  }, []);
 
   return (
     <ProductContext.Provider
       value={{
         allMedicine,
         category,
-        filteredItems,
-        getItemsByCategory,
         selectedCategoryName,
+        getItemsByCategory,
+        getAllMedicine,
+        getCategory,
       }}
     >
-      {loading ? <DashboardLoading /> : children}
+      {children}
     </ProductContext.Provider>
   );
 };

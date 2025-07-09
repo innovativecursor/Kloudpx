@@ -32,7 +32,8 @@ const PrescriptionDetails = () => {
         >
           ← Back to all prescriptions
         </button>
-        <Searchbar />
+
+        {details?.Status !== "fulfilled" && <Searchbar />}
       </div>
 
       {/* Main Prescription Info Card */}

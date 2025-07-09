@@ -20,7 +20,7 @@ export default function LabeledInput({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          disabled={disabled}
+          // disabled={disabled}
           rows={4}
         />
       ) : (
@@ -33,7 +33,7 @@ export default function LabeledInput({
           type={type}
           step={step}
           placeholder={placeholder}
-          disabled={disabled}
+          // disabled={disabled}
         />
       )}
     </div>

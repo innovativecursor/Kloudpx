@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useProductContext } from "@/app/contexts/ProductContext";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/contexts/AuthContext";
@@ -9,7 +9,7 @@ import useModal from "@/app/hooks/useModal";
 const Hamburger = () => {
   const { isOpen, setIsOpen, modalRef } = useModal();
   const { user } = useAuth();
-  const { category, getItemsByCategory } = useProductContext();
+  const { category, getItemsByCategory, getCategory } = useProductContext();
   const router = useRouter();
 
   const handleCategoryClick = async (id) => {
@@ -17,6 +17,10 @@ const Hamburger = () => {
     setIsOpen(false);
     router.push(`/Products?category=${id}`);
   };
+
+  useEffect(() => {
+    getCategory();
+  }, []);
 
   return (
     <>
@@ -61,7 +65,7 @@ const Hamburger = () => {
             {/* Menu Items from API */}
             <div>
               <ul className="space-y-1 font-normal text-xs">
-                {category?.data?.map((item, index) => (
+                {category.map((item, index) => (
                   <li
                     key={index}
                     onClick={() => handleCategoryClick(item.ID)}

@@ -30,7 +30,7 @@ const PrescriptionSection = ({
           handleChange("taxType", val);
         }}
         options={taxTypeOptions}
-        disabled={!formData.leadTime}
+        // disabled={!formData.leadTime}
         placeholder="Select or create tax type"
       />
       <ImageUploader
@@ -40,7 +40,7 @@ const PrescriptionSection = ({
         previewUrls={previewUrls}
         message={message}
         id={id}
-        disabled={images.length >= 5 || !taxType?.value}
+        disabled={images.length >= 5 }
         uploadedImageIds={uploadedImageIds}
         setUploadedImageIds={setUploadedImageIds}
         setPreviewUrls={setPreviewUrls}

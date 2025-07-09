@@ -1,27 +1,38 @@
-const baseURLLive = "http://localhost:10003";
-const baseURLDev = "http://localhost:10003";
+// const baseURLLive = "http://localhost:10003";
+// const baseURLDev = "http://localhost:10003";
 
-const isLive = false;
-const baseUrl = isLive ? baseURLLive : baseURLDev;
+// const isLive = false;
+// const baseUrl = isLive ? baseURLLive : baseURLDev;
 
 const endpoints = {
   auth: {
-    googleLogin: `${baseUrl}/v1/auth/google/callback/user`,
-    getCurrentUser: `${baseUrl}/v1/user/get-current-userinfo`,
+    googleLogin: `/v1/auth/google/callback/user`,
+    getCurrentUser: `/v1/user/get-current-userinfo`,
   },
   medicine: {
-    get: `${baseUrl}/v1/user/get-medicines`,
+    get: `/v1/user/get-medicines`,
   },
   category: {
-    getAll: `${baseUrl}/v1/user/get-categories-for-user`,
-    getItemsByCategory: (id) =>
-      `${baseUrl}/v1/user/get-items-by-categories/${id}`,
+    getAll: `/v1/user/get-categories-for-user`,
+    getItemsByCategory: (id) => `/v1/user/get-items-by-categories/${id}`,
   },
   cart: {
-    add: `${baseUrl}/v1/user/add-to-cart`,
-    get: `${baseUrl}/v1/user/get-cart`,
-    remove: (id) => `${baseUrl}/v1/user/remove-item-cart/${id}`,
+    add: `/v1/user/add-to-cart`,
+    get: `/v1/user/get-cart`,
+    remove: (id) => `/v1/user/remove-item-cart/${id}`,
   },
+  carousel: {
+    get: `/v1/user/get-carousel-img-user`,
+  },
+  gallery: {
+    get: `/v1/user/get-gallery-img-user`,
+  },
+  branded: {
+    get: `/v1/user/get-branded-medicine`,
+  },
+  prescription: {
+    upload: `/v1/user/upload-prescription`
+  }
 };
 
 export default endpoints;

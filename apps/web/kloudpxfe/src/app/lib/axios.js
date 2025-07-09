@@ -1,19 +1,102 @@
-import axios from "axios";
+"use client";
 
-const axiosInstance = axios.create({
-  baseURL: "http://localhost:10003",
-  timeout: 10000,
+import axios from "axios";
+import Swal from "sweetalert2";
+import { store } from "@/app/redux/store";
+
+const BASE_URL = "http://localhost:10003";
+
+const getToken = () =>
+  typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
+const instance = axios.create({
+  baseURL: BASE_URL,
   headers: {
+    Accept: "*/*",
     "Content-Type": "application/json",
   },
 });
 
-// axiosInstance.interceptors.request.use((config) => {
-//   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-//   return config;
-// });
+const showError = (error) => {
+  Swal.fire({
+    title: "Error",
+    text:
+      error?.response?.data?.message ||
+      error?.message ||
+      "Something went wrong",
+    icon: "error",
+    confirmButtonText: "Alright!",
+    allowOutsideClick: false,
+  });
+};
 
-export default axiosInstance;
+const getAuthHeaders = (sendToken) => {
+  if (!sendToken) return {};
+  const token = getToken();
+  return token ? { Authorization: token } : {};
+};
+
+export const getAxiosCall = async (endpoint, params = {}, sendToken = true) => {
+  store.dispatch({ type: "LOADING", payload: true });
+  try {
+    const headers = getAuthHeaders(sendToken);
+    const response = await instance.get(endpoint, {
+      headers,
+      params,
+    });
+    return response;
+  } catch (error) {
+    // showError(error);
+    throw error;
+  } finally {
+    store.dispatch({ type: "LOADING", payload: false });
+  }
+};
+
+export const postAxiosCall = async (endpoint, data, sendToken = true) => {
+  store.dispatch({ type: "LOADING", payload: true });
+  try {
+    const headers = {
+      ...getAuthHeaders(sendToken),
+      "Content-Type": "application/json",
+    };
+    const response = await instance.post(endpoint, data, { headers });
+    return response.data;
+  } catch (error) {
+    // showError(error);
+    throw error;
+  } finally {
+    store.dispatch({ type: "LOADING", payload: false });
+  }
+};
+
+export const updateAxiosCall = async (endpoint, id, data, sendToken = true) => {
+  store.dispatch({ type: "LOADING", payload: true });
+  try {
+    const headers = {
+      ...getAuthHeaders(sendToken),
+      "Content-Type": "application/json",
+    };
+    const response = await instance.put(`${endpoint}/${id}`, data, { headers });
+    return response.data;
+  } catch (error) {
+    // showError(error);
+    throw error;
+  } finally {
+    store.dispatch({ type: "LOADING", payload: false });
+  }
+};
+
+export const deleteAxiosCall = async (endpoint, id, sendToken = true) => {
+  store.dispatch({ type: "LOADING", payload: true });
+  try {
+    const headers = getAuthHeaders(sendToken);
+    const response = await instance.delete(`${endpoint}/${id}`, { headers });
+    return response.data;
+  } catch (error) {
+    // showError(error);
+    throw error;
+  } finally {
+    store.dispatch({ type: "LOADING", payload: false });
+  }
+};

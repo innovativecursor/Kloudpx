@@ -181,10 +181,17 @@ export default function useMedicineForm() {
   }, [id, medicines]);
 
   useEffect(() => {
+    // console.log("spPerBox:", formData.spPerBox);
+    // console.log("piecesPerBox:", formData.piecesPerBox);
+    // console.log("measurementValue:", formData.measurementValue);
+    // console.log("showMeasurementValue:", showMeasurementValue);
+
     const { spPerPiece, cpPerPiece } = calculatePricePerPiece({
       ...formData,
       showMeasurementValue,
     });
+
+    console.log("Calculated spPerPiece:", spPerPiece);
 
     setFormData((prev) => ({
       ...prev,

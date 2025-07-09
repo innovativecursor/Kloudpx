@@ -28,7 +28,7 @@ const Navbar = () => {
             <button type="primary" onClick={showDrawer}>
               <i className="ri-menu-2-fill sm:text-3xl text-2xl rounded-full p-1"></i>
             </button>
-            <NavLink to="/home">
+            <NavLink to="/findprescription">
               <img
                 src={logo}
                 alt="Logo"

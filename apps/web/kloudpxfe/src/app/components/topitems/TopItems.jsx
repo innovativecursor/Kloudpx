@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -41,7 +41,7 @@ const getIconComponent = (iconName) => {
 
 const TopItems = () => {
   const { prevRef, nextRef, setSwiperInstance } = useSwiperNavigation();
-  const { category, getItemsByCategory } = useProductContext();
+  const { category, getItemsByCategory, getCategory } = useProductContext();
   const router = useRouter();
 
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
@@ -51,6 +51,12 @@ const TopItems = () => {
     await getItemsByCategory(id);
     router.push(`/Products?category=${id}`);
   };
+
+  useEffect(() => {
+    getCategory();
+  }, []);
+
+  // console.log(category);
 
   return (
     <div className="w-full">
@@ -66,7 +72,7 @@ const TopItems = () => {
         slidesPerView="auto"
         className="w-full"
       >
-        {category?.data?.map((item, index) => {
+        {category.map((item, index) => {
           const IconComponent = getIconComponent(item.CategoryIcon?.Icon);
 
           return (
