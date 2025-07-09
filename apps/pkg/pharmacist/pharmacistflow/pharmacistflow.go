@@ -259,3 +259,69 @@ func parseUint(s string) uint {
 	}
 	return uint(id)
 }
+
+func EditCartItem(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+	userObj, ok := user.(*models.Pharmacist)
+	if !ok || userObj.ApplicationRole != "Pharmacist" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Access denied: Pharmacist only"})
+		return
+	}
+
+	// Extract cart_id from path
+	cartIDStr := c.Param("cart_id")
+	cartID, err := strconv.ParseUint(cartIDStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid cart ID"})
+		return
+	}
+
+	var req config.UpdateMedicineRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
+		return
+	}
+
+	// Find cart item
+	var cart models.Cart
+	if err := db.First(&cart, cartID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Cart item not found"})
+		return
+	}
+
+	// Fetch new medicine and validate stock
+	var medicine models.Medicine
+	if err := db.First(&medicine, req.MedicineID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Medicine not found"})
+		return
+	}
+
+	availableStock, err := itemscalculation.CalculateTotalStockByBrandName(db, medicine.BrandName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Stock calculation error"})
+		return
+	}
+
+	if req.Quantity > availableStock {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":     "Insufficient stock",
+			"available": availableStock,
+		})
+		return
+	}
+
+	// Update the cart entry
+	cart.MedicineID = req.MedicineID
+	cart.Quantity = req.Quantity
+
+	if err := db.Save(&cart).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Cart item updated successfully"})
+}

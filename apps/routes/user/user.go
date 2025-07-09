@@ -60,6 +60,10 @@ func User(db *gorm.DB) {
 		userflow.GetAllCategoriesForUser(c, db)
 	})
 
+	apiV1.GET("/user/get-two-categories-for-user", func(c *gin.Context) {
+		userflow.GetTwoCategoriesForUser(c, db)
+	})
+
 	apiV1.GET("/user/get-items-by-categories/:category_id", func(c *gin.Context) {
 		userflow.GetItemsByCategory(c, db)
 	})
