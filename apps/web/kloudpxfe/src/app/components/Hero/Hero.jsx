@@ -12,18 +12,22 @@ import Prescription from "@/app/components/modal/Prescription";
 import { useImageContext } from "@/app/contexts/ImagesContext";
 
 export default function Hero() {
-  const { carousel } = useImageContext();
+  const { carousel, getCarousel } = useImageContext();
   const [isHeroPart, setIsHeroPart] = useState(false);
 
   useEffect(() => {
     setIsHeroPart(true);
   }, []);
 
+  useEffect(() => {
+    getCarousel();
+  }, []);
+
   // console.log(carousel);
 
   return (
     <div className="responsive-mx mt-8 md:mt-10">
-      {isHeroPart && carousel?.data?.length > 0 && (
+      {isHeroPart && carousel?.length > 0 && (
         <Swiper
           loop={true}
           pagination={{ clickable: true }}
@@ -31,9 +35,9 @@ export default function Hero() {
           modules={[Pagination, Navigation]}
           className="mySwiper"
         >
-          {carousel.data.map((slide) => (
+          {carousel.map((slide) => (
             <SwiperSlide key={slide.id}>
-              <div className="relative">
+              <div className="relative cursor-pointer">
                 <img
                   src={slide.ImageURL}
                   alt={slide.title1 || "Carousel Slide"}

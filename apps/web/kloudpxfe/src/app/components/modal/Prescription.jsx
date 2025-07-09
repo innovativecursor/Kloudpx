@@ -34,14 +34,18 @@ const Prescription = () => {
 
       {isOpen && (
         <>
+          {loading && (
+            <div className="fixed inset-0 z-[60] bg-black/20 backdrop-blur-sm flex items-center justify-center">
+              <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-white"></div>
+            </div>
+          )}
           <div className="fixed inset-0 bg-black/60 z-40"></div>
-
           <div
             ref={modalRef}
             className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg z-50 w-full max-w-6xl"
           >
             <div className="grid md:grid-cols-2 grid-cols-1">
-              {/* Left side: upload UI */}
+              {/* Left: Upload */}
               <div className="flex justify-center items-center tracking-wide p-8">
                 <div>
                   <h2 className="text-3xl dark-text font-semibold mb-2">
@@ -83,7 +87,7 @@ const Prescription = () => {
                 </div>
               </div>
 
-              {/* Right side: preview */}
+              {/* Right: Preview */}
               <div className="bg-[#EDF6FD] rounded-xl py-12 px-9 flex flex-col items-center justify-center">
                 <h3 className="text-2xl font-semibold mb-4 dark-text">
                   Guide for a valid prescription

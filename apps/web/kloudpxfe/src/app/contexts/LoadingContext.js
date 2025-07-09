@@ -1,15 +1,15 @@
-"use client";
-import { createContext, useContext, useState } from "react";
+// "use client";
+// import { createContext, useContext, useState } from "react";
 
-const LoadingContext = createContext();
+// const LoadingContext = createContext();
 
-export const LoadingProvider = ({ children }) => {
-  const [loading, setLoading] = useState(false);
-  return (
-    <LoadingContext.Provider value={{ loading, setLoading }}>
-      {children}
-    </LoadingContext.Provider>
-  );
-};
+// export const LoadingProvider = ({ children }) => {
+//   const [loading, setLoading] = useState(false);
+//   return (
+//     <LoadingContext.Provider value={{ loading, setLoading }}>
+//       {children}
+//     </LoadingContext.Provider>
+//   );
+// };
 
-export const useLoading = () => useContext(LoadingContext);
+// export const useLoading = () => useContext(LoadingContext);

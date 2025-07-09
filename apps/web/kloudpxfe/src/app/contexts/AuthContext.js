@@ -2,19 +2,19 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import { getAxiosCall } from "@/app/lib/axios";
 import endpoints from "@/app/config/endpoints";
-import DashboardLoading from "../components/Loader/DashboardLoader";
 
 const AuthContext = createContext(null);
 AuthContext.displayName = "AuthContext";
 
 export const AuthProvider = ({ children }) => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const t = localStorage.getItem("access_token");
@@ -22,26 +22,17 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // const [token, setToken] = useState(
-  //   typeof window !== "undefined" ? localStorage.getItem("access_token") : null
-  // );
-
   useEffect(() => {
     const fetchUser = async () => {
       if (!token) return;
       try {
-        const res = await axios.get(endpoints.auth.getCurrentUser, {
-          headers: {
-            Authorization: `${token}`,
-          },
-        });
-        setUser(res.data);
+        const res = await getAxiosCall(endpoints.auth.getCurrentUser, {}, true);
+        setUser(res?.data);
       } catch (err) {
         console.error("Error fetching user info", err);
         setUser(null);
       }
     };
-
     fetchUser();
   }, [token]);
 
@@ -49,16 +40,15 @@ export const AuthProvider = ({ children }) => {
     flow: "auth-code",
     onSuccess: async (codeResponse) => {
       try {
-        setLoading(true);
         if (!codeResponse?.code)
           throw new Error("Authorization code not found");
 
         const encodedCode = encodeURIComponent(codeResponse.code);
-        const res = await axios.get(
+        const res = await getAxiosCall(
           endpoints.auth.googleLogin + `?code=${encodedCode}`
         );
 
-        const { token } = res.data;
+        const token = res?.data?.token;
         if (!token) throw new Error("Token missing from server");
 
         localStorage.setItem("access_token", token);
@@ -67,8 +57,6 @@ export const AuthProvider = ({ children }) => {
         router.push("/");
       } catch (error) {
         console.error("Login failed", error.message);
-      } finally {
-        setLoading(false);
       }
     },
     onError: () => {
@@ -89,12 +77,10 @@ export const AuthProvider = ({ children }) => {
         token,
         login,
         logout,
-        loading,
         isAuthenticated: !!token,
         user,
       }}
     >
-      {loading && <DashboardLoading />}
       {children}
     </AuthContext.Provider>
   );

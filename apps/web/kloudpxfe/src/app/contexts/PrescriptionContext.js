@@ -1,55 +1,68 @@
 "use client";
 
 import { createContext, useContext, useState } from "react";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "@/app/contexts/AuthContext";
 import useModal from "@/app/hooks/useModal";
-import { useLoading } from "@/app/contexts/LoadingContext";
+import { postAxiosCall } from "@/app/lib/axios";
+import endpoints from "@/app/config/endpoints";
+import useImageCompressor from "@/app/hooks/useImageCompressor";
 
 const PrescriptionContext = createContext();
 
 export const PrescriptionProvider = ({ children }) => {
-  const { token } = useAuth();
+  const { token, login } = useAuth();
   const { setIsOpen } = useModal();
-  const { setLoading } = useLoading();
+  const { compressImage } = useImageCompressor();
 
   const [uploadedImage, setUploadedImage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const uploadPrescription = (file) => {
+  // console.log(setIsOpen);
+
+  const uploadPrescription = async (file) => {
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
+    if (!token) {
+      toast.error("Please login first!");
+      login?.();
+      return;
+    }
 
-    reader.onloadend = async () => {
-      try {
-        setLoading(true); // ✅ Start loading
-        const base64String = reader.result;
-        const base64Data = base64String.split(",")[1];
+    try {
+      setLoading(true);
 
-        const response = await axios.post(
-          "http://localhost:10003/v1/user/upload-prescription",
-          { prescriptionimage: base64Data },
-          {
-            headers: { Authorization: token },
-          }
-        );
+      const compressedBase64 = await compressImage(file);
+      const base64Data = compressedBase64.split(",")[1];
 
-        const { url } = response.data;
-        setUploadedImage(url);
-        toast.success("Prescription uploaded successfully");
-        setIsOpen(false);
-      } catch (error) {
-        console.error(
-          "Upload failed:",
-          error.response || error.message || error
-        );
-        toast.error("Upload failed");
-      } finally {
+      const payload = {
+        prescriptionimage: base64Data,
+      };
+
+      const res = await postAxiosCall(endpoints.prescription.upload, payload, true);
+
+      if (res?.url) {
+        const img = new Image();
+        img.src = res.url;
+
+        img.onload = () => {
+          setUploadedImage(res.url);
+          toast.success("Prescription uploaded successfully");
+          setIsOpen(false);
+          setLoading(false);
+        };
+
+        img.onerror = () => {
+          toast.error("Image failed to load.");
+          setLoading(false);
+        };
+      } else {
         setLoading(false);
       }
-    };
+    } catch (err) {
+      toast.error("Upload failed. Try again.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,6 +71,7 @@ export const PrescriptionProvider = ({ children }) => {
         uploadedImage,
         uploadPrescription,
         setUploadedImage,
+        loading,
       }}
     >
       {children}

@@ -180,57 +180,31 @@ export default function useMedicineForm() {
     setIsBrand(medData.isBrand || false);
   }, [id, medicines]);
 
-  // useEffect(() => {
-  //   const { spPerPiece, cpPerPiece } = calculatePricePerPiece({
-  //     ...formData,
-  //     showMeasurementValue,
-  //   });
-
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     spPerPiece,
-  //     cpPerPiece,
-  //   }));
-  // }, [
-  //   formData.spPerBox,
-  //   formData.cpPerBox,
-  //   formData.measurementValue,
-  //   formData.piecesPerBox,
-  //   showMeasurementValue,
-  // ]);
-
-
-
-
-
   useEffect(() => {
-  console.log("spPerBox:", formData.spPerBox);
-  console.log("piecesPerBox:", formData.piecesPerBox);
-  console.log("measurementValue:", formData.measurementValue);
-  console.log("showMeasurementValue:", showMeasurementValue);
+    // console.log("spPerBox:", formData.spPerBox);
+    // console.log("piecesPerBox:", formData.piecesPerBox);
+    // console.log("measurementValue:", formData.measurementValue);
+    // console.log("showMeasurementValue:", showMeasurementValue);
 
-  const { spPerPiece, cpPerPiece } = calculatePricePerPiece({
-    ...formData,
+    const { spPerPiece, cpPerPiece } = calculatePricePerPiece({
+      ...formData,
+      showMeasurementValue,
+    });
+
+    console.log("Calculated spPerPiece:", spPerPiece);
+
+    setFormData((prev) => ({
+      ...prev,
+      spPerPiece,
+      cpPerPiece,
+    }));
+  }, [
+    formData.spPerBox,
+    formData.cpPerBox,
+    formData.measurementValue,
+    formData.piecesPerBox,
     showMeasurementValue,
-  });
-
-  console.log("Calculated spPerPiece:", spPerPiece);
-
-  setFormData((prev) => ({
-    ...prev,
-    spPerPiece,
-    cpPerPiece,
-  }));
-}, [
-  formData.spPerBox,
-  formData.cpPerBox,
-  formData.measurementValue,
-  formData.piecesPerBox,
-  showMeasurementValue,
-]);
-
-
-
+  ]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

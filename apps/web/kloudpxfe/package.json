@@ -22,9 +22,12 @@
     "react-image-magnify": "^2.7.4",
     "react-inner-image-zoom": "^2.0.1",
     "react-pro-sidebar": "^1.1.0",
+    "react-redux": "^9.2.0",
     "react-slick": "^0.30.3",
     "react-tiny-fab": "^4.0.4",
     "react-youtube": "^10.1.0",
+    "redux": "^5.0.1",
+    "redux-persist": "^6.0.0",
     "slick-carousel": "^1.8.1",
     "sweetalert2": "^11.22.1",
     "swiper": "^11.2.10"

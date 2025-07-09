@@ -8,11 +8,20 @@ import classNames from "classnames";
 const CartDrawer = ({ isOpen, onClose }) => {
   const { token } = useAuth();
   const router = useRouter();
-  const { getCartData, removeFromCart } = useCartContext();
+  const { getCartData, removeFromCart, getAllCartData } = useCartContext();
   const { data, loading } = getCartData;
 
+  // useEffect(() => {
+  //   if (!token) {
+  //     router.push("/");
+  //     // console.log("home");
+
+  //   }
+  // }, [token]);
+
   useEffect(() => {
-    if (!token) {
+    const storedToken = localStorage.getItem("access_token");
+    if (token === null && !storedToken) {
       router.push("/");
     }
   }, [token]);
@@ -25,6 +34,10 @@ const CartDrawer = ({ isOpen, onClose }) => {
   const handleDelete = (id) => {
     removeFromCart(id);
   };
+
+  useEffect(() => {
+    getAllCartData();
+  }, []);
 
   // conse data
 
