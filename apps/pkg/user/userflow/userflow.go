@@ -402,3 +402,18 @@ func GetBrandedMedicinesForUser(c *gin.Context, db *gorm.DB) {
 		"medicines": response,
 	})
 }
+
+// two categories
+func GetTwoCategoriesForUser(c *gin.Context, db *gorm.DB) {
+	var categories []models.Category
+	if err := db.Preload("CategoryIcon").Limit(2).Find(&categories).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch categories from database")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch categories"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":    "Categories fetched successfully",
+		"categories": categories,
+	})
+}
