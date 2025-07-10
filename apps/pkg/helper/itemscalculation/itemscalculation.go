@@ -17,9 +17,9 @@ func CalculateTotalStockByBrandName(db *gorm.DB, brandName string) (int, error) 
 		if m.UnitOfMeasurement == "per box" {
 			// Total pieces = boxes * pieces per box
 			total += m.MeasurementUnitValue * m.NumberOfPiecesPerBox
-		} else {
-			// Just add the number of pieces available
-			total += m.NumberOfPiecesPerBox
+		} else if m.UnitOfMeasurement == "per piece" {
+			// Just add the number of pieces directly
+			total += m.MeasurementUnitValue
 		}
 	}
 	return total, nil

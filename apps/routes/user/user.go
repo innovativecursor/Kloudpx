@@ -40,6 +40,10 @@ func User(db *gorm.DB) {
 		userflow.GetMedicinesForUser(c, db)
 	})
 
+	apiV1.GET("/user/medicine-details/:medicine_id", func(c *gin.Context) {
+		userflow.GetMedicineDetailsByID(c, db)
+	})
+
 	apiV1.GET("/user/get-current-userinfo", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
 		userflow.GetCurrentUserInfo(c, db)
 	})
@@ -61,7 +65,7 @@ func User(db *gorm.DB) {
 	})
 
 	apiV1.GET("/user/get-two-categories-for-user", func(c *gin.Context) {
-		userflow.GetTwoCategoriesForUser(c, db)
+		userflow.GetTwoCategoriesWithItems(c, db)
 	})
 
 	apiV1.GET("/user/get-items-by-categories/:category_id", func(c *gin.Context) {
