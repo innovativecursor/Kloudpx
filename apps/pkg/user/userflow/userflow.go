@@ -54,6 +54,7 @@ func GetMedicinesForUser(c *gin.Context, db *gorm.DB) {
 			ID:                   med.ID,
 			BrandName:            med.BrandName,
 			Power:                med.Power,
+			Discount:             med.Discount,
 			GenericName:          med.Generic.GenericName,
 			Category:             med.Category.CategoryName,
 			Description:          med.Description,
@@ -70,6 +71,63 @@ func GetMedicinesForUser(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, gin.H{
 		"message":   "Medicines fetched successfully",
 		"medicines": response,
+	})
+}
+
+func GetMedicineDetailsByID(c *gin.Context, db *gorm.DB) {
+	medicineIDParam := c.Param("medicine_id")
+	medicineID, err := strconv.Atoi(medicineIDParam)
+	if err != nil {
+		logrus.WithField("param", medicineIDParam).Warn("Invalid medicine ID format")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid medicine ID"})
+		return
+	}
+
+	var med models.Medicine
+	if err := db.Preload("Generic").
+		Preload("Supplier").
+		Preload("ItemImages").
+		Preload("Category").
+		First(&med, medicineID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Medicine not found"})
+		} else {
+			logrus.WithError(err).Error("Failed to fetch medicine by ID")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicine"})
+		}
+		return
+	}
+
+	var imageFilenames []string
+	for _, img := range med.ItemImages {
+		imageFilenames = append(imageFilenames, img.FileName)
+	}
+
+	price := med.SellingPricePerBox
+	if med.UnitOfMeasurement == "per piece" {
+		price = med.SellingPricePerPiece
+	}
+
+	response := config.UserFacingMedicine{
+		ID:                   med.ID,
+		BrandName:            med.BrandName,
+		Power:                med.Power,
+		Discount:             med.Discount,
+		GenericName:          med.Generic.GenericName,
+		Category:             med.Category.CategoryName,
+		Description:          med.Description,
+		Unit:                 med.UnitOfMeasurement,
+		MeasurementUnitValue: med.MeasurementUnitValue,
+		NumberOfPiecesPerBox: med.NumberOfPiecesPerBox,
+		Price:                price,
+		TaxType:              med.TaxType,
+		Prescription:         med.Prescription,
+		Images:               imageFilenames,
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "Medicine details fetched successfully",
+		"medicine": response,
 	})
 }
 
@@ -296,6 +354,7 @@ func GetItemsByCategory(c *gin.Context, db *gorm.DB) {
 			GenericName:          med.Generic.GenericName,
 			Category:             med.Category.CategoryName,
 			Description:          med.Description,
+			Discount:             med.Discount,
 			Unit:                 med.UnitOfMeasurement,
 			MeasurementUnitValue: med.MeasurementUnitValue,
 			NumberOfPiecesPerBox: med.NumberOfPiecesPerBox,
@@ -404,16 +463,83 @@ func GetBrandedMedicinesForUser(c *gin.Context, db *gorm.DB) {
 }
 
 // two categories
-func GetTwoCategoriesForUser(c *gin.Context, db *gorm.DB) {
+func GetTwoCategoriesWithItems(c *gin.Context, db *gorm.DB) {
 	var categories []models.Category
 	if err := db.Preload("CategoryIcon").Limit(2).Find(&categories).Error; err != nil {
-		logrus.WithError(err).Error("Failed to fetch categories from database")
+		logrus.WithError(err).Error("Failed to fetch categories")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch categories"})
 		return
 	}
 
+	var response []config.CategoryWithMedicines // ✅ Corrected type here
+
+	for _, category := range categories {
+		var uniqueMedicineIDs []uint
+
+		err := db.Model(&models.Medicine{}).
+			Select("MIN(id)").
+			Where("category_id = ?", category.ID).
+			Group("brand_name").
+			Scan(&uniqueMedicineIDs).Error
+
+		if err != nil {
+			logrus.WithError(err).Errorf("Failed to fetch medicine IDs for category %d", category.ID)
+			continue
+		}
+
+		var medicines []models.Medicine
+		err = db.Preload("Generic").
+			Preload("Supplier").
+			Preload("ItemImages").
+			Preload("Category").
+			Where("id IN ?", uniqueMedicineIDs).
+			Find(&medicines).Error
+
+		if err != nil {
+			logrus.WithError(err).Errorf("Failed to fetch medicines for category %d", category.ID)
+			continue
+		}
+
+		var userMedicines []config.UserFacingMedicine
+		for _, med := range medicines {
+			var imageFilenames []string
+			for _, img := range med.ItemImages {
+				imageFilenames = append(imageFilenames, img.FileName)
+			}
+
+			price := med.SellingPricePerBox
+			if med.UnitOfMeasurement == "per piece" {
+				price = med.SellingPricePerPiece
+			}
+
+			userMedicines = append(userMedicines, config.UserFacingMedicine{
+				ID:                   med.ID,
+				BrandName:            med.BrandName,
+				Power:                med.Power,
+				GenericName:          med.Generic.GenericName,
+				Category:             med.Category.CategoryName,
+				Description:          med.Description,
+				Discount:             med.Discount,
+				Unit:                 med.UnitOfMeasurement,
+				MeasurementUnitValue: med.MeasurementUnitValue,
+				NumberOfPiecesPerBox: med.NumberOfPiecesPerBox,
+				Price:                price,
+				TaxType:              med.TaxType,
+				Prescription:         med.Prescription,
+				Images:               imageFilenames,
+			})
+		}
+
+		response = append(response, config.CategoryWithMedicines{
+			ID:           category.ID,
+			CategoryName: category.CategoryName,
+			IconURL:      category.CategoryIcon.Icon,
+			Medicines:    userMedicines,
+		})
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"message":    "Categories fetched successfully",
-		"categories": categories,
+		"message":    "Categories with medicines fetched successfully",
+		"categories": response,
 	})
 }

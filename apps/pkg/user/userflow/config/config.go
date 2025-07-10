@@ -11,6 +11,7 @@ type UserFacingMedicine struct {
 	BrandName            string   `json:"brandname"`
 	Power                string   `json:"power"`
 	GenericName          string   `json:"genericname"`
+	Discount             string   `json:"discount"`
 	Category             string   `json:"category"`
 	Description          string   `json:"description"`
 	Unit                 string   `json:"unit"`
@@ -20,4 +21,11 @@ type UserFacingMedicine struct {
 	TaxType              string   `json:"taxtype"`
 	Prescription         bool     `json:"prescription"`
 	Images               []string `json:"images"`
+}
+
+type CategoryWithMedicines struct {
+	ID           uint                 `json:"id"`
+	CategoryName string               `json:"categoryname"`
+	IconURL      string               `json:"iconurl"`
+	Medicines    []UserFacingMedicine `json:"medicines"`
 }

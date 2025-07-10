@@ -26,7 +26,7 @@ type Supplier struct {
 type Category struct {
 	gorm.Model
 	CategoryName   string `gorm:"not null"`
-	CategoryIconID uint
+	CategoryIconID *uint
 	CategoryIcon   CategoryIcon `gorm:"foreignKey:CategoryIconID"`
 }
 
@@ -45,6 +45,7 @@ type Medicine struct {
 	gorm.Model
 	BrandName             string `gorm:"not null"`
 	IsBrand               bool
+	InhouseBrand          bool
 	Discount              string
 	Power                 string
 	GenericID             uint
@@ -55,6 +56,10 @@ type Medicine struct {
 	ItemImages            []ItemImage `gorm:"foreignKey:MedicineID"`
 	CategoryID            uint
 	Category              Category `gorm:"foreignKey:CategoryID"`
+	CategorySubClass      string
+	DosageForm            string
+	Packaging             string
+	Marketer              string
 	Description           string
 	UnitOfMeasurement     string
 	MeasurementUnitValue  int
