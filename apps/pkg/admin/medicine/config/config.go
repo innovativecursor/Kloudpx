@@ -3,11 +3,16 @@ package config
 type MedicineData struct {
 	BrandName             string  `json:"brandname" binding:"required"`
 	IsBrand               bool    `json:"isbrand"`
+	InhouseBrand          bool    `json:"inhousebrand"`
 	Discount              string  `json:"discount"`
 	Power                 string  `json:"power"`
 	GenericID             uint    `json:"genericid" binding:"required"`
 	SupplierID            uint    `json:"supplierid" binding:"required"`
 	CategoryID            uint    `json:"categoryid"`
+	CategorySubClass      string  `json:"categorysubclass"`
+	DosageForm            string  `json:"dosageform"`
+	Packaging             string  `json:"packaging"`
+	Marketer              string  `json:"marketer"`
 	SupplierDiscount      string  `json:"supplierdiscount"`
 	Description           string  `json:"description"`
 	UnitOfMeasurement     string  `json:"unitofmeasurement"`
@@ -28,12 +33,17 @@ type MedicineData struct {
 type UpdateMedicineData struct {
 	BrandName             string  `json:"brandname" binding:"required"`
 	IsBrand               bool    `json:"isbrand"`
+	InhouseBrand          bool    `json:"inhousebrand"`
 	Discount              string  `json:"discount"`
 	Power                 string  `json:"power"`
 	GenericID             uint    `json:"genericid" binding:"required"`
 	SupplierID            uint    `json:"supplierid" binding:"required"`
 	CategoryID            uint    `json:"categoryid"`
 	CategoryIconID        uint    `json:"categoryiconid"`
+	CategorySubClass      string  `json:"categorysubclass"`
+	DosageForm            string  `json:"dosageform"`
+	Packaging             string  `json:"packaging"`
+	Marketer              string  `json:"marketer"`
 	SupplierDiscount      string  `json:"supplierdiscount"`
 	Description           string  `json:"description"`
 	UnitOfMeasurement     string  `json:"unitofmeasurement"`

@@ -39,19 +39,30 @@ func AddMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// Validation
+	if payload.UnitOfMeasurement == "per piece" && payload.NumberOfPiecesPerBox != 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "NumberOfPiecesPerBox must be 0 when unit is 'per piece'"})
+		return
+	}
+
 	newMedicine := models.Medicine{
 		BrandName:             payload.BrandName,
 		IsBrand:               payload.IsBrand,
+		InhouseBrand:          payload.InhouseBrand,
 		Discount:              payload.Discount,
 		Power:                 payload.Power,
 		GenericID:             payload.GenericID,
 		SupplierID:            payload.SupplierID,
 		CategoryID:            payload.CategoryID,
+		CategorySubClass:      payload.CategorySubClass,
+		DosageForm:            payload.DosageForm,
+		Packaging:             payload.Packaging,
+		Marketer:              payload.Marketer,
 		SupplierDiscount:      payload.SupplierDiscount,
 		Description:           payload.Description,
 		UnitOfMeasurement:     payload.UnitOfMeasurement,
-		MeasurementUnitValue:  0, // Default, will override if "per box"
-		NumberOfPiecesPerBox:  payload.NumberOfPiecesPerBox,
+		MeasurementUnitValue:  payload.MeasurementUnitValue,
+		NumberOfPiecesPerBox:  0,
 		SellingPricePerBox:    payload.SellingPricePerBox,
 		SellingPricePerPiece:  payload.SellingPricePerPiece,
 		CostPricePerBox:       payload.CostPricePerBox,
@@ -65,7 +76,7 @@ func AddMedicine(c *gin.Context, db *gorm.DB) {
 	}
 
 	if payload.UnitOfMeasurement == "per box" {
-		newMedicine.MeasurementUnitValue = payload.MeasurementUnitValue
+		newMedicine.NumberOfPiecesPerBox = payload.NumberOfPiecesPerBox
 	}
 
 	if err := db.Create(&newMedicine).Error; err != nil {
@@ -74,7 +85,7 @@ func AddMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Assign uploaded image records to this medicine
+	// Associate uploaded images
 	for _, imgID := range payload.ImageIDs {
 		if err := db.Model(&models.ItemImage{}).
 			Where("id = ?", imgID).
@@ -87,6 +98,7 @@ func AddMedicine(c *gin.Context, db *gorm.DB) {
 		"message": "Medicine added successfully",
 	})
 }
+
 func GetAllMedicines(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -120,6 +132,7 @@ func GetAllMedicines(c *gin.Context, db *gorm.DB) {
 		"medicines": medicines,
 	})
 }
+
 func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -163,25 +176,29 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// Validation
+	if payload.UnitOfMeasurement == "per piece" && payload.NumberOfPiecesPerBox != 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "NumberOfPiecesPerBox must be 0 when unit is 'per piece'"})
+		return
+	}
+
 	// Update fields
 	medicine.BrandName = payload.BrandName
 	medicine.IsBrand = payload.IsBrand
+	medicine.InhouseBrand = payload.InhouseBrand
 	medicine.Discount = payload.Discount
+	medicine.Power = payload.Power
 	medicine.GenericID = payload.GenericID
 	medicine.SupplierID = payload.SupplierID
 	medicine.CategoryID = payload.CategoryID
+	medicine.CategorySubClass = payload.CategorySubClass
+	medicine.DosageForm = payload.DosageForm
+	medicine.Packaging = payload.Packaging
+	medicine.Marketer = payload.Marketer
 	medicine.SupplierDiscount = payload.SupplierDiscount
 	medicine.Description = payload.Description
 	medicine.UnitOfMeasurement = payload.UnitOfMeasurement
-
-	if payload.UnitOfMeasurement == "per box" {
-		medicine.MeasurementUnitValue = payload.MeasurementUnitValue
-	} else {
-		medicine.MeasurementUnitValue = 0
-	}
-
-	medicine.Power = payload.Power
-	medicine.NumberOfPiecesPerBox = payload.NumberOfPiecesPerBox
+	medicine.MeasurementUnitValue = payload.MeasurementUnitValue
 	medicine.SellingPricePerBox = payload.SellingPricePerBox
 	medicine.SellingPricePerPiece = payload.SellingPricePerPiece
 	medicine.CostPricePerBox = payload.CostPricePerBox
@@ -193,6 +210,13 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 	medicine.Prescription = payload.Prescription
 	medicine.UpdatedBy = userObj.ID
 
+	if payload.UnitOfMeasurement == "per box" {
+		medicine.NumberOfPiecesPerBox = payload.NumberOfPiecesPerBox
+	} else {
+		medicine.NumberOfPiecesPerBox = 0
+	}
+
+	// Update images if provided
 	if len(payload.ImageIDs) > 0 {
 		if err := db.Model(&models.ItemImage{}).
 			Where("id IN ?", payload.ImageIDs).
@@ -209,6 +233,7 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// Update category icon if provided
 	if payload.CategoryIconID != 0 {
 		var category models.Category
 		if err := db.First(&category, medicine.CategoryID).Error; err != nil {
@@ -217,7 +242,7 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 			return
 		}
 
-		category.CategoryIconID = payload.CategoryIconID
+		category.CategoryIconID = &payload.CategoryIconID
 		if err := db.Save(&category).Error; err != nil {
 			logrus.WithError(err).Error("Failed to update category icon")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update category icon"})
