@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -18,9 +18,7 @@ import * as GiIcons from "react-icons/gi";
 
 const getIconComponent = (iconName) => {
   if (!iconName) return null;
-
   const prefix = iconName.slice(0, 2);
-
   switch (prefix) {
     case "Fa":
       return FaIcons[iconName];
@@ -41,22 +39,24 @@ const getIconComponent = (iconName) => {
 
 const TopItems = () => {
   const { prevRef, nextRef, setSwiperInstance } = useSwiperNavigation();
-  const { category, getItemsByCategory, getCategory } = useProductContext();
+  const {
+    category,
+    getItemsByCategory,
+    selectedCategoryId,
+    setSelectedCategoryId,
+    setSelectedCategoryName,
+  } = useProductContext();
   const router = useRouter();
 
-  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
-
   const handleCategoryClick = async (id) => {
+    const selected = category.find((cat) => cat.ID === id);
     setSelectedCategoryId(id);
+    setSelectedCategoryName(selected?.CategoryName || "");
     await getItemsByCategory(id);
-    router.push(`/Products?category=${id}`);
+    const categorySlug =
+      selected?.CategoryName?.toLowerCase().replace(/\s+/g, "-") || "";
+    router.push(`/Products?category=${id}&name=${categorySlug}`);
   };
-
-  useEffect(() => {
-    getCategory();
-  }, []);
-
-  // console.log(category);
 
   return (
     <div className="w-full">
@@ -74,7 +74,6 @@ const TopItems = () => {
       >
         {category.map((item, index) => {
           const IconComponent = getIconComponent(item.CategoryIcon?.Icon);
-
           return (
             <SwiperSlide key={item.ID || index} className="!w-auto">
               <div

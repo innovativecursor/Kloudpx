@@ -97,9 +97,12 @@ const ProductCardItem = ({ item, fallbackImage }) => {
   );
 };
 
-const ProductsCard = ({ productsData }) => {
+const ProductsCard = ({ selectedCategoryItems }) => {
   const fallbackImage = "/assets/paracetamol.jpeg";
-  const medicines = productsData || [];
+  const medicines = selectedCategoryItems || [];
+
+  console.log(selectedCategoryItems);
+
   return (
     <div>
       <div className="grid lg:grid-cols-3 sm:gap-7 gap-10 md:grid-cols-2 sm:grid-cols-2 grid-cols-1 mt-7 sm:mt-11 sm:mb-20 mb-12">

@@ -20,28 +20,32 @@ const ProductDetails = () => {
   const { uploadedImage } = usePrescriptionContext();
   const [addedToCart, setAddedToCart] = useState(false);
 
-  // const product = allMedicine.data.find((item) => String(item.id) === id);
+  const [product, setProduct] = useState(null);
 
-  // if (allMedicine.loading) {
-  //   return <div className="text-center p-10">Loading product...</div>;
-  // }
-
-  // if (!product) {
-  //   return (
-  //     <div className="p-10 text-red-600 text-center">Product Not Found</div>
-  //   );
-  // }
+  // useEffect(() => {
+  //   getAllMedicine();
+  // }, []);
 
   useEffect(() => {
-    getAllMedicine();
-  }, []);
-  console.log(allMedicine);
+    if (id && allMedicine.length > 0) {
+      const match = allMedicine.find((item) => String(item.id) === id);
+      setProduct(match);
+    }
+  }, [allMedicine, id]);
+
+  if (!product) {
+    return (
+      <div className="p-10 text-gray-600 text-center">
+        Loading product details...
+      </div>
+    );
+  }
 
   const handleAddToCart = async () => {
     const quantity = getQuantity(product.id);
     try {
       const res = await addToCart(
-        medicineid,
+        product.id,
         quantity,
         product?.prescription,
         uploadedImage
@@ -49,22 +53,21 @@ const ProductDetails = () => {
 
       if (res?.error === "insufficient_stock") {
         toast.error(`Only ${res.available} items are available in stock.`);
-
         return;
       }
 
       setAddedToCart(true);
     } catch (error) {
-      toast.error("Cart me add karne me problem aayi");
+      toast.error("Problem adding to cart");
     }
   };
 
   const handleGoToCart = () => {
     router.push("/Checkout");
   };
+
   const fallbackImage = "/assets/demo.jpg";
   const images = product.images?.length > 0 ? product.images : [fallbackImage];
-  const medicineid = product.id;
 
   return (
     <div className="bg-gray-100 pb-10 min-h-screen">
@@ -88,36 +91,15 @@ const ProductDetails = () => {
               Generic: {product?.genericname || "General Medicine"}
             </h2>
 
-            {/* <div className="flex items-center gap-3 mb-6">
-              <div className="flex gap-[3px] text-yellow-400 text-xl">
-                {[...Array(5)].map((_, i) => (
-                  <i key={i} className="ri-star-fill"></i>
-                ))}
-              </div>
-              <span className="text-red-800 font-medium text-base">
-                120 Reviews
-              </span>
-            </div> */}
-
             <p className="text-gray-700 leading-relaxed mb-6 text-base md:text-lg text-justify">
               {product?.description || "No description available."}
             </p>
 
             <div className="flex items-center gap-3 mb-2">
               <span className="text-2xl font-bold text-green-600">
-                ₱{product?.price?.toFixed(2) || "N/A"}
+                ₹{product?.price?.toFixed(2) || "N/A"}
               </span>
-              {/* <span className="text-sm text-gray-500 line-through -mt-2">
-                MRP ₹{(product?.price * 1.1).toFixed(2)}
-              </span> */}
             </div>
-
-            {/* <div className="text-gray-700 font-semibold text-sm mb-6">
-              <span>{product?.measurementunitvalue || 1}</span>
-              <span className="mx-1">{product?.unit || "unit"}</span>
-              <span className="mx-1">/</span>
-              <span>{product?.numberofpiecesperbox || "?"} per box</span>
-            </div> */}
 
             <QuantitySelector medicineid={product.id} />
 
@@ -151,3 +133,25 @@ const ProductDetails = () => {
 };
 
 export default ProductDetails;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

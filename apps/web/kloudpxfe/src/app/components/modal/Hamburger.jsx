@@ -9,18 +9,25 @@ import useModal from "@/app/hooks/useModal";
 const Hamburger = () => {
   const { isOpen, setIsOpen, modalRef } = useModal();
   const { user } = useAuth();
-  const { category, getItemsByCategory, getCategory } = useProductContext();
+  const {
+    category,
+    getItemsByCategory,
+    getCategory,
+    setSelectedCategoryId,
+    setSelectedCategoryName,
+  } = useProductContext();
   const router = useRouter();
 
   const handleCategoryClick = async (id) => {
+    const selected = category.find((cat) => cat.ID === id);
+    setSelectedCategoryId(id);
+    setSelectedCategoryName(selected?.CategoryName || "");
     await getItemsByCategory(id);
+    const categorySlug =
+      selected?.CategoryName?.toLowerCase().replace(/\s+/g, "-") || "";
+    router.push(`/Products?category=${id}&name=${categorySlug}`);
     setIsOpen(false);
-    router.push(`/Products?category=${id}`);
   };
-
-  useEffect(() => {
-    getCategory();
-  }, []);
 
   return (
     <>

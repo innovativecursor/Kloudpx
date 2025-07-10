@@ -31,8 +31,8 @@ const endpoints = {
     get: `/v1/user/get-branded-medicine`,
   },
   prescription: {
-    upload: `/v1/user/upload-prescription`
-  }
+    upload: `/v1/user/upload-prescription`,
+  },
 };
 
 export default endpoints;
