@@ -20,7 +20,7 @@ const FeaturedBrand = () => {
     }
   }, []);
 
-  console.log(branded);
+  // console.log(branded);
 
   return (
     <div className="responsive-mx mt-8 md:mt-24 bg-gray-200/70 rounded-xl sm:py-12 py-8 sm:px-6 px-4">

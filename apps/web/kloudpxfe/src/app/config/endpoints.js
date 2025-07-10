@@ -16,6 +16,9 @@ const endpoints = {
     getAll: `/v1/user/get-categories-for-user`,
     getItemsByCategory: (id) => `/v1/user/get-items-by-categories/${id}`,
   },
+  details: {
+    get: (id) => `http://localhost:10003/v1/user/medicine-details/${id}`,
+  },
   cart: {
     add: `/v1/user/add-to-cart`,
     get: `/v1/user/get-cart`,
@@ -29,6 +32,9 @@ const endpoints = {
   },
   branded: {
     get: `/v1/user/get-branded-medicine`,
+  },
+  twocategory: {
+    get: `/v1/user/get-two-categories-for-user`,
   },
   prescription: {
     upload: `/v1/user/upload-prescription`,

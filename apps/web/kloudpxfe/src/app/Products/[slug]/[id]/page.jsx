@@ -15,60 +15,31 @@ const ProductDetails = () => {
   const { id } = useParams();
   const router = useRouter();
 
-  const {
-    allMedicine,
-    getAllMedicine,
-    selectedCategoryName,
-    setSelectedCategoryName,
-    category,
-    getCategory,
-  } = useProductContext();
-
+  const { getProductDeatils, productDetails } = useProductContext();
   const { addToCart, getQuantity } = useCartContext();
   const { uploadedImage } = usePrescriptionContext();
 
-  const [product, setProduct] = useState(null);
   const [addedToCart, setAddedToCart] = useState(false);
-  useEffect(() => {
-    if (allMedicine.length === 0) {
-      getAllMedicine();
-    }
-  }, []);
 
   useEffect(() => {
-    if (id && allMedicine.length > 0) {
-      const match = allMedicine.find((item) => String(item.id) === id);
-      setProduct(match);
-    }
-  }, [allMedicine, id]);
+    if (id) getProductDeatils(id);
+  }, [id]);
 
-  useEffect(() => {
-    if (product?.categoryid && category.length > 0) {
-      const match = category.find((c) => c.ID === product.categoryid);
-      if (match) {
-        setSelectedCategoryName(match.CategoryName);
-      }
-    } else if (category.length === 0) {
-      getCategory();
-    }
-  }, [product, category]);
-
-  if (!product) {
+  if (!productDetails?.id) {
     return (
       <div className="p-10 text-gray-600 text-center">
         Loading product details...
       </div>
     );
   }
-  console.log(product);
 
   const handleAddToCart = async () => {
-    const quantity = getQuantity(product.id);
+    const quantity = getQuantity(productDetails.id);
     try {
       const res = await addToCart(
-        product.id,
+        productDetails.id,
         quantity,
-        product?.prescription,
+        productDetails?.prescription,
         uploadedImage
       );
 
@@ -88,7 +59,16 @@ const ProductDetails = () => {
   };
 
   const fallbackImage = "/assets/demo.jpg";
-  const images = product.images?.length > 0 ? product.images : [fallbackImage];
+  const images =
+    productDetails.images?.length > 0 ? productDetails.images : [fallbackImage];
+
+  const price = Number(productDetails?.price);
+  const discountPercent = Number(productDetails?.discount || 0);
+  const discountedPrice = price - (price * discountPercent) / 100;
+
+  console.log(productDetails);
+
+  console.log(discountPercent);
 
   return (
     <div className="bg-gray-100 pb-10 min-h-screen">
@@ -96,46 +76,59 @@ const ProductDetails = () => {
         <SubTitle
           paths={[
             "Home",
-            selectedCategoryName || "Category",
-            product?.brandname,
+            productDetails?.category || "Category",
+            productDetails?.brandname,
           ]}
         />
 
         <div className="md:flex gap-10 mt-6 sm:mt-12">
           {/* Image Swiper */}
-          <ImageSwiper images={images} />
+          <ImageSwiper images={images} discount={discountPercent} />
 
           {/* Product Info */}
           <div className="w-full md:w-1/2 mt-8 md:mt-0 flex flex-col px-4 sm:px-6 md:px-0">
             <div className="flex items-start gap-8">
-              <h1 className="sm:text-4xl text-2xl font-extrabold text-gray-900 mb-3">
-                {product?.brandname} {product?.power}
-              </h1>
+              <h2 className="sm:text-4xl text-2xl font-extrabold text-gray-900 mb-3">
+                {productDetails?.genericname || "General Medicine"}
+              </h2>
               <SocialIcons />
             </div>
 
-            <h2 className="text-xl font-semibold text-gray-700 mb-2">
-              Generic: {product?.genericname || "General Medicine"}
-            </h2>
+            <h1 className="text-xl font-semibold text-gray-700 mb-2">
+              {productDetails?.brandname} {productDetails?.power}
+            </h1>
 
             <p className="text-gray-700 leading-relaxed mb-6 text-base md:text-lg text-justify">
-              {product?.description || "No description available."}
+              {productDetails?.description || "No description available."}
             </p>
 
             <div className="flex items-center gap-3 mb-2">
-              <span className="text-2xl font-bold text-green-600">
-                ₹{product?.price?.toFixed(2) || "N/A"}
-              </span>
+              {price ? (
+                discountPercent > 0 ? (
+                  <>
+                    <span className="text-xl font-semibold text-green-600">
+                      ₹{discountedPrice.toFixed(2)}
+                    </span>
+                    <span className="opacity-55 line-through -mt-2">
+                      ₹{price.toFixed(2)}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-xl font-semibold text-green-600">
+                    ₹{price.toFixed(2)}
+                  </span>
+                )
+              ) : (
+                <span className="text-red-500">Price not available</span>
+              )}
             </div>
 
-            <QuantitySelector medicineid={product.id} />
+            <QuantitySelector medicineid={productDetails.id} />
 
-            {/* Buttons */}
             <div className="mt-8 flex flex-col sm:flex-row gap-4 sm:gap-6 w-full">
               {addedToCart ? (
                 <button
                   onClick={handleGoToCart}
-                  type="button"
                   className="w-full sm:flex-1 flex items-center justify-center gap-3 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold text-base px-8 py-3 cursor-pointer rounded-full shadow-sm transition-colors hover:border-blue-700 active:scale-95"
                 >
                   <i className="ri-shopping-cart-2-line text-xl"></i>
@@ -144,7 +137,6 @@ const ProductDetails = () => {
               ) : (
                 <button
                   onClick={handleAddToCart}
-                  type="button"
                   className="w-full sm:flex-1 flex items-center justify-center gap-3 bg-[#0070ba] hover:to-blue-600 text-white font-semibold text-base px-8 py-3 rounded-full cursor-pointer shadow-lg transition-transform transform hover:scale-105 active:scale-95"
                 >
                   <i className="ri-shopping-cart-line text-xl"></i>

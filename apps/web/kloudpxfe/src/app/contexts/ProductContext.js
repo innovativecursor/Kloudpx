@@ -13,7 +13,8 @@ export const ProductProvider = ({ children }) => {
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [selectedCategoryName, setSelectedCategoryName] = useState("");
   const [branded, setBranded] = useState([]);
-  
+  const [twoCategory, setTwoCategory] = useState([]);
+  const [productDetails, setProductDetails] = useState([]);
 
   const getAllMedicine = async () => {
     try {
@@ -58,6 +59,25 @@ export const ProductProvider = ({ children }) => {
     }
   };
 
+  const getProductDeatils = async (id) => {
+    try {
+      const res = await getAxiosCall(endpoints.details.get(id), {}, false);
+      setProductDetails(res?.data?.medicine || []);
+    } catch (error) {
+      console.error("Failed to fetch items by category", error);
+      setProductDetails([]);
+    }
+  };
+
+  const getTwoCategory = async () => {
+    try {
+      const res = await getAxiosCall(endpoints.twocategory.get, {}, false);
+      setTwoCategory(res?.data?.categories || []);
+    } catch (error) {
+      setTwoCategory([]);
+    }
+  };
+
   useEffect(() => {
     getCategory();
   }, []);
@@ -77,6 +97,10 @@ export const ProductProvider = ({ children }) => {
         setSelectedCategoryName,
         getBranded,
         branded,
+        getTwoCategory,
+        twoCategory,
+        getProductDeatils,
+        productDetails,
       }}
     >
       {children}

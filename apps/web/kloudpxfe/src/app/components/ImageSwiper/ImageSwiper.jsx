@@ -10,8 +10,10 @@ import "swiper/css/thumbs";
 import InnerImageZoom from "react-inner-image-zoom";
 import "react-inner-image-zoom/lib/InnerImageZoom/styles.css";
 
-const ImageSwiper = ({ images }) => {
+const ImageSwiper = ({ images, discount }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
+
+  console.log(discount);
 
   const fallbackImage =
     "https://5.imimg.com/data5/SELLER/Default/2023/7/327286162/LK/TW/UM/123268409/paracetamol-500-mg.jpg";
@@ -22,9 +24,11 @@ const ImageSwiper = ({ images }) => {
     <div className="md:w-1/2">
       {/* Discount Badge */}
       <div className="relative rounded-xl overflow-hidden">
-        <div className="absolute top-2 right-2 bg-[#0070ba] text-white text-xs px-3 py-1 rounded-full font-semibold z-10">
-          -10%
-        </div>
+        {discount > 0 && (
+          <div className="absolute top-2 right-2 bg-[#0070ba] text-white text-xs px-3 py-1 rounded-full font-semibold z-10">
+            {discount}%
+          </div>
+        )}
 
         <div className="flex justify-center items-center w-full h-full">
           <Swiper

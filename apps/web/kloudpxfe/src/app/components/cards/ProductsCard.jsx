@@ -5,13 +5,15 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
+import { generateSlug } from "@/app/utils/slugify";
 
 const ProductCardItem = ({ item, fallbackImage }) => {
   const router = useRouter();
   const swiperRef = useRef(null);
 
-  const handleCardClick = (id) => {
-    router.push(`/Products/${id}`);
+  const handleCardClick = (id, genericname) => {
+    const slug = generateSlug(genericname);
+    router.push(`/Products/${slug}/${id}`);
   };
 
   const validImages = (item.images || []).filter(
@@ -37,10 +39,10 @@ const ProductCardItem = ({ item, fallbackImage }) => {
 
   return (
     <div
-      onClick={() => handleCardClick(item.id)}
+      onClick={() => handleCardClick(item.id, item.genericname)}
       className="w-full bg-white h-[340px] rounded cursor-pointer transform transition-transform duration-300 hover:scale-105 hover:shadow-xl overflow-hidden"
     >
-      <h1 className="mx-3.5 lg:text-xl mt-4 md:text-xl text-lg font-light">
+      <h1 className="mx-3.5 lg:text-lg mt-4 md:text-xl text-lg font-light">
         {item.brandname}
       </h1>
 
@@ -55,7 +57,7 @@ const ProductCardItem = ({ item, fallbackImage }) => {
           slidesPerView={1}
           loop
           allowTouchMove={true}
-          style={{ width: "80%", height: "190px" }}
+          style={{ width: "80%", height: "160px" }}
         >
           {slides.map((img, index) => (
             <SwiperSlide key={index}>
@@ -64,7 +66,7 @@ const ProductCardItem = ({ item, fallbackImage }) => {
                   src={img.FileName}
                   alt={item.brandname}
                   fill
-                  className="object-cover rounded"
+                  className=" rounded"
                 />
               </div>
             </SwiperSlide>
