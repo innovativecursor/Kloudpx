@@ -33,8 +33,6 @@ const endpoints = {
   carousel: {
     get: `${baseUrl}/v1/carousel/get-all-carousel-img`,
     add: `${baseUrl}/v1/carousel/add-carousel-img`,
-    
-
   },
 
   protected: {

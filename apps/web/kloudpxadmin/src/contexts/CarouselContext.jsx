@@ -15,10 +15,7 @@ const CarouselProvider = ({ children }) => {
   const [carouselImages, setCarouselImages] = useState([]);
 
   const getAllCarouselImages = async () => {
-    const res = await getAxiosCall(
-      "/v1/carousel/get-all-carousel-img"
-
-    );
+    const res = await getAxiosCall("/v1/carousel/get-all-carousel-img");
     if (res?.data?.data) {
       setCarouselImages(res.data.data);
     }

@@ -1,158 +1,250 @@
 import React from "react";
-import { Table, Button, Tooltip } from "antd";
-import { RiEditLine, RiDeleteBin6Line } from "react-icons/ri";
+import { CheckCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons";
+import { Image, Button, Tooltip } from "antd";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import { RiEdit2Fill } from "react-icons/ri";
+import { useIconComponent } from "../../hooks/useIconComponent";
+import { RiDeleteBin4Fill } from "react-icons/ri";
 
-import * as FaIcons from "react-icons/fa";
-import * as AiIcons from "react-icons/ai";
-import * as TbIcons from "react-icons/tb";
-import * as MdIcons from "react-icons/md";
-import * as BiIcons from "react-icons/bi";
-import * as GiIcons from "react-icons/gi";
-
-const allIcons = {
-  ...FaIcons,
-  ...AiIcons,
-  ...TbIcons,
-  ...MdIcons,
-  ...BiIcons,
-  ...GiIcons,
+const CategoryIconRenderer = ({ iconName }) => {
+  const IconComponent = useIconComponent(iconName);
+  return IconComponent ? <IconComponent size={20} /> : "N/A";
 };
 
-const MedicineTable = ({ data, onEdit, onDelete }) => {
-  const columns = [
-    {
-      title: "Brand Name",
-      dataIndex: "brandName",
-      key: "brandName",
-      sorter: (a, b) => a.brandName.localeCompare(b.brandName),
-    },
-    { title: "Power", dataIndex: "power", key: "power" },
-    { title: "Discount", dataIndex: "discount", key: "discount" },
-    {
-      title: "Category Icon",
-      dataIndex: "categoryIcon",
-      key: "categoryIcon",
-      render: (iconName) => {
-        if (!iconName)
-          return <span className="text-gray-400 italic">No Data</span>;
-        const IconComponent = allIcons[iconName];
-        return IconComponent ? (
-          <IconComponent className="text-xl" />
-        ) : (
-          <span>{iconName}</span>
-        );
-      },
-    },
-    {
-      title: "Generic Name",
-      dataIndex: ["genericName", "label"],
-      key: "genericName",
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-      ellipsis: true,
-    },
-    { title: "Category", dataIndex: ["category", "label"], key: "category" },
-    { title: "Unit", dataIndex: ["unitType", "label"], key: "unitType" },
-    {
-      title: "Measurement Value",
-      dataIndex: "measurementValue",
-      key: "measurementValue",
-    },
-    { title: "Pieces/Box", dataIndex: "piecesPerBox", key: "piecesPerBox" },
-    { title: "SP/Box", dataIndex: "spPerBox", key: "spPerBox" },
-    { title: "SP/Piece", dataIndex: "spPerPiece", key: "spPerPiece" },
-    { title: "CP/Box", dataIndex: "cpPerBox", key: "cpPerBox" },
-    { title: "CP/Piece", dataIndex: "cpPerPiece", key: "cpPerPiece" },
-    { title: "Supplier", dataIndex: ["supplier", "label"], key: "supplier" },
-    {
-      title: "Supplier Discount (%)",
-      dataIndex: "supplierDiscount",
-      key: "supplierDiscount",
-      render: (val) => `${val}%`,
-    },
-    { title: "Min Threshold", dataIndex: "minThreshold", key: "minThreshold" },
-    { title: "Max Threshold", dataIndex: "maxThreshold", key: "maxThreshold" },
-    { title: "Lead Time (days)", dataIndex: "leadTime", key: "leadTime" },
-    { title: "Tax Type", dataIndex: ["taxType", "label"], key: "taxType" },
-    {
-      title: "Images",
-      dataIndex: "images",
-      key: "images",
-      render: (images) =>
-        images.length > 0 ? (
-          <div className="flex gap-2 flex-wrap">
-            {images.map((url, idx) => (
-              <img
-                key={idx}
-                src={url}
-                alt={`img-${idx}`}
-                className="w-12 h-12 object-cover rounded border"
-              />
-            ))}
-          </div>
-        ) : (
-          <span className="text-gray-400 text-xs">No Image</span>
-        ),
-    },
-    {
-      title: "Prescription",
-      dataIndex: "prescription",
-      key: "prescription",
-      render: (val) => (val ? "✔️" : "❌"),
-    },
-    {
-      title: "IsBrand",
-      dataIndex: "isBrand",
-      key: "isBrand",
-      render: (val) => (val ? "✔️" : "❌"),
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      fixed: "right",
-      width: 90,
-      align: "center",
-      render: (_, record) => (
-        <div className="flex justify-center gap-3">
-          <Tooltip title="Edit">
-            <Button
-              type="primary"
-              onClick={() => onEdit(`/addMedicine/edit/${record._id}`)}
-              icon={<RiEditLine className="text-white" />}
-              size="small"
-              className="bg-blue-600 hover:bg-blue-700 border-none"
-            />
-          </Tooltip>
-          <Tooltip title="Delete">
-            <Button
-              type="primary"
-              danger
-              onClick={() => onDelete(record._id)}
-              icon={<RiDeleteBin6Line className="text-white" />}
-              size="small"
-            />
-          </Tooltip>
-        </div>
-      ),
-    },
-  ];
-
-  return (
-    <Table
-      dataSource={data}
-      columns={columns}
-      rowKey="_id"
-      scroll={{ x: "max-content" }}
-      bordered
-      pagination={{ pageSize: 6 }}
-      rowClassName={() =>
-        "cursor-pointer hover:bg-blue-50 transition duration-200"
-      }
-    />
+const renderTick = (val) =>
+  val ? (
+    <CheckCircleTwoTone twoToneColor="#52c41a" />
+  ) : (
+    <CloseCircleTwoTone twoToneColor="#ff4d4f" />
   );
-};
 
-export default MedicineTable;
+export const getMedicineColumns = ({ handleEdit, deleteMedicine }) => [
+  {
+    title: "Brand",
+    dataIndex: "BrandName",
+    key: "BrandName",
+    fixed: "left",
+    align: "center",
+  },
+  {
+    title: "Category",
+    dataIndex: ["Category", "CategoryName"],
+    key: "CategoryName",
+    align: "center",
+  },
+  {
+    title: "Category Icon",
+    key: "CategoryIcon",
+    align: "center",
+    render: (_, record) => {
+      const iconName = record?.Category?.CategoryIcon?.Icon;
+      return <CategoryIconRenderer iconName={iconName} />;
+    },
+  },
+  {
+    title: "Subclass",
+    dataIndex: "CategorySubClass",
+    key: "CategorySubClass",
+    align: "center",
+  },
+  {
+    title: "Description",
+    dataIndex: "Description",
+    key: "Description",
+    align: "center",
+  },
+
+  {
+    title: "Generic",
+    dataIndex: ["Generic", "GenericName"],
+    key: "GenericName",
+    align: "center",
+  },
+  {
+    title: "Supplier",
+    dataIndex: ["Supplier", "SupplierName"],
+    key: "SupplierName",
+    align: "center",
+  },
+  {
+    title: "Power",
+    dataIndex: "Power",
+    key: "Power",
+    align: "center",
+  },
+  {
+    title: "Dosage",
+    dataIndex: "DosageForm",
+    key: "DosageForm",
+    align: "center",
+  },
+  {
+    title: "Packaging",
+    dataIndex: "Packaging",
+    key: "Packaging",
+    align: "center",
+  },
+  {
+    title: "SP/Box",
+    dataIndex: "SellingPricePerBox",
+    key: "SellingPricePerBox",
+    align: "center",
+    render: (price) => `₹${price?.toFixed(2)}`,
+  },
+  {
+    title: "SP/Piece",
+    dataIndex: "SellingPricePerPiece",
+    key: "SellingPricePerPiece",
+    align: "center",
+    render: (price) => `₹${price?.toFixed(2)}`,
+  },
+  {
+    title: "CP/Box",
+    dataIndex: "CostPricePerBox",
+    key: "CostPricePerBox",
+    align: "center",
+    render: (price) => `₹${price?.toFixed(2)}`,
+  },
+  {
+    title: "CP/Piece",
+    dataIndex: "CostPricePerPiece",
+    key: "CostPricePerPiece",
+    align: "center",
+    render: (price) => `₹${price?.toFixed(2)}`,
+  },
+  {
+    title: "Tax",
+    dataIndex: "TaxType",
+    key: "TaxType",
+    align: "center",
+  },
+  {
+    title: "Discount",
+    dataIndex: "Discount",
+    key: "Discount",
+    align: "center",
+  },
+  {
+    title: "Supplier Discount",
+    dataIndex: "SupplierDiscount",
+    key: "SupplierDiscount",
+    align: "center",
+  },
+  {
+    title: "Unit Value",
+    dataIndex: "MeasurementUnitValue",
+    key: "MeasurementUnitValue",
+    align: "center",
+  },
+  {
+    title: "Unit",
+    dataIndex: "UnitOfMeasurement",
+    key: "UnitOfMeasurement",
+    align: "center",
+  },
+  {
+    title: "Pieces/Box",
+    dataIndex: "NumberOfPiecesPerBox",
+    key: "NumberOfPiecesPerBox",
+    align: "center",
+  },
+  {
+    title: "Max Thresh.",
+    dataIndex: "MaximumThreshold",
+    key: "MaximumThreshold",
+    align: "center",
+  },
+  {
+    title: "Min Thresh.",
+    dataIndex: "MinimumThreshold",
+    key: "MinimumThreshold",
+    align: "center",
+  },
+  {
+    title: "Lead Time (Days)",
+    dataIndex: "EstimatedLeadTimeDays",
+    key: "EstimatedLeadTimeDays",
+    align: "center",
+  },
+  {
+    title: "Marketer",
+    dataIndex: "Marketer",
+    key: "Marketer",
+    align: "center",
+  },
+  {
+    title: "Inhouse",
+    dataIndex: "InhouseBrand",
+    key: "InhouseBrand",
+    align: "center",
+    render: renderTick,
+  },
+  {
+    title: "Is Brand",
+    dataIndex: "IsBrand",
+    key: "IsBrand",
+    align: "center",
+    render: renderTick,
+  },
+  {
+    title: "Prescription",
+    dataIndex: "Prescription",
+    key: "Prescription",
+    align: "center",
+    render: renderTick,
+  },
+  {
+    title: "Is Featured",
+    dataIndex: "IsFeature",
+    key: "IsFeature",
+    align: "center",
+    render: renderTick,
+  },
+  {
+    title: "Images",
+    dataIndex: "ItemImages",
+    key: "ItemImages",
+    align: "center",
+    render: (images) =>
+      images?.length ? (
+        <div className="flex flex-wrap justify-center gap-1">
+          {images.map((img, i) => (
+            <Image
+              key={i}
+              src={img.FileName}
+              alt="med"
+              width={40}
+              height={40}
+              style={{ objectFit: "cover" }}
+            />
+          ))}
+        </div>
+      ) : (
+        "N/A"
+      ),
+  },
+  {
+    title: "Actions",
+    key: "actions",
+    fixed: "right",
+    align: "center",
+    render: (_, record) => (
+      <div className="flex justify-center gap-3">
+        <Tooltip title="Edit">
+          <Button
+            type="link"
+            icon={<RiEdit2Fill className="text-[#0070ba] text-2xl" />}
+            onClick={() => handleEdit(record)}
+          />
+        </Tooltip>
+        <Tooltip title="Delete">
+          <Button
+            type="link"
+            icon={<RiDeleteBin4Fill className="text-red-600 text-2xl" />}
+            onClick={() => deleteMedicine(record.ID)}
+          />
+        </Tooltip>
+      </div>
+    ),
+  },
+];

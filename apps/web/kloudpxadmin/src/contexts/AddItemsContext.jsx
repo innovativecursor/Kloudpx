@@ -7,7 +7,6 @@ import { useImageContext } from "./ImageContext";
 import { postAxiosCall, updateAxiosCall } from "../Axios/UniversalAxiosCalls";
 import { useCategoryContext } from "./CategoryContext";
 import { useNavigate } from "react-router-dom";
-import endpoints from "../config/endpoints";
 
 export const AddItemsContext = createContext();
 
@@ -26,6 +25,8 @@ const AddItemsProvider = ({ children }) => {
     setIsPrescriptionRequired,
     isInhouseBrand,
     setIsInhouseBrand,
+    isfeature,
+    setIsFeature,
   } = useFormDataContext();
 
   const {
@@ -34,12 +35,8 @@ const AddItemsProvider = ({ children }) => {
     setSelectedGeneric,
     setSelectedSupplier,
   } = useDropdownContext();
-  const {
-    selectedCategory,
-    selectedCategoryIcon,
-    setSelectedCategory,
-    setSelectedCategoryIcon,
-  } = useCategoryContext();
+  const { selectedCategory, setSelectedCategory, setSelectedCategoryIcon } =
+    useCategoryContext();
 
   const {
     measurementType,
@@ -91,6 +88,7 @@ const AddItemsProvider = ({ children }) => {
       estimatedleadtimedays: Number(formData.leadTime),
       prescription: isPrescriptionRequired,
       imageids: uploadedImageIds,
+      isfeature: isfeature,
     };
 
     console.log("📦 Payload ready to send:", payload);
@@ -100,6 +98,7 @@ const AddItemsProvider = ({ children }) => {
         await updateAxiosCall(
           "/v1/medicine/update-medicine",
           // endpoints.medicine.update,
+
           medicineId,
           payload
         );
@@ -130,7 +129,7 @@ const AddItemsProvider = ({ children }) => {
       setIsBranded(false);
       setIsPrescriptionRequired(false);
       setIsInhouseBrand(false);
-
+      setIsFeature(false);
       setSelectedGeneric(null);
       setSelectedSupplier(null);
       setSelectedCategory(null);
@@ -152,6 +151,8 @@ const AddItemsProvider = ({ children }) => {
       console.error("❌ API Error:", error);
     }
   };
+
+  console.log(uploadedImageIds);
 
   return (
     <AddItemsContext.Provider value={{ handleSubmit }}>

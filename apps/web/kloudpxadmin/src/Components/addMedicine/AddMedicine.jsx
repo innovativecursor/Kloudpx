@@ -20,44 +20,25 @@ const AddMedicine = () => {
   const {
     brandName,
     setBrandName,
-    formData,
     setFormData,
     taxOption,
     setTaxOption,
-    isBranded,
     setIsBranded,
-    isInhouseBrand,
     setIsInhouseBrand,
-    isPrescriptionRequired,
     setIsPrescriptionRequired,
+    setIsFeature,
   } = useFormDataContext();
 
+  const { setSelectedGeneric, setSelectedSupplier } = useDropdownContext();
+  const { setSelectedCategory, setSelectedCategoryIcon } = useCategoryContext();
   const {
-    selectedGeneric,
-    setSelectedGeneric,
-    selectedSupplier,
-    setSelectedSupplier,
-  } = useDropdownContext();
-  const {
-    selectedCategory,
-    setSelectedCategory,
-    selectedCategoryIcon,
-    setSelectedCategoryIcon,
-  } = useCategoryContext();
-  const {
-    measurementType,
     setMeasurementType,
-    measurementValue,
     setMeasurementValue,
-    piecesPerBox,
     setPiecesPerBox,
-    sellingPricePerBox,
     setSellingPricePerBox,
-    sellingPricePerPiece,
     setSellingPricePerPiece,
-    costPricePerBox,
     setCostPricePerBox,
-    costPricePerPiece,
+
     setCostPricePerPiece,
   } = useMeasurementContext();
 
@@ -114,6 +95,7 @@ const AddMedicine = () => {
     setIsBranded(data.IsBrand);
     setIsInhouseBrand(data.InhouseBrand);
     setIsPrescriptionRequired(data.Prescription);
+    setIsFeature(data.IsFeature);
   };
 
   return (
@@ -215,7 +197,7 @@ const AddMedicine = () => {
         <ImageUploader />
       </div>
 
-      <div className="my-10">
+      <div className="my-7">
         <BooleanCheckbox />
       </div>
 

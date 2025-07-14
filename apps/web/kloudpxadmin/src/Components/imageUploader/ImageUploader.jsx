@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useImageContext } from "../../contexts/ImageContext";
 import { useLocation } from "react-router-dom";
 import imageCompression from "browser-image-compression";
+import { deleteAxiosCall } from "../../Axios/UniversalAxiosCalls";
 
 const ImageUploader = () => {
   const {
@@ -68,20 +69,33 @@ const ImageUploader = () => {
     uploadImages("0", compressedBase64Images);
   };
 
-  // ✅ Remove existing image
-  const handleRemoveExisting = (index) => {
-    const updatedUrls = [...existingImages];
-    const updatedIds = [...existingImageIds];
+  // ✅ Remove existing image with API call
+  const handleRemoveExisting = async (index) => {
+    const imageIdToDelete = existingImageIds[index];
 
-    updatedUrls.splice(index, 1);
-    updatedIds.splice(index, 1);
+    try {
+      const res = await deleteAxiosCall(
+        "/v1/itemimage/delete-itemimage",
+        imageIdToDelete
+      );
+      console.log("🗑️ Deleted image successfully:", res);
 
-    setExistingImages(updatedUrls);
-    setExistingImageIds(updatedIds);
-    setUploadedImageIds([
-      ...updatedIds,
-      ...uploadedImageIds.filter((id) => !existingImageIds.includes(id)),
-    ]);
+      // Now update the UI
+      const updatedUrls = [...existingImages];
+      const updatedIds = [...existingImageIds];
+
+      updatedUrls.splice(index, 1);
+      updatedIds.splice(index, 1);
+
+      setExistingImages(updatedUrls);
+      setExistingImageIds(updatedIds);
+      setUploadedImageIds([
+        ...updatedIds,
+        ...uploadedImageIds.filter((id) => !existingImageIds.includes(id)),
+      ]);
+    } catch (err) {
+      console.error("❌ Image delete failed:", err);
+    }
   };
 
   // ✅ Remove base64 image

@@ -9,12 +9,14 @@ const BooleanCheckbox = () => {
     setIsPrescriptionRequired,
     isInhouseBrand,
     setIsInhouseBrand,
+    isfeature,
+    setIsFeature,
   } = useFormDataContext();
 
   const checkboxes = [
     {
       id: "branded",
-      label: "Branded Product",
+      label: " Mark as a branded Product",
       checked: isBranded,
       onChange: setIsBranded,
     },
@@ -26,16 +28,25 @@ const BooleanCheckbox = () => {
     },
     {
       id: "inhouse",
-      label: "In-house Brand",
+      label: "Is this an in-house brand product?",
       checked: isInhouseBrand,
       onChange: setIsInhouseBrand,
+    },
+    {
+      id: "isfeature",
+      label: "Mark as a featured product",
+      checked: isfeature,
+      onChange: setIsFeature,
     },
   ];
 
   return (
-    <div className="grid sm:grid-cols-3 gap-3">
+    <div className="grid sm:grid-cols-3 gap-5">
       {checkboxes.map((cb) => (
-        <label key={cb.id} className="flex items-center gap-2 text-sm">
+        <label
+          key={cb.id}
+          className="flex items-center gap-2 font-semibold md:text-base text-sm"
+        >
           <input
             type="checkbox"
             checked={cb.checked}

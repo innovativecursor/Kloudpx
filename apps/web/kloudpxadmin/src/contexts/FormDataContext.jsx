@@ -20,6 +20,7 @@ const FormDataProvider = ({ children }) => {
   const [isBranded, setIsBranded] = useState(false);
   const [isPrescriptionRequired, setIsPrescriptionRequired] = useState(false);
   const [isInhouseBrand, setIsInhouseBrand] = useState(false);
+  const [isfeature, setIsFeature] = useState(false);
   const [taxOption, setTaxOption] = useState(null);
   const [brandName, setBrandName] = useState("");
 
@@ -46,6 +47,8 @@ const FormDataProvider = ({ children }) => {
         brandName,
         setBrandName,
         setFormData,
+        isfeature,
+        setIsFeature,
       }}
     >
       {children}
