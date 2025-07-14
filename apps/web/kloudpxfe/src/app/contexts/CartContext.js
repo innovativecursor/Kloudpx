@@ -126,7 +126,7 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = async (id) => {
     console.log(id, "cart id is here");
-    
+
     if (!token) {
       toast.error("please login...");
       return;

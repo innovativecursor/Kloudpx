@@ -30,6 +30,13 @@ const endpoints = {
   itemimage: {
     add: `${baseUrl}/v1/itemimage/add-itemimage`,
   },
+  carousel: {
+    get: `${baseUrl}/v1/carousel/get-all-carousel-img`,
+    add: `${baseUrl}/v1/carousel/add-carousel-img`,
+    
+
+  },
+
   protected: {
     basic: `${baseUrl}/api/v1/protected`,
     admin: `${baseUrl}/api/v1/admin`,

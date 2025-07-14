@@ -51,7 +51,7 @@ const Category7 = () => {
           <img
             src={rightImage.ImageURL}
             alt={rightImage.ButtonText || "Gallery"}
-            className="w-full h-full object-cover rounded-md transition cursor-pointer duration-300 group-hover:opacity-60"
+            className="w-full h-full  rounded-md transition cursor-pointer duration-300 group-hover:opacity-60"
           />
           <div className="absolute inset-0 flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition duration-300">
             <PrimaryButton title={rightImage.ButtonText || "View"} />

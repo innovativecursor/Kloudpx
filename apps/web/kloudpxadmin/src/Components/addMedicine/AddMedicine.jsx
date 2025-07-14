@@ -1,208 +1,230 @@
-import React from "react";
-import Title from "../comman/Title";
-import Button from "../comman/Button";
-import FormSectionWrapper from "../formSectionWrapper/FormSectionWrapper";
-import LabeledInput from "../labelInput/LabelInput";
-import LabeledSelect from "../labeledSelect/LabeledSelect";
-
-import MedicineFormInputs from "../medicine/MedicineFormInputs";
-import PriceSection from "../medicine/PriceSection";
-import ThresholdSection from "../medicine/ThresholdSection";
-import PrescriptionSection from "../medicine/PrescriptionSection";
-
-import useMedicineForm from "../../hooks/useMedicineForm";
-import IsBrandItem from "./IsBrandItem";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import Dropdown from "../../Components/comman/Dropdown";
+import MeasurementUnit from "../comman/MeasurementUnit";
+import PriceFields from "../comman/PriceFields";
+import ImageUploader from "../imageUploader/ImageUploader";
+import TaxSelect from "../comman/TaxSelect";
+import Input from "../comman/Input";
+import BooleanCheckbox from "../comman/BooleanCheckbox";
+import { useFormDataContext } from "../../contexts/FormDataContext";
+import { useAddItemsContext } from "../../contexts/AddItemsContext";
+import { useDropdownContext } from "../../contexts/DropdownContext";
+import { useMeasurementContext } from "../../contexts/MeasurementContext";
+import { useCategoryContext } from "../../contexts/CategoryContext";
 
 const AddMedicine = () => {
+  const location = useLocation();
+  const medicine = location.state?.medicine;
+
   const {
+    brandName,
+    setBrandName,
     formData,
-    handleChange,
-    genericName,
-    handleGenericChange,
-    handleGenericCreate,
-    genericOptions,
-    genericError,
+    setFormData,
+    taxOption,
+    setTaxOption,
+    isBranded,
+    setIsBranded,
+    isInhouseBrand,
+    setIsInhouseBrand,
+    isPrescriptionRequired,
+    setIsPrescriptionRequired,
+  } = useFormDataContext();
 
-    category,
-    handleCategoryChange,
-    handleCategoryCreate,
-    categoryOptions,
-    categoryError,
+  const {
+    selectedGeneric,
+    setSelectedGeneric,
+    selectedSupplier,
+    setSelectedSupplier,
+  } = useDropdownContext();
+  const {
+    selectedCategory,
+    setSelectedCategory,
+    selectedCategoryIcon,
+    setSelectedCategoryIcon,
+  } = useCategoryContext();
+  const {
+    measurementType,
+    setMeasurementType,
+    measurementValue,
+    setMeasurementValue,
+    piecesPerBox,
+    setPiecesPerBox,
+    sellingPricePerBox,
+    setSellingPricePerBox,
+    sellingPricePerPiece,
+    setSellingPricePerPiece,
+    costPricePerBox,
+    setCostPricePerBox,
+    costPricePerPiece,
+    setCostPricePerPiece,
+  } = useMeasurementContext();
 
-    supplier,
-    handleSupplierChange,
-    handleSupplierCreate,
-    supplierOptions,
-    supplierError,
+  const { handleSubmit } = useAddItemsContext();
 
-    unitType,
-    handleUnitChange,
-    unitOptions,
-    showMeasurementValue,
+  useEffect(() => {
+    if (medicine) {
+      prefillData(medicine);
+    }
+  }, [medicine]);
 
-    taxType,
-    handleTaxTypeChange,
-    taxTypeOptions,
-
-    prescriptionRequired,
-
-    handleSubmit,
-    handleUpload,
-    handleImageChange,
-    images,
-    setImages,
-    previewUrls,
-    message,
-    id,
-    uploadedImageIds,
-    setPreviewUrls,
-    setUploadedImageIds,
-    isBrand,
-    setIsBrand,
-    categoryIcons,
-    handleCategoryIconChange,
-    handleCategoryIconCreate,
-    categoryIcon,
-    categoryIconError,
-    categoryIconOptions,
-  } = useMedicineForm();
-  const navigate = useNavigate();
-  const createGenericOption = (inputValue) => ({
-    label: inputValue,
-    value: inputValue.toLowerCase().replace(/\s+/g, "-"),
-  });
-
-  const createCategoryOption = (inputValue) => ({
-    label: inputValue,
-    value: inputValue.toLowerCase().replace(/\s+/g, "-"),
-  });
-
-  const createSupplierOption = (inputValue) => ({
-    label: inputValue,
-    value: inputValue.toLowerCase().replace(/\s+/g, "-"),
-  });
+  const prefillData = (data) => {
+    setBrandName(data.BrandName);
+    setTaxOption({ label: data.TaxType, value: data.TaxType });
+    setFormData({
+      power: data.Power,
+      productDiscount: data.Discount?.replace("%", ""),
+      supplierDiscount: data.SupplierDiscount?.replace("%", ""),
+      minThreshold: data.MinimumThreshold,
+      maxThreshold: data.MaximumThreshold,
+      leadTime: data.EstimatedLeadTimeDays,
+      categorySubclass: data.CategorySubClass,
+      dosageForm: data.DosageForm,
+      packaging: data.Packaging,
+      marketer: data.Marketer,
+      description: data.Description,
+    });
+    setSelectedGeneric({
+      label: data.Generic?.GenericName,
+      value: data.GenericID,
+    });
+    setSelectedSupplier({
+      label: data.Supplier?.SupplierName,
+      value: data.SupplierID,
+    });
+    setSelectedCategory({
+      label: data.Category?.CategoryName,
+      value: data.CategoryID,
+    });
+    setSelectedCategoryIcon({
+      label: data.Category?.CategoryIcon?.Icon,
+      value: data.CategoryIconID,
+    });
+    setMeasurementType({
+      label: data.UnitOfMeasurement,
+      value: data.UnitOfMeasurement,
+    });
+    setMeasurementValue(data.MeasurementUnitValue);
+    setPiecesPerBox(data.NumberOfPiecesPerBox);
+    setSellingPricePerBox(data.SellingPricePerBox);
+    setSellingPricePerPiece(data.SellingPricePerPiece);
+    setCostPricePerBox(data.CostPricePerBox);
+    setCostPricePerPiece(data.CostPricePerPiece);
+    setIsBranded(data.IsBrand);
+    setIsInhouseBrand(data.InhouseBrand);
+    setIsPrescriptionRequired(data.Prescription);
+  };
 
   return (
-    <div className="flex justify-center items-center mb-20 ">
-      <div className="responsive-mx card">
-        <Title text={id ? "Update Items" : "Add Items"} />
+    <div className="max-w-6xl md:mx-auto mx-3  md:px-16 px-7 py-12 bg-white border border-[#0070ba] rounded-md my-20 shadow-md">
+      <h2 className="text-4xl font-bold mb-9 text-center text-[#0070ba]">
+        {medicine ? "✏️ Edit Items" : "➕ Add Items"}
+      </h2>
 
-        {/* Error Messages */}
-        {genericError && <p className="text-red-500 mb-2">{genericError}</p>}
-        {supplierError && <p className="text-red-500 mb-2">{supplierError}</p>}
-        {categoryError && <p className="text-red-500 mb-2">{categoryError}</p>}
-        {categoryIconError && (
-          <p className="text-red-500 mb-2">{categoryIconError}</p>
-        )}
-
-        <FormSectionWrapper onSubmit={handleSubmit}>
-          <MedicineFormInputs
-            formData={formData}
-            handleChange={handleChange}
-            genericName={genericName}
-            handleGenericChange={handleGenericChange}
-            handleGenericCreate={handleGenericCreate}
-            genericOptions={genericOptions}
-            categoryIcon={categoryIcon}
-            handleCategoryIconChange={handleCategoryIconChange}
-            handleCategoryIconCreate={handleCategoryIconCreate}
-            categoryIconOptions={categoryIconOptions}
-            category={category}
-            handleCategoryChange={handleCategoryChange}
-            handleCategoryCreate={handleCategoryCreate}
-            categoryOptions={categoryOptions}
-            unitType={unitType}
-            handleUnitChange={handleUnitChange}
-            unitOptions={unitOptions}
-            showMeasurementValue={showMeasurementValue}
-          />
-          <IsBrandItem
-            label="Mark as Branded Product"
-            isBrand={isBrand}
-            setIsBrand={setIsBrand}
-          />
-
-          {/* Price Section */}
-          <PriceSection formData={formData} handleChange={handleChange} />
-
-          <div className="flex gap-4">
-            <div className="w-full">
-              {/* Supplier Select */}
-              <LabeledSelect
-                label="Supplier"
-                value={supplier}
-                onChange={(val) => {
-                  handleSupplierChange(val);
-                  handleChange("supplier", val);
-                }}
-                onCreate={(inputValue) =>
-                  handleSupplierCreate(inputValue, createSupplierOption)
-                }
-                options={supplierOptions}
-                // disabled={!formData.cpPerPiece}
-                placeholder="Select or create supplier"
-              />
-            </div>
-            <div className="w-full">
-              {/* Supplier Discount Input */}
-              <LabeledInput
-                label="Supplier Discount (%)"
-                type="number"
-                step="0.01"
-                value={formData.supplierDiscount}
-                onChange={(e) =>
-                  handleChange("supplierDiscount", e.target.value)
-                }
-                // disabled={!supplier}
-                placeholder="Enter supplier discount"
-              />
-            </div>
-          </div>
-          {/* Threshold Section */}
-          <ThresholdSection
-            formData={formData}
-            handleChange={handleChange}
-            supplier={supplier}
-          />
-
-          {/* Prescription Section */}
-          <PrescriptionSection
-            formData={formData}
-            handleChange={handleChange}
-            taxType={taxType}
-            handleTaxTypeChange={handleTaxTypeChange}
-            taxTypeOptions={taxTypeOptions}
-            handleImageChange={handleImageChange}
-            handleUpload={handleUpload}
-            images={images}
-            previewUrls={previewUrls}
-            message={message}
-            id={id}
-            uploadedImageIds={uploadedImageIds}
-            setUploadedImageIds={setUploadedImageIds}
-            setPreviewUrls={setPreviewUrls}
-            prescriptionRequired={prescriptionRequired}
-            setImages={setImages}
-          />
-
-          {/* Submit Button */}
-          <div className="flex justify-center items-center gap-6 my-8 pb-8">
-            <Button
-              className="w-72"
-              text={id ? "Update Medicine" : "Add Medicine"}
-              type="submit"
-              disabled={uploadedImageIds.length === 0}
-            />
-            <Button
-              className="w-60 bg-red-400 hover:bg-red-500 text-white"
-              text="Cancel"
-              type="button"
-              onClick={() => navigate(-1)}
-            />
-          </div>
-        </FormSectionWrapper>
+      <div>
+        <label className="block font-medium mb-1">Brand Name</label>
+        <input
+          type="text"
+          value={brandName}
+          onChange={(e) => setBrandName(e.target.value)}
+          className="w-full px-3 py-3.5 border border-gray-500 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          placeholder="Enter brand name"
+        />
       </div>
+
+      <div className="my-10">
+        <Input
+          label="Description"
+          name="description"
+          placeholder="Enter product description"
+        />
+      </div>
+      <div className="my-10">
+        <Dropdown type="generic" label="Generic Name" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <Dropdown type="supplier" label="Supplier Name" />
+        <Input
+          label="Supplier Discount (%)"
+          name="supplierDiscount"
+          placeholder="Enter supplier discount"
+        />
+        <Dropdown type="category" label="Select or Create Category" />
+        <Dropdown type="categoryIcon" label="Select Category Icon" />
+        <Input
+          label="Dosage Form"
+          name="dosageForm"
+          placeholder="e.g. Tablet, Syrup"
+        />
+        <Input
+          label="Packaging"
+          name="packaging"
+          placeholder="e.g. Strip, Bottle"
+        />
+        <Input label="Power" name="power" placeholder="e.g. 500mg" />
+        <Input
+          label="Product Discount (%)"
+          name="productDiscount"
+          placeholder="Enter product discount"
+        />
+        <Input
+          label="Minimum Threshold"
+          name="minThreshold"
+          placeholder="Enter minimum stock threshold"
+        />
+        <Input
+          label="Maximum Threshold"
+          name="maxThreshold"
+          placeholder="Enter maximum stock threshold"
+        />
+        <Input
+          label="Category Subclass"
+          name="categorySubclass"
+          placeholder="Enter subclass (optional)"
+        />
+        <Input
+          label="Marketer"
+          name="marketer"
+          placeholder="Enter marketer name"
+        />
+      </div>
+
+      {/* Full-width components */}
+      <div className="my-10">
+        <MeasurementUnit />
+      </div>
+
+      <div className="my-10">
+        <PriceFields />
+      </div>
+
+      <div className="my-10">
+        <Input
+          label="Estimated Lead Time (days)"
+          name="leadTime"
+          placeholder="Enter estimated delivery time"
+        />
+      </div>
+
+      <div>
+        <TaxSelect value={taxOption} onChange={setTaxOption} />
+      </div>
+
+      <div className="my-10">
+        <ImageUploader />
+      </div>
+
+      <div className="my-10">
+        <BooleanCheckbox />
+      </div>
+
+      <button
+        onClick={() => handleSubmit(medicine?.ID)}
+        className="mt-8 w-full py-3 bg-[#0070ba] text-white text-lg rounded-md transition"
+      >
+        {medicine ? "Update Items" : "Submit Items"}
+      </button>
     </div>
   );
 };

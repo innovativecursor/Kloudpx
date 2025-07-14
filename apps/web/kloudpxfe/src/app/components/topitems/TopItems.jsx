@@ -64,42 +64,48 @@ const TopItems = () => {
 
   return (
     <div className="w-full">
-      <Swiper
-        loop={true}
-        modules={[Navigation]}
-        onSwiper={setSwiperInstance}
-        navigation={{
-          prevEl: prevRef.current,
-          nextEl: nextRef.current,
-        }}
-        spaceBetween={10}
-        slidesPerView="auto"
-        className="w-full"
-      >
-        {category.map((item, index) => {
-          const IconComponent = getIconComponent(item.CategoryIcon?.Icon);
-          return (
-            <SwiperSlide key={item.ID || index} className="!w-auto">
-              <div
-                onClick={() => handleCategoryClick(item.ID)}
-                className={`flex min-w-max md:px-5 px-2 gap-2 cursor-pointer transition-all duration-300 ease-in-out items-center justify-center whitespace-nowrap
+      {category.length > 0 ? (
+        <Swiper
+          loop={true}
+          modules={[Navigation]}
+          onSwiper={setSwiperInstance}
+          navigation={{
+            prevEl: prevRef.current,
+            nextEl: nextRef.current,
+          }}
+          spaceBetween={10}
+          slidesPerView="auto"
+          className="w-full"
+        >
+          {category.map((item, index) => {
+            const IconComponent = getIconComponent(item.CategoryIcon?.Icon);
+            return (
+              <SwiperSlide key={item.ID || index} className="!w-auto">
+                <div
+                  onClick={() => handleCategoryClick(item.ID)}
+                  className={`flex min-w-max md:px-5 px-2 gap-2 cursor-pointer transition-all duration-300 ease-in-out items-center justify-center whitespace-nowrap
                   ${
                     selectedCategoryId === item.ID
                       ? "text-[#0070ba]"
                       : "hover:text-[#0070ba]"
                   }`}
-              >
-                {IconComponent && (
-                  <IconComponent className="sm:text-2xl text-base text-color" />
-                )}
-                <p className="sm:text-xs text-[11px] font-medium tracking-wide">
-                  {item.CategoryName}
-                </p>
-              </div>
-            </SwiperSlide>
-          );
-        })}
-      </Swiper>
+                >
+                  {IconComponent && (
+                    <IconComponent className="sm:text-2xl text-base text-color" />
+                  )}
+                  <p className="sm:text-xs text-[11px] font-medium tracking-wide">
+                    {item.CategoryName}
+                  </p>
+                </div>
+              </SwiperSlide>
+            );
+          })}
+        </Swiper>
+      ) : (
+        <div className="text-center text-gray-500 mt-6">
+          No Category Available at the Moment.
+        </div>
+      )}
     </div>
   );
 };

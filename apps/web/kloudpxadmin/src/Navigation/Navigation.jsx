@@ -77,13 +77,16 @@ function Navigation(props) {
                 <Route path="/addMedicine" element={<AddMedicine />} />
                 <Route path="/carousel" element={<Carousel />} />
                 <Route path="/gallery" element={<Gallery />} />
-                <Route path="/addMedicine/edit/:id" element={<AddMedicine />} />
+                {/* <Route path="/addMedicine/edit/:id" element={<AddMedicine />} /> */}
+                <Route path="/edit-medicine" element={<AddMedicine />} />
+
                 <Route path="/addOtcProduct" element={<AddOtcProduct />} />
                 <Route path="/orderHistory" element={<OrderHistory />} />
                 <Route path="/allmedicine" element={<AllMedicine />} />
                 <Route path="/addsupplier" element={<AddSupplier />} />
                 <Route
-                  path="/medicines/edit/:id"
+                  // path="/medicines/edit/:id"
+                  path="/edit-medicine/:id"
                   element={<UpdateMedicine />}
                 />
 

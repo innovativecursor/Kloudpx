@@ -15,7 +15,10 @@ const CarouselProvider = ({ children }) => {
   const [carouselImages, setCarouselImages] = useState([]);
 
   const getAllCarouselImages = async () => {
-    const res = await getAxiosCall("/v1/carousel/get-all-carousel-img");
+    const res = await getAxiosCall(
+      "/v1/carousel/get-all-carousel-img"
+
+    );
     if (res?.data?.data) {
       setCarouselImages(res.data.data);
     }
@@ -29,7 +32,7 @@ const CarouselProvider = ({ children }) => {
       const res = await postAxiosCall("/v1/carousel/add-carousel-img", payload);
       if (res?.message) {
         Swal.fire("Success", res.message, "success");
-        getAllCarouselImages(); 
+        getAllCarouselImages();
       } else {
         Swal.fire("Error", "Image upload failed", "error");
       }

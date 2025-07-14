@@ -70,19 +70,25 @@ const Hamburger = () => {
             </div>
 
             {/* Menu Items from API */}
-            <div>
-              <ul className="space-y-1 font-normal text-xs">
-                {category.map((item, index) => (
-                  <li
-                    key={index}
-                    onClick={() => handleCategoryClick(item.ID)}
-                    className="px-6 py-2 hover:bg-[#0070BA]/20 hover:font-medium transition-all cursor-pointer"
-                  >
-                    {item.CategoryName}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {category.length > 0 ? (
+              <div>
+                <ul className="space-y-1 font-normal text-xs">
+                  {category.map((item, index) => (
+                    <li
+                      key={index}
+                      onClick={() => handleCategoryClick(item.ID)}
+                      className="px-6 py-2 hover:bg-[#0070BA]/20 hover:font-medium transition-all cursor-pointer"
+                    >
+                      {item.CategoryName}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div className="text-center text-gray-500  text-xs mb-20 mt-6">
+                No Category Available at the Moment.
+              </div>
+            )}
           </div>
         </>
       )}

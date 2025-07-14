@@ -7,11 +7,16 @@ import { PersistGate } from "redux-persist/integration/react";
 import { BrowserRouter } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import AuthProvider from "./contexts/AuthContext.jsx";
-import ImageProvider from "./contexts/ImageContext.jsx";
+// import ImageProvider from "./contexts/ImageContext.jsx";
+import { ImageProvider } from "./contexts/ImageContext.jsx";
 import DropdownProvider from "./contexts/DropdownContext.jsx";
 import CategoryProvider from "./contexts/CategoryContext.jsx";
 import CarouselProvider from "./contexts/CarouselContext.jsx";
 import GalleryProvider from "./contexts/GalleryContext.jsx";
+import AddItemsProvider from "./contexts/AddItemsContext.jsx";
+import { MeasurementProvider } from "./contexts/MeasurementContext.jsx";
+import FormDataProvider from "./contexts/FormDataContext.jsx";
+import GetDataProvider from "./contexts/GetDataContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <GoogleOAuthProvider clientId="573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com">
@@ -19,17 +24,25 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <PersistGate persistor={persistor}>
         <BrowserRouter>
           <AuthProvider>
-            <ImageProvider>
-              <CategoryProvider>
-                <DropdownProvider>
-                  <CarouselProvider>
-                    <GalleryProvider>
-                      <App />
-                    </GalleryProvider>
-                  </CarouselProvider>
-                </DropdownProvider>
-              </CategoryProvider>
-            </ImageProvider>
+            <MeasurementProvider>
+              <ImageProvider>
+                <FormDataProvider>
+                  <CategoryProvider>
+                    <DropdownProvider>
+                      <AddItemsProvider>
+                        <GetDataProvider>
+                          <CarouselProvider>
+                            <GalleryProvider>
+                              <App />
+                            </GalleryProvider>
+                          </CarouselProvider>
+                        </GetDataProvider>
+                      </AddItemsProvider>
+                    </DropdownProvider>
+                  </CategoryProvider>
+                </FormDataProvider>
+              </ImageProvider>
+            </MeasurementProvider>
           </AuthProvider>
         </BrowserRouter>
       </PersistGate>

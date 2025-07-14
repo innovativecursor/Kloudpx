@@ -30,30 +30,36 @@ const FeaturedBrand = () => {
         nextRef={nextRef}
       />
 
-      <Swiper
-        loop={true}
-        onSwiper={setSwiperInstance}
-        modules={[Navigation]}
-        breakpoints={{
-          0: { slidesPerView: 2, spaceBetween: 10 },
-          640: { slidesPerView: 3, spaceBetween: 20 },
-          768: { slidesPerView: 4, spaceBetween: 20 },
-          1024: { slidesPerView: 4, spaceBetween: 20 },
-        }}
-        className="mySwiper"
-      >
-        {branded.map(({ images, id }, index) => (
-          <SwiperSlide key={id}>
-            <div className="w-full h-20 sm:h-36 lg:h-52 flex items-center justify-center bg-white rounded-lg overflow-hidden">
-              <img
-                src={images?.[0] || fallbackImage}
-                alt={`Brand ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      {branded.length > 0 ? (
+        <Swiper
+          loop={true}
+          onSwiper={setSwiperInstance}
+          modules={[Navigation]}
+          breakpoints={{
+            0: { slidesPerView: 2, spaceBetween: 10 },
+            640: { slidesPerView: 3, spaceBetween: 20 },
+            768: { slidesPerView: 4, spaceBetween: 20 },
+            1024: { slidesPerView: 4, spaceBetween: 20 },
+          }}
+          className="mySwiper"
+        >
+          {branded.map(({ images, id }, index) => (
+            <SwiperSlide key={id}>
+              <div className="w-full h-20 sm:h-36 lg:h-52 flex items-center justify-center bg-white rounded-lg overflow-hidden">
+                <img
+                  src={images?.[0] || fallbackImage}
+                  alt={`Brand ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      ) : (
+        <div className="text-center text-gray-500 mt-6">
+          🚫 No Brands Available
+        </div>
+      )}
     </div>
   );
 };

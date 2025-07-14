@@ -25,7 +25,7 @@ export default function Hero() {
 
   return (
     <div className="responsive-mx mt-8 md:mt-10">
-      {isHeroPart && carousel?.length > 0 && (
+      {isHeroPart && carousel?.length > 0 ? (
         <Swiper
           loop={true}
           pagination={{ clickable: true }}
@@ -46,6 +46,10 @@ export default function Hero() {
             </SwiperSlide>
           ))}
         </Swiper>
+      ) : (
+        <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] xl:h-[700px] flex items-center justify-center border rounded-md text-gray-500 text-sm sm:text-base bg-gray-50">
+          🚫 No Banner Available
+        </div>
       )}
 
       <div className="flex items-center justify-center gap-4 sm:text-xs text-[9px] tracking-wider text-gray-600 sm:mt-9 mt-4">
