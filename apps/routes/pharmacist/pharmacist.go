@@ -32,28 +32,21 @@ func Pharmacist(db *gorm.DB) {
 	})
 
 	apiV1.GET("/pharmacist/all-prescriptions", middleware.JWTMiddlewarePharmacist(db), func(c *gin.Context) {
-		pharmacistflow.GetPrescriptions(c, db)
+		pharmacistflow.GetUsersWithPrescriptionSummary(c, db)
 	})
 
-	apiV1.GET("/pharmacist/prescriptions-details/:id", middleware.JWTMiddlewarePharmacist(db), func(c *gin.Context) {
-		pharmacistflow.GetPrescriptionDetails(c, db)
-	})
-
-	apiV1.GET("/pharmacist/search-medicine", middleware.JWTMiddlewarePharmacist(db), func(c *gin.Context) {
-		pharmacistflow.SearchMedicine(c, db)
-	})
-
-	apiV1.POST("/pharmacist/add-medicine-to-prescriptions/:id", middleware.JWTMiddlewarePharmacist(db), func(c *gin.Context) {
-		pharmacistflow.AddMedicineToPrescription(c, db)
+	apiV1.GET("/pharmacist/prescriptions-details/:user_id", middleware.JWTMiddlewarePharmacist(db), func(c *gin.Context) {
+		pharmacistflow.GetUserPrescriptionHistory(c, db)
 	})
 
 	apiV1.GET("/pharmacist/get-prescriptions-cart/:id", middleware.JWTMiddlewarePharmacist(db), func(c *gin.Context) {
-		pharmacistflow.GetCart(c, db)
+		pharmacistflow.GetPrescriptionCart(c, db)
 	})
 
 	apiV1.POST("/pharmacist/submit-prescriptions/:id", middleware.JWTMiddlewarePharmacist(db), func(c *gin.Context) {
 		pharmacistflow.SubmitPrescription(c, db)
 	})
+
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
 	router.Run(":" + port)

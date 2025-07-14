@@ -27,6 +27,7 @@ type MedicineData struct {
 	MaximumThreshold      int     `json:"maximumthreshold"`
 	EstimatedLeadTimeDays int     `json:"estimatedleadtimedays"`
 	Prescription          bool    `json:"prescription"`
+	IsFeature             bool    `json:"isfeature"`
 	ImageIDs              []uint  `json:"imageids"`
 }
 
@@ -58,5 +59,6 @@ type UpdateMedicineData struct {
 	MaximumThreshold      int     `json:"maximumthreshold"`
 	EstimatedLeadTimeDays int     `json:"estimatedleadtimedays"`
 	Prescription          bool    `json:"prescription"`
+	IsFeature             bool    `json:"isfeature"`
 	ImageIDs              []uint  `json:"imageids"`
 }

@@ -5,6 +5,12 @@ type AddCartRequest struct {
 	Quantity   int  `json:"quantity"`
 }
 
+type CartResponse struct {
+	CartID   uint               `json:"cart_id"`
+	Quantity int                `json:"quantity"`
+	Medicine UserFacingMedicine `json:"medicine"`
+}
+
 // Struct to return only user-facing fields
 type UserFacingMedicine struct {
 	ID                   uint     `json:"id"`
