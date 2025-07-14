@@ -72,6 +72,7 @@ func AddMedicine(c *gin.Context, db *gorm.DB) {
 		MaximumThreshold:      payload.MaximumThreshold,
 		EstimatedLeadTimeDays: payload.EstimatedLeadTimeDays,
 		Prescription:          payload.Prescription,
+		IsFeature:             payload.IsFeature,
 		UpdatedBy:             userObj.ID,
 	}
 
@@ -208,6 +209,7 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 	medicine.MaximumThreshold = payload.MaximumThreshold
 	medicine.EstimatedLeadTimeDays = payload.EstimatedLeadTimeDays
 	medicine.Prescription = payload.Prescription
+	medicine.IsFeature = payload.IsFeature
 	medicine.UpdatedBy = userObj.ID
 
 	if payload.UnitOfMeasurement == "per box" {

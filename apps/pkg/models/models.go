@@ -73,6 +73,7 @@ type Medicine struct {
 	MaximumThreshold      int
 	EstimatedLeadTimeDays int
 	Prescription          bool `gorm:"not null"`
+	IsFeature             bool
 	UpdatedBy             uint
 }
 
@@ -117,6 +118,7 @@ type Cart struct {
 	Medicine       Medicine
 	Quantity       int
 	IsOTC          bool // NEW: explicitly marks whether it’s OTC
+	VisibleToUser  bool `gorm:"default:false"`
 }
 
 type CarouselImage struct {

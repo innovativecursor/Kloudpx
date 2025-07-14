@@ -160,20 +160,17 @@ func GetCurrentUserInfo(c *gin.Context, db *gorm.DB) {
 func AddOTCToCart(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
-		logrus.Warn("Unauthorized access: user not found in context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 	userObj, ok := user.(*models.User)
 	if !ok {
-		logrus.Warn("Invalid user object")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
 		return
 	}
 
 	var req config.AddCartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		logrus.WithError(err).Warn("Invalid payload while adding OTC to cart")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid payload"})
 		return
 	}
@@ -184,73 +181,96 @@ func AddOTCToCart(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	if medicine.Prescription {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Prescription required for this medicine. Please upload a prescription",
-		})
-		return
-	}
-
-	// Check total stock across suppliers
+	// Check stock
 	availableStock, err := itemscalculation.CalculateTotalStockByBrandName(db, medicine.BrandName)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to calculate stock"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Stock check failed"})
 		return
 	}
-
 	if req.Quantity > availableStock {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":     "Insufficient stock",
-			"available": availableStock,
-		})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Insufficient stock", "available": availableStock})
 		return
 	}
 
 	entry := models.Cart{
-		UserID:     userObj.ID,
-		MedicineID: req.MedicineID,
-		Quantity:   req.Quantity,
-		IsOTC:      true,
+		UserID:        userObj.ID,
+		MedicineID:    req.MedicineID,
+		Quantity:      req.Quantity,
+		IsOTC:         !medicine.Prescription,
+		VisibleToUser: !medicine.Prescription, // prescription items hidden until approved
 	}
 
 	if err := db.Create(&entry).Error; err != nil {
-		logrus.WithError(err).Error("Failed to add OTC item to cart")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add to cart"})
 		return
 	}
 
-	logrus.Info("OTC item added to cart")
-	c.JSON(http.StatusOK, gin.H{"message": "OTC item added to cart"})
+	if medicine.Prescription {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Medicine added to cart. Prescription required. Please upload a prescription to proceed.",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "OTC medicine added to cart successfully"})
 }
 
 func GetUserCart(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
-		logrus.Warn("Unauthorized access: user not found in context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 	userObj, ok := user.(*models.User)
 	if !ok {
-		logrus.Warn("Invalid user object")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
 		return
 	}
 
-	var cart []models.Cart
+	var cartItems []models.Cart
 	if err := db.
-		Preload("Medicine").
+		Preload("Medicine.Generic").
+		Preload("Medicine.Category").
 		Preload("Medicine.ItemImages").
-		Preload("Prescription").
-		Preload("Prescription.User").
-		Where("user_id = ?", userObj.ID).
-		Find(&cart).Error; err != nil {
-		logrus.WithError(err).Error("Failed to fetch user cart")
+		Where("user_id = ? AND visible_to_user = ?", userObj.ID, true).
+		Find(&cartItems).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart"})
 		return
 	}
 
-	c.JSON(http.StatusOK, cart)
+	var response []config.CartResponse
+	for _, item := range cartItems {
+		medicine := item.Medicine
+		var images []string
+		for _, img := range medicine.ItemImages {
+			images = append(images, img.FileName)
+		}
+
+		med := config.UserFacingMedicine{
+			ID:                   medicine.ID,
+			BrandName:            medicine.BrandName,
+			Power:                medicine.Power,
+			GenericName:          medicine.Generic.GenericName,
+			Discount:             medicine.Discount,
+			Category:             medicine.Category.CategoryName,
+			Description:          medicine.Description,
+			Unit:                 medicine.UnitOfMeasurement,
+			MeasurementUnitValue: medicine.MeasurementUnitValue,
+			NumberOfPiecesPerBox: medicine.NumberOfPiecesPerBox,
+			Price:                medicine.SellingPricePerPiece,
+			TaxType:              medicine.TaxType,
+			Prescription:         medicine.Prescription,
+			Images:               images,
+		}
+
+		response = append(response, config.CartResponse{
+			CartID:   item.ID,
+			Quantity: item.Quantity,
+			Medicine: med,
+		})
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func RemoveItemFromCart(c *gin.Context, db *gorm.DB) {
