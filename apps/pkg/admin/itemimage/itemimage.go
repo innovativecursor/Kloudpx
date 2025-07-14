@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"strconv"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -298,5 +299,47 @@ func UploadProdutImages(c *gin.Context, db *gorm.DB) {
 		"message":    "Images uploaded successfully",
 		"image_ids":  imageIDs,
 		"image_urls": imageURLs,
+	})
+}
+
+func DeleteItemImage(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		logrus.Warn("Unauthorized access")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+
+	admin, ok := user.(*models.Admin)
+	if !ok || admin.ApplicationRole != "admin" {
+		logrus.Warn("Access denied: not an admin")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Only admins can delete images"})
+		return
+	}
+
+	imageIDParam := c.Param("image_id")
+	imageID, err := strconv.Atoi(imageIDParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid image ID"})
+		return
+	}
+
+	// Optional: Fetch image info before delete for S3 deletion
+	var image models.ItemImage
+	if err := db.First(&image, imageID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Image not found"})
+		return
+	}
+
+	// Delete from DB permanently
+	if err := db.Unscoped().Delete(&models.ItemImage{}, imageID).Error; err != nil {
+		logrus.WithError(err).Error("Failed to delete image")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete image"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "Image deleted successfully",
+		"image_id": imageID,
 	})
 }

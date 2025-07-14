@@ -13,6 +13,7 @@ import (
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/medicine"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/oauth"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/supplier"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/uploadexcel"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/middleware"
 	"github.com/innovativecursor/Kloudpx/apps/routes/getapiroutes"
 	"gorm.io/gorm"
@@ -91,6 +92,10 @@ func Admin(db *gorm.DB) {
 	apiV1.POST("/itemimage/add-itemimage", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		itemimage.UploadProdutImages(c, db)
 	})
+
+	apiV1.DELETE("/itemimage/delete-itemimage/:image_id", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		itemimage.DeleteItemImage(c, db)
+	})
 	//medicine
 	apiV1.POST("/medicine/add-medicine", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		medicine.AddMedicine(c, db)
@@ -143,6 +148,10 @@ func Admin(db *gorm.DB) {
 		cms.DeleteGalleryImage(c, db)
 	})
 
+	//upload excel
+	apiV1.POST("/excel/upload-excel", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		uploadexcel.UploadMedicineExcel(c, db)
+	})
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
 	router.Run(":" + port)
