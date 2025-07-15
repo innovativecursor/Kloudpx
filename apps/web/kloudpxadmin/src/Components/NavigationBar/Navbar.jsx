@@ -3,8 +3,10 @@ import { NavLink } from "react-router-dom";
 import { connect } from "react-redux";
 import logo from "../../../public/kloudlogo.webp";
 import { googleLogout } from "@react-oauth/google";
-import { Button, Collapse, Drawer, Radio, Space } from "antd";
+import { Button, Collapse, Drawer, Tooltip, Space } from "antd";
 import { Menu } from "../../Constants/Conts";
+import { AiOutlineLogout } from "react-icons/ai";
+// import { Tooltip } from "antd";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 const { Panel } = Collapse;
@@ -40,30 +42,12 @@ function Navbar() {
               <img
                 src={logo}
                 alt="Logo"
-                className="w-16 md:w-20 object-contain"
+                className="w-14 md:w-20 object-contain"
               />
             </NavLink>
-            <input
-              type="text"
-              placeholder="Search"
-              className="hidden md:flex md:w-full rounded-full px-4 py-2 bg-gray-100 focus:outline-none"
-            />
           </div>
           {/* Right Side */}
           <div className="flex items-center space-x-3">
-            <button
-              onClick={handleLogout}
-              className=" text-lg text-red-600 font-medium"
-            >
-              <i className="ri-logout-box-r-line font-semibold text-xl"></i>
-            </button>
-            <div className="relative">
-              <i className="ri-notification-3-line text-2xl text-gray-600"></i>
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
-                2
-              </span>
-            </div>
-
             <div className="w-10 h-10">
               <img
                 src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid&w=740"
@@ -71,6 +55,15 @@ function Navbar() {
                 className="w-full h-full rounded-full object-cover"
               />
             </div>
+
+            <Tooltip title="Logout">
+              <button
+                onClick={handleLogout}
+                className="group relative inline-flex items-center justify-center md:w-9 md:h-9 w-8 h-8 rounded-full bg-white text-red-600 border border-red-300 hover:bg-gradient-to-tr from-red-500 to-red-700 hover:text-white transition-all duration-300 shadow-md"
+              >
+                <AiOutlineLogout className="text-xl transition-transform duration-300 group-hover:rotate-[-20deg]" />
+              </button>
+            </Tooltip>
           </div>
         </div>
         <Drawer
@@ -112,12 +105,6 @@ function Navbar() {
               </Panel>
             ))}
           </Collapse>
-          <button
-            onClick={handleLogout}
-            className="text-2xl  mx-6 text-red-600 font-medium"
-          >
-            LogOut <i className="ri-logout-box-r-line text-lg"></i>
-          </button>
         </Drawer>
       </nav>
     </div>

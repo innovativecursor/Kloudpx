@@ -5,144 +5,15 @@ import HealthArticles from "@/app/components/healtharticles/HealthArticles";
 import Testimonial from "@/app/components/testimonial/Testimonial";
 import FeaturedBrand from "@/app/components/featuredbrand/FeaturedBrand";
 import Faq from "@/app/components/faq/Faq";
+import { useProductContext } from "@/app/contexts/ProductContext";
+import { useEffect } from "react";
 
 function Products() {
-  const popularProducts = [
-    {
-      id: 1,
-      productImg: "/assets/product1.png",
-      category: "Supplements, Vitamins",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 2,
-      productImg: "/assets/product2.png",
-      category: "Supplements, Vitamins",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 3,
-      productImg: "/assets/product3.png",
-      category: "Supplements, Vitamins",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 4,
-      productImg: "/assets/product4.png",
-      category: "Supplements, Vitamins",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 5,
-      productImg: "/assets/product5.png",
-      category: "Supplements, Vitamins",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 6,
-      productImg: "/assets/product3.png",
-      category: "Supplements, Vitamins",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-  ];
-  const healthProducts = [
-    {
-      id: 1,
-      productImg: "/assets/healthpro2.png",
-      category: "Supplements, Vitamins",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 2,
-      productImg: "/assets/healthpro5.png",
-      category: "Supplements, Vitamins",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 3,
-      productImg: "/assets/healthpro2.png",
-      category: "Supplements, Vitamins",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 4,
-      productImg: "/assets/healthpro4.png",
-      category: "Supplements, Vitamins",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 5,
-      productImg: "/assets/healthpro5.png",
-      category: "Supplements, Vitamins",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 6,
-      productImg: "/assets/healthpro2.png",
-      category: "Supplements, Vitamins",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-  ];
+  const { getTwoCategory, twoCategory } = useProductContext();
+
+  const firstCategory = twoCategory[0]?.medicines || [];
+  const secondCategory = twoCategory[1]?.medicines || [];
+
   const trendingProducts = [
     {
       id: 1,
@@ -318,12 +189,18 @@ function Products() {
     },
   ];
 
+  useEffect(() => {
+    if (!twoCategory || twoCategory.length === 0) {
+      getTwoCategory();
+    }
+  }, []);
+
   return (
     <>
       <Category7 />
-      <Cards data={popularProducts} title="Popular Properties" />
+      <Cards data={firstCategory} title="Popular Properties" />
       <FeaturedBrand />
-      <Cards data={healthProducts} title="Health Products" />
+      <Cards data={secondCategory} title="Health Products" />
       <TrendingProducts trendingProducts={trendingProducts} />
       <HealthArticles articles={articles} />
       <Testimonial testimonials={testimonials} />
