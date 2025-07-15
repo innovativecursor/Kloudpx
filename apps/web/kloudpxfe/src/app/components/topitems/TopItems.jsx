@@ -60,7 +60,7 @@ const TopItems = () => {
     router.push(`/Products?${categorySlug}&category=${id}`);
   };
 
-  console.log(category);
+  // console.log(category);
 
   return (
     <div className="w-full">

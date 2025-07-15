@@ -13,7 +13,7 @@ import "react-inner-image-zoom/lib/InnerImageZoom/styles.css";
 const ImageSwiper = ({ images, discount }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
 
-  console.log(discount);
+  // console.log(discount);
 
   const fallbackImage =
     "https://5.imimg.com/data5/SELLER/Default/2023/7/327286162/LK/TW/UM/123268409/paracetamol-500-mg.jpg";

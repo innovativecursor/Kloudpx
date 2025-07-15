@@ -7,8 +7,6 @@ import "./Hero.css";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
-
-import Prescription from "@/app/components/modal/Prescription";
 import { useImageContext } from "@/app/contexts/ImagesContext";
 
 export default function Hero() {
@@ -57,8 +55,6 @@ export default function Hero() {
         PLACE YOUR ORDER VIA
         <div className="flex-grow h-px bg-gray-300"></div>
       </div>
-
-      <Prescription />
     </div>
   );
 }
