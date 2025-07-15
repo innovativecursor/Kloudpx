@@ -86,6 +86,7 @@ func UploadMedicineExcel(c *gin.Context, db *gorm.DB) {
 			SupplierDiscount:     strings.TrimSpace(row[23]),
 			IsBrand:              strings.ToLower(strings.TrimSpace(row[24])) == "true",
 			InhouseBrand:         strings.ToLower(strings.TrimSpace(row[25])) == "true",
+			IsFeature:            strings.ToLower(strings.TrimSpace(row[26])) == "true",
 			NumberOfPiecesPerBox: 0,
 			MeasurementUnitValue: measurementUnitValue,
 		}

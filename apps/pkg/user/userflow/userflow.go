@@ -482,6 +482,67 @@ func GetBrandedMedicinesForUser(c *gin.Context, db *gorm.DB) {
 	})
 }
 
+func GetFeaturedProductForUser(c *gin.Context, db *gorm.DB) {
+	var uniqueMedicineIDs []uint
+
+	// Subquery: Get the first (MIN ID) for each unique brand name where IsFeature is true
+	if err := db.
+		Model(&models.Medicine{}).
+		Select("MIN(id)").
+		Where("is_feature = ?", true).
+		Group("brand_name").
+		Scan(&uniqueMedicineIDs).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch distinct featured medicine IDs")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch featured medicines"})
+		return
+	}
+
+	var medicines []models.Medicine
+	if err := db.Preload("Generic").
+		Preload("ItemImages").
+		Preload("Category").
+		Where("id IN ?", uniqueMedicineIDs).
+		Find(&medicines).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch featured medicines by ID list")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch featured medicines"})
+		return
+	}
+
+	var response []config.UserFacingMedicine
+	for _, med := range medicines {
+		var imageFilenames []string
+		for _, img := range med.ItemImages {
+			imageFilenames = append(imageFilenames, img.FileName)
+		}
+
+		price := med.SellingPricePerBox
+		if med.UnitOfMeasurement == "per piece" {
+			price = med.SellingPricePerPiece
+		}
+
+		response = append(response, config.UserFacingMedicine{
+			ID:                   med.ID,
+			BrandName:            med.BrandName,
+			Power:                med.Power,
+			GenericName:          med.Generic.GenericName,
+			Category:             med.Category.CategoryName,
+			Description:          med.Description,
+			Unit:                 med.UnitOfMeasurement,
+			MeasurementUnitValue: med.MeasurementUnitValue,
+			NumberOfPiecesPerBox: med.NumberOfPiecesPerBox,
+			Price:                price,
+			TaxType:              med.TaxType,
+			Prescription:         med.Prescription,
+			Images:               imageFilenames,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "Featured medicines fetched successfully",
+		"medicines": response,
+	})
+}
+
 // two categories
 func GetTwoCategoriesWithItems(c *gin.Context, db *gorm.DB) {
 	var categories []models.Category
@@ -491,7 +552,7 @@ func GetTwoCategoriesWithItems(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	var response []config.CategoryWithMedicines // ✅ Corrected type here
+	var response []config.CategoryWithMedicines
 
 	for _, category := range categories {
 		var uniqueMedicineIDs []uint
