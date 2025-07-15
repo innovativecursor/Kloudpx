@@ -29,7 +29,7 @@ const Carousel = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10">
+    <div className="max-w-6xl mx-auto px-6 py-10 mt-12 md:mt-20">
       {/* Heading */}
       <h1 className="text-3xl font-extrabold text-center mb-8 text-indigo-700">
         🎠 Carousel Image Manager

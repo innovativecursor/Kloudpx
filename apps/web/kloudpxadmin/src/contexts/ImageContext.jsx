@@ -1,125 +1,51 @@
 import { createContext, useContext, useState } from "react";
-import axios from "axios";
+import { postAxiosCall } from "../Axios/UniversalAxiosCalls";
 import Swal from "sweetalert2";
-import { store } from "@store";
-import { useAuthContext } from "./AuthContext";
-import imageCompression from "browser-image-compression";
 
 export const ImageContext = createContext();
 
-const ImageProvider = ({ children }) => {
-  const [images, setImages] = useState([]);
-  const [previewUrls, setPreviewUrls] = useState([]);
-  const [message, setMessage] = useState("");
+export const ImageProvider = ({ children }) => {
+  const [base64Images, setBase64Images] = useState([]);
   const [uploadedImageIds, setUploadedImageIds] = useState([]);
-  const { token, checkToken } = useAuthContext();
 
-  const handleImageChange = async (e) => {
-    const selectedFiles = Array.from(e.target.files);
-
-    if (images.length + selectedFiles.length > 5) {
-      setMessage("❌ Max 5 images allowed.");
-      return;
-    }
-
-    const compressedFiles = [];
-    const previews = [];
-
-    for (const file of selectedFiles) {
-      try {
-        const options = {
-          maxSizeMB: 0.05,
-          maxWidthOrHeight: 800,
-          useWebWorker: true,
-        };
-
-        const compressedFile = await imageCompression(file, options);
-        compressedFiles.push(compressedFile);
-        const previewUrl = URL.createObjectURL(compressedFile);
-        previews.push(previewUrl);
-      } catch (error) {
-        console.error("Compression Error:", error);
-        setMessage("❌ Failed to compress some image.");
-      }
-    }
-
-    setImages([...images, ...compressedFiles]);
-    setPreviewUrls([...previewUrls, ...previews]);
-    setMessage("");
-  };
-
-  const handleUpload = async (e, itemId) => {
-    e.preventDefault();
-
-    if (!checkToken()) {
-      setMessage("Authentication token missing. Please login again.");
-      return;
-    }
-
+  const uploadImages = async (itemId = "0", imagesToUpload = []) => {
     try {
-      store.dispatch({ type: "LOADING", payload: true });
-      const convertToBase64 = (file) =>
-        new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            resolve(reader.result.split(",")[1]);
-          };
-          reader.onerror = (error) => reject(error);
-          reader.readAsDataURL(file);
-        });
-
-      const base64Images = await Promise.all(images.map(convertToBase64));
-
-      const instance = axios.create({
-        baseURL: process.env.REACT_APP_UAT_URL,
-        headers: {
-          Authorization: token,
-          "Content-Type": "application/json",
-        },
-      });
-
-      const payload = {
-        item_id: itemId || "0",
-        images: base64Images,
-      };
-
-      const response = await instance.post(
-        "/v1/itemimage/add-itemimage",
-        payload
+      const cleanBase64Images = imagesToUpload.map((img) =>
+        img.includes(",") ? img.split(",")[1] : img
       );
 
-      const uploadedIds = response.data.image_ids || [];
-      setUploadedImageIds((prev) => [...prev, ...uploadedIds]);
-      setMessage("✅ Images uploaded successfully!");
-      setImages([]);
-      setPreviewUrls([]);
+      const payload = {
+        item_id: itemId,
+        images: cleanBase64Images,
+      };
+
+      console.log("📦 Sending to API:", payload);
+
+      const res = await postAxiosCall("/v1/itemimage/add-itemimage", payload);
+      console.log("✅ res data is here:", res);
+      const imageIds = res?.image_ids || [];
+
+      setUploadedImageIds(imageIds);
+      setBase64Images(imagesToUpload);
+
+      Swal.fire("Uploaded", "Images uploaded successfully!", "success");
     } catch (error) {
-      setMessage("❌ Image upload failed.");
-      Swal.fire({
-        title: "Error",
-        text: error?.response?.data?.message || error.message,
-        icon: "error",
-        confirmButtonText: "OK",
-        allowOutsideClick: false,
-      });
-    } finally {
-      store.dispatch({ type: "LOADING", payload: false });
+      console.error(
+        "❌ Upload failed:",
+        error?.response?.data || error.message
+      );
+      Swal.fire("Error", "Image upload failed", "error");
     }
   };
 
   return (
     <ImageContext.Provider
       value={{
-        images,
-        previewUrls,
-        message,
+        base64Images,
+        uploadImages,
+        setBase64Images,
         uploadedImageIds,
-        handleImageChange,
-        handleUpload,
         setUploadedImageIds,
-        setPreviewUrls,
-        setMessage,
-        setImages,
       }}
     >
       {children}
@@ -127,5 +53,4 @@ const ImageProvider = ({ children }) => {
   );
 };
 
-export default ImageProvider;
 export const useImageContext = () => useContext(ImageContext);

@@ -29,7 +29,7 @@ const CarouselProvider = ({ children }) => {
       const res = await postAxiosCall("/v1/carousel/add-carousel-img", payload);
       if (res?.message) {
         Swal.fire("Success", res.message, "success");
-        getAllCarouselImages(); 
+        getAllCarouselImages();
       } else {
         Swal.fire("Error", "Image upload failed", "error");
       }

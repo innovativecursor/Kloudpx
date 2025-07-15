@@ -9,18 +9,25 @@ import useModal from "@/app/hooks/useModal";
 const Hamburger = () => {
   const { isOpen, setIsOpen, modalRef } = useModal();
   const { user } = useAuth();
-  const { category, getItemsByCategory, getCategory } = useProductContext();
+  const {
+    category,
+    getItemsByCategory,
+    getCategory,
+    setSelectedCategoryId,
+    setSelectedCategoryName,
+  } = useProductContext();
   const router = useRouter();
 
   const handleCategoryClick = async (id) => {
+    const selected = category.find((cat) => cat.ID === id);
+    setSelectedCategoryId(id);
+    setSelectedCategoryName(selected?.CategoryName || "");
     await getItemsByCategory(id);
+    const categorySlug =
+      selected?.CategoryName?.toLowerCase().replace(/\s+/g, "-") || "";
+    router.push(`/Products?category=${id}&name=${categorySlug}`);
     setIsOpen(false);
-    router.push(`/Products?category=${id}`);
   };
-
-  useEffect(() => {
-    getCategory();
-  }, []);
 
   return (
     <>
@@ -63,19 +70,25 @@ const Hamburger = () => {
             </div>
 
             {/* Menu Items from API */}
-            <div>
-              <ul className="space-y-1 font-normal text-xs">
-                {category.map((item, index) => (
-                  <li
-                    key={index}
-                    onClick={() => handleCategoryClick(item.ID)}
-                    className="px-6 py-2 hover:bg-[#0070BA]/20 hover:font-medium transition-all cursor-pointer"
-                  >
-                    {item.CategoryName}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {category.length > 0 ? (
+              <div>
+                <ul className="space-y-1 font-normal text-xs">
+                  {category.map((item, index) => (
+                    <li
+                      key={index}
+                      onClick={() => handleCategoryClick(item.ID)}
+                      className="px-6 py-2 hover:bg-[#0070BA]/20 hover:font-medium transition-all cursor-pointer"
+                    >
+                      {item.CategoryName}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div className="text-center text-gray-500  text-xs mb-20 mt-6">
+                No Category Available at the Moment.
+              </div>
+            )}
           </div>
         </>
       )}

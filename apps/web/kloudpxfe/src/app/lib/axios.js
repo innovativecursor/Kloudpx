@@ -87,14 +87,27 @@ export const updateAxiosCall = async (endpoint, id, data, sendToken = true) => {
   }
 };
 
-export const deleteAxiosCall = async (endpoint, id, sendToken = true) => {
+// export const deleteAxiosCall = async (endpoint, id, sendToken = true) => {
+//   store.dispatch({ type: "LOADING", payload: true });
+//   try {
+//     const headers = getAuthHeaders(sendToken);
+//     const response = await instance.delete(`${endpoint}/${id}`, { headers });
+//     return response.data;
+//   } catch (error) {
+//     // showError(error);
+//     throw error;
+//   } finally {
+//     store.dispatch({ type: "LOADING", payload: false });
+//   }
+// };
+
+export const deleteAxiosCall = async (endpoint, sendToken = true) => {
   store.dispatch({ type: "LOADING", payload: true });
   try {
     const headers = getAuthHeaders(sendToken);
-    const response = await instance.delete(`${endpoint}/${id}`, { headers });
+    const response = await instance.delete(endpoint, { headers });
     return response.data;
   } catch (error) {
-    // showError(error);
     throw error;
   } finally {
     store.dispatch({ type: "LOADING", payload: false });
