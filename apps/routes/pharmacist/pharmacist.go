@@ -47,6 +47,11 @@ func Pharmacist(db *gorm.DB) {
 		pharmacistflow.SubmitPrescription(c, db)
 	})
 
+	//pharmacist info
+	apiV1.GET("/pharmacist/info", middleware.JWTMiddlewarePharmacist(db), func(c *gin.Context) {
+		pharmacistflow.GetCurrentPharmacistInfo(c, db)
+	})
+
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
 	router.Run(":" + port)

@@ -48,8 +48,12 @@ func User(db *gorm.DB) {
 		userflow.GetCurrentUserInfo(c, db)
 	})
 
-	apiV1.POST("/user/add-to-cart", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
-		userflow.AddOTCToCart(c, db)
+	apiV1.POST("/user/add-to-cart-otc", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		userflow.AddToCartOTC(c, db)
+	})
+
+	apiV1.POST("/user/add-to-cart-medicine", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		userflow.AddToCartMedicine(c, db)
 	})
 
 	apiV1.GET("/user/get-cart", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
@@ -86,6 +90,14 @@ func User(db *gorm.DB) {
 
 	apiV1.GET("/user/get-feature-products", func(c *gin.Context) {
 		userflow.GetFeaturedProductForUser(c, db)
+	})
+
+	apiV1.GET("/user/search-medicine", func(c *gin.Context) {
+		userflow.SearchMedicinesForUser(c, db)
+	})
+
+	apiV1.GET("/user/trending-medicines", func(c *gin.Context) {
+		userflow.GetTrendingMedicines(c, db)
 	})
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)

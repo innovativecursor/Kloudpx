@@ -43,38 +43,44 @@ type CategoryIcon struct {
 
 type Medicine struct {
 	gorm.Model
-	BrandName             string `gorm:"not null"`
-	IsBrand               bool
-	InhouseBrand          bool
-	Discount              string
-	Power                 string
-	GenericID             uint
-	Generic               Generic `gorm:"foreignKey:GenericID"`
-	SupplierID            uint
-	Supplier              Supplier `gorm:"foreignKey:SupplierID"`
-	SupplierDiscount      string
-	ItemImages            []ItemImage `gorm:"foreignKey:MedicineID"`
-	CategoryID            uint
-	Category              Category `gorm:"foreignKey:CategoryID"`
-	CategorySubClass      string
-	DosageForm            string
-	Packaging             string
-	Marketer              string
-	Description           string
-	UnitOfMeasurement     string
-	MeasurementUnitValue  int
-	NumberOfPiecesPerBox  int
-	SellingPricePerBox    float64
-	SellingPricePerPiece  float64
-	CostPricePerBox       float64
-	CostPricePerPiece     float64
-	TaxType               string
-	MinimumThreshold      int
-	MaximumThreshold      int
-	EstimatedLeadTimeDays int
-	Prescription          bool `gorm:"not null"`
-	IsFeature             bool
-	UpdatedBy             uint
+	BrandName                 string `gorm:"not null"`
+	IsBrand                   bool
+	InhouseBrand              bool
+	Discount                  string
+	Power                     string
+	GenericID                 uint
+	Generic                   Generic `gorm:"foreignKey:GenericID"`
+	SupplierID                uint
+	Supplier                  Supplier `gorm:"foreignKey:SupplierID"`
+	SupplierDiscount          string
+	ItemImages                []ItemImage `gorm:"foreignKey:MedicineID"`
+	CategoryID                uint
+	Category                  Category `gorm:"foreignKey:CategoryID"`
+	CategorySubClass          string
+	DosageForm                string
+	Packaging                 string
+	Marketer                  string
+	Description               string
+	UnitOfMeasurement         string
+	MeasurementUnitValue      int
+	NumberOfPiecesPerBox      int
+	SellingPricePerBox        float64
+	SellingPricePerPiece      float64
+	CostPricePerBox           float64
+	CostPricePerPiece         float64
+	TaxType                   string
+	MinimumThreshold          int
+	MaximumThreshold          int
+	EstimatedLeadTimeDays     int
+	Prescription              bool `gorm:"not null"`
+	IsFeature                 bool
+	Benefits                  string
+	KeyIngredients            string
+	RecommendedDailyAllowance string
+	DirectionsForUse          string
+	SafetyInformation         string
+	Storage                   string
+	UpdatedBy                 uint
 }
 
 // Pharmacist
@@ -118,7 +124,6 @@ type Cart struct {
 	Medicine       Medicine
 	Quantity       int
 	IsOTC          bool // NEW: explicitly marks whether it’s OTC
-	VisibleToUser  bool `gorm:"default:false"`
 }
 
 type CarouselImage struct {

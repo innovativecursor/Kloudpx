@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -124,12 +125,30 @@ func SubmitPrescription(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	if err := db.Model(&models.Cart{}).
-		Where("prescription_id = ?", id).
-		Update("visible_to_user", true).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart visibility"})
+	c.JSON(http.StatusOK, gin.H{"message": "Prescription submitted successfully"})
+}
+
+// pharmacist info
+func GetCurrentPharmacistInfo(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+	userObj, ok := user.(*models.Pharmacist)
+	if !ok {
+		logrus.Warn("Invalid pharmacist object")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid pharmacist object"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Prescription submitted successfully"})
+	c.JSON(http.StatusOK, gin.H{
+		"id":               userObj.ID,
+		"first_name":       userObj.FirstName,
+		"last_name":        userObj.LastName,
+		"email":            userObj.Email,
+		"email_verified":   userObj.EmailVerified,
+		"application_role": userObj.ApplicationRole,
+		"created_at":       userObj.CreatedAt,
+	})
 }
