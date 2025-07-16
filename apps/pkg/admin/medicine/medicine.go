@@ -46,34 +46,40 @@ func AddMedicine(c *gin.Context, db *gorm.DB) {
 	}
 
 	newMedicine := models.Medicine{
-		BrandName:             payload.BrandName,
-		IsBrand:               payload.IsBrand,
-		InhouseBrand:          payload.InhouseBrand,
-		Discount:              payload.Discount,
-		Power:                 payload.Power,
-		GenericID:             payload.GenericID,
-		SupplierID:            payload.SupplierID,
-		CategoryID:            payload.CategoryID,
-		CategorySubClass:      payload.CategorySubClass,
-		DosageForm:            payload.DosageForm,
-		Packaging:             payload.Packaging,
-		Marketer:              payload.Marketer,
-		SupplierDiscount:      payload.SupplierDiscount,
-		Description:           payload.Description,
-		UnitOfMeasurement:     payload.UnitOfMeasurement,
-		MeasurementUnitValue:  payload.MeasurementUnitValue,
-		NumberOfPiecesPerBox:  0,
-		SellingPricePerBox:    payload.SellingPricePerBox,
-		SellingPricePerPiece:  payload.SellingPricePerPiece,
-		CostPricePerBox:       payload.CostPricePerBox,
-		CostPricePerPiece:     payload.CostPricePerPiece,
-		TaxType:               payload.TaxType,
-		MinimumThreshold:      payload.MinimumThreshold,
-		MaximumThreshold:      payload.MaximumThreshold,
-		EstimatedLeadTimeDays: payload.EstimatedLeadTimeDays,
-		Prescription:          payload.Prescription,
-		IsFeature:             payload.IsFeature,
-		UpdatedBy:             userObj.ID,
+		BrandName:                 payload.BrandName,
+		IsBrand:                   payload.IsBrand,
+		InhouseBrand:              payload.InhouseBrand,
+		Discount:                  payload.Discount,
+		Power:                     payload.Power,
+		GenericID:                 payload.GenericID,
+		SupplierID:                payload.SupplierID,
+		CategoryID:                payload.CategoryID,
+		CategorySubClass:          payload.CategorySubClass,
+		DosageForm:                payload.DosageForm,
+		Packaging:                 payload.Packaging,
+		Marketer:                  payload.Marketer,
+		SupplierDiscount:          payload.SupplierDiscount,
+		Description:               payload.Description,
+		UnitOfMeasurement:         payload.UnitOfMeasurement,
+		MeasurementUnitValue:      payload.MeasurementUnitValue,
+		NumberOfPiecesPerBox:      0,
+		SellingPricePerBox:        payload.SellingPricePerBox,
+		SellingPricePerPiece:      payload.SellingPricePerPiece,
+		CostPricePerBox:           payload.CostPricePerBox,
+		CostPricePerPiece:         payload.CostPricePerPiece,
+		TaxType:                   payload.TaxType,
+		MinimumThreshold:          payload.MinimumThreshold,
+		MaximumThreshold:          payload.MaximumThreshold,
+		EstimatedLeadTimeDays:     payload.EstimatedLeadTimeDays,
+		Prescription:              payload.Prescription,
+		IsFeature:                 payload.IsFeature,
+		UpdatedBy:                 userObj.ID,
+		Benefits:                  payload.Benefits,
+		KeyIngredients:            payload.KeyIngredients,
+		RecommendedDailyAllowance: payload.RecommendedDailyAllowance,
+		DirectionsForUse:          payload.DirectionsForUse,
+		SafetyInformation:         payload.SafetyInformation,
+		Storage:                   payload.Storage,
 	}
 
 	if payload.UnitOfMeasurement == "per box" {
@@ -211,6 +217,12 @@ func UpdateMedicine(c *gin.Context, db *gorm.DB) {
 	medicine.Prescription = payload.Prescription
 	medicine.IsFeature = payload.IsFeature
 	medicine.UpdatedBy = userObj.ID
+	medicine.Benefits = payload.Benefits
+	medicine.KeyIngredients = payload.KeyIngredients
+	medicine.RecommendedDailyAllowance = payload.RecommendedDailyAllowance
+	medicine.DirectionsForUse = payload.DirectionsForUse
+	medicine.SafetyInformation = payload.SafetyInformation
+	medicine.Storage = payload.Storage
 
 	if payload.UnitOfMeasurement == "per box" {
 		medicine.NumberOfPiecesPerBox = payload.NumberOfPiecesPerBox

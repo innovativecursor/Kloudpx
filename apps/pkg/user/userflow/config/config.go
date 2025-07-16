@@ -5,28 +5,41 @@ type AddCartRequest struct {
 	Quantity   int  `json:"quantity"`
 }
 
+type AddCartRequestMedicine struct {
+	MedicineID     uint `json:"medicineid"`
+	Quantity       int  `json:"quantity"`
+	PrescriptionId uint `json:"prescriptionid"`
+}
+
 type CartResponse struct {
-	CartID   uint               `json:"cart_id"`
-	Quantity int                `json:"quantity"`
-	Medicine UserFacingMedicine `json:"medicine"`
+	CartID             uint               `json:"cart_id"`
+	Quantity           int                `json:"quantity"`
+	Medicine           UserFacingMedicine `json:"medicine"`
+	PrescriptionStatus string             `json:"prescription_status"`
 }
 
 // Struct to return only user-facing fields
 type UserFacingMedicine struct {
-	ID                   uint     `json:"id"`
-	BrandName            string   `json:"brandname"`
-	Power                string   `json:"power"`
-	GenericName          string   `json:"genericname"`
-	Discount             string   `json:"discount"`
-	Category             string   `json:"category"`
-	Description          string   `json:"description"`
-	Unit                 string   `json:"unit"`
-	MeasurementUnitValue int      `json:"measurementunitvalue"`
-	NumberOfPiecesPerBox int      `json:"numberofpiecesperbox"`
-	Price                float64  `json:"price"`
-	TaxType              string   `json:"taxtype"`
-	Prescription         bool     `json:"prescription"`
-	Images               []string `json:"images"`
+	ID                        uint     `json:"id"`
+	BrandName                 string   `json:"brandname"`
+	Power                     string   `json:"power"`
+	GenericName               string   `json:"genericname"`
+	Discount                  string   `json:"discount"`
+	Category                  string   `json:"category"`
+	Description               string   `json:"description"`
+	Unit                      string   `json:"unit"`
+	MeasurementUnitValue      int      `json:"measurementunitvalue"`
+	NumberOfPiecesPerBox      int      `json:"numberofpiecesperbox"`
+	Price                     float64  `json:"price"`
+	TaxType                   string   `json:"taxtype"`
+	Prescription              bool     `json:"prescription"`
+	Benefits                  string   `json:"benefits"`
+	KeyIngredients            string   `json:"keyingredients"`
+	RecommendedDailyAllowance string   `json:"recommendeddailyallowance"`
+	DirectionsForUse          string   `json:"directionsforuse"`
+	SafetyInformation         string   `json:"safetyinformation"`
+	Storage                   string   `json:"storage"`
+	Images                    []string `json:"images"`
 }
 
 type CategoryWithMedicines struct {

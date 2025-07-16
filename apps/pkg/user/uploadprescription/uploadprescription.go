@@ -11,7 +11,6 @@ import (
 	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/s3helper"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/uploadprescription/config"
-	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -167,15 +166,9 @@ func UploadPrescription(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Link prescription to hidden cart items
-	if err := db.Model(&models.Cart{}).
-		Where("user_id = ? AND visible_to_user = ? AND prescription_id IS NULL", userObj.ID, false).
-		Update("prescription_id", prescription.ID).Error; err != nil {
-		logrus.WithError(err).Error("Failed to update cart with prescription ID")
-	}
-
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Prescription uploaded successfully",
-		"url":     imageURL,
+		"message":         "Prescription uploaded successfully",
+		"url":             imageURL,
+		"prescription_id": prescription.ID,
 	})
 }
