@@ -51,20 +51,26 @@ func GetMedicinesForUser(c *gin.Context, db *gorm.DB) {
 		}
 
 		response = append(response, config.UserFacingMedicine{
-			ID:                   med.ID,
-			BrandName:            med.BrandName,
-			Power:                med.Power,
-			Discount:             med.Discount,
-			GenericName:          med.Generic.GenericName,
-			Category:             med.Category.CategoryName,
-			Description:          med.Description,
-			Unit:                 med.UnitOfMeasurement,
-			MeasurementUnitValue: med.MeasurementUnitValue,
-			NumberOfPiecesPerBox: med.NumberOfPiecesPerBox,
-			Price:                price,
-			TaxType:              med.TaxType,
-			Prescription:         med.Prescription,
-			Images:               imageFilenames,
+			ID:                        med.ID,
+			BrandName:                 med.BrandName,
+			Power:                     med.Power,
+			Discount:                  med.Discount,
+			GenericName:               med.Generic.GenericName,
+			Category:                  med.Category.CategoryName,
+			Description:               med.Description,
+			Unit:                      med.UnitOfMeasurement,
+			MeasurementUnitValue:      med.MeasurementUnitValue,
+			NumberOfPiecesPerBox:      med.NumberOfPiecesPerBox,
+			Price:                     price,
+			TaxType:                   med.TaxType,
+			Prescription:              med.Prescription,
+			Benefits:                  med.Benefits,
+			KeyIngredients:            med.KeyIngredients,
+			RecommendedDailyAllowance: med.RecommendedDailyAllowance,
+			DirectionsForUse:          med.DirectionsForUse,
+			SafetyInformation:         med.SafetyInformation,
+			Storage:                   med.Storage,
+			Images:                    imageFilenames,
 		})
 	}
 
@@ -109,26 +115,79 @@ func GetMedicineDetailsByID(c *gin.Context, db *gorm.DB) {
 	}
 
 	response := config.UserFacingMedicine{
-		ID:                   med.ID,
-		BrandName:            med.BrandName,
-		Power:                med.Power,
-		Discount:             med.Discount,
-		GenericName:          med.Generic.GenericName,
-		Category:             med.Category.CategoryName,
-		Description:          med.Description,
-		Unit:                 med.UnitOfMeasurement,
-		MeasurementUnitValue: med.MeasurementUnitValue,
-		NumberOfPiecesPerBox: med.NumberOfPiecesPerBox,
-		Price:                price,
-		TaxType:              med.TaxType,
-		Prescription:         med.Prescription,
-		Images:               imageFilenames,
+		ID:                        med.ID,
+		BrandName:                 med.BrandName,
+		Power:                     med.Power,
+		Discount:                  med.Discount,
+		GenericName:               med.Generic.GenericName,
+		Category:                  med.Category.CategoryName,
+		Description:               med.Description,
+		Unit:                      med.UnitOfMeasurement,
+		MeasurementUnitValue:      med.MeasurementUnitValue,
+		NumberOfPiecesPerBox:      med.NumberOfPiecesPerBox,
+		Price:                     price,
+		TaxType:                   med.TaxType,
+		Prescription:              med.Prescription,
+		Benefits:                  med.Benefits,
+		KeyIngredients:            med.KeyIngredients,
+		RecommendedDailyAllowance: med.RecommendedDailyAllowance,
+		DirectionsForUse:          med.DirectionsForUse,
+		SafetyInformation:         med.SafetyInformation,
+		Storage:                   med.Storage,
+		Images:                    imageFilenames,
+	}
+
+	// === Related Medicines Logic ===
+	var relatedMedicines []models.Medicine
+	if err := db.Preload("Generic").
+		Preload("Category").
+		Preload("ItemImages").
+		Where("category_id = ? AND id != ?", med.CategoryID, med.ID).
+		Limit(8).
+		Find(&relatedMedicines).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch related medicines")
+	}
+
+	var related []config.UserFacingMedicine
+	for _, m := range relatedMedicines {
+		var imgs []string
+		for _, img := range m.ItemImages {
+			imgs = append(imgs, img.FileName)
+		}
+		p := m.SellingPricePerBox
+		if m.UnitOfMeasurement == "per piece" {
+			p = m.SellingPricePerPiece
+		}
+		related = append(related, config.UserFacingMedicine{
+			ID:                        m.ID,
+			BrandName:                 m.BrandName,
+			Power:                     m.Power,
+			GenericName:               m.Generic.GenericName,
+			Category:                  m.Category.CategoryName,
+			Description:               m.Description,
+			Discount:                  m.Discount,
+			Unit:                      m.UnitOfMeasurement,
+			MeasurementUnitValue:      m.MeasurementUnitValue,
+			NumberOfPiecesPerBox:      m.NumberOfPiecesPerBox,
+			Price:                     p,
+			TaxType:                   m.TaxType,
+			Prescription:              m.Prescription,
+			Benefits:                  m.Benefits,
+			KeyIngredients:            m.KeyIngredients,
+			RecommendedDailyAllowance: m.RecommendedDailyAllowance,
+			DirectionsForUse:          m.DirectionsForUse,
+			SafetyInformation:         m.SafetyInformation,
+			Storage:                   m.Storage,
+			Images:                    imgs,
+		})
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":  "Medicine details fetched successfully",
-		"medicine": response,
+		"message":           "Medicine details fetched successfully",
+		"medicine":          response,
+		"related_medicines": related,
 	})
+
 }
 
 func GetCurrentUserInfo(c *gin.Context, db *gorm.DB) {
@@ -156,8 +215,120 @@ func GetCurrentUserInfo(c *gin.Context, db *gorm.DB) {
 	})
 }
 
-// add to cart
-func AddOTCToCart(c *gin.Context, db *gorm.DB) {
+// // add to cart
+// func AddOTCToCart(c *gin.Context, db *gorm.DB) {
+// 	user, exists := c.Get("user")
+// 	if !exists {
+// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+// 		return
+// 	}
+// 	userObj, ok := user.(*models.User)
+// 	if !ok {
+// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
+// 		return
+// 	}
+
+// 	var req config.AddCartRequest
+// 	if err := c.ShouldBindJSON(&req); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid payload"})
+// 		return
+// 	}
+
+// 	var medicine models.Medicine
+// 	if err := db.First(&medicine, req.MedicineID).Error; err != nil {
+// 		c.JSON(http.StatusNotFound, gin.H{"error": "Medicine not found"})
+// 		return
+// 	}
+
+// 	// Check stock
+// 	availableStock, err := itemscalculation.CalculateTotalStockByBrandName(db, medicine.BrandName)
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Stock check failed"})
+// 		return
+// 	}
+// 	if req.Quantity > availableStock {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Insufficient stock", "available": availableStock})
+// 		return
+// 	}
+
+// 	entry := models.Cart{
+// 		UserID:        userObj.ID,
+// 		MedicineID:    req.MedicineID,
+// 		Quantity:      req.Quantity,
+// 		IsOTC:         !medicine.Prescription,
+// 		VisibleToUser: !medicine.Prescription, // prescription items hidden until approved
+// 	}
+
+// 	if err := db.Create(&entry).Error; err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add to cart"})
+// 		return
+// 	}
+
+// 	if medicine.Prescription {
+// 		c.JSON(http.StatusOK, gin.H{
+// 			"message": "Medicine added to cart. Prescription required. Please upload a prescription to proceed.",
+// 		})
+// 		return
+// 	}
+
+// 	c.JSON(http.StatusOK, gin.H{"message": "OTC medicine added to cart successfully"})
+// }
+
+// func AddToCart(c *gin.Context, db *gorm.DB) {
+// 	user, exists := c.Get("user")
+// 	if !exists {
+// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+// 		return
+// 	}
+// 	userObj, ok := user.(*models.User)
+// 	if !ok {
+// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
+// 		return
+// 	}
+
+// 	var req config.AddCartRequest
+// 	if err := c.ShouldBindJSON(&req); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid payload"})
+// 		return
+// 	}
+
+// 	var medicine models.Medicine
+// 	if err := db.First(&medicine, req.MedicineID).Error; err != nil {
+// 		c.JSON(http.StatusNotFound, gin.H{"error": "Medicine not found"})
+// 		return
+// 	}
+
+// 	// Check stock
+// 	availableStock, err := itemscalculation.CalculateTotalStockByBrandName(db, medicine.BrandName)
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Stock check failed"})
+// 		return
+// 	}
+// 	if req.Quantity > availableStock {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Insufficient stock", "available": availableStock})
+// 		return
+// 	}
+
+// 	entry := models.Cart{
+// 		UserID:     userObj.ID,
+// 		MedicineID: req.MedicineID,
+// 		Quantity:   req.Quantity,
+// 		IsOTC:      !medicine.Prescription,
+// 	}
+
+// 	if err := db.Create(&entry).Error; err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add to cart"})
+// 		return
+// 	}
+
+// 	msg := "Medicine added to cart successfully"
+// 	if medicine.Prescription {
+// 		msg = "Prescription medicine added to cart. Please upload prescription."
+// 	}
+// 	c.JSON(http.StatusOK, gin.H{"message": msg})
+// }
+
+func AddToCartOTC(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -181,6 +352,12 @@ func AddOTCToCart(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// Reject if the medicine requires a prescription
+	if medicine.Prescription {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "This medicine requires a prescription. Please upload a prescription before adding to cart."})
+		return
+	}
+
 	// Check stock
 	availableStock, err := itemscalculation.CalculateTotalStockByBrandName(db, medicine.BrandName)
 	if err != nil {
@@ -193,11 +370,10 @@ func AddOTCToCart(c *gin.Context, db *gorm.DB) {
 	}
 
 	entry := models.Cart{
-		UserID:        userObj.ID,
-		MedicineID:    req.MedicineID,
-		Quantity:      req.Quantity,
-		IsOTC:         !medicine.Prescription,
-		VisibleToUser: !medicine.Prescription, // prescription items hidden until approved
+		UserID:     userObj.ID,
+		MedicineID: req.MedicineID,
+		Quantity:   req.Quantity,
+		IsOTC:      true,
 	}
 
 	if err := db.Create(&entry).Error; err != nil {
@@ -205,15 +381,131 @@ func AddOTCToCart(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	if medicine.Prescription {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Medicine added to cart. Prescription required. Please upload a prescription to proceed.",
-		})
+	c.JSON(http.StatusOK, gin.H{"message": "OTC medicine added to cart successfully"})
+}
+
+func AddToCartMedicine(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	userObj, ok := user.(*models.User)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "OTC medicine added to cart successfully"})
+	var req config.AddCartRequestMedicine
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
+		return
+	}
+
+	// Validate medicine
+	var medicine models.Medicine
+	if err := db.First(&medicine, req.MedicineID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Medicine not found"})
+		return
+	}
+
+	// Validate prescription
+	var prescription models.Prescription
+	if err := db.First(&prescription, req.PrescriptionId).Error; err != nil || prescription.UserID != userObj.ID {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or unauthorized prescription ID"})
+		return
+	}
+
+	// Check stock
+	availableStock, err := itemscalculation.CalculateTotalStockByBrandName(db, medicine.BrandName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Stock check failed"})
+		return
+	}
+	if req.Quantity > availableStock {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Insufficient stock", "available": availableStock})
+		return
+	}
+
+	entry := models.Cart{
+		UserID:         userObj.ID,
+		MedicineID:     req.MedicineID,
+		Quantity:       req.Quantity,
+		IsOTC:          !medicine.Prescription,
+		PrescriptionID: &req.PrescriptionId,
+	}
+
+	if err := db.Create(&entry).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add medicine to cart"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Medicine added to cart successfully"})
 }
+
+// func GetUserCart(c *gin.Context, db *gorm.DB) {
+// 	user, exists := c.Get("user")
+// 	if !exists {
+// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+// 		return
+// 	}
+// 	userObj, ok := user.(*models.User)
+// 	if !ok {
+// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
+// 		return
+// 	}
+
+// 	var cartItems []models.Cart
+// 	if err := db.
+// 		Preload("Medicine.Generic").
+// 		Preload("Medicine.Category").
+// 		Preload("Medicine.ItemImages").
+// 		Where("user_id = ? AND visible_to_user = ?", userObj.ID, true).
+// 		Find(&cartItems).Error; err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart"})
+// 		return
+// 	}
+
+// 	var response []config.CartResponse
+// 	for _, item := range cartItems {
+// 		medicine := item.Medicine
+// 		var images []string
+// 		for _, img := range medicine.ItemImages {
+// 			images = append(images, img.FileName)
+// 		}
+
+// 		med := config.UserFacingMedicine{
+// 			ID:                        medicine.ID,
+// 			BrandName:                 medicine.BrandName,
+// 			Power:                     medicine.Power,
+// 			GenericName:               medicine.Generic.GenericName,
+// 			Discount:                  medicine.Discount,
+// 			Category:                  medicine.Category.CategoryName,
+// 			Description:               medicine.Description,
+// 			Unit:                      medicine.UnitOfMeasurement,
+// 			MeasurementUnitValue:      medicine.MeasurementUnitValue,
+// 			NumberOfPiecesPerBox:      medicine.NumberOfPiecesPerBox,
+// 			Price:                     medicine.SellingPricePerPiece,
+// 			TaxType:                   medicine.TaxType,
+// 			Prescription:              medicine.Prescription,
+// 			Benefits:                  medicine.Benefits,
+// 			KeyIngredients:            medicine.KeyIngredients,
+// 			RecommendedDailyAllowance: medicine.RecommendedDailyAllowance,
+// 			DirectionsForUse:          medicine.DirectionsForUse,
+// 			SafetyInformation:         medicine.SafetyInformation,
+// 			Storage:                   medicine.Storage,
+// 			Images:                    images,
+// 		}
+
+// 		response = append(response, config.CartResponse{
+// 			CartID:   item.ID,
+// 			Quantity: item.Quantity,
+// 			Medicine: med,
+// 		})
+// 	}
+
+// 	c.JSON(http.StatusOK, response)
+// }
 
 func GetUserCart(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
@@ -232,7 +524,7 @@ func GetUserCart(c *gin.Context, db *gorm.DB) {
 		Preload("Medicine.Generic").
 		Preload("Medicine.Category").
 		Preload("Medicine.ItemImages").
-		Where("user_id = ? AND visible_to_user = ?", userObj.ID, true).
+		Where("user_id = ?", userObj.ID).
 		Find(&cartItems).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart"})
 		return
@@ -241,32 +533,64 @@ func GetUserCart(c *gin.Context, db *gorm.DB) {
 	var response []config.CartResponse
 	for _, item := range cartItems {
 		medicine := item.Medicine
+
+		// Collect all image filenames
 		var images []string
 		for _, img := range medicine.ItemImages {
 			images = append(images, img.FileName)
 		}
 
-		med := config.UserFacingMedicine{
-			ID:                   medicine.ID,
-			BrandName:            medicine.BrandName,
-			Power:                medicine.Power,
-			GenericName:          medicine.Generic.GenericName,
-			Discount:             medicine.Discount,
-			Category:             medicine.Category.CategoryName,
-			Description:          medicine.Description,
-			Unit:                 medicine.UnitOfMeasurement,
-			MeasurementUnitValue: medicine.MeasurementUnitValue,
-			NumberOfPiecesPerBox: medicine.NumberOfPiecesPerBox,
-			Price:                medicine.SellingPricePerPiece,
-			TaxType:              medicine.TaxType,
-			Prescription:         medicine.Prescription,
-			Images:               images,
+		// Determine prescription status
+		prescriptionStatus := "Not Required"
+		if medicine.Prescription {
+			if item.PrescriptionID == nil {
+				prescriptionStatus = "Prescription Not Uploaded"
+			} else {
+				var pres models.Prescription
+				if err := db.First(&pres, *item.PrescriptionID).Error; err == nil {
+					switch pres.Status {
+					case "fulfilled":
+						prescriptionStatus = "Fulfilled"
+					case "unsettled":
+						prescriptionStatus = "Unsettled"
+					default:
+						prescriptionStatus = "Prescription Not Uploaded"
+					}
+				} else {
+					prescriptionStatus = "Prescription Not Uploaded"
+				}
+			}
+		}
+
+		// Format medicine for user
+		userMed := config.UserFacingMedicine{
+			ID:                        medicine.ID,
+			BrandName:                 medicine.BrandName,
+			Power:                     medicine.Power,
+			GenericName:               medicine.Generic.GenericName,
+			Discount:                  medicine.Discount,
+			Category:                  medicine.Category.CategoryName,
+			Description:               medicine.Description,
+			Unit:                      medicine.UnitOfMeasurement,
+			MeasurementUnitValue:      medicine.MeasurementUnitValue,
+			NumberOfPiecesPerBox:      medicine.NumberOfPiecesPerBox,
+			Price:                     medicine.SellingPricePerPiece,
+			TaxType:                   medicine.TaxType,
+			Prescription:              medicine.Prescription,
+			Benefits:                  medicine.Benefits,
+			KeyIngredients:            medicine.KeyIngredients,
+			RecommendedDailyAllowance: medicine.RecommendedDailyAllowance,
+			DirectionsForUse:          medicine.DirectionsForUse,
+			SafetyInformation:         medicine.SafetyInformation,
+			Storage:                   medicine.Storage,
+			Images:                    images,
 		}
 
 		response = append(response, config.CartResponse{
-			CartID:   item.ID,
-			Quantity: item.Quantity,
-			Medicine: med,
+			CartID:             item.ID,
+			Quantity:           item.Quantity,
+			Medicine:           userMed,
+			PrescriptionStatus: prescriptionStatus,
 		})
 	}
 
@@ -368,20 +692,26 @@ func GetItemsByCategory(c *gin.Context, db *gorm.DB) {
 		}
 
 		response = append(response, config.UserFacingMedicine{
-			ID:                   med.ID,
-			BrandName:            med.BrandName,
-			Power:                med.Power,
-			GenericName:          med.Generic.GenericName,
-			Category:             med.Category.CategoryName,
-			Description:          med.Description,
-			Discount:             med.Discount,
-			Unit:                 med.UnitOfMeasurement,
-			MeasurementUnitValue: med.MeasurementUnitValue,
-			NumberOfPiecesPerBox: med.NumberOfPiecesPerBox,
-			Price:                price,
-			TaxType:              med.TaxType,
-			Prescription:         med.Prescription,
-			Images:               imageFilenames,
+			ID:                        med.ID,
+			BrandName:                 med.BrandName,
+			Power:                     med.Power,
+			GenericName:               med.Generic.GenericName,
+			Category:                  med.Category.CategoryName,
+			Description:               med.Description,
+			Discount:                  med.Discount,
+			Unit:                      med.UnitOfMeasurement,
+			MeasurementUnitValue:      med.MeasurementUnitValue,
+			NumberOfPiecesPerBox:      med.NumberOfPiecesPerBox,
+			Price:                     price,
+			TaxType:                   med.TaxType,
+			Prescription:              med.Prescription,
+			Benefits:                  med.Benefits,
+			KeyIngredients:            med.KeyIngredients,
+			RecommendedDailyAllowance: med.RecommendedDailyAllowance,
+			DirectionsForUse:          med.DirectionsForUse,
+			SafetyInformation:         med.SafetyInformation,
+			Storage:                   med.Storage,
+			Images:                    imageFilenames,
 		})
 	}
 
@@ -460,19 +790,25 @@ func GetBrandedMedicinesForUser(c *gin.Context, db *gorm.DB) {
 		}
 
 		response = append(response, config.UserFacingMedicine{
-			ID:                   med.ID,
-			BrandName:            med.BrandName,
-			Power:                med.Power,
-			GenericName:          med.Generic.GenericName,
-			Category:             med.Category.CategoryName,
-			Description:          med.Description,
-			Unit:                 med.UnitOfMeasurement,
-			MeasurementUnitValue: med.MeasurementUnitValue,
-			NumberOfPiecesPerBox: med.NumberOfPiecesPerBox,
-			Price:                price,
-			TaxType:              med.TaxType,
-			Prescription:         med.Prescription,
-			Images:               imageFilenames,
+			ID:                        med.ID,
+			BrandName:                 med.BrandName,
+			Power:                     med.Power,
+			GenericName:               med.Generic.GenericName,
+			Category:                  med.Category.CategoryName,
+			Description:               med.Description,
+			Unit:                      med.UnitOfMeasurement,
+			MeasurementUnitValue:      med.MeasurementUnitValue,
+			NumberOfPiecesPerBox:      med.NumberOfPiecesPerBox,
+			Price:                     price,
+			TaxType:                   med.TaxType,
+			Prescription:              med.Prescription,
+			Benefits:                  med.Benefits,
+			KeyIngredients:            med.KeyIngredients,
+			RecommendedDailyAllowance: med.RecommendedDailyAllowance,
+			DirectionsForUse:          med.DirectionsForUse,
+			SafetyInformation:         med.SafetyInformation,
+			Storage:                   med.Storage,
+			Images:                    imageFilenames,
 		})
 	}
 
@@ -521,19 +857,25 @@ func GetFeaturedProductForUser(c *gin.Context, db *gorm.DB) {
 		}
 
 		response = append(response, config.UserFacingMedicine{
-			ID:                   med.ID,
-			BrandName:            med.BrandName,
-			Power:                med.Power,
-			GenericName:          med.Generic.GenericName,
-			Category:             med.Category.CategoryName,
-			Description:          med.Description,
-			Unit:                 med.UnitOfMeasurement,
-			MeasurementUnitValue: med.MeasurementUnitValue,
-			NumberOfPiecesPerBox: med.NumberOfPiecesPerBox,
-			Price:                price,
-			TaxType:              med.TaxType,
-			Prescription:         med.Prescription,
-			Images:               imageFilenames,
+			ID:                        med.ID,
+			BrandName:                 med.BrandName,
+			Power:                     med.Power,
+			GenericName:               med.Generic.GenericName,
+			Category:                  med.Category.CategoryName,
+			Description:               med.Description,
+			Unit:                      med.UnitOfMeasurement,
+			MeasurementUnitValue:      med.MeasurementUnitValue,
+			NumberOfPiecesPerBox:      med.NumberOfPiecesPerBox,
+			Price:                     price,
+			TaxType:                   med.TaxType,
+			Prescription:              med.Prescription,
+			Benefits:                  med.Benefits,
+			KeyIngredients:            med.KeyIngredients,
+			RecommendedDailyAllowance: med.RecommendedDailyAllowance,
+			DirectionsForUse:          med.DirectionsForUse,
+			SafetyInformation:         med.SafetyInformation,
+			Storage:                   med.Storage,
+			Images:                    imageFilenames,
 		})
 	}
 
@@ -594,20 +936,26 @@ func GetTwoCategoriesWithItems(c *gin.Context, db *gorm.DB) {
 			}
 
 			userMedicines = append(userMedicines, config.UserFacingMedicine{
-				ID:                   med.ID,
-				BrandName:            med.BrandName,
-				Power:                med.Power,
-				GenericName:          med.Generic.GenericName,
-				Category:             med.Category.CategoryName,
-				Description:          med.Description,
-				Discount:             med.Discount,
-				Unit:                 med.UnitOfMeasurement,
-				MeasurementUnitValue: med.MeasurementUnitValue,
-				NumberOfPiecesPerBox: med.NumberOfPiecesPerBox,
-				Price:                price,
-				TaxType:              med.TaxType,
-				Prescription:         med.Prescription,
-				Images:               imageFilenames,
+				ID:                        med.ID,
+				BrandName:                 med.BrandName,
+				Power:                     med.Power,
+				GenericName:               med.Generic.GenericName,
+				Category:                  med.Category.CategoryName,
+				Description:               med.Description,
+				Discount:                  med.Discount,
+				Unit:                      med.UnitOfMeasurement,
+				MeasurementUnitValue:      med.MeasurementUnitValue,
+				NumberOfPiecesPerBox:      med.NumberOfPiecesPerBox,
+				Price:                     price,
+				TaxType:                   med.TaxType,
+				Prescription:              med.Prescription,
+				Benefits:                  med.Benefits,
+				KeyIngredients:            med.KeyIngredients,
+				RecommendedDailyAllowance: med.RecommendedDailyAllowance,
+				DirectionsForUse:          med.DirectionsForUse,
+				SafetyInformation:         med.SafetyInformation,
+				Storage:                   med.Storage,
+				Images:                    imageFilenames,
 			})
 		}
 
@@ -622,5 +970,148 @@ func GetTwoCategoriesWithItems(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, gin.H{
 		"message":    "Categories with medicines fetched successfully",
 		"categories": response,
+	})
+}
+
+// search bar
+func SearchMedicinesForUser(c *gin.Context, db *gorm.DB) {
+	query := c.Query("q")
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Search query is required"})
+		return
+	}
+
+	var medicines []models.Medicine
+	if err := db.Preload("Generic").
+		Preload("Category").
+		Preload("ItemImages").
+		Joins("LEFT JOIN categories ON categories.id = medicines.category_id").
+		Where("medicines.brand_name LIKE ? OR categories.category_name LIKE ?", "%"+query+"%", "%"+query+"%").
+		Find(&medicines).Error; err != nil {
+		logrus.WithError(err).Error("Failed to search medicines")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search medicines"})
+		return
+	}
+
+	var response []config.UserFacingMedicine
+	for _, med := range medicines {
+		var imageFilenames []string
+		for _, img := range med.ItemImages {
+			imageFilenames = append(imageFilenames, img.FileName)
+		}
+
+		price := med.SellingPricePerBox
+		if med.UnitOfMeasurement == "per piece" {
+			price = med.SellingPricePerPiece
+		}
+
+		response = append(response, config.UserFacingMedicine{
+			ID:                        med.ID,
+			BrandName:                 med.BrandName,
+			Power:                     med.Power,
+			GenericName:               med.Generic.GenericName,
+			Category:                  med.Category.CategoryName,
+			Description:               med.Description,
+			Discount:                  med.Discount,
+			Unit:                      med.UnitOfMeasurement,
+			MeasurementUnitValue:      med.MeasurementUnitValue,
+			NumberOfPiecesPerBox:      med.NumberOfPiecesPerBox,
+			Price:                     price,
+			TaxType:                   med.TaxType,
+			Prescription:              med.Prescription,
+			Benefits:                  med.Benefits,
+			KeyIngredients:            med.KeyIngredients,
+			RecommendedDailyAllowance: med.RecommendedDailyAllowance,
+			DirectionsForUse:          med.DirectionsForUse,
+			SafetyInformation:         med.SafetyInformation,
+			Storage:                   med.Storage,
+			Images:                    imageFilenames,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "Search results",
+		"medicines": response,
+	})
+}
+
+// trending products
+func GetTrendingMedicines(c *gin.Context, db *gorm.DB) {
+	var trendingMedicineIDs []uint
+
+	// Top 10 most frequently added medicines to cart in last 7 days
+	err := db.
+		Model(&models.Cart{}).
+		Select("medicine_id").
+		Where("created_at >= NOW() - INTERVAL 7 DAY").
+		Group("medicine_id").
+		Order("COUNT(*) DESC").
+		Limit(10).
+		Pluck("medicine_id", &trendingMedicineIDs).Error
+
+	if err != nil {
+		logrus.WithError(err).Error("Failed to fetch trending medicine IDs")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch trending medicines"})
+		return
+	}
+
+	if len(trendingMedicineIDs) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"message":   "No trending medicines found",
+			"medicines": []config.UserFacingMedicine{},
+		})
+		return
+	}
+
+	var medicines []models.Medicine
+	err = db.Preload("Generic").
+		Preload("ItemImages").
+		Preload("Category").
+		Where("id IN ?", trendingMedicineIDs).
+		Find(&medicines).Error
+
+	if err != nil {
+		logrus.WithError(err).Error("Failed to fetch trending medicine details")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicine details"})
+		return
+	}
+
+	var response []config.UserFacingMedicine
+	for _, med := range medicines {
+		var images []string
+		for _, img := range med.ItemImages {
+			images = append(images, img.FileName)
+		}
+		price := med.SellingPricePerBox
+		if med.UnitOfMeasurement == "per piece" {
+			price = med.SellingPricePerPiece
+		}
+		response = append(response, config.UserFacingMedicine{
+			ID:                        med.ID,
+			BrandName:                 med.BrandName,
+			Power:                     med.Power,
+			GenericName:               med.Generic.GenericName,
+			Category:                  med.Category.CategoryName,
+			Description:               med.Description,
+			Discount:                  med.Discount,
+			Unit:                      med.UnitOfMeasurement,
+			MeasurementUnitValue:      med.MeasurementUnitValue,
+			NumberOfPiecesPerBox:      med.NumberOfPiecesPerBox,
+			Price:                     price,
+			TaxType:                   med.TaxType,
+			Prescription:              med.Prescription,
+			Benefits:                  med.Benefits,
+			KeyIngredients:            med.KeyIngredients,
+			RecommendedDailyAllowance: med.RecommendedDailyAllowance,
+			DirectionsForUse:          med.DirectionsForUse,
+			SafetyInformation:         med.SafetyInformation,
+			Storage:                   med.Storage,
+			Images:                    images,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "Trending medicines fetched successfully",
+		"medicines": response,
 	})
 }

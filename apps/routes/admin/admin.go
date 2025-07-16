@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/category"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/cms"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/dashboard"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/generic"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/itemimage"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/medicine"
@@ -152,6 +153,20 @@ func Admin(db *gorm.DB) {
 	apiV1.POST("/excel/upload-excel", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		uploadexcel.UploadMedicineExcel(c, db)
 	})
+
+	//admin info dash
+	apiV1.GET("/admin/admin-info", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		dashboard.GetCurrentAdminInfo(c, db)
+	})
+
+	apiV1.GET("/admin/admin-dash-userinfo", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		dashboard.GetDashboardUserSummary(c, db)
+	})
+
+	apiV1.GET("/admin/admin-dash-medicinecount", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		dashboard.GetMedicineCountSummary(c, db)
+	})
+
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
 	router.Run(":" + port)
