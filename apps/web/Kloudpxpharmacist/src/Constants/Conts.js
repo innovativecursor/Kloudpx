@@ -1,5 +1,5 @@
 export const Menu = {
-  Prescription: [
-    { text: "Find Prescription", link: "/findprescription" },
+  user: [
+    { text: "AllData", link: "/home" },
   ],
 };

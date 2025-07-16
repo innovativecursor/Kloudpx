@@ -100,7 +100,7 @@ const ProductCardItem = ({ item, fallbackImage }) => {
 };
 
 const ProductsCard = ({ selectedCategoryItems }) => {
-  const fallbackImage = "/assets/paracetamol.jpeg";
+  const fallbackImage = "/assets/fallback.png";
   const medicines = selectedCategoryItems || [];
 
   console.log(selectedCategoryItems);

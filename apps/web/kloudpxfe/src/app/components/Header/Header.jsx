@@ -8,7 +8,7 @@ import Hamburger from "@/app/components/modal/Hamburger";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useCartContext } from "@/app/contexts/CartContext";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import { FiShoppingCart } from "react-icons/fi";
 import CartModal from "@/app/components/modal/CartModal";
 import useModal from "@/app/hooks/useModal";
 import UserProfile from "../Profile/UserProfile";
@@ -20,13 +20,13 @@ const Header = () => {
   const { isOpen, setIsOpen, modalRef } = useModal();
 
   return (
-    <div className="">
-      <div className="flex-between-center responsive-mx mt-3">
-        <div className="flex-between-center lg:w-[75%] sm:w-[75%] w-[45%]">
+    <div className="fixed top-0 left-0 right-0 z-40 bg-white shadow-sm">
+      <div className="flex-between-center items-baseline responsive-mx mt-2">
+        <div className="flex-between-center items-baseline lg:w-[85%] sm:w-[75%] w-[45%]">
           <Logo />
           <SearchBar />
         </div>
-        <div className="flex-between-center sm:gap-6 gap-3">
+        <div className="flex-between-center items-center sm:gap-6 gap-3">
           <div>
             {!loading && user ? (
               <UserProfile user={user} logout={logout} />
@@ -47,7 +47,8 @@ const Header = () => {
             onMouseLeave={() => setIsOpen(false)}
           >
             <div>
-              <i className="ri-shopping-cart-line text-xl font-medium"></i>
+              {/* <i className="ri-shopping-cart-line text-xl font-medium"></i> */}
+              <FiShoppingCart className="text-3xl" />
               <span className="absolute -top-0 -right-1 text-[8px] bg-red-600 text-white rounded-full w-3 h-3 flex items-center justify-center">
                 {cartLength}
               </span>
@@ -60,9 +61,9 @@ const Header = () => {
       </div>
 
       {/* Hamburger & Top Items */}
-      <div className="mt-4">
+      <div className="mt-5">
         <div className="flex-between-center border-t border-b border-gray-200">
-          <div className="w-full px-3 md:px-[8vw] py-3 sm:py-4">
+          <div className="w-full px-3 md:px-[8vw] py-3 sm:py-2">
             <div className="flex items-center justify-center w-full">
               <div className="w-fit bg-white">
                 <Hamburger />

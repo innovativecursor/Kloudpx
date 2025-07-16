@@ -1,108 +1,133 @@
-import React, { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import Searchbar from "../../Components/searchbar/Searchbar";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { usePrescriptionContext } from "../../contexts/PrescriptionContext";
 import CustomModal from "../../Components/modal/CustomModal";
-import UserCart from "../../Components/usercart/UserCart";
 
 const PrescriptionDetails = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-
-  const { prescriptionDetails, getPrescriptionDetails } =
+  const { userid } = useParams();
+  const { allPrescriptions, prescriptionDetails, fetchPrescriptionsDetails } =
     usePrescriptionContext();
 
-  useEffect(() => {
-    if (id) {
-      getPrescriptionDetails(id);
-    }
-  }, [id]);
+  const [activeTab, setActiveTab] = useState("unsettled");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPrescription, setSelectedPrescription] = useState(null);
 
-  const details = prescriptionDetails?.data;
-  if (!details) return null;
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedPrescription(null);
+  };
+
+  useEffect(() => {
+    if (userid) fetchPrescriptionsDetails(userid);
+  }, [userid]);
+
+  const userInfo = allPrescriptions.find(
+    (user) => Number(user.userid) === Number(userid)
+  );
+
+  const { unsettled = [], past = [] } = prescriptionDetails || {};
+
+  const handleCardClick = (item) => {
+    setSelectedPrescription(item);
+    setIsModalOpen(true);
+  };
+
+  const renderCards = (data) => {
+    if (!data || data.length === 0) {
+      return <p className="text-gray-500 mt-4">No data available.</p>;
+    }
+
+    return (
+      <div className="grid grid-cols-1 mb-32 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-12">
+        {data.map((item) => (
+          <div
+            key={item.ID}
+            onClick={() => handleCardClick(item)}
+            className="cursor-pointer bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition duration-300"
+          >
+            {item.UploadedImage ? (
+              <img
+                src={item.UploadedImage}
+                alt="Uploaded"
+                className="w-full h-48 object-cover"
+              />
+            ) : (
+              <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
+                No Image Available
+              </div>
+            )}
+            <div className="p-4">
+              <p className="text-base font-semibold text-gray-700 mb-1">
+                👤 User ID: <span className="text-black">{item.UserID}</span>
+              </p>
+              <p className="text-sm text-gray-600">
+                📌 Status:{" "}
+                <span
+                  className={`px-3 py-1 text-xs rounded-full font-bold ${
+                    (item.Status || "unsettled") === "unsettled"
+                      ? "bg-red-100 text-red-600"
+                      : "bg-green-100 text-green-600"
+                  }`}
+                >
+                  {item.Status || "unsettled"}
+                </span>
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8 pb-32">
-      {/* Top Bar */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+    <div className="p-4 md:mt-20 mt-12 md:mx-[5vw] mx-2">
+      {/* User Info */}
+      <div className="max-w-md mx-auto mb-8 bg-white rounded-xl shadow-lg p-6 flex flex-col items-center">
+        <div className="w-16 h-16 bg-[#0070ba] text-white rounded-full flex items-center justify-center text-2xl font-bold mb-4 shadow-md">
+          {userInfo?.name?.charAt(0) || "U"}
+        </div>
+        <p className="text-xl font-semibold text-gray-800">
+          {userInfo?.name || "Unknown User"}
+        </p>
+        <p className="text-sm text-gray-500 mt-1">
+          {userInfo?.email || "Not Found"}
+        </p>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex mt-12 gap-12 mb-4 flex-wrap">
         <button
-          onClick={() => navigate(-1)}
-          className="text-blue-600 font-semibold text-sm hover:underline transition"
-          aria-label="Go back to all prescriptions"
+          className={`px-12 py-3 rounded-full ${
+            activeTab === "past"
+              ? "bg-[#0070ba] text-white"
+              : "bg-gray-300 text-gray-900"
+          }`}
+          onClick={() => setActiveTab("past")}
         >
-          ← Back to all prescriptions
+          Past ({past.length})
         </button>
-
-        {details?.Status !== "fulfilled" && <Searchbar />}
+        <button
+          className={`px-12 py-3 rounded-full ${
+            activeTab === "unsettled"
+              ? "bg-[#0070ba] text-white"
+              : "bg-gray-300 text-gray-900"
+          }`}
+          onClick={() => setActiveTab("unsettled")}
+        >
+          Unsettled ({unsettled.length})
+        </button>
       </div>
 
-      {/* Main Prescription Info Card */}
-      <div className="bg-white rounded-3xl shadow-xl overflow-hidden grid md:grid-cols-2 gap-8">
-        {/* Image section */}
-        <div className="h-96 relative bg-gray-100 rounded-l-3xl overflow-hidden group shadow-md">
-          <img
-            src={details.UploadedImage}
-            alt="Prescription"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
-          />
-          <span className="absolute top-5 right-5 bg-white border border-gray-300 shadow-md px-4 py-1 rounded-full text-sm font-semibold text-gray-700 select-none">
-            ID: #{details.ID}
-          </span>
-        </div>
+      {/* Cards */}
+      {activeTab === "unsettled" && renderCards(unsettled)}
+      {activeTab === "past" && renderCards(past)}
 
-        {/* Details section */}
-        <div className="p-8 space-y-8 text-gray-900">
-          {/* Patient Name */}
-          <div>
-            <h4 className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-1">
-              Patient Name
-            </h4>
-            <p className="text-2xl font-bold capitalize">
-              {details.User?.FirstName || "N/A"}
-            </p>
-          </div>
-
-          {/* Status */}
-          <div>
-            <h4 className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-1">
-              Status
-            </h4>
-            <span
-              className={`inline-block px-4 py-1 rounded-full text-sm font-semibold capitalize ${
-                details.Status === "past"
-                  ? "bg-green-100 text-green-800"
-                  : details.Status === "unsettled"
-                  ? "bg-yellow-100 text-yellow-800"
-                  : "bg-blue-100 text-blue-800"
-              }`}
-            >
-              {details.Status}
-            </span>
-          </div>
-
-          {/* Uploaded On */}
-          <div>
-            <h4 className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-1">
-              Uploaded On
-            </h4>
-            <p className="text-lg font-medium">
-              {new Date(details.CreatedAt).toLocaleDateString()}
-            </p>
-          </div>
-
-          {/* User ID */}
-          <div>
-            <h4 className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-1">
-              User ID
-            </h4>
-            <p className="text-lg font-medium">{details.UserID}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* User Cart & Modal */}
-      <UserCart details={details} />
-      <CustomModal />
+      {/* Modal */}
+      <CustomModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        selectedPrescription={selectedPrescription}
+      />
     </div>
   );
 };

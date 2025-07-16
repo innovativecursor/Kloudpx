@@ -17,19 +17,21 @@ const Category7 = () => {
     getGalleryImages();
   }, []);
 
+  // console.log(galleryImages);
+
   const ImageCard = ({ image, index }) => (
     <div
-      className={`relative group overflow-hidden col-span-2 sm:col-span-1 ${
-        index < 2 ? "h-[160px] sm:h-[220px]" : "h-[160px] sm:h-[250px]"
-      }`}
+      className={`relative group overflow-hidden shadow col-span-2 sm:col-span-1 
+        ${index < 2 ? "h-[160px] sm:h-[260px]" : "h-[160px] sm:h-[260px]"}
+      `}
     >
       <img
         src={image.ImageURL}
         alt={image.ButtonText || `Gallery ${index + 1}`}
-        className="w-full h-full object-cover rounded-md  transition duration-300 group-hover:opacity-60"
+        className="w-full h-full  rounded-md  transition duration-300 "
       />
-      <div className="absolute inset-0 flex items-center justify-center  opacity-0 group-hover:opacity-100 transition duration-300">
-        <PrimaryButton title={image.ButtonText || "View"} />
+      <div className="absolute inset-0 flex items-center justify-center bg-black/50 cursor-pointer opacity-0 group-hover:opacity-100 transition duration-300">
+        <PrimaryButton title={rightImage.ButtonText || "View"} />
       </div>
     </div>
   );
@@ -37,7 +39,7 @@ const Category7 = () => {
   // console.log(galleryImages);
 
   return (
-    <div className="responsive-mx flex flex-col md:flex-row gap-3 md:gap-4 mt-8 md:mt-20">
+    <div className="responsive-mx flex  flex-col md:flex-row gap-3 md:gap-4 mt-8 md:mt-20">
       {/* Left Grid */}
       <div className="grid grid-cols-2 gap-3 md:gap-4 cursor-pointer md:w-[70%]">
         {leftImages.map((img, i) => (
@@ -53,7 +55,7 @@ const Category7 = () => {
             alt={rightImage.ButtonText || "Gallery"}
             className="w-full h-full  rounded-md transition cursor-pointer duration-300 group-hover:opacity-60"
           />
-          <div className="absolute inset-0 flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition duration-300">
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50 cursor-pointer opacity-0 group-hover:opacity-100 transition duration-300">
             <PrimaryButton title={rightImage.ButtonText || "View"} />
           </div>
         </div>

@@ -6,13 +6,13 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
 
-const CartDrawer = ({ isOpen, onClose }) => {
+const CartModal = ({ isOpen, onClose }) => {
   const { token } = useAuth();
   const router = useRouter();
   const { getCartData, removeFromCart, getAllCartData } = useCartContext();
   const { data, loading } = getCartData;
 
-  const fallbackImage = "/assets/demo.jpg";
+  const fallbackImage = "/assets/fallback.png";
   const [activeTab, setActiveTab] = useState("All");
 
   useEffect(() => {
@@ -63,10 +63,10 @@ const CartDrawer = ({ isOpen, onClose }) => {
         <div className="flex justify-end items-end mt-1">
           <button
             onClick={onClose}
-            className="text-2xl text-gray-600 hover:text-black transition"
+            className="text-2xl text-gray-600 cursor-pointer hover:text-black transition"
             title="Close"
           >
-            <i class="ri-close-line mr-3"></i>
+            <i className="ri-close-line mr-3"></i>
           </button>
         </div>
         <div className="p-4 flex justify-between items-center">
@@ -150,7 +150,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                         className="ml-2 cursor-pointer font-light text-gray-400"
                         title="Remove"
                       >
-                        <i class="ri-close-circle-line text-2xl font-light"></i>
+                        <i className="ri-close-circle-line text-2xl font-light"></i>
                       </button>
                     </div>
 
@@ -204,4 +204,4 @@ const CartDrawer = ({ isOpen, onClose }) => {
   );
 };
 
-export default CartDrawer;
+export default CartModal;

@@ -3,7 +3,7 @@ import Category7 from "@/app/components/category7/Category7";
 import TrendingProducts from "@/app/components/trendingproducts/TrendingProducts";
 import HealthArticles from "@/app/components/healtharticles/HealthArticles";
 import Testimonial from "@/app/components/testimonial/Testimonial";
-import FeaturedBrand from "@/app/components/featuredbrand/FeaturedBrand";
+// import FeaturedBrand from "@/app/components/featuredbrand/FeaturedBrand";
 import Faq from "@/app/components/faq/Faq";
 import { useProductContext } from "@/app/contexts/ProductContext";
 import { useEffect } from "react";
@@ -12,7 +12,12 @@ function Products() {
   const { getTwoCategory, twoCategory } = useProductContext();
 
   const firstCategory = twoCategory[0]?.medicines || [];
+  const firstCategoryName = twoCategory[0]?.categoryname || null;
   const secondCategory = twoCategory[1]?.medicines || [];
+  const secondCategoryName = twoCategory[1]?.categoryname || null;
+
+  console.log(twoCategory);
+  
 
   const trendingProducts = [
     {
@@ -198,9 +203,9 @@ function Products() {
   return (
     <>
       <Category7 />
-      <Cards data={firstCategory} title="Popular Properties" />
-      <FeaturedBrand />
-      <Cards data={secondCategory} title="Health Products" />
+      <Cards data={firstCategory} title={firstCategoryName} />
+      {/* <FeaturedBrand /> */}
+      <Cards data={secondCategory} title={secondCategoryName} />
       <TrendingProducts trendingProducts={trendingProducts} />
       <HealthArticles articles={articles} />
       <Testimonial testimonials={testimonials} />

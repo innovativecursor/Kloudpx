@@ -1,8 +1,7 @@
 const ROUTES = {
   LOGIN: "/",
   HOME: "/home",
-  FINDPRESCRIPTION: "/findprescription",
-  PRESCRIPTION_DETAILS: "/prescription-details/:id",
+  PRESCRIPTION_DETAILS: "/prescription-details/:userid",
 };
 
 export default ROUTES;

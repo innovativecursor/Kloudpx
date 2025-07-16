@@ -18,7 +18,7 @@ import Prescription from "../modal/Prescription";
 const SwiperSlider = ({ data, title }) => {
   const router = useRouter();
   const { prevRef, nextRef, setSwiperInstance } = useSwiperNavigation();
-  const fallbackImage = "/assets/paracetamol.jpeg";
+  const fallbackImage = "/assets/fallback.png";
   const { isOpen } = usePrescriptionContext();
   const handleCardClick = (id, genericname) => {
     const slug = generateSlug(genericname);
@@ -47,12 +47,12 @@ const SwiperSlider = ({ data, title }) => {
           >
             {data.map((product) => (
               <SwiperSlide key={product.id}>
-                <div className="bg-white min-h-[350px] flex flex-col justify-between">
+                <div className=" min-h-[350px] bg-white flex flex-col justify-between">
                   <div
                     onClick={() =>
                       handleCardClick(product?.id, product?.genericname)
                     }
-                    className="bg-gray-100 cursor-pointer sm:p-5 p-4 sm:h-56 h-36 rounded-md flex items-center justify-center overflow-hidden"
+                    className="bg-gray-100 cursor-pointer sm:py-5 px-5 p-4 sm:h-72 h-36 rounded-md flex items-center justify-center overflow-hidden"
                   >
                     <img
                       src={product.images?.[0] || fallbackImage}
@@ -67,8 +67,8 @@ const SwiperSlider = ({ data, title }) => {
                   </div>
 
                   {/* Add to Cart */}
-                  <div className="mt-3 px-2 pb-2">
-                    <AddToCart title="Add To Cart" productDetails={product} />
+                  <div className="mt-4 px-2 pb-2">
+                    <AddToCart title="Add To Cart" productDetails={product} className="text-xs flex items-center gap-3 rounded-full font-medium py-1.5 justify-center text-black bg-gray-200/50 cursor-pointer w-full" />
                   </div>
                 </div>
               </SwiperSlide>

@@ -1,7 +1,12 @@
-import React from "react";
+import React from 'react'
+import AllPrescription from './prescription/AllPrescription'
 
 const Home = () => {
-  return <div>Home</div>;
-};
+  return (
+    <div>
+      <AllPrescription />
+    </div>
+  )
+}
 
-export default Home;
+export default Home

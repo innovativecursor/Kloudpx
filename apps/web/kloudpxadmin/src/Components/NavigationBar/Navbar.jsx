@@ -6,7 +6,6 @@ import { googleLogout } from "@react-oauth/google";
 import { Button, Collapse, Drawer, Tooltip, Space } from "antd";
 import { Menu } from "../../Constants/Conts";
 import { AiOutlineLogout } from "react-icons/ai";
-// import { Tooltip } from "antd";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 const { Panel } = Collapse;

@@ -2,17 +2,14 @@ import { createContext, useContext, useState } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import axios from "axios";
 import endpoints from "../config/endpoints";
+import { getAxiosCall } from "../Axios/AxiosConfig";
+import { store } from "../store/index";
 
 export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  // const [token, setToken] = useState(
-  //   localStorage.getItem("access_token") || null
-  // );
   const [token, setToken] = useState(
     sessionStorage.getItem("access_token") || null
   );
@@ -21,29 +18,24 @@ const AuthProvider = ({ children }) => {
     flow: "auth-code",
     onSuccess: async (codeResponse) => {
       try {
-        setLoading(true);
         if (!codeResponse?.code)
           throw new Error("Authorization code not found");
 
-        const encodedCode = encodeURIComponent(codeResponse.code);
-        const res = await axios.get(
-          // `http://localhost:10002/v1/auth/google/callback/pharmacist?code=${encodedCode}`
-          `${endpoints.auth.googleLoginPharmacist}?code=${encodedCode}`
+        const response = await getAxiosCall(
+          `${endpoints.auth.googleLoginPharmacist}?code=${codeResponse.code}`,
+          {},
+          false
         );
 
-        const { token } = res.data;
+        const { token } = response;
         if (!token) throw new Error("Token missing from server");
 
-        // localStorage.setItem("access_token", token);
         sessionStorage.setItem("access_token", token);
         setToken(token);
-        Swal.fire("Success", "Login successful", "success");
-        navigate("/findprescription");
+        navigate("/home");
       } catch (error) {
         console.error(error);
         Swal.fire("Error", error.message || "Login failed", "error");
-      } finally {
-        setLoading(false);
       }
     },
     onError: () => {
@@ -52,11 +44,14 @@ const AuthProvider = ({ children }) => {
   });
 
   const logout = () => {
-    // localStorage.removeItem("access_token");
-    sessionStorage.removeItem("access_token");
-    setToken(null);
-    Swal.fire("Logged Out", "You have been logged out", "info");
-    navigate("/");
+    store.dispatch({ type: "LOADING", payload: true });
+
+    setTimeout(() => {
+      sessionStorage.removeItem("access_token");
+      setToken(null);
+      store.dispatch({ type: "LOADING", payload: false });
+      navigate("/");
+    }, 500);
   };
 
   const isUserLoggedIn = !!token;
@@ -67,9 +62,6 @@ const AuthProvider = ({ children }) => {
         token,
         login,
         logout,
-        loading,
-        // isAuthenticated: !!token,
-        // isAuthenticated: isUserLoggedIn,
         isUserLoggedIn,
       }}
     >

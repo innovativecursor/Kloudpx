@@ -3,6 +3,7 @@
 import React from "react";
 import useModal from "@/app/hooks/useModal";
 import { useRouter } from "next/navigation";
+import { VscAccount } from "react-icons/vsc";
 
 const UserProfile = ({ user, logout }) => {
   const { isOpen, setIsOpen, modalRef } = useModal();
@@ -22,7 +23,8 @@ const UserProfile = ({ user, logout }) => {
         aria-haspopup="true"
         aria-expanded={isOpen}
       >
-        {`Hi, ${user.first_name} ${user.last_name}`}
+        {/* {`Hi, ${user.first_name} ${user.last_name}`} */}
+        <VscAccount className="text-3xl" />
       </button>
 
       {/* Dropdown Modal */}
