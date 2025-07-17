@@ -99,6 +99,9 @@ func User(db *gorm.DB) {
 	apiV1.GET("/user/trending-medicines", func(c *gin.Context) {
 		userflow.GetTrendingMedicines(c, db)
 	})
+	apiV1.GET("/user/popular-medicines", func(c *gin.Context) {
+		userflow.GetPopularMedicines(c, db)
+	})
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
 	router.Run(":" + port)

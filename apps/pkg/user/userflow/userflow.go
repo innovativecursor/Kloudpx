@@ -1046,7 +1046,7 @@ func GetTrendingMedicines(c *gin.Context, db *gorm.DB) {
 		Where("created_at >= NOW() - INTERVAL 7 DAY").
 		Group("medicine_id").
 		Order("COUNT(*) DESC").
-		Limit(10).
+		Limit(9).
 		Pluck("medicine_id", &trendingMedicineIDs).Error
 
 	if err != nil {
@@ -1112,6 +1112,62 @@ func GetTrendingMedicines(c *gin.Context, db *gorm.DB) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message":   "Trending medicines fetched successfully",
+		"medicines": response,
+	})
+}
+
+func GetPopularMedicines(c *gin.Context, db *gorm.DB) {
+	var medicines []models.Medicine
+
+	err := db.Preload("Generic").
+		Preload("ItemImages").
+		Preload("Category").
+		Order("created_at DESC").
+		Limit(10).
+		Find(&medicines).Error
+
+	if err != nil {
+		logrus.WithError(err).Error("Failed to fetch latest medicines")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch latest medicines"})
+		return
+	}
+
+	var response []config.UserFacingMedicine
+	for _, med := range medicines {
+		var images []string
+		for _, img := range med.ItemImages {
+			images = append(images, img.FileName)
+		}
+		price := med.SellingPricePerBox
+		if med.UnitOfMeasurement == "per piece" {
+			price = med.SellingPricePerPiece
+		}
+		response = append(response, config.UserFacingMedicine{
+			ID:                        med.ID,
+			BrandName:                 med.BrandName,
+			Power:                     med.Power,
+			GenericName:               med.Generic.GenericName,
+			Category:                  med.Category.CategoryName,
+			Description:               med.Description,
+			Discount:                  med.Discount,
+			Unit:                      med.UnitOfMeasurement,
+			MeasurementUnitValue:      med.MeasurementUnitValue,
+			NumberOfPiecesPerBox:      med.NumberOfPiecesPerBox,
+			Price:                     price,
+			TaxType:                   med.TaxType,
+			Prescription:              med.Prescription,
+			Benefits:                  med.Benefits,
+			KeyIngredients:            med.KeyIngredients,
+			RecommendedDailyAllowance: med.RecommendedDailyAllowance,
+			DirectionsForUse:          med.DirectionsForUse,
+			SafetyInformation:         med.SafetyInformation,
+			Storage:                   med.Storage,
+			Images:                    images,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "Latest medicines fetched successfully",
 		"medicines": response,
 	})
 }
