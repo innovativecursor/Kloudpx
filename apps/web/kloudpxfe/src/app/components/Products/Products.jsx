@@ -3,7 +3,7 @@ import Category7 from "@/app/components/category7/Category7";
 import TrendingProducts from "@/app/components/trendingproducts/TrendingProducts";
 import HealthArticles from "@/app/components/healtharticles/HealthArticles";
 import Testimonial from "@/app/components/testimonial/Testimonial";
-// import FeaturedBrand from "@/app/components/featuredbrand/FeaturedBrand";
+import FeaturedBrand from "@/app/components/featuredbrand/FeaturedBrand";
 import Faq from "@/app/components/faq/Faq";
 import { useProductContext } from "@/app/contexts/ProductContext";
 import { useEffect } from "react";
@@ -113,7 +113,7 @@ function Products() {
       <div>
       <Cards data={firstCategory} title={firstCategoryName} />
       </div>
-      {/* <FeaturedBrand /> */}
+      <FeaturedBrand />
       <div className="mt-6 sm:mt-10 md:mt-12">
       <Cards data={secondCategory} title={secondCategoryName} />
       </div>

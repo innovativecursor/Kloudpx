@@ -42,6 +42,9 @@ const endpoints = {
   trending: {
     get: `/v1/user/trending-medicines`,
   },
+  feature: {
+    get:  `/v1/user/get-feature-products`
+  },
   search: {
     get: (query) => `/v1/user/search-medicine?q=${encodeURIComponent(query)}`,
   },

@@ -16,6 +16,7 @@ export const ProductProvider = ({ children }) => {
   const [twoCategory, setTwoCategory] = useState([]);
   const [productDetails, setProductDetails] = useState([]);
   const [trending, setTrending] = useState([]);
+  const [feature, setFeature] = useState([]);
 
   const getAllMedicine = async () => {
     try {
@@ -25,6 +26,16 @@ export const ProductProvider = ({ children }) => {
       setAllMedicine([]);
     }
   };
+
+  const getAllFeature = async () => {
+    try {
+      const res = await getAxiosCall(endpoints.feature.get, {}, false
+      )
+      setFeature(res?.data?.medicines || []);
+    } catch (error) {
+          setFeature([]);
+    }
+  }
 
   const getBranded = async () => {
     try {
@@ -113,6 +124,9 @@ export const ProductProvider = ({ children }) => {
         productDetails,
         getTrendingProducts,
         trending,
+        getAllFeature,
+        feature
+
       }}
     >
       {children}

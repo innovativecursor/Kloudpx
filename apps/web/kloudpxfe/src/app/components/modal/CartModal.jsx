@@ -48,7 +48,7 @@ const CartModal = ({ isOpen, onClose }) => {
     (item) => item.prescription_status === "Unsettled"
   );
 
-  // console.log(data);
+  console.log(data);
 
   return (
     <>
@@ -120,7 +120,10 @@ const CartModal = ({ isOpen, onClose }) => {
           ) : (
             filteredData.map((item) => {
               const medicine = item?.medicine;
-              const imageUrl = medicine?.images[0] || fallbackImage;
+              const imageUrl =
+                Array.isArray(medicine?.images) && medicine.images[0]
+                  ? medicine.images[0]
+                  : fallbackImage;
               const price = medicine?.price || 0;
               const discountPercent =
                 parseFloat(medicine?.discount?.replace("%", "")) || 0;
