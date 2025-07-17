@@ -49,7 +49,7 @@ const CartModal = ({ isOpen, onClose }) => {
     (item) => item.prescription_status === "Unsettled"
   );
 
-  console.log(data);
+  // console.log(data);
 
   return (
     <>

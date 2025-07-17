@@ -21,7 +21,7 @@ const FeaturedBrand = () => {
     getAllFeature();
   }, []);
 
-  console.log(feature);
+  // console.log(feature);
 
   return (
     <div className="responsive-mx mt-12 sm:mt-16 md:mt-20 bg-gray-200/70 rounded-xl sm:py-12 py-8 sm:px-6 px-4">

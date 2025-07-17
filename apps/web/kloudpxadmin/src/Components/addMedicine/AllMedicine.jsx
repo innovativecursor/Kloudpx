@@ -26,7 +26,7 @@ const AllMedicine = () => {
 
   const columns = getMedicineColumns({ handleEdit, deleteMedicine });
 
-console.log(medicines)
+// console.log(medicines)
 
   return (
     <div className="md:p-4 mt-16 mx-[4vw]">

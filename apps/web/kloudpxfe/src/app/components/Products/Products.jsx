@@ -112,7 +112,7 @@ function Products() {
     getAllPopular();
   }, []);
 
-  console.log(popular);
+  // console.log(popular);
 
   return (
     <>

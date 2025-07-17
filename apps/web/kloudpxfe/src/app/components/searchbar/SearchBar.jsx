@@ -48,7 +48,7 @@ export default function SearchBar() {
 
     try {
       const res = await getAxiosCall(endpoints.search.get(query), {}, false);
-      console.log(res);
+      // console.log(res);
       setResults(res?.data?.medicines || []);
       setShowDropdown(true);
     } catch (error) {

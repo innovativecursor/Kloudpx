@@ -103,7 +103,7 @@ const ProductsCard = ({ selectedCategoryItems }) => {
   const fallbackImage = "/assets/fallback.png";
   const medicines = selectedCategoryItems || [];
 
-  console.log(selectedCategoryItems);
+  // console.log(selectedCategoryItems);
 
   return (
     <div>

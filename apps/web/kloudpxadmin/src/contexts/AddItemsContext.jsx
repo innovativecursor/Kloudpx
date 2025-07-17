@@ -97,7 +97,7 @@ const AddItemsProvider = ({ children }) => {
       isfeature: isfeature,
     };
 
-    console.log("📦 Payload ready to send:", payload);
+    // console.log("📦 Payload ready to send:", payload);
 
     try {
       if (medicineId) {
@@ -164,7 +164,7 @@ const AddItemsProvider = ({ children }) => {
     }
   };
 
-  console.log(uploadedImageIds);
+  // console.log(uploadedImageIds);
 
   return (
     <AddItemsContext.Provider value={{ handleSubmit }}>

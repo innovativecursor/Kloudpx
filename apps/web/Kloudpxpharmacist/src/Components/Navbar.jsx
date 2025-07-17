@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuthContext } from "../contexts/AuthContext";
-import logo from "../../public/assests/kloudlogo.webp";
-import { Button, Collapse, Drawer, Radio, Space, Tooltip } from "antd";
+import logo from "../assets/kloudlogo.webp";
+import { Button, Collapse, Drawer, Space, Tooltip } from "antd";
 import { useNavigate } from "react-router-dom";
 import { Menu } from "../Constants/Conts";
 import { AiOutlineLogout } from "react-icons/ai";

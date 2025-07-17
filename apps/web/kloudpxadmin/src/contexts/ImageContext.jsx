@@ -19,10 +19,10 @@ export const ImageProvider = ({ children }) => {
         images: cleanBase64Images,
       };
 
-      console.log("📦 Sending to API:", payload);
+      // console.log("📦 Sending to API:", payload);
 
       const res = await postAxiosCall("/v1/itemimage/add-itemimage", payload);
-      console.log("✅ res data is here:", res);
+      // console.log("✅ res data is here:", res);
       const imageIds = res?.image_ids || [];
 
       setUploadedImageIds(imageIds);
