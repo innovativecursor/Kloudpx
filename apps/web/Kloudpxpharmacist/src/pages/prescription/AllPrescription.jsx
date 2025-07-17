@@ -1,61 +1,98 @@
-import React from "react";
-import CommonButton from "../../Components/button/CommanButton";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { usePrescriptionContext } from "../../contexts/PrescriptionContext";
+import { Table, Tag } from "antd";
+import { useNavigate } from "react-router-dom";
 
-const AllPrescription = ({ loading, prescriptions, handleClick }) => {
-  console.log(prescriptions);
-  
+const Home = () => {
+  const { allPrescriptions, fetchAllPrescriptions } = usePrescriptionContext();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!allPrescriptions || allPrescriptions.length === 0) {
+      fetchAllPrescriptions();
+    }
+  }, []);
+
+  const columns = [
+    {
+      title: "Sr. No.",
+      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
+    },
+    {
+      title: "User ID",
+      dataIndex: "userid",
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      render: (text) => <strong className="text-[#0070ba]">{text}</strong>,
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+    },
+    {
+      title: "Pending",
+      dataIndex: "pendingprescription",
+      render: (pending) => (
+        <Tag color="orange" className="font-medium px-2">
+          {pending}
+        </Tag>
+      ),
+    },
+    {
+      title: "Past",
+      dataIndex: "pastprescription",
+      render: (past) => (
+        <Tag color="blue" className="font-medium px-2">
+          {past}
+        </Tag>
+      ),
+    },
+    {
+      title: "Status",
+      dataIndex: "prescriptionstatus",
+      render: (status) => (
+        <Tag
+          color={status === "unsettled" ? "red" : "green"}
+          className="capitalize font-medium px-3"
+        >
+          {status}
+        </Tag>
+      ),
+    },
+  ];
+
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex gap-4">
-          <CommonButton
-            onClick={() => handleClick("fulfilled")}
-            disabled={loading}
-          >
-            Past Prescription
-          </CommonButton>
-          <CommonButton
-            onClick={() => handleClick("unsettled")}
-            disabled={loading}
-          >
-            Unsettled Prescription
-          </CommonButton>
-        </div>
+    <div className="px-2 md:px-6 py-4 md:mt-20 mt-12">
+      <div className="text-[#0070ba]">
+        <h1 className="text-xl sm:text-3xl text-center font-bold">
+          🧾 All Prescriptions
+        </h1>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-20">
-        {Array.isArray(prescriptions.data) && prescriptions.data.length > 0 ? (
-          prescriptions.data.map((item, index) => (
-            <div
-              key={index}
-              className="bg-white p-4 rounded-lg shadow border border-gray-200"
-            >
-              <Link to={`/prescription-details/${item.ID}`}>
-                <img
-                  src={item.UploadedImage}
-                  alt="Prescription"
-                  className="w-full h-60 object-cover rounded mb-3 cursor-pointer"
-                />
-              </Link>
-              <p className="text-sm">
-                <span className="font-semibold">User:</span>{" "}
-                {item?.User?.FirstName} {item?.User?.LastName}
-              </p>
-              <p className="text-sm">
-                <span className="font-semibold">Email:</span>{" "}
-                {item?.User?.Email}
-              </p>
-            </div>
-          ))
-        ) : loading ? (
-          <p className="text-gray-500">Loading...</p>
-        ) : (
-          <p className="text-gray-500">No prescriptions found.</p>
-        )}
+      <div className="bg-white mt-6 md:mx-[4vw] md:p-2 cursor-pointer rounded rounded-b-md shadow-md overflow-auto">
+        <Table
+          dataSource={allPrescriptions || []}
+          columns={columns}
+          rowKey="userid"
+          pagination={{
+            current: currentPage,
+            pageSize,
+            onChange: setCurrentPage,
+            showSizeChanger: false,
+          }}
+          bordered
+          className="w-full"
+          onRow={(record) => ({
+            onClick: () => navigate(`/prescription-details/${record.userid}`),
+          })}
+        />
       </div>
     </div>
   );
 };
 
-export default AllPrescription;
+export default Home;

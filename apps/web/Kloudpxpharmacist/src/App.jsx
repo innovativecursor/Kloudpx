@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import RoutePage from "./routes/RoutePage";
 import { useAuthContext } from "./contexts/AuthContext";
 import Navbar from "./Components/Navbar";
+import GlobalLoader from "./loader/GlobalLoader";
 
 const App = () => {
   const location = useLocation();
@@ -12,6 +13,7 @@ const App = () => {
 
   return (
     <>
+      <GlobalLoader />
       {isUserLoggedIn && !onLoginPage && <Navbar />}
       <RoutePage />
     </>

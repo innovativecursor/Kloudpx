@@ -20,9 +20,12 @@ const endpoints = {
     get: (id) => `http://localhost:10003/v1/user/medicine-details/${id}`,
   },
   cart: {
-    add: `/v1/user/add-to-cart`,
+    add: `/v1/user/add-to-cart-otc`,
     get: `/v1/user/get-cart`,
     remove: (id) => `/v1/user/remove-item-cart/${id}`,
+  },
+  prescriptioncart: {
+    add: `/v1/user/add-to-cart-medicine`,
   },
   carousel: {
     get: `/v1/user/get-carousel-img-user`,
@@ -35,6 +38,12 @@ const endpoints = {
   },
   twocategory: {
     get: `/v1/user/get-two-categories-for-user`,
+  },
+  trending: {
+    get: `/v1/user/trending-medicines`,
+  },
+  search: {
+    get: (query) => `/v1/user/search-medicine?q=${encodeURIComponent(query)}`,
   },
   prescription: {
     upload: `/v1/user/upload-prescription`,

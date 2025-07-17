@@ -3,7 +3,7 @@ import Category7 from "@/app/components/category7/Category7";
 import TrendingProducts from "@/app/components/trendingproducts/TrendingProducts";
 import HealthArticles from "@/app/components/healtharticles/HealthArticles";
 import Testimonial from "@/app/components/testimonial/Testimonial";
-import FeaturedBrand from "@/app/components/featuredbrand/FeaturedBrand";
+// import FeaturedBrand from "@/app/components/featuredbrand/FeaturedBrand";
 import Faq from "@/app/components/faq/Faq";
 import { useProductContext } from "@/app/contexts/ProductContext";
 import { useEffect } from "react";
@@ -12,100 +12,12 @@ function Products() {
   const { getTwoCategory, twoCategory } = useProductContext();
 
   const firstCategory = twoCategory[0]?.medicines || [];
+  const firstCategoryName = twoCategory[0]?.categoryname || null;
   const secondCategory = twoCategory[1]?.medicines || [];
+  const secondCategoryName = twoCategory[1]?.categoryname || null;
 
-  const trendingProducts = [
-    {
-      id: 1,
-      productImg: "/assets/product1.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 2,
-      productImg: "/assets/product2.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 3,
-      productImg: "/assets/product3.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 4,
-      productImg: "/assets/product4.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 5,
-      productImg: "/assets/product5.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 6,
-      productImg: "/assets/product3.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 7,
-      productImg: "/assets/product3.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 8,
-      productImg: "/assets/product3.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 9,
-      productImg: "/assets/product3.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-  ];
+  // console.log(twoCategory);
+
   const articles = [
     {
       id: 1,
@@ -198,14 +110,18 @@ function Products() {
   return (
     <>
       <Category7 />
-      <Cards data={firstCategory} title="Popular Properties" />
-      <FeaturedBrand />
-      <Cards data={secondCategory} title="Health Products" />
-      <TrendingProducts trendingProducts={trendingProducts} />
+      <div>
+      <Cards data={firstCategory} title={firstCategoryName} />
+      </div>
+      {/* <FeaturedBrand /> */}
+      <div className="mt-6 sm:mt-10 md:mt-12">
+      <Cards data={secondCategory} title={secondCategoryName} />
+      </div>
+      <TrendingProducts />
       <HealthArticles articles={articles} />
       <Testimonial testimonials={testimonials} />
       <Faq />
-      <div className="mt-10 md:mt-16">
+       <div className="mt-10 sm:mt-16 md:mt-20">
         <img
           src="/assets/time.png"
           alt="Upload"

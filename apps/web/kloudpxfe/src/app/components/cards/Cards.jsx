@@ -18,18 +18,18 @@ import Prescription from "../modal/Prescription";
 const SwiperSlider = ({ data, title }) => {
   const router = useRouter();
   const { prevRef, nextRef, setSwiperInstance } = useSwiperNavigation();
-  const fallbackImage = "/assets/paracetamol.jpeg";
+  const fallbackImage = "/assets/fallback.png";
   const { isOpen } = usePrescriptionContext();
   const handleCardClick = (id, genericname) => {
     const slug = generateSlug(genericname);
     router.push(`/Products/${slug}/${id}`);
   };
 
-  console.log(data);
+  // console.log(data);
 
   return (
     <>
-      <div className="responsive-mx mt-8 md:mt-24">
+      <div className="responsive-mx ">
         <TitleSlider title={title} prevRef={prevRef} nextRef={nextRef} />
 
         {data?.length > 0 ? (
@@ -47,12 +47,12 @@ const SwiperSlider = ({ data, title }) => {
           >
             {data.map((product) => (
               <SwiperSlide key={product.id}>
-                <div className="bg-white min-h-[350px] flex flex-col justify-between">
+                <div className=" md:min-h-[350px] min-h-[300px] bg-white flex flex-col justify-between">
                   <div
                     onClick={() =>
                       handleCardClick(product?.id, product?.genericname)
                     }
-                    className="bg-gray-100 cursor-pointer sm:p-5 p-4 sm:h-56 h-36 rounded-md flex items-center justify-center overflow-hidden"
+                    className="bg-[#F6F5FA] cursor-pointer sm:py-5 px-5 p-4 sm:h-72 h-44 rounded-md flex items-center justify-center overflow-hidden"
                   >
                     <img
                       src={product.images?.[0] || fallbackImage}
@@ -62,13 +62,13 @@ const SwiperSlider = ({ data, title }) => {
                   </div>
 
                   {/* Product details */}
-                  <div className="mt-2 px-2">
+                  <div className="md:mt-3 mt-1 px-2">
                     <DetailsCard product={product} />
                   </div>
 
                   {/* Add to Cart */}
-                  <div className="mt-3 px-2 pb-2">
-                    <AddToCart title="Add To Cart" productDetails={product} />
+                  <div className="md:mt-4 mt-2 px-2 pb-2">
+                    <AddToCart title="Add To Cart" productDetails={product} className="md:text-xs text-[10px] flex items-center gap-3 rounded-full font-medium md:py-1.5 py-1 justify-center text-black bg-[#EDF4F6] cursor-pointer w-full" />
                   </div>
                 </div>
               </SwiperSlide>

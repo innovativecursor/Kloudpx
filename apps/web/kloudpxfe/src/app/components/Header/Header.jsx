@@ -8,7 +8,7 @@ import Hamburger from "@/app/components/modal/Hamburger";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useCartContext } from "@/app/contexts/CartContext";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import { FiShoppingCart } from "react-icons/fi";
 import CartModal from "@/app/components/modal/CartModal";
 import useModal from "@/app/hooks/useModal";
 import UserProfile from "../Profile/UserProfile";
@@ -20,49 +20,64 @@ const Header = () => {
   const { isOpen, setIsOpen, modalRef } = useModal();
 
   return (
-    <div className="">
-      <div className="flex-between-center responsive-mx mt-3">
-        <div className="flex-between-center lg:w-[75%] sm:w-[75%] w-[45%]">
-          <Logo />
-          <SearchBar />
-        </div>
-        <div className="flex-between-center sm:gap-6 gap-3">
-          <div>
-            {!loading && user ? (
-              <UserProfile user={user} logout={logout} />
-            ) : (
-              <div
-                onClick={!loading ? login : undefined}
-                className="font-semibold sm:text-xs text-xs cursor-pointer"
-              >
-                {loading ? "Signing In..." : "Login/Signup"}
-              </div>
-            )}
+    <div className="fixed top-0 left-0 right-0 z-40 bg-white shadow-sm">
+      <div className="responsive-mx md:mt-2 sm:mt-5 mt-3">
+        {/* Top Row: Logo + SearchBar + Cart/User */}
+        <div className="flex items-center justify-between gap-4 w-full">
+          {/* Left: Logo + Hamburger */}
+          <div className="flex items-center gap-2">
+            <div className="md:hidden block">
+              <Hamburger />
+            </div>
+            <Logo />
           </div>
 
-          {/* Cart Icon with Hover */}
-          <div
-            className="relative cursor-pointer"
-            onMouseEnter={() => setIsOpen(true)}
-            onMouseLeave={() => setIsOpen(false)}
-          >
+          {/* Center: Search Bar */}
+          <div className="md:block hidden flex-grow px-4">
+            <SearchBar />
+          </div>
+
+          {/* Right: User & Cart */}
+          <div className="flex items-center gap-4">
             <div>
-              <i className="ri-shopping-cart-line text-xl font-medium"></i>
-              <span className="absolute -top-0 -right-1 text-[8px] bg-red-600 text-white rounded-full w-3 h-3 flex items-center justify-center">
-                {cartLength}
-              </span>
+              {!loading && user ? (
+                <UserProfile user={user} logout={logout} />
+              ) : (
+                <div
+                  onClick={!loading ? login : undefined}
+                  className="font-semibold sm:text-xs text-xs cursor-pointer"
+                >
+                  {loading ? "Signing In..." : "Login/Signup"}
+                </div>
+              )}
             </div>
 
-            {/* Cart Modal */}
-            <CartModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+            {/* Cart Icon with Hover */}
+            <div
+              className="relative cursor-pointer"
+              onMouseEnter={() => setIsOpen(true)}
+              onMouseLeave={() => setIsOpen(false)}
+            >
+              <FiShoppingCart className="md:text-3xl text-2xl font-light" />
+              <span className="absolute -top-1 -right-1 text-[10px] bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center">
+                {cartLength}
+              </span>
+
+              {/* Cart Modal */}
+              <CartModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Hamburger & Top Items */}
-      <div className="mt-4">
+      <div className="md:hidden block mx-3 pt-3 pb-4">
+        <SearchBar />
+      </div>
+
+      {/* Bottom Row: Hamburger + TopItems */}
+      <div className="mt-5 md:block hidden">
         <div className="flex-between-center border-t border-b border-gray-200">
-          <div className="w-full px-3 md:px-[8vw] py-3 sm:py-4">
+          <div className="w-full px-3 md:px-[8vw] py-3 sm:py-2">
             <div className="flex items-center justify-center w-full">
               <div className="w-fit bg-white">
                 <Hamburger />

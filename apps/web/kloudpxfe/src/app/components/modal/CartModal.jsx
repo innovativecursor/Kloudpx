@@ -6,13 +6,13 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
 
-const CartDrawer = ({ isOpen, onClose }) => {
+const CartModal = ({ isOpen, onClose }) => {
   const { token } = useAuth();
   const router = useRouter();
   const { getCartData, removeFromCart, getAllCartData } = useCartContext();
   const { data, loading } = getCartData;
 
-  const fallbackImage = "/assets/demo.jpg";
+  const fallbackImage = "/assets/fallback.png";
   const [activeTab, setActiveTab] = useState("All");
 
   useEffect(() => {
@@ -37,12 +37,18 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
   const filteredData = data?.filter((item) => {
     if (activeTab === "All") return true;
-    if (activeTab === "Regular") return !item?.Prescription;
-    if (activeTab === "Prescribed Drug") return item?.Prescription;
+    if (activeTab === "Regular")
+      return item.prescription_status === "Not Required";
+    if (activeTab === "Prescribed Drug")
+      return item.prescription_status !== "Not Required";
     return true;
   });
 
-  console.log(data);
+  const hasUnsettledItems = filteredData.some(
+    (item) => item.prescription_status === "Unsettled"
+  );
+
+  // console.log(data);
 
   return (
     <>
@@ -63,12 +69,13 @@ const CartDrawer = ({ isOpen, onClose }) => {
         <div className="flex justify-end items-end mt-1">
           <button
             onClick={onClose}
-            className="text-2xl text-gray-600 hover:text-black transition"
+            className="text-2xl text-gray-600 cursor-pointer hover:text-black transition"
             title="Close"
           >
-            <i class="ri-close-line mr-3"></i>
+            <i className="ri-close-line mr-3"></i>
           </button>
         </div>
+
         <div className="p-4 flex justify-between items-center">
           <div>
             <h2 className="text-2xl font-semibold">Cart</h2>
@@ -103,7 +110,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
         </div>
 
         {/* Cart Items */}
-        <div className="flex-1 overflow-y-auto px-4 md:space-y-4 space-y-8 mt-7">
+        <div className="flex-1 overflow-y-auto thin-scrollbar px-4 md:space-y-4 space-y-8 mt-7">
           {loading ? (
             <p className="text-center text-gray-500 mt-8">Loading cart...</p>
           ) : !filteredData || filteredData.length === 0 ? (
@@ -113,9 +120,8 @@ const CartDrawer = ({ isOpen, onClose }) => {
           ) : (
             filteredData.map((item) => {
               const medicine = item?.medicine;
-              const imageUrl = medicine?.images || fallbackImage;
+              const imageUrl = medicine?.images[0] || fallbackImage;
               const price = medicine?.price || 0;
-
               const discountPercent =
                 parseFloat(medicine?.discount?.replace("%", "")) || 0;
               const discountedPrice = (
@@ -123,22 +129,29 @@ const CartDrawer = ({ isOpen, onClose }) => {
                 (price * discountPercent) / 100
               ).toFixed(2);
 
+              const isUnsettled = item.prescription_status === "Unsettled";
+
               return (
                 <div
-                  key={item.ID}
-                  className="flex items-center gap-4  md:p-3 md:shadow-sm"
+                  key={item.cart_id}
+                  className={classNames(
+                    "flex items-center gap-4 md:p-3 md:shadow-sm rounded-md transition",
+                    {
+                      "bg-gray-200 opacity-60 pointer-events-none": isUnsettled,
+                    }
+                  )}
                 >
-                  <div className="">
+                  <div>
                     <img
                       src={imageUrl}
                       alt="product"
                       className="w-16 h-16 object-cover rounded-md"
                     />
                   </div>
-                  <div className=" flex-1">
+                  <div className="flex-1">
                     <div className="flex justify-between items-start">
                       <div className="flex flex-col">
-                        <p className="text-base font-light  text-[#0070ba]">
+                        <p className="text-base font-light text-[#0070ba]">
                           {medicine?.genericname || "N/A"}
                         </p>
                         <h4 className="font-medium text-base mb-1">
@@ -150,7 +163,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                         className="ml-2 cursor-pointer font-light text-gray-400"
                         title="Remove"
                       >
-                        <i class="ri-close-circle-line text-2xl font-light"></i>
+                        <i className="ri-close-circle-line text-2xl font-light"></i>
                       </button>
                     </div>
 
@@ -168,20 +181,14 @@ const CartDrawer = ({ isOpen, onClose }) => {
                         </p>
                       )}
                     </div>
+
+                    {/* Prescription Status (optional label) */}
+                    {isUnsettled && (
+                      <p className="text-xs text-red-500 mt-1">
+                        Waiting for pharmacist approval before purchase
+                      </p>
+                    )}
                   </div>
-
-                  {/* Quantity Control (non-functional now) */}
-                  {/* <div className="flex items-center gap-1">
-                    <button className="w-7 h-7 bg-indigo-100 text-lg rounded-full">
-                      –
-                    </button>
-                    <span className="w-6 text-center">{item.Quantity}</span>
-                    <button className="w-7 h-7 bg-indigo-100 text-lg rounded-full">
-                      +
-                    </button>
-                  </div> */}
-
-                  {/* Remove Button */}
                 </div>
               );
             })
@@ -190,10 +197,16 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
         {/* Checkout Button */}
         {filteredData?.length > 0 && (
-          <div className="p-4 ">
+          <div className="p-4">
             <button
               onClick={handleCheckout}
-              className="w-full bg-[#0070BA] text-white py-3 rounded-full cursor-pointer font-semibold hover:bg-[#005c96]"
+              disabled={hasUnsettledItems}
+              className={classNames(
+                "w-full py-3 rounded-full font-semibold",
+                hasUnsettledItems
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-[#0070BA] text-white hover:bg-[#005c96]"
+              )}
             >
               Proceed to Checkout
             </button>
@@ -204,4 +217,4 @@ const CartDrawer = ({ isOpen, onClose }) => {
   );
 };
 
-export default CartDrawer;
+export default CartModal;

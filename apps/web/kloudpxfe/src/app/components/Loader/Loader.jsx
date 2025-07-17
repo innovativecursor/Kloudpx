@@ -7,7 +7,7 @@ const Loader = () => {
   if (!loading) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center">
+    <div className="fixed inset-0 z-[999] bg-black/20 backdrop-blur-sm flex items-center justify-center">
       <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-white"></div>
     </div>
   );

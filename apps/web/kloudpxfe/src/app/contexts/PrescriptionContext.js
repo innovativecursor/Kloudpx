@@ -4,6 +4,7 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { postAxiosCall } from "@/app/lib/axios";
 import endpoints from "@/app/config/endpoints";
 import useImageCompressor from "@/app/hooks/useImageCompressor";
+import { useCartContext } from "./CartContext";
 
 const PrescriptionContext = createContext();
 
@@ -13,9 +14,12 @@ export const PrescriptionProvider = ({ children }) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
+  const [uploadedPrescriptionId, setUploadedPrescriptionId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [pendingCartData, setPendingCartData] = useState(null);
+  const { getAllCartData } = useCartContext();
 
-  const uploadPrescription = async (file) => {
+  const uploadPrescription = async (file, medicineid, quantity) => {
     if (!file) return;
 
     if (!token) {
@@ -39,16 +43,30 @@ export const PrescriptionProvider = ({ children }) => {
         payload,
         true
       );
+      const prescriptionId = res?.prescription_id;
+      setUploadedPrescriptionId(prescriptionId);
 
       if (res?.url) {
         const img = new Image();
         img.src = res.url;
 
-        img.onload = () => {
+        img.onload = async () => {
           setUploadedImage(res.url);
-          toast.success("Prescription uploaded successfully");
+          // toast.success("Prescription uploaded successfully");
           setIsOpen(false);
           setLoading(false);
+          await postAxiosCall(
+            // "http://localhost:10003/v1/user/add-to-cart-medicine",
+            endpoints.prescriptioncart.add,
+            {
+              medicineid,
+              prescriptionid: prescriptionId,
+              quantity,
+            },
+            true
+          );
+          toast.success("Item added to cart with prescription!");
+          getAllCartData();
         };
 
         img.onerror = () => {
@@ -73,6 +91,9 @@ export const PrescriptionProvider = ({ children }) => {
         uploadPrescription,
         setUploadedImage,
         loading,
+        uploadedPrescriptionId,
+        pendingCartData,
+        setPendingCartData,
       }}
     >
       {children}

@@ -1,14 +1,150 @@
+"use client";
+
+import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
+import { getAxiosCall } from "@/app/lib/axios";
+import endpoints from "@/app/config/endpoints";
+import { generateSlug } from "@/app/utils/slugify";
+import { useRouter } from "next/navigation";
+
+// ✅ Debounce function
+function debounce(func, delay) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+}
+
 export default function SearchBar() {
+  const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [results, setResults] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const searchbar = "/assets/searchbar.jpg";
+  const fallbackImage = "/assets/fallback.png";
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const fetchSuggestions = debounce(async (query) => {
+    if (!query.trim()) {
+      setResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    try {
+      const res = await getAxiosCall(endpoints.search.get(query), {}, false);
+      console.log(res);
+      setResults(res?.data?.medicines || []);
+      setShowDropdown(true);
+    } catch (error) {
+      console.error("Search error:", error);
+      setResults([]);
+    }
+  }, 300);
+
+  useEffect(() => {
+    fetchSuggestions(searchTerm);
+  }, [searchTerm]);
+
+  // const handleSelect = (item) => {
+  //   setSearchTerm(item.brandname || item.category || "");
+  //   setShowDropdown(false);
+  // };
+
+  const handleClicked = (id, genericname) => {
+    const slug = generateSlug(genericname);
+    router.push(`/Products/${slug}/${id}`);
+    setShowDropdown(false);
+  };
+
   return (
-    <div className="flex items-center w-full lg:max-w-2xl md:max-w-lg  sm:max-w-sm max-w-0 bg-[#0070ba]/7 rounded-full overflow-hidden mx-auto">
-      <input
-        type="text"
-        placeholder="Search for products, categories or brands..."
-        className="flex-grow px-6 md:py-3 py-2 bg-transparent text-sm text-gray-800 placeholder-gray-600 focus:outline-none placeholder:text-xs"
-      />
-      <button className="bg-[#006EBB] w-14 md:p-3 p-2">
-        <i className="ri-search-line text-white w-6 h-6"></i>
-      </button>
+    <div
+      ref={wrapperRef}
+      className="relative w-full lg:max-w-4xl md:max-w-lg max-w-full mx-auto"
+    >
+      <div className="flex items-center md:h-14 h-12 bg-[#EDF4F6] rounded-full overflow-hidden">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search for products, categories or brands..."
+          className="flex-grow px-6 md:py-4 py-2 bg-transparent text-sm text-gray-800 placeholder-gray-600 focus:outline-none placeholder:text-xs"
+        />
+        <button className="bg-[#006EBB] md:w-20 w-12 md:p-4 p-2">
+          <i className="ri-search-line text-white text-2xl"></i>
+        </button>
+      </div>
+
+      {showDropdown && (
+        <ul className="absolute z-50 w-full py-4 px-4 bg-white rounded-2xl mt-4 thin-scrollbar border border-gray-300 max-h-96 overflow-y-auto shadow-md">
+          {results.length > 0 ? (
+            results.map((item, idx) => (
+              <li
+                key={idx}
+                // onClick={() => handleSelect(item)}
+                onClick={() => handleClicked(item?.id, item?.genericname)}
+                className="flex items-center gap-4 px-4 py-3 hover:bg-[#F0F6FF] transition rounded-lg cursor-pointer"
+              >
+                <div className="relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden border border-gray-200">
+                  <Image
+                    src={item.images?.[0] || fallbackImage}
+                    alt={item.brandname}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-medium text-gray-800 text-[15px]">
+                    {item.brandname}
+                  </span>
+                  <span className="text-xs text-gray-500">{item.category}</span>
+                </div>
+              </li>
+            ))
+          ) : (
+            <li className="px-4 py-6">
+              <div className="flex flex-col items-center justify-center gap-3 text-center">
+                <div className="relative w-32 h-32 opacity-70">
+                  <Image
+                    src={searchbar}
+                    alt="No results"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                <p className="text-gray-600 md:text-base sm:text-sm text-xs font-medium">
+                  Oops! No matches found for{" "}
+                  <span className="text-[#006EBB] font-semibold">
+                    {searchTerm}
+                  </span>
+                </p>
+                <p className="sm:text-sm text-xs text-gray-500">
+                  Get in touch with our pharmacist instead?
+                </p>
+                <div className="flex sm:text-sm text-[9px] items-center gap-2 text-[#006EBB] font-medium mt-1">
+                  <i className="ri-phone-line"></i>
+                  <span>Call a pharmacist: +63 998 972 1498</span>
+                </div>
+              </div>
+            </li>
+          )}
+        </ul>
+      )}
     </div>
   );
 }

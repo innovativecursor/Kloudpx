@@ -125,24 +125,6 @@
 
 // export default Prescription;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // "use client";
 
 // import React, { useRef, useEffect } from "react";
@@ -255,49 +237,6 @@
 
 // export default Prescription;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 "use client";
 
 import React, { useRef } from "react";
@@ -310,6 +249,8 @@ const Prescription = () => {
     uploadedImage,
     uploadPrescription,
     loading,
+    pendingCartData,
+    uploadedPrescriptionId,
   } = usePrescriptionContext();
 
   const modalRef = useRef(null);
@@ -321,11 +262,15 @@ const Prescription = () => {
 
   if (!isOpen) return null;
 
+  console.log(uploadedImage, "datat is here");
+
+  console.log(uploadedPrescriptionId, "id gett");
+
   return (
     <>
       {/* Loading Overlay */}
       {loading && (
-        <div className="fixed inset-0 z-[60] bg-black/20 backdrop-blur-sm flex items-center justify-center">
+        <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center">
           <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-white"></div>
         </div>
       )}
@@ -365,27 +310,43 @@ const Prescription = () => {
                 alt="Upload New"
                 className="w-20 h-20 mb-2"
               />
-              <p className="text-base font-semibold text-[#0070BA]">Upload New</p>
-              <input
+              <p className="text-base font-semibold text-[#0070BA]">
+                Upload New
+              </p>
+              {/* <input
                 type="file"
                 accept="image/*"
                 className="hidden"
                 onChange={handleFileChange}
                 disabled={loading}
+              /> */}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+
+                  if (file && pendingCartData) {
+                    const { medicineid, quantity } = pendingCartData;
+                    uploadPrescription(file, medicineid, quantity);
+                  }
+                }}
               />
             </label>
 
             <hr className="border opacity-70 border-gray-300 mt-8 mb-6 w-full" />
 
             <p className="text-sm tracking-wide text-center">
-              <span className="font-bold text-[#0070BA]">Note:</span>{" "}
-              Always upload a clean version of your prescription for better result.
+              <span className="font-bold text-[#0070BA]">Note:</span> Always
+              upload a clean version of your prescription for better result.
             </p>
           </div>
 
           {/* Right side - Guide / Preview */}
           <div className="bg-[#EDF6FD] rounded-xl py-6 px-6 flex flex-col items-center justify-center">
-            <h3 className="text-2xl font-semibold mb-4">Guide for a valid prescription</h3>
+            <h3 className="text-2xl font-semibold mb-4">
+              Guide for a valid prescription
+            </h3>
             <div className="w-full h-72 overflow-hidden rounded-md border border-gray-300 flex items-center justify-center">
               {uploadedImage ? (
                 <img
@@ -394,7 +355,9 @@ const Prescription = () => {
                   className="object-contain w-full h-full rounded-md"
                 />
               ) : (
-                <p className="text-center text-sm opacity-60">Upload Prescription</p>
+                <p className="text-center text-sm opacity-60">
+                  Upload Prescription
+                </p>
               )}
             </div>
             <div className="flex flex-col items-center justify-center tracking-wider mt-5">
@@ -402,7 +365,8 @@ const Prescription = () => {
                 Doctor Signature & Stamp:
               </p>
               <p className="text-center opacity-60 text-sm mt-2">
-                The prescription with signature and stamp of doctor to be considered valid.
+                The prescription with signature and stamp of doctor to be
+                considered valid.
               </p>
             </div>
           </div>

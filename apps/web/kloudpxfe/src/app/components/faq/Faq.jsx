@@ -33,7 +33,7 @@ const Faq = () => {
   };
 
   return (
-    <div className="md:max-w-3xl w-full mx-auto  mt-10 md:mt-20">
+    <div className="md:max-w-3xl w-full mx-auto  mt-14 sm:mt-16 md:mt-28">
       <h1 className="text-center font-semibold sm:mb-6 mb-2 text-[#00243F] tracking-wide md:text-lg">
         Frequently Asked Questions (FAQs)
       </h1>
