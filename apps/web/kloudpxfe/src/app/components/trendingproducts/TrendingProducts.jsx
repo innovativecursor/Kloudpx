@@ -1,20 +1,15 @@
 import React, { useEffect } from "react";
 import { useProductContext } from "@/app/contexts/ProductContext";
-import { generateSlug } from "@/app/utils/slugify";
-import { useRouter } from "next/navigation";
+import useProductNavigation from "@/app/hooks/useProductNavigation";
 
 const TrendingProducts = ({}) => {
-  const router = useRouter();
   const { getTrendingProducts, trending } = useProductContext();
+  const { goToProductPage } = useProductNavigation();
   const fallbackImage = "/assets/fallback.png";
+
   useEffect(() => {
     getTrendingProducts();
   }, []);
-
-  const handleclick = (id, genericname) => {
-    const slug = generateSlug(genericname);
-    router.push(`/Products/${slug}/${id}`);
-  };
 
   return (
     <div className="responsive-mx mt-14 sm:mt-16 md:mt-28">
@@ -34,10 +29,12 @@ const TrendingProducts = ({}) => {
           return (
             <div
               key={product.id}
-              className="flex sm:flex-row flex-col  rounded-md justify-between items-center"
+              className="flex sm:flex-row flex-col cursor-pointer  rounded-md justify-between items-center"
             >
               <div
-                onClick={() => handleclick(product?.id, product?.genericname)}
+                onClick={() =>
+                  goToProductPage(product?.id, product?.genericname)
+                }
                 className="border sm:w-[30%] w-full border-[#0070BA] py-3 rounded-md flex items-center justify-center"
               >
                 <img

@@ -56,11 +56,8 @@ const TopItems = () => {
     await getItemsByCategory(id);
     const categorySlug =
       selected?.CategoryName?.toLowerCase().replace(/\s+/g, "-") || "";
-    // router.push(`/Products?category=${id}&name=${categorySlug}`);
     router.push(`/Products?${categorySlug}&category=${id}`);
   };
-
-  // console.log(category);
 
   return (
     <div className="w-full">
@@ -80,25 +77,6 @@ const TopItems = () => {
           {category.map((item, index) => {
             const IconComponent = getIconComponent(item.CategoryIcon?.Icon);
             return (
-              // <SwiperSlide key={item.ID || index} className="!w-auto">
-              //   <div
-              //     onClick={() => handleCategoryClick(item.ID)}
-              //     className={`flex min-w-max md:px-5 px-2 gap-2 cursor-pointer transition-all duration-300 ease-in-out items-center justify-center whitespace-nowrap
-              //     ${
-              //       selectedCategoryId === item.ID
-              //         ? "text-[#0070ba]"
-              //         : "hover:text-[#0070ba]"
-              //     }`}
-              //   >
-              //     {IconComponent && (
-              //       <IconComponent className="md:text-3xl text-base text-color" />
-              //     )}
-              //     <p className="sm:text-sm text-[11px] font-medium tracking-wide">
-              //       {item.CategoryName}
-              //     </p>
-              //   </div>
-              // </SwiperSlide>
-
               <SwiperSlide key={item.ID || index} className="!w-auto">
                 <div
                   onClick={() => handleCategoryClick(item.ID)}

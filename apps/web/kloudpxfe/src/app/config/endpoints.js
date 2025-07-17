@@ -43,7 +43,10 @@ const endpoints = {
     get: `/v1/user/trending-medicines`,
   },
   feature: {
-    get:  `/v1/user/get-feature-products`
+    get: `/v1/user/get-feature-products`,
+  },
+  popular: {
+    get: `/v1/user/popular-medicines`,
   },
   search: {
     get: (query) => `/v1/user/search-medicine?q=${encodeURIComponent(query)}`,

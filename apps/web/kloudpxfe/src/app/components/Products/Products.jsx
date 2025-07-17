@@ -9,7 +9,8 @@ import { useProductContext } from "@/app/contexts/ProductContext";
 import { useEffect } from "react";
 
 function Products() {
-  const { getTwoCategory, twoCategory } = useProductContext();
+  const { getTwoCategory, twoCategory, getAllPopular, popular } =
+    useProductContext();
 
   const firstCategory = twoCategory[0]?.medicines || [];
   const firstCategoryName = twoCategory[0]?.categoryname || null;
@@ -107,21 +108,30 @@ function Products() {
     }
   }, []);
 
+  useEffect(() => {
+    getAllPopular();
+  }, []);
+
+  console.log(popular);
+
   return (
     <>
       <Category7 />
       <div>
-      <Cards data={firstCategory} title={firstCategoryName} />
+        <Cards data={popular} title="Popular Properties" />
+      </div>
+      <div className="mt-12 sm:mt-16 md:mt-20 lg:mt-28">
+        <Cards data={firstCategory} title={firstCategoryName} />
       </div>
       <FeaturedBrand />
-      <div className="mt-6 sm:mt-10 md:mt-12">
-      <Cards data={secondCategory} title={secondCategoryName} />
+      <div className="mt-12 sm:mt-16 md:mt-20 lg:mt-28">
+        <Cards data={secondCategory} title={secondCategoryName} />
       </div>
       <TrendingProducts />
       <HealthArticles articles={articles} />
       <Testimonial testimonials={testimonials} />
       <Faq />
-       <div className="mt-10 sm:mt-16 md:mt-20">
+      <div className="mt-10 sm:mt-16 md:mt-20">
         <img
           src="/assets/time.png"
           alt="Upload"
