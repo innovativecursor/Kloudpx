@@ -47,6 +47,9 @@ func Pharmacist(db *gorm.DB) {
 		pharmacistflow.SubmitPrescription(c, db)
 	})
 
+	apiV1.PUT("/pharmacist/reject-prescriptions/:id", middleware.JWTMiddlewarePharmacist(db), func(c *gin.Context) {
+		pharmacistflow.RejectPrescription(c, db)
+	})
 	//pharmacist info
 	apiV1.GET("/pharmacist/info", middleware.JWTMiddlewarePharmacist(db), func(c *gin.Context) {
 		pharmacistflow.GetCurrentPharmacistInfo(c, db)
