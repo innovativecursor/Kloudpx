@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import { store } from "@/app/redux/store";
 
 const BASE_URL = "http://localhost:10003";
+// const BASE_URL = "https://api.user";
 
 const getToken = () =>
   typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
