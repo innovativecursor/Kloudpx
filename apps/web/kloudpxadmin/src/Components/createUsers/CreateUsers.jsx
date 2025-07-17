@@ -9,7 +9,7 @@ function CreateUsers() {
   const submit = async () => {
     let cloneInputs = { ...inputs };
     cloneInputs = { ...cloneInputs, code: 8050, role_id: 4 };
-    console.log("cloneInputs", cloneInputs);
+    // console.log("cloneInputs", cloneInputs);
     setInputs({ ...cloneInputs });
     if (inputs?.password !== inputs?.confirm_password) {
       Swal.fire({

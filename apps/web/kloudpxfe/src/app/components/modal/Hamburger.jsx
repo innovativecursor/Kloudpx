@@ -12,7 +12,6 @@ const Hamburger = () => {
   const {
     category,
     getItemsByCategory,
-    getCategory,
     setSelectedCategoryId,
     setSelectedCategoryName,
   } = useProductContext();

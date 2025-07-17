@@ -12,10 +12,11 @@ export const ProductProvider = ({ children }) => {
   const [selectedCategoryItems, setSelectedCategoryItems] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [selectedCategoryName, setSelectedCategoryName] = useState("");
-  const [branded, setBranded] = useState([]);
   const [twoCategory, setTwoCategory] = useState([]);
   const [productDetails, setProductDetails] = useState([]);
   const [trending, setTrending] = useState([]);
+  const [feature, setFeature] = useState([]);
+  const [popular, setPopular] = useState([]);
 
   const getAllMedicine = async () => {
     try {
@@ -26,12 +27,21 @@ export const ProductProvider = ({ children }) => {
     }
   };
 
-  const getBranded = async () => {
+  const getAllFeature = async () => {
     try {
-      const res = await getAxiosCall(endpoints.branded.get, {}, false);
-      setBranded(res?.data?.medicines || []);
+      const res = await getAxiosCall(endpoints.feature.get, {}, false);
+      setFeature(res?.data?.medicines || []);
     } catch (error) {
-      setBranded([]);
+      setFeature([]);
+    }
+  };
+
+  const getAllPopular = async () => {
+    try {
+      const res = await getAxiosCall(endpoints.popular.get, {}, false);
+      setPopular(res?.data?.medicines || []);
+    } catch (error) {
+      setPopular([]);
     }
   };
 
@@ -105,14 +115,18 @@ export const ProductProvider = ({ children }) => {
         setSelectedCategoryId,
         selectedCategoryName,
         setSelectedCategoryName,
-        getBranded,
-        branded,
+
         getTwoCategory,
         twoCategory,
         getProductDeatils,
         productDetails,
         getTrendingProducts,
         trending,
+        getAllFeature,
+        feature,
+        getAllPopular,
+        popular
+
       }}
     >
       {children}

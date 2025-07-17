@@ -119,7 +119,7 @@ export default function useMedicineForm() {
     handleSelectCategoryIcon(val);
   };
 
-  console.log(categoryIcon);
+  // console.log(categoryIcon);
 
   const { value: taxType, handleChange: handleTaxTypeChange } =
     useCreatableSelect();
@@ -151,7 +151,7 @@ export default function useMedicineForm() {
       alert("Medicine not found");
       return;
     }
-    console.log("Loaded medicine data for edit:", medData);
+    // console.log("Loaded medicine data for edit:", medData);
     // setFormData(medData.formData);
     setFormData((prev) => ({
       ...medData.formData,
@@ -191,7 +191,7 @@ export default function useMedicineForm() {
       showMeasurementValue,
     });
 
-    console.log("Calculated spPerPiece:", spPerPiece);
+    // console.log("Calculated spPerPiece:", spPerPiece);
 
     setFormData((prev) => ({
       ...prev,
@@ -231,7 +231,7 @@ export default function useMedicineForm() {
       categoryIcon: categoryIcon,
       isBrand,
     });
-    console.log(payload);
+    // console.log(payload);
 
     try {
       if (id) {

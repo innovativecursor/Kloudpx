@@ -1,6 +1,6 @@
 import { useGoogleLogin } from "@react-oauth/google";
 import { useAuthContext } from "../../contexts/AuthContext";
-import logo from "../../../public/kloudlogo.webp";
+import logo from "../../assets/Images/kloudlogo.webp";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router";
 import { useState } from "react";

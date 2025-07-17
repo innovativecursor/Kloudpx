@@ -262,9 +262,7 @@ const Prescription = () => {
 
   if (!isOpen) return null;
 
-  console.log(uploadedImage, "datat is here");
 
-  console.log(uploadedPrescriptionId, "id gett");
 
   return (
     <>

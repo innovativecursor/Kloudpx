@@ -38,7 +38,7 @@ const GetDataProvider = ({ children }) => {
 
     try {
       const res = await deleteAxiosCall("/v1/medicine/delete-medicine", id);
-      console.log("✅ Deleted:", res);
+      // console.log("✅ Deleted:", res);
 
       setMedicines((prev) => prev.filter((item) => item.ID !== id));
 
