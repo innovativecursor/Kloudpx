@@ -314,6 +314,24 @@ func AddToCartMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// Check for existing unsettled cart item for same medicine
+	var existingCart models.Cart
+	err = db.
+		Where("user_id = ? AND medicine_id = ? AND is_otc = ? AND prescription_id IS NOT NULL", userObj.ID, req.MedicineID, false).
+		Preload("Prescription").
+		First(&existingCart).Error
+
+	if err == nil && existingCart.Prescription != nil && existingCart.Prescription.Status == "unsettled" {
+		existingCart.Quantity += req.Quantity
+		existingCart.PrescriptionID = &req.PrescriptionId
+		if err := db.Save(&existingCart).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart item"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "Cart item updated with new prescription"})
+		return
+	}
+
 	entry := models.Cart{
 		UserID:         userObj.ID,
 		MedicineID:     req.MedicineID,
