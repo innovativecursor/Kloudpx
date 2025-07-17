@@ -117,9 +117,12 @@ function Products() {
   return (
     <>
       <Category7 />
-      <div>
-        <Cards data={popular} title="Popular Properties" />
-      </div>
+      {popular.length > 0 ? (
+        <div>
+          <Cards data={popular} title="Popular Properties" />
+        </div>
+      ) : null}
+
       <div className="mt-12 sm:mt-16 md:mt-20 lg:mt-28">
         <Cards data={firstCategory} title={firstCategoryName} />
       </div>
