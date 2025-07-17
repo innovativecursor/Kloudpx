@@ -1,7 +1,6 @@
 import React from "react";
 import { CheckCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons";
 import { Image, Button, Tooltip } from "antd";
-import { FaEdit, FaTrash } from "react-icons/fa";
 import { RiEdit2Fill } from "react-icons/ri";
 import { useIconComponent } from "../../hooks/useIconComponent";
 import { RiDeleteBin4Fill } from "react-icons/ri";
@@ -172,6 +171,48 @@ export const getMedicineColumns = ({ handleEdit, deleteMedicine }) => [
     key: "Marketer",
     align: "center",
   },
+  {
+    title: "Benefits",
+    dataIndex: "Benefits",
+    key: "Benefits",
+    align: "center",
+  },
+
+  {
+    title: "KeyIngredients",
+    dataIndex: "KeyIngredients",
+    key: "KeyIngredients",
+    align: "center",
+  },
+
+  {
+    title: "RecommendedDailyAllowance",
+    dataIndex: "RecommendedDailyAllowance",
+    key: "RecommendedDailyAllowance",
+    align: "center",
+  },
+
+  {
+    title: "DirectionsForUse",
+    dataIndex: "DirectionsForUse",
+    key: "DirectionsForUse",
+    align: "center",
+  },
+
+  {
+    title: "SafetyInformation",
+    dataIndex: "SafetyInformation",
+    key: "SafetyInformation",
+    align: "center",
+  },
+
+  {
+    title: "Storage",
+    dataIndex: "Storage",
+    key: "Storage",
+    align: "center",
+  },
+
   {
     title: "Inhouse",
     dataIndex: "InhouseBrand",

@@ -72,6 +72,12 @@ const AddItemsProvider = ({ children }) => {
       dosageform: formData.dosageForm,
       packaging: formData.packaging,
       marketer: formData.marketer,
+      benefits: formData.benefits,
+      keyingredients: formData.keyingredients,
+      recommendeddailyallowance: formData.recommendeddailyallowance,
+      directionsforuse: formData.directionsforuse,
+      safetyinformation: formData.safetyinformation,
+      storage: formData.storage,
       supplierdiscount: `${formData.supplierDiscount}%`,
       description: formData.description,
       unitofmeasurement: measurementType?.value,
@@ -124,6 +130,12 @@ const AddItemsProvider = ({ children }) => {
         packaging: "",
         marketer: "",
         description: "",
+        benefits: "",
+        keyingredients: "",
+        recommendeddailyallowance: "",
+        directionsforuse: "",
+        safetyinformation: "",
+        storage: "",
       });
       setTaxOption(null);
       setIsBranded(false);
