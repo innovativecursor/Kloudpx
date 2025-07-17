@@ -9,28 +9,29 @@ import { Navigation } from "swiper/modules";
 import TitleSlider from "../titleslider/TitleSlider";
 import useSwiperNavigation from "@/app/hooks/useSwiperNavigation";
 import { useProductContext } from "@/app/contexts/ProductContext";
+import useProductNavigation from "@/app/hooks/useProductNavigation";
 
 const FeaturedBrand = () => {
   const { prevRef, nextRef, setSwiperInstance } = useSwiperNavigation();
-  const { getBranded, branded } = useProductContext();
-  const fallbackImage = "/assets/paracetamol.jpeg";
+  const { getAllFeature, feature } = useProductContext();
+  const { goToProductPage } = useProductNavigation();
+  const fallbackImage = "/assets/fallback.png";
+
   useEffect(() => {
-    if (!branded || branded.length === 0) {
-      getBranded();
-    }
+    getAllFeature();
   }, []);
 
-  // console.log(branded);
+  // console.log(feature);
 
   return (
-    <div className="responsive-mx mt-8 md:mt-24 bg-gray-200/70 rounded-xl sm:py-12 py-8 sm:px-6 px-4">
+    <div className="responsive-mx mt-12 sm:mt-16 md:mt-20 bg-gray-200/70 rounded-xl sm:py-12 py-8 sm:px-6 px-4">
       <TitleSlider
         title="Featured Brands"
         prevRef={prevRef}
         nextRef={nextRef}
       />
 
-      {branded.length > 0 ? (
+      {feature.length > 0 ? (
         <Swiper
           loop={true}
           onSwiper={setSwiperInstance}
@@ -43,13 +44,16 @@ const FeaturedBrand = () => {
           }}
           className="mySwiper"
         >
-          {branded.map(({ images, id }, index) => (
+          {feature.map(({ images, id, genericname }, index) => (
             <SwiperSlide key={id}>
-              <div className="w-full h-20 sm:h-36 lg:h-52 flex items-center justify-center bg-white rounded-lg overflow-hidden">
+              <div
+                onClick={() => goToProductPage(id, genericname)}
+                className="w-full h-20 sm:h-36 cursor-pointer lg:h-64 flex items-center justify-center p-2 rounded-lg overflow-hidden"
+              >
                 <img
                   src={images?.[0] || fallbackImage}
                   alt={`Brand ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full "
                 />
               </div>
             </SwiperSlide>

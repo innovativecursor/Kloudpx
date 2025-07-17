@@ -37,7 +37,7 @@ const CategoryProvider = ({ children }) => {
         icon: item.CategoryIcon?.Icon || null,
         iconId: item.CategoryIconID || null,
       }));
-      console.log("📦 All categories from API:", formatted);
+      // console.log("📦 All categories from API:", formatted);
       setCategoryOptions(formatted);
     } catch (error) {
       setCategoryError("Failed to load categories.");
@@ -46,13 +46,13 @@ const CategoryProvider = ({ children }) => {
 
   // ✅ 3. Create category
   const createCategoryOption = async (inputValue) => {
-    console.log("🟢 Creating category:", inputValue);
+    // console.log("🟢 Creating category:", inputValue);
     try {
       const res = await postAxiosCall("/v1/category/add-category", {
         category: inputValue,
       });
 
-      console.log("✅ API Response from /add-category:", res);
+      // console.log("✅ API Response from /add-category:", res);
       const created = res?.category;
 
       if (created) {
@@ -63,7 +63,7 @@ const CategoryProvider = ({ children }) => {
           iconId: created.CategoryIconID || null,
         };
 
-        console.log("🆕 New category option:", newOption);
+        // console.log("🆕 New category option:", newOption);
         setCategoryOptions((prev) => {
           const exists = prev.find((opt) => opt.value === newOption.value);
           if (!exists) return [...prev, newOption];
@@ -73,7 +73,7 @@ const CategoryProvider = ({ children }) => {
         setSelectedCategory(newOption);
 
         if (newOption.icon && newOption.iconId) {
-          console.log("🎯 Auto-selecting icon:", newOption.icon);
+          // console.log("🎯 Auto-selecting icon:", newOption.icon);
           setSelectedCategoryIcon({
             label: newOption.icon,
             value: newOption.iconId,
@@ -101,7 +101,7 @@ const CategoryProvider = ({ children }) => {
 
     try {
       const res = await postAxiosCall("/v1/category/assign-icon", payload);
-      console.log("✅ Icon assigned:", res);
+      // console.log("✅ Icon assigned:", res);
     } catch (error) {
       console.error("❌ Icon assign failed:", error);
     }

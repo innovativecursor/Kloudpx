@@ -78,7 +78,7 @@ const ImageUploader = () => {
         "/v1/itemimage/delete-itemimage",
         imageIdToDelete
       );
-      console.log("🗑️ Deleted image successfully:", res);
+      // console.log("🗑️ Deleted image successfully:", res);
 
       // Now update the UI
       const updatedUrls = [...existingImages];

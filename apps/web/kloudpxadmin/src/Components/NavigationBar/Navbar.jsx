@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { connect } from "react-redux";
-import logo from "../../../public/kloudlogo.webp";
+import logo from "../../assets/Images/kloudlogo.webp";
 import { googleLogout } from "@react-oauth/google";
 import { Button, Collapse, Drawer, Tooltip, Space } from "antd";
 import { Menu } from "../../Constants/Conts";

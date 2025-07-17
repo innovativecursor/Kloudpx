@@ -15,6 +15,12 @@ const FormDataProvider = ({ children }) => {
     packaging: "",
     marketer: "",
     description: "",
+    benefits: "",
+    keyingredients: "",
+    recommendeddailyallowance: "",
+    directionsforuse: "",
+    safetyinformation: "",
+    storage: ""
   });
 
   const [isBranded, setIsBranded] = useState(false);

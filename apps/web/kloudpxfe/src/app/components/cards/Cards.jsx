@@ -10,22 +10,15 @@ import TitleSlider from "../titleslider/TitleSlider";
 import AddToCart from "../button/AddToCart";
 import DetailsCard from "./DetailsCard";
 import useSwiperNavigation from "@/app/hooks/useSwiperNavigation";
-import { useRouter } from "next/navigation";
-import { generateSlug } from "@/app/utils/slugify";
 import { usePrescriptionContext } from "@/app/contexts/PrescriptionContext";
 import Prescription from "../modal/Prescription";
+import useProductNavigation from "@/app/hooks/useProductNavigation";
 
 const SwiperSlider = ({ data, title }) => {
-  const router = useRouter();
   const { prevRef, nextRef, setSwiperInstance } = useSwiperNavigation();
+  const { goToProductPage } = useProductNavigation();
   const fallbackImage = "/assets/fallback.png";
   const { isOpen } = usePrescriptionContext();
-  const handleCardClick = (id, genericname) => {
-    const slug = generateSlug(genericname);
-    router.push(`/Products/${slug}/${id}`);
-  };
-
-  // console.log(data);
 
   return (
     <>
@@ -50,7 +43,7 @@ const SwiperSlider = ({ data, title }) => {
                 <div className=" md:min-h-[350px] min-h-[300px] bg-white flex flex-col justify-between">
                   <div
                     onClick={() =>
-                      handleCardClick(product?.id, product?.genericname)
+                      goToProductPage(product?.id, product?.genericname)
                     }
                     className="bg-[#F6F5FA] cursor-pointer sm:py-5 px-5 p-4 sm:h-72 h-44 rounded-md flex items-center justify-center overflow-hidden"
                   >
@@ -68,7 +61,11 @@ const SwiperSlider = ({ data, title }) => {
 
                   {/* Add to Cart */}
                   <div className="md:mt-4 mt-2 px-2 pb-2">
-                    <AddToCart title="Add To Cart" productDetails={product} className="md:text-xs text-[10px] flex items-center gap-3 rounded-full font-medium md:py-1.5 py-1 justify-center text-black bg-[#EDF4F6] cursor-pointer w-full" />
+                    <AddToCart
+                      title="Add To Cart"
+                      productDetails={product}
+                      className="md:text-xs text-[10px] flex items-center gap-3 rounded-full font-medium md:py-1.5 py-1 justify-center text-black bg-[#EDF4F6] cursor-pointer w-full"
+                    />
                   </div>
                 </div>
               </SwiperSlide>

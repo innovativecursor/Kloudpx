@@ -5,13 +5,14 @@ import { useCartContext } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
+import useProductNavigation from "@/app/hooks/useProductNavigation";
 
 const CartModal = ({ isOpen, onClose }) => {
   const { token } = useAuth();
   const router = useRouter();
   const { getCartData, removeFromCart, getAllCartData } = useCartContext();
   const { data, loading } = getCartData;
-
+  const { goToProductPage } = useProductNavigation();
   const fallbackImage = "/assets/fallback.png";
   const [activeTab, setActiveTab] = useState("All");
 
@@ -120,7 +121,10 @@ const CartModal = ({ isOpen, onClose }) => {
           ) : (
             filteredData.map((item) => {
               const medicine = item?.medicine;
-              const imageUrl = medicine?.images[0] || fallbackImage;
+              const imageUrl =
+                Array.isArray(medicine?.images) && medicine.images[0]
+                  ? medicine.images[0]
+                  : fallbackImage;
               const price = medicine?.price || 0;
               const discountPercent =
                 parseFloat(medicine?.discount?.replace("%", "")) || 0;
@@ -141,7 +145,14 @@ const CartModal = ({ isOpen, onClose }) => {
                     }
                   )}
                 >
-                  <div>
+                  <div
+                    onClick={() =>
+                      goToProductPage(
+                        item?.medicine?.id,
+                        item?.medicine?.genericname
+                      )
+                    }
+                  >
                     <img
                       src={imageUrl}
                       alt="product"

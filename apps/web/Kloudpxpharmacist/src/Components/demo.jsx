@@ -3,6 +3,10 @@
 
 
 
-     <div className="md:hidden block mx-3 pt-4 pb-5">
-          <SearchBar />
-          </div>
+     // <div className="md:hidden block mx-3 pt-4 pb-5">
+     //      <SearchBar />
+     //      </div>
+
+
+
+     // benefits,keyingredients,recommendeddailyallowance,directionsforuse,safetyinformation,storage

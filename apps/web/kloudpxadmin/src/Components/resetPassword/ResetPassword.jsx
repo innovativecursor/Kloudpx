@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { postAxiosCall } from "../../Axios/UniversalAxiosCalls";
 import { Button, Input } from "antd";
 import Swal from "sweetalert2";
-import logo from "../../../public/Homex.webp";
+import logo from "../../assets/Images/Homex.webp";
 import background from "../../assets/Images/background.webp";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 

@@ -64,6 +64,12 @@ const AddMedicine = () => {
       dosageForm: data.DosageForm,
       packaging: data.Packaging,
       marketer: data.Marketer,
+      benefits: data.Benefits,
+      keyingredients: data.KeyIngredients,
+      recommendeddailyallowance: data.RecommendedDailyAllowance,
+      directionsforuse: data.DirectionsForUse,
+      safetyinformation: data.SafetyInformation,
+      storage: data.Storage,
       description: data.Description,
     });
     setSelectedGeneric({
@@ -191,6 +197,39 @@ const AddMedicine = () => {
 
       <div>
         <TaxSelect value={taxOption} onChange={setTaxOption} />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 my-10">
+        <Input
+          label="Benefits"
+          name="benefits"
+          placeholder="Enter benefits name"
+        />
+        <Input
+          label="Keyingredients"
+          name="keyingredients"
+          placeholder="Enter Keyingredients name"
+        />
+        <Input
+          label="Recommendeddailyallowance"
+          name="recommendeddailyallowance"
+          placeholder="Enter Recommendeddailyallowance name"
+        />
+        <Input
+          label="Directionsforuse"
+          name="directionsforuse"
+          placeholder="Enter Directionsforuse name"
+        />
+        <Input
+          label="Safetyinformation"
+          name="safetyinformation"
+          placeholder="Enter Safetyinformation name"
+        />
+        <Input
+          label="Storage"
+          name="storage"
+          placeholder="Enter Storage name"
+        />
       </div>
 
       <div className="my-10">
