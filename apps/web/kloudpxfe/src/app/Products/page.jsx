@@ -35,7 +35,7 @@ const Page = () => {
   }, [categoryIdFromUrl, category]);
 
   return (
-    <div className="bg-gray-100">
+    <div className="bg-gray-100 md:mt-64 sm:mt-48 mt-40">
       <div className="responsive-mx pt-5 md:pt-7">
         <SubTitle paths={["Home", selectedCategoryName || "Category"]} />
         <div className="flex mt-7">

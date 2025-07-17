@@ -1,6 +1,6 @@
 function Footer() {
   return (
-    <footer className="mt-2 md:mt-14">
+    <footer className="mt-8 sm:mt-16">
       <div className="grid sm:grid-cols-3 grid-cols-1 gap-7 responsive-mx sm:pb-10 pb-6">
         <div className="">
           <div className="flex items-center gap-2">

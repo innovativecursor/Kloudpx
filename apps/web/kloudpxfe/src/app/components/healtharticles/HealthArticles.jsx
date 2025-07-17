@@ -13,7 +13,7 @@ const HealthArticles = ({ articles }) => {
     const { prevRef, nextRef, setSwiperInstance } = useSwiperNavigation();
 
     return (
-        <div className="responsive-mx mt-8 md:mt-24">
+        <div className="responsive-mx mt-14 sm:mt-16 md:mt-28">
             <TitleSlider title="Health Articles" prevRef={prevRef} nextRef={nextRef} />
 
             <Swiper

@@ -24,7 +24,7 @@ const UserProfile = ({ user, logout }) => {
         aria-expanded={isOpen}
       >
         {/* {`Hi, ${user.first_name} ${user.last_name}`} */}
-        <VscAccount className="text-3xl" />
+        <VscAccount className="md:text-3xl text-2xl" />
       </button>
 
       {/* Dropdown Modal */}

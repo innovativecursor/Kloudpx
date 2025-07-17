@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "framer-motion": "^12.16.0",
+    "lodash": "^4.17.21",
     "react-hot-toast": "^2.5.2",
     "react-image-magnify": "^2.7.4",
     "react-slick": "^0.30.3",

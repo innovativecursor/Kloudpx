@@ -31,20 +31,18 @@ export default function RootLayout({ children }) {
             <PersistGate loading={null} persistor={persistor}>
               <Loader />
               <AuthProvider>
-                <PrescriptionProvider>
                 <ProductProvider>
                   <CartProvider>
-                    {/* <PrescriptionProvider> */}
+                    <PrescriptionProvider>
                       <ImageProvider>
                         <Header />
                         <main className="flex-1">{children}</main>
                         <Footer />
                         <Toaster position="top-right" reverseOrder={false} />
                       </ImageProvider>
-                    {/* </PrescriptionProvider> */}
+                    </PrescriptionProvider>
                   </CartProvider>
                 </ProductProvider>
-                </PrescriptionProvider>
               </AuthProvider>
             </PersistGate>
           </Provider>

@@ -16,101 +16,8 @@ function Products() {
   const secondCategory = twoCategory[1]?.medicines || [];
   const secondCategoryName = twoCategory[1]?.categoryname || null;
 
-  console.log(twoCategory);
-  
+  // console.log(twoCategory);
 
-  const trendingProducts = [
-    {
-      id: 1,
-      productImg: "/assets/product1.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 2,
-      productImg: "/assets/product2.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 3,
-      productImg: "/assets/product3.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 4,
-      productImg: "/assets/product4.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 5,
-      productImg: "/assets/product5.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 6,
-      productImg: "/assets/product3.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 7,
-      productImg: "/assets/product3.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 8,
-      productImg: "/assets/product3.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-    {
-      id: 9,
-      productImg: "/assets/product3.png",
-      title: "Immune Booster 1000mg Tablets",
-      starImg: "/assets/star.png",
-      rating: 2,
-      reviewsCount: 2,
-      originalPrice: 2000.2,
-      discountedPrice: 150.0,
-    },
-  ];
   const articles = [
     {
       id: 1,
@@ -203,14 +110,18 @@ function Products() {
   return (
     <>
       <Category7 />
+      <div>
       <Cards data={firstCategory} title={firstCategoryName} />
+      </div>
       {/* <FeaturedBrand /> */}
+      <div className="mt-6 sm:mt-10 md:mt-12">
       <Cards data={secondCategory} title={secondCategoryName} />
-      <TrendingProducts trendingProducts={trendingProducts} />
+      </div>
+      <TrendingProducts />
       <HealthArticles articles={articles} />
       <Testimonial testimonials={testimonials} />
       <Faq />
-      <div className="mt-10 md:mt-16">
+       <div className="mt-10 sm:mt-16 md:mt-20">
         <img
           src="/assets/time.png"
           alt="Upload"

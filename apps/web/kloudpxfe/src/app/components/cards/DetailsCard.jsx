@@ -8,14 +8,14 @@ const DetailsCard = ({ product }) => {
 
   return (
     <div>
-      <p className="font-light text-[13px] mt-2 text-color tracking-wide capitalize">
+      <p className="font-light md:text-[13px] text-[11px] md:mt-2 text-color tracking-wide capitalize">
         {product?.genericname}
       </p>
 
       <span className="text-black font-semibold mt-1 sm:text-[12px] text-[9px] tracking-wide">
         {product?.brandname}
       </span>
-      <div className="flex gap-2 items-center mt-2 text-[15px] tracking-wide">
+      <div className="flex gap-2 items-center md:mt-2 mt-1 text-[15px] tracking-wide">
         {price ? (
           discountPercent > 0 ? (
             <>

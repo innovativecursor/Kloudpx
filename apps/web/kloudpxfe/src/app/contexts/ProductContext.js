@@ -15,6 +15,7 @@ export const ProductProvider = ({ children }) => {
   const [branded, setBranded] = useState([]);
   const [twoCategory, setTwoCategory] = useState([]);
   const [productDetails, setProductDetails] = useState([]);
+  const [trending, setTrending] = useState([]);
 
   const getAllMedicine = async () => {
     try {
@@ -31,6 +32,15 @@ export const ProductProvider = ({ children }) => {
       setBranded(res?.data?.medicines || []);
     } catch (error) {
       setBranded([]);
+    }
+  };
+
+  const getTrendingProducts = async () => {
+    try {
+      const res = await getAxiosCall(endpoints.trending.get, {}, false);
+      setTrending(res?.data?.medicines || []);
+    } catch (error) {
+      setTrending([]);
     }
   };
 
@@ -101,6 +111,8 @@ export const ProductProvider = ({ children }) => {
         twoCategory,
         getProductDeatils,
         productDetails,
+        getTrendingProducts,
+        trending,
       }}
     >
       {children}

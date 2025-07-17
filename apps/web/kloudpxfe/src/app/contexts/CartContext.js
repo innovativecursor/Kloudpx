@@ -12,9 +12,6 @@ export const CartProvider = ({ children }) => {
   const { token } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [getCartData, setGetCartData] = useState({ data: [], loading: false });
-  const [prescriptionCheckedItems, setPrescriptionCheckedItems] = useState(
-    new Set()
-  );
 
   const addToCart = async (medicineid, quantity) => {
     if (!token) {
@@ -98,6 +95,8 @@ export const CartProvider = ({ children }) => {
   };
 
   const cartLength = getCartData?.data?.length || 0;
+
+  // console.log(cartItems);
 
   return (
     <CartContext.Provider

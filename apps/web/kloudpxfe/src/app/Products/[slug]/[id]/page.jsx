@@ -48,7 +48,7 @@ const ProductDetails = () => {
   const discountedPrice = price - (price * discountPercent) / 100;
 
   return (
-    <div className="bg-gray-100 pb-10 min-h-screen">
+    <div className="bg-gray-100 pb-10 min-h-screen md:mt-64 sm:mt-48 mt-40">
       <div className="responsive-mx pt-7 md:pt-11">
         <SubTitle
           paths={[

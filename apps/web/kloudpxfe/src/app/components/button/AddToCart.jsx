@@ -6,17 +6,24 @@ import { usePrescriptionContext } from "@/app/contexts/PrescriptionContext";
 
 const AddToCart = ({ productDetails, title, className = "" }) => {
   const { addToCart, getQuantity } = useCartContext();
-  const { setIsOpen } = usePrescriptionContext();
+  const { setIsOpen, setPendingCartData } = usePrescriptionContext();
 
   if (!productDetails) return null;
 
   const handleAddToCartClick = async () => {
     const qty = getQuantity(productDetails.id);
-    await addToCart(productDetails.id, qty);
 
     if (productDetails.prescription) {
+      setPendingCartData({
+        medicineid: productDetails.id,
+        quantity: qty,
+      });
+
       setIsOpen(true);
+      return;
     }
+
+    await addToCart(productDetails.id, qty);
   };
 
   return (
@@ -26,7 +33,7 @@ const AddToCart = ({ productDetails, title, className = "" }) => {
       // className="text-[11px] sm:text-base flex items-center gap-2 rounded-full font-medium py-2 px-6 justify-center bg-[#0070ba] hover:bg-[#005c96] text-white w-full shadow-lg transition-transform transform hover:scale-105 active:scale-95"
       className={`${className}`}
     >
-      <i className="ri-shopping-cart-line text-xl"></i>
+      <i className="ri-shopping-cart-line md:text-xl"></i>
       {title}
     </button>
   );
