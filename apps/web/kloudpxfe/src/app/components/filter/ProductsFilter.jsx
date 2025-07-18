@@ -1,65 +1,186 @@
-import { useState } from "react";
-import { IoIosArrowDown } from "react-icons/io";
-import Title from "../Titles/Title";
+"use client";
 
-const filterSections = [
-  {
-    title: "Shop by Category",
-    items: [
-      "Medicines",
-      "Personal Care",
-      "Healthcare Devices",
-      "Baby",
-      "Herbs",
-      "Vitamins",
-    ],
-  },
-  {
-    title: "Refined By",
-    items: ["Brand", "Color", "Price"],
-  },
-];
-
-const AccordionItem = ({ label, isOpen, toggleOpen }) => (
-  <div
-    onClick={toggleOpen}
-    className="flex justify-between items-center cursor-pointer py-3 border-b border-gray-200"
-  >
-    <span className="text-sm font-normal text-gray-800">{label}</span>
-    <IoIosArrowDown
-      className={`transform transition-transform duration-200 text-sm text-gray-500 ${
-        isOpen ? "rotate-180" : ""
-      }`}
-    />
-  </div>
-);
+import React, { useState } from "react";
+import { Range } from "react-range";
+import { CiFilter } from "react-icons/ci";
+import { useProductContext } from "@/app/contexts/ProductContext";
 
 const ProductsFilter = () => {
-  const [openSections, setOpenSections] = useState({});
+  const { category } = useProductContext();
+  const [priceRange, setPriceRange] = useState([50, 13350]);
+  const [discountRange, setDiscountRange] = useState([10, 90]);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  const toggleSection = (label) => {
-    setOpenSections((prev) => ({
-      ...prev,
-      [label]: !prev[label],
-    }));
-  };
+  const brands = [
+    { id: 1, name: "Brand One" },
+    { id: 2, name: "Brand Two" },
+    { id: 3, name: "Brand Three" },
+    { id: 4, name: "Brand Four" },
+  ];
 
-  return (
-    <aside className="w-full md:w-[20%]  hidden md:block sticky top-4">
-      {filterSections.map((section, idx) => (
-        <div key={idx} className="mb-4">
-          <Title text={section.title} />
-          {section.items.map((item, index) => (
-            <AccordionItem
-              key={index}
-              label={item}
-              isOpen={!!openSections[item]}
-              toggleOpen={() => toggleSection(item)}
+  const FilterContent = () => (
+    <div className="bg-gray-100 h-full overflow-y-auto p-5">
+      {/* Category */}
+      <span className="font-medium text-lg tracking-wide dark-text">
+        Category
+      </span>
+      {category?.map((item) => (
+        <div key={item.ID} className="flex justify-between items-center mt-3">
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              className="w-4 h-4 bg-transparent accent-[#0070ba] cursor-pointer"
             />
-          ))}
+            <span className="text-sm tracking-wider">
+              {(item?.CategoryName?.slice(0, 15) || "No CategoryName") +
+                (item?.CategoryName?.length > 20 ? "... " : "")}
+            </span>
+          </div>
+          <span>22</span>
         </div>
       ))}
-    </aside>
+
+      {/* Brands */}
+      <div className="mt-8">
+        <span className="font-medium text-lg tracking-wide dark-text">
+          Brands
+        </span>
+        {brands.map((brand) => (
+          <div key={brand.id} className="flex items-center gap-2 mt-3">
+            <input
+              type="checkbox"
+              className="w-4 h-4 bg-transparent accent-[#0070ba] cursor-pointer"
+            />
+            <span className="text-sm tracking-wider">{brand.name}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Price Range */}
+      <div className="mt-10">
+        <div className="flex justify-between items-center cursor-pointer mb-2">
+          <span className="font-medium text-lg tracking-wide dark-text">
+            Price
+          </span>
+          <i className="ri-arrow-drop-up-line text-xl"></i>
+        </div>
+        <Range
+          step={50}
+          min={0}
+          max={15000}
+          values={priceRange}
+          onChange={(values) => setPriceRange(values)}
+          renderTrack={({ props, children }) => (
+            <div
+              {...props}
+              className="h-1.5 bg-gray-200 rounded relative w-full"
+            >
+              <div
+                className="absolute h-1.5 bg-[#0070ba] rounded"
+                style={{
+                  left: `${(priceRange[0] / 15000) * 100}%`,
+                  width: `${((priceRange[1] - priceRange[0]) / 15000) * 100}%`,
+                }}
+              />
+              {children}
+            </div>
+          )}
+          renderThumb={({ props }) => (
+            <div
+              {...props}
+              className="h-4 w-4 bg-[#0070ba] rounded-full cursor-pointer"
+            />
+          )}
+        />
+        <div className="flex justify-between text-sm mt-2">
+          <span>₱{priceRange[0].toFixed(2)}</span>
+          <span>₱{priceRange[1].toFixed(2)}</span>
+        </div>
+      </div>
+
+      {/* Discount */}
+      <div className="mt-12 mb-20">
+        <div className="flex justify-between items-center cursor-pointer mb-2">
+          <span className="font-medium text-lg tracking-wide dark-text">
+            Discount
+          </span>
+          <i className="ri-arrow-drop-up-line text-xl"></i>
+        </div>
+        <Range
+          step={1}
+          min={0}
+          max={100}
+          values={discountRange}
+          onChange={(values) => setDiscountRange(values)}
+          renderTrack={({ props, children }) => (
+            <div
+              {...props}
+              className="h-1.5 bg-gray-200 rounded relative w-full"
+            >
+              <div
+                className="absolute h-1.5 bg-[#0070ba] rounded"
+                style={{
+                  left: `${(discountRange[0] / 100) * 100}%`,
+                  width: `${
+                    ((discountRange[1] - discountRange[0]) / 100) * 100
+                  }%`,
+                }}
+              />
+              {children}
+            </div>
+          )}
+          renderThumb={({ props }) => (
+            <div
+              {...props}
+              className="h-4 w-4 bg-[#0070ba] rounded-full cursor-pointer"
+            />
+          )}
+        />
+        <div className="flex justify-between text-sm mt-2">
+          <span>{discountRange[0]}%</span>
+          <span>{discountRange[1]}%</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop sidebar */}
+      <div className="w-full lg:w-[20%] md:w-[30%] hidden md:block mt-4 rounded-lg sticky top-20 max-h-fit overflow-auto">
+        <div className="bg-gray-100">
+          <div className="flex justify-between items-center py-4 px-5 bg-[#0070ba] text-white rounded-tl-xl rounded-tr-xl font-medium text-xl">
+            <span>Filter</span>
+            <i className="ri-sound-module-line"></i>
+          </div>
+          {FilterContent()}
+        </div>
+      </div>
+
+      <div
+        className="fixed bottom-0 right-0 border-l border-l-gray-200 w-1/2 bg-white text-sm dark-text border-t border-gray-300 shadow-md text-center py-3 md:hidden cursor-pointer z-30 font-medium"
+        onClick={() => setIsMobileOpen(true)}
+      >
+        <div className="flex justify-center items-center">
+          <CiFilter /> FILTER
+        </div>
+      </div>
+
+      {/* Mobile Drawer */}
+      {isMobileOpen && (
+        <div className="fixed inset-0 bg-black/40 z-50 md:hidden">
+          <div className="absolute left-0 right-0 bg-white rounded-t-xl h-full overflow-y-auto">
+            <div className="flex justify-between items-center px-4 py-3 border-b">
+              <span className="font-semibold text-lg">Filters</span>
+              <button onClick={() => setIsMobileOpen(false)}>
+                <i className="ri-close-line text-2xl"></i>
+              </button>
+            </div>
+            {FilterContent()}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

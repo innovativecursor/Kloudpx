@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { generateSlug } from "@/app/utils/slugify";
+import AddToCart from "../button/AddToCart";
+import { usePrescriptionContext } from "@/app/contexts/PrescriptionContext";
+import Prescription from "../modal/Prescription";
 
 const ProductCardItem = ({ item, fallbackImage }) => {
   const router = useRouter();
@@ -39,25 +42,27 @@ const ProductCardItem = ({ item, fallbackImage }) => {
 
   return (
     <div
-      onClick={() => handleCardClick(item.id, item.genericname)}
-      className="w-full bg-white h-[340px] rounded cursor-pointer transform transition-transform duration-300 hover:scale-105 hover:shadow-xl overflow-hidden"
+      className="w-full sm:h-[380px]  h-[240px]  bg-white rounded-xl border-2 border-gray-100 
+      md:shadow-[0_8px_15px_-6px_rgba(0,0,0,0.5)] shadow-[0_2px_6px_-3px_rgba(0,0,0,0.4)] cursor-pointer transform transition-transform duration-300 hover:scale-105 hover:shadow-xl overflow-hidden"
     >
-      <h1 className="mx-3.5 lg:text-lg mt-4 md:text-xl text-lg font-light">
-        {item.brandname}
-      </h1>
-
       <div
-        className="mt-4 px-4"
+        onClick={() => handleCardClick(item.id, item.genericname)}
+        className="relative  sm:h-64  flex items-center justify-center h-36 px-4 shadow bg-[#F6F5FA]"
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 bg-[#002046] text-white sm:text-[10px] text-[8px] sm:px-5 px-3 py-[2px] lg:py-[5px] sm:py-[4px]  rounded-b-xl  z-10 shadow-lg">
+          30% Off
+        </div>
+
         <Swiper
           ref={swiperRef}
           spaceBetween={10}
           slidesPerView={1}
           loop
           allowTouchMove={true}
-          style={{ width: "80%", height: "160px" }}
+          // style={{ width: "80%", height: "160px" }}
+          className="sm:w-[80%] sm:h-[160px] w-[95%] h-[100px]"
         >
           {slides.map((img, index) => (
             <SwiperSlide key={index}>
@@ -74,25 +79,28 @@ const ProductCardItem = ({ item, fallbackImage }) => {
         </Swiper>
       </div>
 
-      <div className="flex justify-between items-start mt-5 mx-3.5 mb-2">
+      <div className=" mt-3 mx-3.5 mb-2">
         <div>
-          <h1 className="text-xs font-medium">
-            {item.category || "No Category"}
+          <h1 className="sm:text-[12px] text-[10px] text-color font-light">
+            {(item?.genericname?.slice(0, 22) || "No genericname") +
+              (item?.genericname?.length > 22 ? "..." : "")}
           </h1>
-          <p className="text-[12px] font-light opacity-70 mt-1">
-            {item.description
-              ? item.description.split(" ").slice(0, 5).join(" ")
-              : "No description"}
-            {item.description && item.description.split(" ").length > 5 && (
-              <span className="text-color"> ...more</span>
-            )}
+
+          <p className="sm:text-[13px] text-[11px] font-medium tracking-wide mt-2">
+            {(item?.brandname?.slice(0, 25) || "No brandname") +
+              (item?.brandname?.length > 25 ? "..." : "")}
           </p>
         </div>
-
-        <div className="flex gap-5 z-20">
-          <div className="bg-white shadow-md flex items-center justify-center -mt-8 w-9 h-9 rounded-full">
-            <i className="ri-whatsapp-line text-2xl text-green-600"></i>
-          </div>
+        <div className="flex justify-between sm:mt-3 mt-2 pb-2 items-center">
+          <p className="font-semibold sm:text-base text-xs">
+            {" "}
+            ₱{item?.price.toFixed(2)}
+          </p>
+          <AddToCart
+            title="Add To Cart"
+            productDetails={item}
+            className="md:text-[9px] text-[6px] flex items-center gap-1 rounded-full font-medium sm:px-6 px-2 py-1 justify-center text-white bg-[#0070ba] cursor-pointer "
+          />
         </div>
       </div>
     </div>
@@ -102,24 +110,23 @@ const ProductCardItem = ({ item, fallbackImage }) => {
 const ProductsCard = ({ selectedCategoryItems }) => {
   const fallbackImage = "/assets/fallback.png";
   const medicines = selectedCategoryItems || [];
-
+  const { isOpen } = usePrescriptionContext();
   // console.log(selectedCategoryItems);
 
   return (
     <div>
-      <div className="grid lg:grid-cols-3 sm:gap-7 gap-10 md:grid-cols-2 sm:grid-cols-2 grid-cols-1 mt-7 sm:mt-11 sm:mb-20 mb-12">
-        {medicines.length > 0 ? (
-          medicines.map((item) => (
-            <ProductCardItem
-              key={item.id}
-              item={item}
-              fallbackImage={fallbackImage}
-            />
-          ))
-        ) : (
-          <p className="text-center col-span-full">No products available.</p>
-        )}
+      <div className="grid lg:grid-cols-4 lg:gap-5 space-y-7 md:space-y-10 sm:gap-10 gap-3 grid-cols-2 sm:mt-5 ">
+        {medicines.length > 0
+          ? medicines.map((item) => (
+              <ProductCardItem
+                key={item.id}
+                item={item}
+                fallbackImage={fallbackImage}
+              />
+            ))
+          : null}
       </div>
+      {isOpen && <Prescription />}
     </div>
   );
 };

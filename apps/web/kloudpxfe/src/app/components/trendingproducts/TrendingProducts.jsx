@@ -13,9 +13,12 @@ const TrendingProducts = ({}) => {
 
   return (
     <div className="responsive-mx mt-14 sm:mt-16 md:mt-28">
-      <h2 className="sm:text-2xl text-xl font-semibold sm:mb-9 mb-6 text-[#00243F] ">
-        Trending Products
-      </h2>
+      {trending.length > 0 ? (
+        <h2 className="sm:text-2xl text-xl font-semibold sm:mb-9 mb-6 text-[#00243F] ">
+          Trending Products
+        </h2>
+      ) : null}
+
       <div className="grid md:grid-cols-3 lg:gap-9 md:gap-8 sm:gap-6 grid-cols-2 gap-6">
         {trending.map((product) => {
           const price = parseFloat(product.price) || 0;
