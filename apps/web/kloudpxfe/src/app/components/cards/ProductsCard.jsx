@@ -116,17 +116,15 @@ const ProductsCard = ({ selectedCategoryItems }) => {
   return (
     <div>
       <div className="grid lg:grid-cols-4 lg:gap-5 space-y-7 md:space-y-10 sm:gap-10 gap-3 grid-cols-2 sm:mt-5 ">
-        {medicines.length > 0 ? (
-          medicines.map((item) => (
-            <ProductCardItem
-              key={item.id}
-              item={item}
-              fallbackImage={fallbackImage}
-            />
-          ))
-        ) : (
-          <p className="text-center col-span-full">No products available.</p>
-        )}
+        {medicines.length > 0
+          ? medicines.map((item) => (
+              <ProductCardItem
+                key={item.id}
+                item={item}
+                fallbackImage={fallbackImage}
+              />
+            ))
+          : null}
       </div>
       {isOpen && <Prescription />}
     </div>

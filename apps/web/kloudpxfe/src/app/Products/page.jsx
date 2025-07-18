@@ -50,8 +50,9 @@ const Page = () => {
             </p>{" "}
             <span className="dark-text">"Medicine"</span>
           </div>
-          <div className="md:block hidden">
-          <Sorting />
+
+          <div className="">
+            <Sorting />
           </div>
         </div>
         <div className="flex mt-7">

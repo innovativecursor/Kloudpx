@@ -3,6 +3,7 @@ import ProductsCard from "@/app/components/cards/ProductsCard";
 import FeaturedBrand from "../featuredbrand/FeaturedBrand";
 import sale1 from "@/assets/1.svg";
 import sale2 from "@/assets/2.svg";
+import Pagination from "../Pagination/Pagination";
 
 const AllProducts = ({ selectedCategoryItems = [] }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,20 +25,21 @@ const AllProducts = ({ selectedCategoryItems = [] }) => {
         <>
           <ProductsCard selectedCategoryItems={first8} />
 
-          <div className="mt-5 sm:mt-10 md:mt-12 bg-gray-200/70 rounded-xl sm:py-9 py-8 md:w-[60vw] w-[94vw] sm:px-6 px-4 overflow-hidden mb-10 sm:mb-20">
-            <FeaturedBrand />
+          <div className="bg-white flex justify-center">
+            <div className="mt-5 sm:mt-10 md:mt-12 bg-gray-200/70 rounded-xl sm:py-9 py-8 md:w-[63vw] w-[94vw] sm:px-6 px-4 overflow-hidden mb-10 sm:mb-20">
+              <FeaturedBrand />
+            </div>
           </div>
-
           <ProductsCard selectedCategoryItems={next4} />
 
-          <div className="flex justify-between items-center lg:mt-10 sm:mt-14 sm:gap-4 gap-2 mb-10 sm:mb-16">
+          <div className="flex justify-between items-center lg:mt-10 sm:mt-14 sm:gap-4 gap-2 mb-10 sm:mb-20">
             <img
-              className="lg:h-[440px] sm:h-[280px] h-[135px] w-auto object-contain"
+              className="lg:h-[26vw] md:h-[25vw]  h-[37vw] w-auto object-contain"
               src={sale1.src}
               alt="sale1"
             />
             <img
-              className="lg:h-[440px] sm:h-[280px] h-[135px] w-auto object-contain"
+              className="lg:h-[26vw] md:h-[25vw] h-[37vw] w-auto object-contain"
               src={sale2.src}
               alt="sale2"
             />
@@ -49,27 +51,13 @@ const AllProducts = ({ selectedCategoryItems = [] }) => {
       {currentPage === 2 && <ProductsCard selectedCategoryItems={remaining} />}
 
       {/* Pagination Controls */}
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-4 mt-8">
-          <button
-            className="px-4 py-2 bg-gray-200 text-sm rounded hover:bg-gray-300"
-            onClick={handlePrev}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <span className="text-sm flex items-center">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            className="px-4 py-2 bg-gray-200 text-sm rounded hover:bg-gray-300"
-            onClick={handleNext}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
-      )}
+
+      <Pagination
+        totalPages={totalPages}
+        currentPage={currentPage}
+        handlePrev={handlePrev}
+        handleNext={handleNext}
+      />
     </>
   );
 };
