@@ -26,7 +26,7 @@ const AllMedicine = () => {
 
   const columns = getMedicineColumns({ handleEdit, deleteMedicine });
 
-// console.log(medicines)
+console.log(medicines)
 
   return (
     <div className="md:p-4 mt-16 mx-[4vw]">
@@ -58,7 +58,8 @@ const AllMedicine = () => {
             onChange: (page) => setCurrentPage(page),
             showSizeChanger: false,
           }}
-          scroll={{ x: 3000 }}
+          // scroll={{ x: 3000 }}
+           scroll={{ x: 'max-content' }}
           bordered
         />
       </div>

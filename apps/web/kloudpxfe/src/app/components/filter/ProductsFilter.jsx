@@ -45,7 +45,7 @@ const ProductsFilter = () => {
   };
 
   return (
-    <aside className="w-full md:w-[20%]  hidden md:block sticky top-4">
+    <aside className="w-full md:w-[20%] hidden md:block sticky top-4">
       {filterSections.map((section, idx) => (
         <div key={idx} className="mb-4">
           <Title text={section.title} />

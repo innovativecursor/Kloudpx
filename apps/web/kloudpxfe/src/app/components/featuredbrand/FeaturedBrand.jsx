@@ -26,13 +26,12 @@ const FeaturedBrand = () => {
   return (
     <>
       {feature.length > 0 ? (
-        <div className="responsive-mx mt-12 sm:mt-16 md:mt-20 bg-gray-200/70 rounded-xl sm:py-12 py-8 sm:px-6 px-4">
+        <div>
           <TitleSlider
             title="Featured Brands"
             prevRef={prevRef}
             nextRef={nextRef}
           />
-
           <Swiper
             loop={true}
             onSwiper={setSwiperInstance}
@@ -51,10 +50,15 @@ const FeaturedBrand = () => {
                   onClick={() => goToProductPage(id, genericname)}
                   className="w-full h-20 sm:h-36 cursor-pointer lg:h-64 flex items-center justify-center p-2 rounded-lg overflow-hidden"
                 >
-                  <img
+                  {/* <img
                     src={images?.[0] || fallbackImage}
                     alt={`Brand ${index + 1}`}
                     className="w-full h-full "
+                  /> */}
+                  <img
+                    src={images?.[0] || fallbackImage}
+                    alt={`Brand ${index + 1}`}
+                    className="max-w-full max-h-full object-contain"
                   />
                 </div>
               </SwiperSlide>

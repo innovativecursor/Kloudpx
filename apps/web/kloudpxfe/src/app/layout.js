@@ -7,7 +7,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProductProvider } from "./contexts/ProductContext";
 import { CartProvider } from "./contexts/CartContext";
-import { Toaster } from "react-hot-toast";
+// import { Toaster } from "react-hot-toast";
 import { PrescriptionProvider } from "./contexts/PrescriptionContext";
 import { ImageProvider } from "./contexts/ImagesContext";
 
@@ -15,6 +15,7 @@ import { Provider } from "react-redux";
 import { store, persistor } from "@/app/redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 import Loader from "@/app/components/Loader/Loader";
+import CustomToaster from "./utils/CustomToaster";
 
 export default function RootLayout({ children }) {
   return (
@@ -38,7 +39,8 @@ export default function RootLayout({ children }) {
                         <Header />
                         <main className="flex-1">{children}</main>
                         <Footer />
-                        <Toaster position="top-right" reverseOrder={false} />
+                        {/* <Toaster position="bottom-right" reverseOrder={false} /> */}
+                        <CustomToaster />
                       </ImageProvider>
                     </PrescriptionProvider>
                   </CartProvider>

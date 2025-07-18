@@ -126,7 +126,9 @@ function Products() {
       <div className="mt-12 sm:mt-16 md:mt-20 lg:mt-28">
         <Cards data={firstCategory} title={firstCategoryName} />
       </div>
+      <div className="responsive-mx mt-12 sm:mt-16 md:mt-20 bg-gray-200/70 rounded-xl sm:py-12 py-8 sm:px-6 px-4">
       <FeaturedBrand />
+      </div>
       <div className="mt-12 sm:mt-16 md:mt-20 lg:mt-28">
         <Cards data={secondCategory} title={secondCategoryName} />
       </div>

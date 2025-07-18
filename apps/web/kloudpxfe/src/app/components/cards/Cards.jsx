@@ -30,7 +30,7 @@ const SwiperSlider = ({ data, title }) => {
           onSwiper={setSwiperInstance}
           modules={[Navigation]}
           breakpoints={{
-            0: { slidesPerView: 2, spaceBetween: 20 },
+            0: { slidesPerView: 2, spaceBetween: 10 },
             640: { slidesPerView: 3, spaceBetween: 20 },
             768: { slidesPerView: 4, spaceBetween: 20 },
             1024: { slidesPerView: 5, spaceBetween: 30 },
@@ -39,7 +39,7 @@ const SwiperSlider = ({ data, title }) => {
         >
           {data.map((product) => (
             <SwiperSlide key={product.id}>
-              <div className=" md:min-h-[350px] min-h-[300px] bg-white flex flex-col justify-between">
+              <div className=" md:h-[350px] bg-white h-[300px] flex flex-col justify-between">
                 <div
                   onClick={() =>
                     goToProductPage(product?.id, product?.genericname)
@@ -59,7 +59,7 @@ const SwiperSlider = ({ data, title }) => {
                 </div>
 
                 {/* Add to Cart */}
-                <div className="md:mt-4 mt-2 px-2 pb-2">
+                <div className="md:mt-3 mt-1  px-2 pb-2">
                   <AddToCart
                     title="Add To Cart"
                     productDetails={product}

@@ -77,13 +77,13 @@ export default function SearchBar() {
       ref={wrapperRef}
       className="relative w-full lg:max-w-4xl md:max-w-lg max-w-full mx-auto"
     >
-      <div className="flex items-center md:h-14 h-12 bg-[#EDF4F6] rounded-full overflow-hidden">
+      <div className="flex items-center md:h-14 h-12 bg-[#EDF4F6] rounded-full overflow-hidden border-2 border-transparent hover:border-[#0070ba] focus-within:border-[#0070ba] transition-all duration-200 cursor-pointer">
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search for products, categories or brands..."
-          className="flex-grow px-6 md:py-4 py-2 bg-transparent text-sm text-gray-800 placeholder-gray-600 focus:outline-none placeholder:text-xs"
+          className="flex-grow px-6 md:py-4 py-2 bg-transparent text-sm text-gray-800 placeholder-gray-600 focus:outline-none placeholder:text-xs "
         />
         <button className="bg-[#006EBB] md:w-20 w-12 md:p-4 p-2">
           <i className="ri-search-line text-white text-2xl"></i>

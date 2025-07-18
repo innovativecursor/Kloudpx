@@ -43,7 +43,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const getAllCartData = async () => {
-    if (!token) return;
+    // if (!token) return;
     setGetCartData({ data: [], loading: true });
     try {
       const res = await getAxiosCall(endpoints.cart.get, {}, true);

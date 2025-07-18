@@ -33,7 +33,7 @@ const HomeFloatingBtn = () => {
       {showButton && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-12 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-slate-600 text-white shadow-lg transition-all duration-300 hover:bg-slate-700 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+          className="fixed bottom-12 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#0070ba] text-white shadow-lg transition-all duration-300 hover:bg-[#0070ba]/80 cursor-pointer hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[#0070ba] focus:ring-offset-2"
           aria-label="Scroll to top"
         >
           <IoChevronUp size={24} />
