@@ -1,4 +1,4 @@
-const baseURLLive = "http://localhost:10001";
+const baseURLLive = "https://api.admin";
 const baseURLDev = "http://localhost:10001";
 
 const isLive = false;
