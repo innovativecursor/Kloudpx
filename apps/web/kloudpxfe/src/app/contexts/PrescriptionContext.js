@@ -19,6 +19,8 @@ export const PrescriptionProvider = ({ children }) => {
   const [pendingCartData, setPendingCartData] = useState(null);
   const { getAllCartData } = useCartContext();
 
+  // console.log(pendingCartData);
+
   const uploadPrescription = async (file, medicineid, quantity) => {
     if (!file) return;
 
@@ -44,6 +46,8 @@ export const PrescriptionProvider = ({ children }) => {
         true
       );
       const prescriptionId = res?.prescription_id;
+      // console.log(prescriptionId);
+
       setUploadedPrescriptionId(prescriptionId);
 
       if (res?.url) {
@@ -55,6 +59,22 @@ export const PrescriptionProvider = ({ children }) => {
           // toast.success("Prescription uploaded successfully");
           setIsOpen(false);
           setLoading(false);
+
+          console.log("🧾 Debug Prescription Payload:");
+          console.log("prescriptionId:", prescriptionId);
+          console.log("medicineId:", medicineid);
+          console.log("quantity:", quantity);
+
+          if (!medicineid || !prescriptionId || !quantity) {
+            console.error("❌ Missing data in prescription cart call", {
+              medicineid,
+              prescriptionId,
+              quantity,
+            });
+            toast.error("Something went wrong, missing data.");
+            return;
+          }
+
           await postAxiosCall(
             // "http://localhost:10003/v1/user/add-to-cart-medicine",
             endpoints.prescriptioncart.add,

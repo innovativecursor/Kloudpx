@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const t = localStorage.getItem("access_token");
+      // const t = sessionStorage.getItem("access_token");
       setToken(t);
     }
   }, []);
@@ -42,16 +43,16 @@ export const AuthProvider = ({ children }) => {
       try {
         if (!codeResponse?.code)
           throw new Error("Authorization code not found");
-
         const encodedCode = encodeURIComponent(codeResponse.code);
         const res = await getAxiosCall(
           endpoints.auth.googleLogin + `?code=${encodedCode}`
         );
-
+        // console.log(res);
         const token = res?.data?.token;
         if (!token) throw new Error("Token missing from server");
 
         localStorage.setItem("access_token", token);
+        // sessionStorage.setItem("access_token", token);
         setToken(token);
 
         router.push("/");
@@ -66,6 +67,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem("access_token");
+    // sessionStorage.removeItem("access_token");
     setToken(null);
     setUser(null);
     router.push("/");

@@ -45,7 +45,7 @@ const Hamburger = () => {
 
           <div
             ref={modalRef}
-            className="fixed md:top-32 top-20 max-w-md bg-white max-h-96 overflow-y-scroll rounded-sm z-50 thin-scrollbar"
+            className="fixed md:top-32 top-20 max-w-md bg-white max-h-96 overflow-y-scroll rounded-sm z-[99] thin-scrollbar"
           >
             {/* User Info */}
             <div className="p-6">

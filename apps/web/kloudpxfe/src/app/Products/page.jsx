@@ -5,7 +5,9 @@ import { useSearchParams } from "next/navigation";
 import { useProductContext } from "../contexts/ProductContext";
 import ProductsFilter from "../components/filter/ProductsFilter";
 import AllProducts from "../components/AllProducts/AllProducts";
-import SubTitle from "../components/Titles/SubTitle";
+// import SubTitle from "../components/Titles/SubTitle";
+import Hero from "../components/Hero/Hero";
+import Sorting from "../components/sorting/Sorting";
 
 const Page = () => {
   const searchParams = useSearchParams();
@@ -34,10 +36,25 @@ const Page = () => {
     }
   }, [categoryIdFromUrl, category]);
 
+  console.log(selectedCategoryItems.length);
+
   return (
-    <div className="bg-gray-100 md:mt-64 sm:mt-48 mt-40">
+    <div>
+      <Hero />
       <div className="responsive-mx pt-5 md:pt-7">
-        <SubTitle paths={["Home", selectedCategoryName || "Category"]} />
+        {/* <SubTitle paths={["Home", selectedCategoryName || "Category"]} /> */}
+        <div className="flex justify-between items-start md:mt-5 mt-4 dark-text font-medium">
+          <div className="flex gap-1 lg:text-base md:text-sm">
+            <p className="opacity-70">
+              Viewing {selectedCategoryItems.length} results of
+            </p>{" "}
+            <span className="dark-text">"Medicine"</span>
+          </div>
+
+          <div className="">
+            <Sorting />
+          </div>
+        </div>
         <div className="flex mt-7">
           <ProductsFilter />
           <div className="flex-1 md:ml-9">
