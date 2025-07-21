@@ -21,6 +21,7 @@ func init() {
 		ClientID:     "573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com",
 		ClientSecret: "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",
 		RedirectURL:  "http://localhost:3000", // backend redirect URL
+		// RedirectURL:  "https://kloudpx.com", // backend redirect URL
 		Scopes:       []string{"profile", "email"},
 		Endpoint:     google.Endpoint,
 	}
