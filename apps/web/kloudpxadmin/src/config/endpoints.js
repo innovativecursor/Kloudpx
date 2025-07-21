@@ -1,4 +1,4 @@
-const baseURLLive = "https://api.admin";
+const baseURLLive = "https://api.admin.kloudpx.com";
 const baseURLDev = "http://localhost:10001";
 
 const isLive = false;

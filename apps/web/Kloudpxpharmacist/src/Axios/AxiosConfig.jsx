@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import { store } from "../store/index";
 
 const BASE_URL = "http://localhost:10002";
-// const BASE_URL = "https://api.pharmacist";
+// const BASE_URL = "https://api.pharmacist.kloudpx.com";
 
 const getToken = () => {
   if (typeof window === "undefined") return null;
