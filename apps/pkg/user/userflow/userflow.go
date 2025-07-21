@@ -256,6 +256,22 @@ func AddToCartOTC(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// Check for existing OTC cart item
+	var existingCart models.Cart
+	err = db.Where("user_id = ? AND medicine_id = ? AND is_otc = ?", userObj.ID, req.MedicineID, true).
+		First(&existingCart).Error
+
+	if err == nil {
+		// Found existing cart entry — update quantity
+		existingCart.Quantity += req.Quantity
+		if err := db.Save(&existingCart).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart item"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "OTC medicine quantity updated in cart"})
+		return
+	}
+
 	entry := models.Cart{
 		UserID:     userObj.ID,
 		MedicineID: req.MedicineID,
