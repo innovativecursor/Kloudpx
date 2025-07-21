@@ -104,6 +104,7 @@ func GetPrescriptionCart(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, cartItems)
 }
 
+// approve
 func SubmitPrescription(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -126,6 +127,37 @@ func SubmitPrescription(c *gin.Context, db *gorm.DB) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Prescription submitted successfully"})
+}
+
+// reject
+func RejectPrescription(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+	userObj, ok := user.(*models.Pharmacist)
+	if !ok || userObj.ApplicationRole != "Pharmacist" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Access denied: Pharmacist only"})
+		return
+	}
+
+	id := c.Param("id")
+
+	var prescription models.Prescription
+	if err := db.First(&prescription, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Prescription not found"})
+		return
+	}
+
+	if err := db.Model(&models.Prescription{}).
+		Where("id = ?", id).
+		Update("status", "rejected").Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to reject prescription"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Prescription rejected successfully"})
 }
 
 // pharmacist info

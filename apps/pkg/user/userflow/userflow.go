@@ -215,119 +215,6 @@ func GetCurrentUserInfo(c *gin.Context, db *gorm.DB) {
 	})
 }
 
-// // add to cart
-// func AddOTCToCart(c *gin.Context, db *gorm.DB) {
-// 	user, exists := c.Get("user")
-// 	if !exists {
-// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-// 		return
-// 	}
-// 	userObj, ok := user.(*models.User)
-// 	if !ok {
-// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
-// 		return
-// 	}
-
-// 	var req config.AddCartRequest
-// 	if err := c.ShouldBindJSON(&req); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid payload"})
-// 		return
-// 	}
-
-// 	var medicine models.Medicine
-// 	if err := db.First(&medicine, req.MedicineID).Error; err != nil {
-// 		c.JSON(http.StatusNotFound, gin.H{"error": "Medicine not found"})
-// 		return
-// 	}
-
-// 	// Check stock
-// 	availableStock, err := itemscalculation.CalculateTotalStockByBrandName(db, medicine.BrandName)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Stock check failed"})
-// 		return
-// 	}
-// 	if req.Quantity > availableStock {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Insufficient stock", "available": availableStock})
-// 		return
-// 	}
-
-// 	entry := models.Cart{
-// 		UserID:        userObj.ID,
-// 		MedicineID:    req.MedicineID,
-// 		Quantity:      req.Quantity,
-// 		IsOTC:         !medicine.Prescription,
-// 		VisibleToUser: !medicine.Prescription, // prescription items hidden until approved
-// 	}
-
-// 	if err := db.Create(&entry).Error; err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add to cart"})
-// 		return
-// 	}
-
-// 	if medicine.Prescription {
-// 		c.JSON(http.StatusOK, gin.H{
-// 			"message": "Medicine added to cart. Prescription required. Please upload a prescription to proceed.",
-// 		})
-// 		return
-// 	}
-
-// 	c.JSON(http.StatusOK, gin.H{"message": "OTC medicine added to cart successfully"})
-// }
-
-// func AddToCart(c *gin.Context, db *gorm.DB) {
-// 	user, exists := c.Get("user")
-// 	if !exists {
-// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-// 		return
-// 	}
-// 	userObj, ok := user.(*models.User)
-// 	if !ok {
-// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
-// 		return
-// 	}
-
-// 	var req config.AddCartRequest
-// 	if err := c.ShouldBindJSON(&req); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid payload"})
-// 		return
-// 	}
-
-// 	var medicine models.Medicine
-// 	if err := db.First(&medicine, req.MedicineID).Error; err != nil {
-// 		c.JSON(http.StatusNotFound, gin.H{"error": "Medicine not found"})
-// 		return
-// 	}
-
-// 	// Check stock
-// 	availableStock, err := itemscalculation.CalculateTotalStockByBrandName(db, medicine.BrandName)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Stock check failed"})
-// 		return
-// 	}
-// 	if req.Quantity > availableStock {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Insufficient stock", "available": availableStock})
-// 		return
-// 	}
-
-// 	entry := models.Cart{
-// 		UserID:     userObj.ID,
-// 		MedicineID: req.MedicineID,
-// 		Quantity:   req.Quantity,
-// 		IsOTC:      !medicine.Prescription,
-// 	}
-
-// 	if err := db.Create(&entry).Error; err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add to cart"})
-// 		return
-// 	}
-
-// 	msg := "Medicine added to cart successfully"
-// 	if medicine.Prescription {
-// 		msg = "Prescription medicine added to cart. Please upload prescription."
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{"message": msg})
-// }
-
 func AddToCartOTC(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -427,6 +314,24 @@ func AddToCartMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// Check for existing unsettled cart item for same medicine
+	var existingCart models.Cart
+	err = db.
+		Where("user_id = ? AND medicine_id = ? AND is_otc = ? AND prescription_id IS NOT NULL", userObj.ID, req.MedicineID, false).
+		Preload("Prescription").
+		First(&existingCart).Error
+
+	if err == nil && existingCart.Prescription != nil && existingCart.Prescription.Status == "unsettled" {
+		existingCart.Quantity += req.Quantity
+		existingCart.PrescriptionID = &req.PrescriptionId
+		if err := db.Save(&existingCart).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart item"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "Cart item updated with new prescription"})
+		return
+	}
+
 	entry := models.Cart{
 		UserID:         userObj.ID,
 		MedicineID:     req.MedicineID,
@@ -442,70 +347,6 @@ func AddToCartMedicine(c *gin.Context, db *gorm.DB) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Medicine added to cart successfully"})
 }
-
-// func GetUserCart(c *gin.Context, db *gorm.DB) {
-// 	user, exists := c.Get("user")
-// 	if !exists {
-// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-// 		return
-// 	}
-// 	userObj, ok := user.(*models.User)
-// 	if !ok {
-// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
-// 		return
-// 	}
-
-// 	var cartItems []models.Cart
-// 	if err := db.
-// 		Preload("Medicine.Generic").
-// 		Preload("Medicine.Category").
-// 		Preload("Medicine.ItemImages").
-// 		Where("user_id = ? AND visible_to_user = ?", userObj.ID, true).
-// 		Find(&cartItems).Error; err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart"})
-// 		return
-// 	}
-
-// 	var response []config.CartResponse
-// 	for _, item := range cartItems {
-// 		medicine := item.Medicine
-// 		var images []string
-// 		for _, img := range medicine.ItemImages {
-// 			images = append(images, img.FileName)
-// 		}
-
-// 		med := config.UserFacingMedicine{
-// 			ID:                        medicine.ID,
-// 			BrandName:                 medicine.BrandName,
-// 			Power:                     medicine.Power,
-// 			GenericName:               medicine.Generic.GenericName,
-// 			Discount:                  medicine.Discount,
-// 			Category:                  medicine.Category.CategoryName,
-// 			Description:               medicine.Description,
-// 			Unit:                      medicine.UnitOfMeasurement,
-// 			MeasurementUnitValue:      medicine.MeasurementUnitValue,
-// 			NumberOfPiecesPerBox:      medicine.NumberOfPiecesPerBox,
-// 			Price:                     medicine.SellingPricePerPiece,
-// 			TaxType:                   medicine.TaxType,
-// 			Prescription:              medicine.Prescription,
-// 			Benefits:                  medicine.Benefits,
-// 			KeyIngredients:            medicine.KeyIngredients,
-// 			RecommendedDailyAllowance: medicine.RecommendedDailyAllowance,
-// 			DirectionsForUse:          medicine.DirectionsForUse,
-// 			SafetyInformation:         medicine.SafetyInformation,
-// 			Storage:                   medicine.Storage,
-// 			Images:                    images,
-// 		}
-
-// 		response = append(response, config.CartResponse{
-// 			CartID:   item.ID,
-// 			Quantity: item.Quantity,
-// 			Medicine: med,
-// 		})
-// 	}
-
-// 	c.JSON(http.StatusOK, response)
-// }
 
 func GetUserCart(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
@@ -553,9 +394,12 @@ func GetUserCart(c *gin.Context, db *gorm.DB) {
 						prescriptionStatus = "Fulfilled"
 					case "unsettled":
 						prescriptionStatus = "Unsettled"
+					case "rejected":
+						prescriptionStatus = "Rejected"
 					default:
 						prescriptionStatus = "Prescription Not Uploaded"
 					}
+
 				} else {
 					prescriptionStatus = "Prescription Not Uploaded"
 				}
