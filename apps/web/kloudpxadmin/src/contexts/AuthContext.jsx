@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { getAxiosCall } from "../Axios/UniversalAxiosCalls";
 import Swal from "sweetalert2";
 
@@ -13,14 +13,25 @@ const AuthProvider = ({ children }) => {
     localStorage.getItem("access_token") || null
   );
 
+  useEffect(() => {
+    const initializeUser = async () => {
+      if (token && !user) {
+        const adminInfo = await fetchAdminInfo();
+        if (adminInfo) {
+          setUser(adminInfo);
+        }
+      }
+    };
+
+    initializeUser();
+  }, [token]);
+
   const [prescriptionRequired, setPrescriptionRequired] = useState(false);
 
   const [medicines, setMedicines] = useState([]);
   const [medicineError, setMedicineError] = useState("");
 
   // --------- AUTH FUNCTIONS ---------
-
-
 
   const fetchAdminInfo = async () => {
     try {
@@ -44,8 +55,6 @@ const AuthProvider = ({ children }) => {
       return null;
     }
   };
-
-
 
   const loginUser = async (userData, token) => {
     localStorage.setItem("access_token", token);
@@ -97,6 +106,8 @@ const AuthProvider = ({ children }) => {
     }
     try {
       const res = await getAxiosCall("/v1/medicine/get-all-medicine");
+      // console.log(res, "medivine data");
+
       if (res?.data?.medicines) {
         setMedicines(res.data.medicines);
         setMedicineError("");
@@ -109,7 +120,6 @@ const AuthProvider = ({ children }) => {
   };
 
   // console.log(user);
-
 
   return (
     <AuthContext.Provider

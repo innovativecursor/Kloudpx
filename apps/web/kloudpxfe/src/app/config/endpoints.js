@@ -17,7 +17,9 @@ const endpoints = {
     getItemsByCategory: (id) => `/v1/user/get-items-by-categories/${id}`,
   },
   details: {
-    get: (id) => `http://localhost:10003/v1/user/medicine-details/${id}`,
+    // get: (id) => `http://localhost:10003/v1/user/medicine-details/${id}`,
+    get: (id) => `/v1/user/medicine-details/${id}`,
+
   },
   cart: {
     add: `/v1/user/add-to-cart-otc`,
