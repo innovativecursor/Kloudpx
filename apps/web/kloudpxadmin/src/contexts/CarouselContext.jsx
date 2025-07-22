@@ -90,7 +90,6 @@ const CarouselProvider = ({ children }) => {
         deleteCarouselImage,
         getAllUserData,
         userData,
-        getAllUserData,
         allItemCount,
         getAllItemData
 
