@@ -1,5 +1,9 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { getAxiosCall, postAxiosCall, updateAxiosCall } from "../Axios/AxiosConfig";
+import {
+  getAxiosCall,
+  postAxiosCall,
+  updateAxiosCall,
+} from "../Axios/AxiosConfig";
 import endpoints from "../config/endpoints";
 
 export const PrescriptionContext = createContext();
@@ -61,11 +65,14 @@ const PrescriptionProvider = ({ children }) => {
     }
   };
 
-
-
   const rejectPrescription = async (prescriptionId) => {
     try {
-      const res = await updateAxiosCall(endpoints.Prescriptions.rejectPrescription, prescriptionId, {}, true);
+      const res = await updateAxiosCall(
+        endpoints.Prescriptions.rejectPrescription,
+        prescriptionId,
+        {},
+        true
+      );
       return res;
     } catch (err) {
       console.error("Reject error:", err);
@@ -82,7 +89,7 @@ const PrescriptionProvider = ({ children }) => {
         prescriptionCart,
         fetchPrescriptionCartById,
         approvePrescription,
-        rejectPrescription
+        rejectPrescription,
       }}
     >
       {children}

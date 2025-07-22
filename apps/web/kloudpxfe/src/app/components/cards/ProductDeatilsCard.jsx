@@ -2,6 +2,7 @@ import React from "react";
 import QuantitySelector from "../QuantitySelector/QuantitySelector";
 import AddToCart from "../button/AddToCart";
 import SocialIcons from "../SocialIcons/SocialIcons";
+import { RiTruckLine, RiArrowGoBackLine } from "react-icons/ri";
 
 const ProductDeatilsCard = ({ details }) => {
   const price = Number(details?.price);
@@ -16,19 +17,19 @@ const ProductDeatilsCard = ({ details }) => {
   return (
     <div>
       <div className="">
-        <div className="flex items-start gap-8 mb-2">
-          <h2 className="text-xl font-light text-color ">
+        <div className="flex items-start gap-8 mb-6">
+          <h2 className="sm:text-xl text-lg font-light text-color ">
             {details?.genericname || "General Medicine"}
           </h2>
           {/* <SocialIcons /> */}
         </div>
         <div className="flex items-start gap-8">
-          <h1 className="text-4xl font-bold mb-2">
+          <h1 className="sm:text-4xl text-2xl font-bold ">
             {details?.brandname} {details?.power}
           </h1>
           <SocialIcons />
         </div>
-        <div className="flex items-center  gap-3 mb-2 mt-4">
+        <div className="flex items-center  gap-3 mb-2 mt-8">
           {price ? (
             discountPercent > 0 ? (
               <div className="text-2xl flex items-center gap-5">
@@ -53,25 +54,49 @@ const ProductDeatilsCard = ({ details }) => {
           )}
         </div>
 
-        <p className="opacity-60 leading-relaxed items-start mb-6 mt-5 text-sm md:text-lg text-justify">
+        <p className="opacity-60 leading-relaxed items-start sm:mb-10 mb-6 mt-7  text-sm md:text-lg text-justify">
           {details?.description || "No description available."}
         </p>
 
         <div className="flex justify-between gap-10 items-center">
           <QuantitySelector medicineid={details.id} />
 
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 sm:gap-6 w-full">
-            {/* <button
-                className="w-full sm:flex-1 flex items-center justify-center gap-3 bg-[#0070ba] hover:to-blue-600 text-white font-semibold text-base px-8 py-3 rounded-full cursor-pointer shadow-lg transition-transform transform hover:scale-105 active:scale-95"
-                onClick={handleAddToCartClick}
-              >
-                <i className="ri-shopping-cart-line text-xl"></i>
-                Add to Cart
-              </button> */}
-            <AddToCart productDetails={details} title="Add To Cart" />
-          </div>
+          <AddToCart
+            productDetails={details}
+            title="Add To Cart"
+            className="bg-[#0070ba] w-full text-white sm:py-3 py-2 rounded-full cursor-pointer"
+          />
         </div>
       </div>
+
+<div className="w-full max-w-3xl mx-auto rounded-lg bg-[#f0f8ff]  text-sm mt-12">
+      {/* Delivery row */}
+      <div className="flex items-start gap-4 p-4 border-b border-blue-100">
+        <RiTruckLine className="w-8 h-8 mt-0.5 text-blue-900" />
+        <div>
+          <p className="font-semibold text-blue-950">Delivery by 20 July, 25</p>
+          <a href="#" className="underline text-xs mt-2">
+            Enter your postal code for Delivery Availability
+          </a>
+        </div>
+      </div>
+
+      {/* Return row */}
+      <div className="flex items-start gap-4 p-4">
+        <RiArrowGoBackLine className="w-8 h-8 mt-0.5 text-blue-900" />
+        <div>
+          <p className="font-semibold text-blue-950">Return Delivery</p>
+          <p className="text-gray-600 text-xs">
+            Free 30 Days Delivery Returns.{" "}
+            <a href="#" className="underline">
+              Details
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+
     </div>
   );
 };

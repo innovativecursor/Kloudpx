@@ -36,7 +36,7 @@ const Page = () => {
     }
   }, [categoryIdFromUrl, category]);
 
-  console.log(selectedCategoryItems.length);
+  // console.log(selectedCategoryItems.length);
 
   return (
     <div>
