@@ -40,6 +40,8 @@ const ProductCardItem = ({ item, fallbackImage }) => {
     }
   };
 
+
+
   return (
     <div
       className="w-full sm:h-[380px]  h-[240px]  bg-white rounded-xl border-2 border-gray-100 
@@ -52,7 +54,7 @@ const ProductCardItem = ({ item, fallbackImage }) => {
         onMouseLeave={onMouseLeave}
       >
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 bg-[#002046] text-white sm:text-[10px] text-[8px] sm:px-5 px-3 py-[2px] lg:py-[5px] sm:py-[4px]  rounded-b-xl  z-10 shadow-lg">
-          30% Off
+          {item?.discount}
         </div>
 
         <Swiper
@@ -92,10 +94,14 @@ const ProductCardItem = ({ item, fallbackImage }) => {
           </p>
         </div>
         <div className="flex justify-between sm:mt-3 mt-2 pb-2 items-center">
-          <p className="font-semibold sm:text-base text-xs">
+          {/* <p className="font-semibold sm:text-base text-xs">
             {" "}
             ₱{item?.price.toFixed(2)}
+          </p> */}
+          <p className="font-semibold sm:text-base text-xs">
+            ₱{(item?.price - (item?.price * (parseFloat(item?.discount) || 0) / 100)).toFixed(2)}
           </p>
+
           <AddToCart
             title="Add To Cart"
             productDetails={item}
@@ -118,12 +124,12 @@ const ProductsCard = ({ selectedCategoryItems }) => {
       <div className="grid lg:grid-cols-4 lg:gap-5 space-y-7 md:space-y-10 sm:gap-10 gap-3 grid-cols-2 sm:mt-5 ">
         {medicines.length > 0
           ? medicines.map((item) => (
-              <ProductCardItem
-                key={item.id}
-                item={item}
-                fallbackImage={fallbackImage}
-              />
-            ))
+            <ProductCardItem
+              key={item.id}
+              item={item}
+              fallbackImage={fallbackImage}
+            />
+          ))
           : null}
       </div>
       {isOpen && <Prescription />}
