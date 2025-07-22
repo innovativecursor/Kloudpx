@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -10,9 +10,26 @@ export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null)
   const [token, setToken] = useState(
     sessionStorage.getItem("access_token") || null
   );
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (!token) return;
+      try {
+        const res = await getAxiosCall(endpoints.auth.getCurrentUser, {}, true);
+
+        setUser(res);
+      } catch (err) {
+        console.error("Error fetching user info", err);
+        setUser(null);
+      }
+    };
+    fetchUser();
+  }, [token]);
+
 
   const login = useGoogleLogin({
     flow: "auth-code",
@@ -56,6 +73,9 @@ const AuthProvider = ({ children }) => {
 
   const isUserLoggedIn = !!token;
 
+
+
+
   return (
     <AuthContext.Provider
       value={{
@@ -63,6 +83,7 @@ const AuthProvider = ({ children }) => {
         login,
         logout,
         isUserLoggedIn,
+        user
       }}
     >
       {children}
