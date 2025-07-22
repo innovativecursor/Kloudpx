@@ -11,18 +11,20 @@ import { useCartContext } from "@/app/contexts/CartContext";
 import { usePrescriptionContext } from "@/app/contexts/PrescriptionContext";
 import Prescription from "@/app/components/modal/Prescription";
 import AddToCart from "@/app/components/button/AddToCart";
+import ProductDeatilsCard from "@/app/components/cards/ProductDeatilsCard";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const { getProductDeatils, productDetails } = useProductContext();
-  // const { addToCart, getQuantity } = useCartContext();
   const { isOpen } = usePrescriptionContext();
+  const details = productDetails?.medicine || [];
+  console.log(details);
 
   useEffect(() => {
     if (id) getProductDeatils(id);
   }, [id]);
 
-  if (!productDetails?.id) {
+  if (!details?.id) {
     return (
       <div className="p-10 text-gray-600 text-center">
         Loading product details...
@@ -30,86 +32,23 @@ const ProductDetails = () => {
     );
   }
 
-  // const handleAddToCartClick = () => {
-  //   if (productDetails.prescription) {
-  //     setIsOpen(true);
-  //     return;
-  //   }
-  //   const qty = getQuantity(productDetails.id);
-  //   addToCart(productDetails.id, qty);
-  // };
-
   const fallbackImage = "/assets/fallback.png";
-  const images =
-    productDetails.images?.length > 0 ? productDetails.images : [fallbackImage];
+  const images = details.images?.length > 0 ? details.images : [fallbackImage];
 
-  const price = Number(productDetails?.price);
-  const discountPercent = Number(productDetails?.discount || 0);
-  const discountedPrice = price - (price * discountPercent) / 100;
+  console.log(details);
 
   return (
-    <div className="bg-gray-100 pb-10 min-h-screen md:mt-64 sm:mt-48 mt-40">
+    <div className=" pb-10 min-h-screen md:mt-52 sm:mt-48 mt-40">
       <div className="responsive-mx pt-7 md:pt-11">
         <SubTitle
-          paths={[
-            "Home",
-            productDetails?.category || "Category",
-            productDetails?.brandname,
-          ]}
+          paths={["Home", details?.category || "Category", details?.brandname]}
         />
 
         <div className="md:flex gap-10 mt-6 sm:mt-12">
-          <ImageSwiper images={images} discount={discountPercent} />
+          <ImageSwiper images={images} />
 
           <div className="w-full md:w-1/2 mt-8 md:mt-0 flex flex-col px-4 sm:px-6 md:px-0">
-            <div className="flex items-start gap-8">
-              <h2 className="sm:text-4xl text-2xl font-extrabold text-gray-900 mb-3">
-                {productDetails?.genericname || "General Medicine"}
-              </h2>
-              <SocialIcons />
-            </div>
-
-            <h1 className="text-xl font-semibold text-gray-700 mb-2">
-              {productDetails?.brandname} {productDetails?.power}
-            </h1>
-
-            <p className="text-gray-700 leading-relaxed mb-6 text-base md:text-lg text-justify">
-              {productDetails?.description || "No description available."}
-            </p>
-
-            <div className="flex items-center gap-3 mb-2">
-              {price ? (
-                discountPercent > 0 ? (
-                  <>
-                    <span className="text-xl font-semibold text-green-600">
-                      ₹{discountedPrice.toFixed(2)}
-                    </span>
-                    <span className="opacity-55 line-through -mt-2">
-                      ₹{price.toFixed(2)}
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-xl font-semibold text-green-600">
-                    ₹{price.toFixed(2)}
-                  </span>
-                )
-              ) : (
-                <span className="text-red-500">Price not available</span>
-              )}
-            </div>
-
-            <QuantitySelector medicineid={productDetails.id} />
-
-            <div className="mt-8 flex flex-col sm:flex-row gap-4 sm:gap-6 w-full">
-              {/* <button
-                className="w-full sm:flex-1 flex items-center justify-center gap-3 bg-[#0070ba] hover:to-blue-600 text-white font-semibold text-base px-8 py-3 rounded-full cursor-pointer shadow-lg transition-transform transform hover:scale-105 active:scale-95"
-                onClick={handleAddToCartClick}
-              >
-                <i className="ri-shopping-cart-line text-xl"></i>
-                Add to Cart
-              </button> */}
-              <AddToCart productDetails={productDetails} title="Add To Cart" />
-            </div>
+            <ProductDeatilsCard details={details} />
           </div>
         </div>
       </div>

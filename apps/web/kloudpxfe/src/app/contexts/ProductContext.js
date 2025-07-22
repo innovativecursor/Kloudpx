@@ -82,7 +82,7 @@ export const ProductProvider = ({ children }) => {
   const getProductDeatils = async (id) => {
     try {
       const res = await getAxiosCall(endpoints.details.get(id), {}, false);
-      setProductDetails(res?.data?.medicine || []);
+      setProductDetails(res?.data || []);
     } catch (error) {
       console.error("Failed to fetch items by category", error);
       setProductDetails([]);
