@@ -15,7 +15,7 @@ import UserProfile from "../Profile/UserProfile";
 
 const Header = () => {
   const router = useRouter();
-  const { login, loading, user, token, logout } = useAuth();
+  const { login, loading, user, token, logout, isAuthLoaded } = useAuth();
   const { cartLength } = useCartContext();
   const { isOpen, setIsOpen, modalRef } = useModal();
 
@@ -39,7 +39,7 @@ const Header = () => {
 
           {/* Right: User & Cart */}
           <div className="flex items-center gap-4">
-            <div>
+            {/* <div>
               {!loading && user ? (
                 <UserProfile user={user} logout={logout} />
               ) : (
@@ -50,7 +50,21 @@ const Header = () => {
                   {loading ? "Signing In..." : "Login/Signup"}
                 </div>
               )}
+            </div> */}
+
+             <div>
+              {!isAuthLoaded ? null : !loading && user ? (
+                <UserProfile user={user} logout={logout} />
+              ) : (
+                <div
+                  onClick={!loading ? login : undefined}
+                  className="font-semibold sm:text-xs text-xs cursor-pointer"
+                >
+                  {loading ? "Signing In..." : "Login/Signup"}
+                </div>
+              )}
             </div>
+
 
             {/* Cart Icon with Hover */}
             <div

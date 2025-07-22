@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 const { Panel } = Collapse;
 
 function Navbar() {
-  const { logoutUser } = useAuthContext();
+  const { logoutUser, user } = useAuthContext();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [placement, setPlacement] = useState("left");
@@ -28,12 +28,15 @@ function Navbar() {
     navigate("/");
   };
 
+
+
+
   return (
     <div className="bg-white shadow-md px-4 py-3">
       <nav className=" container mx-auto ">
         <div className="flex items-center justify-between">
           {/* Left */}
-          <div className="flex items-center sm:space-x-4 space-x-2 w-full max-w-xl">
+          <div className="flex items-center  sm:space-x-4 space-x-2  md:max-w-xl">
             <button type="primary" onClick={showDrawer}>
               <i className="ri-menu-2-fill sm:text-3xl text-2xl rounded-full p-1"></i>
             </button>
@@ -46,14 +49,15 @@ function Navbar() {
             </NavLink>
           </div>
           {/* Right Side */}
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10">
-              <img
-                src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid&w=740"
-                alt="profile"
-                className="w-full h-full rounded-full object-cover"
-              />
-            </div>
+          <div className="flex items-center  space-x-1">
+
+            {
+              user && (
+                <div className="md:text-base text-sm font-medium text-gray-700">
+                  Hi, {user?.first_name} {user?.last_name}
+                </div>
+              )
+            }
 
             <Tooltip title="Logout">
               <button

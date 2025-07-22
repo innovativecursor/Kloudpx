@@ -1,34 +1,39 @@
 import React from "react";
 import { FaPills, FaCapsules, FaFileInvoice, FaUser } from "react-icons/fa";
 
-const data = [
-  {
-    id: 1,
-    icon: <FaPills />,
-    title: "Medicine",
-    qty: 120,
-  },
-  {
-    id: 2,
-    icon: <FaCapsules />,
-    title: "OTC",
-    qty: 80,
-  },
-  {
-    id: 3,
-    icon: <FaFileInvoice />,
-    title: "Invoices",
-    qty: 45,
-  },
-  {
-    id: 4,
-    icon: <FaUser />,
-    title: "Users",
-    qty: 60,
-  },
-];
 
-const Card = () => {
+const Card = ({ userCount, allItemCount }) => {
+
+  const data = [
+    {
+      id: 1,
+      icon: <FaPills />,
+      title: "Medicine",
+      qty: allItemCount?.total_medicines || 0,
+    },
+    {
+      id: 2,
+      icon: <FaCapsules />,
+      title: "OTC",
+      qty: allItemCount?.
+        otc_medicines || 0,
+    },
+    // {
+    //   id: 3,
+    //   icon: <FaFileInvoice />,
+    //   title: "Invoices",
+    //   qty: 45,
+    // },
+    {
+      id: 3,
+      icon: <FaUser />,
+      title: "Users",
+      qty: userCount || 0,
+    },
+  ];
+
+
+
   return (
     <div className=" mx-3 md:mx-5 grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 md:gap-7 gap-3 ">
       {data.map(({ id, icon, title, qty }) => (

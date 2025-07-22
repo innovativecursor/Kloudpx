@@ -8,7 +8,7 @@ import classNames from "classnames";
 import useProductNavigation from "@/app/hooks/useProductNavigation";
 
 const CartModal = ({ isOpen, onClose }) => {
-  const { token } = useAuth();
+  const { token, isAuthLoaded } = useAuth();
   const router = useRouter();
   const { getCartData, removeFromCart, getAllCartData } = useCartContext();
   const { data, loading } = getCartData;
@@ -23,9 +23,15 @@ const CartModal = ({ isOpen, onClose }) => {
     }
   }, [token]);
 
+  // useEffect(() => {
+  //   getAllCartData();
+  // }, []);
+
   useEffect(() => {
-    getAllCartData();
-  }, []);
+    if (token) {
+      getAllCartData();
+    }
+  }, [token])
 
   const handleCheckout = () => {
     router.push("/Checkout");
@@ -49,7 +55,7 @@ const CartModal = ({ isOpen, onClose }) => {
     (item) => item.prescription_status === "Unsettled"
   );
 
-  // console.log(data);
+  console.log(data, "my data is here");
 
   return (
     <>
@@ -134,6 +140,8 @@ const CartModal = ({ isOpen, onClose }) => {
               ).toFixed(2);
 
               const isUnsettled = item.prescription_status === "Unsettled";
+              const isRejected = item.prescription_status === "Rejected";
+
 
               return (
                 <div
@@ -142,6 +150,7 @@ const CartModal = ({ isOpen, onClose }) => {
                     "flex items-center gap-4 md:p-3 md:shadow-sm rounded-md transition",
                     {
                       "bg-gray-200 opacity-60 pointer-events-none": isUnsettled,
+                      "bg-red-100 border border-red-400": isRejected,
                     }
                   )}
                 >
@@ -192,6 +201,7 @@ const CartModal = ({ isOpen, onClose }) => {
                         </p>
                       )}
                     </div>
+                    <span>Quantity: {item?.quantity}</span>
 
                     {/* Prescription Status (optional label) */}
                     {isUnsettled && (
@@ -199,6 +209,12 @@ const CartModal = ({ isOpen, onClose }) => {
                         Waiting for pharmacist approval before purchase
                       </p>
                     )}
+                    {isRejected && (
+                      <p className="text-xs text-red-500 mt-1">
+                        This item was rejected by the pharmacist.
+                      </p>
+                    )}
+
                   </div>
                 </div>
               );

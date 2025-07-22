@@ -32,12 +32,14 @@ const endpoints = {
     googleLogin: `/v1/auth/google/callback/`,
     googleLoginPharmacist: `/v1/auth/google/callback/pharmacist`,
     refresh: `/v1/auth/refresh`,
+    getCurrentUser: `/v1/pharmacist/info`
   },
   Prescriptions: {
     get: `/v1/pharmacist/all-prescriptions`,
     details: "/v1/pharmacist/prescriptions-details",
     getCart: "/v1/pharmacist/get-prescriptions-cart",
     submitPrescription: "/v1/pharmacist/submit-prescriptions",
+    rejectPrescription: "/v1/pharmacist/reject-prescriptions"
   },
   protected: {
     basic: `/api/v1/protected`,
