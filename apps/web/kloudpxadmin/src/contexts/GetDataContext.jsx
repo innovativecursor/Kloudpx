@@ -1,8 +1,12 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { getAxiosCall, deleteAxiosCall } from "../Axios/UniversalAxiosCalls";
+import {
+  getAxiosCall,
+  deleteAxiosCall,
+  postAxiosCall,
+} from "../Axios/UniversalAxiosCalls";
 import Swal from "sweetalert2";
-import axios from "axios";
-import { store } from "@store";
+// import axios from "axios";
+// import { store } from "@store";
 
 export const GetDataContext = createContext();
 
@@ -48,41 +52,59 @@ const GetDataProvider = ({ children }) => {
     }
   };
 
+  // const uploadExcel = async (file) => {
+  //   if (!file) return;
+
+  //   const formData = new FormData();
+  //   formData.append("file", file);
+
+  //   try {
+  //     store.dispatch({ type: "LOADING", payload: true });
+
+  //     const token = localStorage.getItem("access_token");
+  //     const instance = axios.create({
+  //       baseURL: "http://localhost:10001",
+  //       headers: {
+  //         Authorization: `${token}`,
+  //         Accept: "*/*",
+  //       },
+  //     });
+
+  //     const res = await instance.post("/v1/excel/upload-excel", formData);
+
+  //     Swal.fire({
+  //       icon: "success",
+  //       title: "Upload Successful",
+  //       text: res.data?.message || "Excel file uploaded successfully",
+  //     });
+
+  //     fetchMedicines();
+  //   } catch (error) {
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Upload Failed",
+  //       text: error?.response?.data?.error || "Something went wrong",
+  //     });
+  //   } finally {
+  //     store.dispatch({ type: "LOADING", payload: false });
+  //   }
+  // };
+
   const uploadExcel = async (file) => {
     if (!file) return;
 
     const formData = new FormData();
     formData.append("file", file);
 
-    try {
-      store.dispatch({ type: "LOADING", payload: true });
+    const res = await postAxiosCall("/v1/excel/upload-excel", formData);
 
-      const token = localStorage.getItem("access_token");
-      const instance = axios.create({
-        baseURL: "http://localhost:10001",
-        headers: {
-          Authorization: `${token}`,
-          Accept: "*/*",
-        },
-      });
-
-      const res = await instance.post("/v1/excel/upload-excel", formData);
-
+    if (res?.message) {
       Swal.fire({
         icon: "success",
         title: "Upload Successful",
-        text: res.data?.message || "Excel file uploaded successfully",
+        text: res.message,
       });
-
       fetchMedicines();
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Upload Failed",
-        text: error?.response?.data?.error || "Something went wrong",
-      });
-    } finally {
-      store.dispatch({ type: "LOADING", payload: false });
     }
   };
 

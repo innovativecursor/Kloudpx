@@ -13,11 +13,27 @@ export const CarouselContext = createContext();
 const CarouselProvider = ({ children }) => {
   const { convertToBase64 } = useBase64Converter();
   const [carouselImages, setCarouselImages] = useState([]);
+  const [userData, setUserData] = useState([]);
+  const [allItemCount, setAllItemCount] = useState([]);
 
   const getAllCarouselImages = async () => {
     const res = await getAxiosCall("/v1/carousel/get-all-carousel-img");
     if (res?.data?.data) {
       setCarouselImages(res.data.data);
+    }
+  };
+
+  const getAllUserData = async () => {
+    const res = await getAxiosCall("/v1/admin/admin-dash-userinfo");
+    if (res?.data) {
+      setUserData(res.data);
+    }
+  };
+
+  const getAllItemData = async () => {
+    const res = await getAxiosCall("/v1/admin/admin-dash-medicinecount");
+    if (res?.data) {
+      setAllItemCount(res.data);
     }
   };
 
@@ -70,6 +86,10 @@ const CarouselProvider = ({ children }) => {
         uploadCarouselImage,
         toggleCarouselStatus,
         deleteCarouselImage,
+        getAllUserData,
+        userData,
+        allItemCount,
+        getAllItemData,
       }}
     >
       {children}

@@ -8,6 +8,7 @@ const endpoints = {
   auth: {
     googleLogin: `${baseUrl}/v1/auth/google/callback`,
     refresh: `${baseUrl}/v1/auth/refresh`,
+    getCurrentUser: `${baseUrl}/v1/admin/admin-info`
   },
   generic: {
     get: `${baseUrl}/v1/generic/get-generic`,
@@ -34,7 +35,12 @@ const endpoints = {
     get: `${baseUrl}/v1/carousel/get-all-carousel-img`,
     add: `${baseUrl}/v1/carousel/add-carousel-img`,
   },
-
+  userCount: {
+    get: `${baseUrl}/v1/admin/admin-dash-userinfo`,
+  },
+  medicineCount: {
+    get: `${baseUrl}/v1/admin/admin-dash-medicinecount`,
+  },
   protected: {
     basic: `${baseUrl}/api/v1/protected`,
     admin: `${baseUrl}/api/v1/admin`,

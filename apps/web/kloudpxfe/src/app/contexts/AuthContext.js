@@ -14,12 +14,13 @@ export const AuthProvider = ({ children }) => {
 
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
+  const [isAuthLoaded, setIsAuthLoaded] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const t = localStorage.getItem("access_token");
-      // const t = sessionStorage.getItem("access_token");
       setToken(t);
+      setIsAuthLoaded(true);
     }
   }, []);
 
@@ -47,12 +48,10 @@ export const AuthProvider = ({ children }) => {
         const res = await getAxiosCall(
           endpoints.auth.googleLogin + `?code=${encodedCode}`
         );
-        // console.log(res);
         const token = res?.data?.token;
         if (!token) throw new Error("Token missing from server");
 
         localStorage.setItem("access_token", token);
-        // sessionStorage.setItem("access_token", token);
         setToken(token);
 
         router.push("/");
@@ -81,6 +80,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         isAuthenticated: !!token,
         user,
+         isAuthLoaded,
       }}
     >
       {children}

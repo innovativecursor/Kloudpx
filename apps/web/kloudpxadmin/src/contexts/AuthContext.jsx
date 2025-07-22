@@ -19,12 +19,53 @@ const AuthProvider = ({ children }) => {
   const [medicineError, setMedicineError] = useState("");
 
   // --------- AUTH FUNCTIONS ---------
-  const loginUser = (userData, token) => {
+
+
+
+  const fetchAdminInfo = async () => {
+    try {
+      const res = await getAxiosCall("/v1/admin/admin-info");
+      // console.log(res, "res");
+
+      if (res && res.data) {
+        return res.data;
+      } else {
+        throw new Error("Failed to fetch admin info");
+      }
+    } catch (error) {
+      console.error("fetchAdminInfo error:", error);
+      Swal.fire({
+        title: "Error",
+        text: "Failed to fetch admin info. Please login again.",
+        icon: "error",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+      return null;
+    }
+  };
+
+
+
+  const loginUser = async (userData, token) => {
     localStorage.setItem("access_token", token);
-    setUser(userData);
     setToken(token);
     setIsAuthenticated(true);
+
+    const adminInfo = await fetchAdminInfo();
+    if (adminInfo) {
+      setUser(adminInfo);
+    } else {
+      setUser(userData);
+    }
   };
+
+  // const loginUser = (userData, token) => {
+  //   localStorage.setItem("access_token", token);
+  //   setUser(userData);
+  //   setToken(token);
+  //   setIsAuthenticated(true);
+  // };
 
   const logoutUser = () => {
     localStorage.removeItem("access_token");
@@ -66,6 +107,9 @@ const AuthProvider = ({ children }) => {
       setMedicineError("Failed to fetch medicines.");
     }
   };
+
+  // console.log(user);
+
 
   return (
     <AuthContext.Provider

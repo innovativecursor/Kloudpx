@@ -57,7 +57,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const removeFromCart = async (id) => {
-    // console.log(id, "cart id is here");
+    // if (!token) return;
     try {
       await deleteAxiosCall(endpoints.cart.remove(id), true);
       toast.success("Item removed from cart!");

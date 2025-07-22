@@ -12,11 +12,13 @@ export let postAxiosCall = async (endpoint, data) => {
       Accept: "*/*",
       Authorization: `${localStorage.getItem("access_token")}`,
     };
+    const isFormData = data instanceof FormData;
     // Create an Axios instance with default configuration
     const instance = axios.create({
       baseURL: process.env.REACT_APP_UAT_URL, // Your API's base URL
       headers: {
-        "Content-Type": "application/json", // Default content type (you can customize this)
+        // "Content-Type": "application/json", // Default content type (you can customize this)
+          ...(isFormData ? {} : { "Content-Type": "application/json" }),
         ..._headers, // Merge custom headers with default headers
       },
       // ...config, // Additional Axios request configuration

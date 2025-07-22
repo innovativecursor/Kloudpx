@@ -9,6 +9,7 @@ const CustomModal = ({ isOpen, onClose, selectedPrescription }) => {
     approvePrescription,
     fetchPrescriptionsDetails,
     fetchAllPrescriptions,
+    rejectPrescription
   } = usePrescriptionContext();
 
   useEffect(() => {
@@ -19,34 +20,66 @@ const CustomModal = ({ isOpen, onClose, selectedPrescription }) => {
 
   if (!isOpen) return null;
 
-const handleApprove = async () => {
-  if (!selectedPrescription?.ID) return;
+  const handleApprove = async () => {
+    if (!selectedPrescription?.ID) return;
 
-  const res = await approvePrescription(selectedPrescription.ID);
+    const res = await approvePrescription(selectedPrescription.ID);
 
-  if (res) {
-    await fetchPrescriptionsDetails(selectedPrescription.UserID);
-    await fetchPrescriptionCartById(selectedPrescription.ID);
-    await fetchAllPrescriptions();
+    if (res) {
+      await fetchPrescriptionsDetails(selectedPrescription.UserID);
+      await fetchPrescriptionCartById(selectedPrescription.ID);
+      await fetchAllPrescriptions();
 
-    Swal.fire({
-      icon: "success",
-      title: "Success!",
-      text: "Prescription approved successfully!",
-      timer: 2000,
-      showConfirmButton: false,
-    });
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Prescription approved successfully!",
+        timer: 2000,
+        showConfirmButton: false,
+      });
 
-    onClose();
-  } else {
-    Swal.fire({
-      icon: "error",
-      title: "Oops...",
-      text: "Failed to approve prescription.",
-    });
-  }
-};
+      onClose();
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to approve prescription.",
+      });
+    }
+  };
 
+
+
+  const handleReject = async () => {
+    if (!selectedPrescription?.ID) return;
+
+    console.log(selectedPrescription?.ID);
+
+
+    const res = await rejectPrescription(selectedPrescription.ID);
+
+    if (res) {
+      await fetchPrescriptionsDetails(selectedPrescription.UserID);
+      await fetchPrescriptionCartById(selectedPrescription.ID);
+      await fetchAllPrescriptions();
+
+      Swal.fire({
+        icon: "success",
+        title: "Rejected!",
+        text: "Prescription rejected successfully.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
+      onClose();
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to reject prescription.",
+      });
+    }
+  };
 
 
   return (
@@ -86,7 +119,7 @@ const handleApprove = async () => {
               </h3>
 
               {Array.isArray(prescriptionCart) &&
-              prescriptionCart.length > 0 ? (
+                prescriptionCart.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-sm text-left border">
                     <thead className="bg-gray-200 text-gray-700 font-semibold">
@@ -117,12 +150,20 @@ const handleApprove = async () => {
                           <td className="px-4 py-2 border">{item.Quantity}</td>
                           <td className="px-4 py-2 border">
                             {selectedPrescription?.Status === "unsettled" ? (
-                              <button
-                                onClick={handleApprove}
-                                className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-                              >
-                                Approve
-                              </button>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={handleApprove}
+                                  className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                                >
+                                  Approve
+                                </button>
+                                <button
+                                  onClick={handleReject}
+                                  className="bg-red-400 text-white px-3 py-1 rounded hover:bg-red-700"
+                                >
+                                  Reject
+                                </button>
+                              </div>
                             ) : (
                               <span className="text-gray-500 text-sm italic">
                                 Already Approved
