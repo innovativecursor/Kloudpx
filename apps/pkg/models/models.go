@@ -138,3 +138,59 @@ type GalleryImage struct {
 	IsActive   bool
 	ButtonText string
 }
+
+type Midwives struct {
+	gorm.Model
+	FirstName    string `gorm:"not null"`
+	LastName     string `gorm:"not null"`
+	MiddleName   string
+	Municipality string `gorm:"not null"`
+	Province     string `gorm:"not null"`
+}
+
+type Hospital struct {
+	gorm.Model
+	Region       string `gorm:"not null"`
+	Province     string `gorm:"not null"`
+	Name         string `gorm:"not null"`
+	BedCount     int
+	Category     string
+	Telephone    string
+	Email        string
+	Street       string
+	Municipality string
+	Sector       string
+	Head         string
+}
+
+type Physician struct {
+	gorm.Model
+	FirstName    string `gorm:"not null"`
+	LastName     string `gorm:"not null"`
+	MiddleName   string
+	Specialty    string `gorm:"not null"`
+	Municipality string `gorm:"not null"`
+	Province     string `gorm:"not null"`
+}
+
+type KonsultaProvider struct {
+	gorm.Model
+	Region       string `gorm:"not null"`
+	Province     string `gorm:"not null"`
+	FacilityName string `gorm:"not null"`
+	Telephone    string
+	Email        string
+	Street       string
+	Municipality string `gorm:"not null"`
+	Sector       string
+	Head         string
+}
+
+type Dentist struct {
+	gorm.Model
+	LastName     string `gorm:"not null" json:"last_name"`
+	FirstName    string `gorm:"not null" json:"first_name"`
+	MiddleName   string `json:"middle_name"`
+	Municipality string `json:"municipality"`
+	Province     string `json:"province"`
+}

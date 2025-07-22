@@ -154,6 +154,26 @@ func Admin(db *gorm.DB) {
 		uploadexcel.UploadMedicineExcel(c, db)
 	})
 
+	apiV1.POST("/excel/upload-midwives-excel", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		uploadexcel.UploadMidwivesExcel(c, db)
+	})
+
+	apiV1.POST("/excel/upload-hospital-excel", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		uploadexcel.UploadHospitalsExcel(c, db)
+	})
+
+	apiV1.POST("/excel/upload-physician-excel", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		uploadexcel.UploadPhysiciansExcel(c, db)
+	})
+
+	apiV1.POST("/excel/upload-konsulta-providers-excel", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		uploadexcel.UploadKonsultaProvidersExcel(c, db)
+	})
+
+	apiV1.POST("/excel/upload-dentists-excel", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		uploadexcel.UploadDentists(c, db)
+	})
+
 	//admin info dash
 	apiV1.GET("/admin/admin-info", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		dashboard.GetCurrentAdminInfo(c, db)

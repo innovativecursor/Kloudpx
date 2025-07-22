@@ -142,3 +142,303 @@ func UploadMedicineExcel(c *gin.Context, db *gorm.DB) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Excel data uploaded successfully"})
 }
+
+func UploadMidwivesExcel(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+	userObj, ok := user.(*models.Admin)
+	if !ok || userObj.ApplicationRole != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Only admins can upload midwives data"})
+		return
+	}
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Excel file is required"})
+		return
+	}
+
+	src, err := file.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open file"})
+		return
+	}
+	defer src.Close()
+
+	xlFile, err := excelize.OpenReader(src)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse Excel"})
+		return
+	}
+
+	sheet := xlFile.GetSheetName(0)
+	rows, err := xlFile.GetRows(sheet)
+	if err != nil || len(rows) < 2 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or empty Excel"})
+		return
+	}
+
+	for i, row := range rows[1:] {
+		if len(row) < 6 {
+			continue
+		}
+
+		midwife := models.Midwives{
+			LastName:     strings.TrimSpace(row[1]),
+			FirstName:    strings.TrimSpace(row[2]),
+			MiddleName:   strings.TrimSpace(row[3]),
+			Municipality: strings.TrimSpace(row[4]),
+			Province:     strings.TrimSpace(row[5]),
+		}
+
+		if err := db.Create(&midwife).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to save midwife", i+2)})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Midwives uploaded successfully"})
+}
+
+// hospital list
+func UploadHospitalsExcel(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+	userObj, ok := user.(*models.Admin)
+	if !ok || userObj.ApplicationRole != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Only admins can upload hospital data"})
+		return
+	}
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Excel file is required"})
+		return
+	}
+
+	src, err := file.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open file"})
+		return
+	}
+	defer src.Close()
+
+	xlFile, err := excelize.OpenReader(src)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read Excel file"})
+		return
+	}
+
+	sheet := xlFile.GetSheetName(0)
+	rows, err := xlFile.GetRows(sheet)
+	if err != nil || len(rows) < 2 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or empty Excel"})
+		return
+	}
+
+	for i, row := range rows[2:] { // Skip header + 1 blank
+		if len(row) < 12 {
+			continue
+		}
+
+		hospital := models.Hospital{
+			Region:   strings.TrimSpace(row[0]),
+			Province: strings.TrimSpace(row[1]),
+			Name:     strings.TrimSpace(row[3]),
+		}
+
+		// Optional and parsed fields
+		fmt.Sscanf(strings.TrimSpace(row[4]), "%d", &hospital.BedCount)
+		hospital.Category = strings.TrimSpace(row[5])
+		hospital.Telephone = strings.TrimSpace(row[6])
+		hospital.Email = strings.TrimSpace(row[7])
+		hospital.Street = strings.TrimSpace(row[8])
+		hospital.Municipality = strings.TrimSpace(row[9])
+		hospital.Sector = strings.TrimSpace(row[10])
+		hospital.Head = strings.TrimSpace(row[11])
+
+		if err := db.Create(&hospital).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to save hospital", i+3)})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Hospitals uploaded successfully"})
+}
+
+// physician
+func UploadPhysiciansExcel(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+	userObj, ok := user.(*models.Admin)
+	if !ok || userObj.ApplicationRole != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Only admins can upload physician data"})
+		return
+	}
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Excel file is required"})
+		return
+	}
+
+	src, err := file.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open file"})
+		return
+	}
+	defer src.Close()
+
+	xlFile, err := excelize.OpenReader(src)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read Excel file"})
+		return
+	}
+
+	sheet := xlFile.GetSheetName(0)
+	rows, err := xlFile.GetRows(sheet)
+	if err != nil || len(rows) < 2 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or empty Excel"})
+		return
+	}
+
+	for i, row := range rows[1:] {
+		if len(row) < 7 {
+			continue
+		}
+
+		physician := models.Physician{
+			LastName:     strings.TrimSpace(row[1]),
+			FirstName:    strings.TrimSpace(row[2]),
+			MiddleName:   strings.TrimSpace(row[3]),
+			Specialty:    strings.TrimSpace(row[4]),
+			Municipality: strings.TrimSpace(row[5]),
+			Province:     strings.TrimSpace(row[6]),
+		}
+
+		if err := db.Create(&physician).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to save physician", i+2)})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Physicians uploaded successfully"})
+}
+
+func UploadKonsultaProvidersExcel(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+	userObj, ok := user.(*models.Admin)
+	if !ok || userObj.ApplicationRole != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Only admins can upload Konsulta Providers"})
+		return
+	}
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Excel file is required"})
+		return
+	}
+
+	src, err := file.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open file"})
+		return
+	}
+	defer src.Close()
+
+	xlFile, err := excelize.OpenReader(src)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse Excel"})
+		return
+	}
+
+	sheet := xlFile.GetSheetName(0)
+	rows, err := xlFile.GetRows(sheet)
+	if err != nil || len(rows) < 2 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or empty Excel"})
+		return
+	}
+
+	for i, row := range rows[1:] {
+		if len(row) < 10 {
+			continue
+		}
+
+		provider := models.KonsultaProvider{
+			Region:       strings.TrimSpace(row[0]),
+			Province:     strings.TrimSpace(row[1]),
+			FacilityName: strings.TrimSpace(row[3]),
+			Telephone:    strings.TrimSpace(row[4]),
+			Email:        strings.TrimSpace(row[5]),
+			Street:       strings.TrimSpace(row[6]),
+			Municipality: strings.TrimSpace(row[7]),
+			Sector:       strings.TrimSpace(row[8]),
+			Head:         strings.TrimSpace(row[9]),
+		}
+
+		if err := db.Create(&provider).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to save provider", i+2)})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Konsulta providers uploaded successfully"})
+}
+
+func UploadDentists(c *gin.Context, db *gorm.DB) {
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "File upload failed"})
+		return
+	}
+
+	f, err := file.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot open file"})
+		return
+	}
+	defer f.Close()
+
+	xlFile, err := excelize.OpenReader(f)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read Excel"})
+		return
+	}
+
+	rows, err := xlFile.GetRows(xlFile.GetSheetName(0))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot get Excel rows"})
+		return
+	}
+
+	for i, row := range rows {
+		if i == 0 || len(row) < 6 {
+			continue
+		}
+
+		dentist := models.Dentist{
+			LastName:     strings.TrimSpace(row[1]),
+			FirstName:    strings.TrimSpace(row[2]),
+			MiddleName:   strings.TrimSpace(row[3]),
+			Municipality: strings.TrimSpace(row[4]),
+			Province:     strings.TrimSpace(row[5]),
+		}
+
+		db.Create(&dentist)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Dentist data uploaded successfully"})
+}
