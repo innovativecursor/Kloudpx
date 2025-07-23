@@ -1,10 +1,4 @@
-// const baseURLLive = "https://api.admin.kloudpx.com";
-// const baseURLDev = "http://localhost:10001";
-
 import { baseUrls } from "../../../../config/env";
-
-// const isLive = false;
-// const baseUrl = isLive ? baseURLLive : baseURLDev;
 
 const baseUrl = baseUrls.admin;
 
