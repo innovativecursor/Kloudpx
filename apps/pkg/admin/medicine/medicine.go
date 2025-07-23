@@ -316,3 +316,46 @@ func DeleteMedicine(c *gin.Context, db *gorm.DB) {
 		"message": "Medicine deleted successfully",
 	})
 }
+
+func DeleteAllMedicines(c *gin.Context, db *gorm.DB) {
+	// Check if user exists in context
+	user, exists := c.Get("user")
+	if !exists {
+		logrus.Warn("Unauthorized access: user not found in context")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Assert user type
+	userObj, ok := user.(*models.Admin)
+	if !ok {
+		logrus.WithField("user", user).Warn("Unauthorized access: invalid user object")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
+		return
+	}
+
+	// Check admin role
+	if userObj.ApplicationRole != "admin" {
+		logrus.WithField("user_id", userObj.ID).Warn("Unauthorized access: non-admin tried to delete all medicines")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Only admins can delete medicines"})
+		return
+	}
+
+	// Delete all associated item images first
+	if err := db.Unscoped().Where("1 = 1").Delete(&models.ItemImage{}).Error; err != nil {
+		logrus.WithError(err).Error("Failed to delete all associated item images")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete associated item images"})
+		return
+	}
+
+	// Delete all medicines (hard delete)
+	if err := db.Unscoped().Where("1 = 1").Delete(&models.Medicine{}).Error; err != nil {
+		logrus.WithError(err).Error("Failed to delete all medicines")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete medicines"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "All medicines and associated item images deleted successfully",
+	})
+}

@@ -113,6 +113,9 @@ func Admin(db *gorm.DB) {
 	apiV1.DELETE("/medicine/delete-medicine/:id", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		medicine.DeleteMedicine(c, db)
 	})
+	apiV1.DELETE("/medicine/delete-medicine-all", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		medicine.DeleteAllMedicines(c, db)
+	})
 
 	//cms
 	//carousel
@@ -152,6 +155,26 @@ func Admin(db *gorm.DB) {
 	//upload excel
 	apiV1.POST("/excel/upload-excel", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		uploadexcel.UploadMedicineExcel(c, db)
+	})
+
+	apiV1.POST("/excel/upload-midwives-excel", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		uploadexcel.UploadMidwivesExcel(c, db)
+	})
+
+	apiV1.POST("/excel/upload-hospital-excel", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		uploadexcel.UploadHospitalsExcel(c, db)
+	})
+
+	apiV1.POST("/excel/upload-physician-excel", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		uploadexcel.UploadPhysiciansExcel(c, db)
+	})
+
+	apiV1.POST("/excel/upload-konsulta-providers-excel", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		uploadexcel.UploadKonsultaProvidersExcel(c, db)
+	})
+
+	apiV1.POST("/excel/upload-dentists-excel", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		uploadexcel.UploadDentists(c, db)
 	})
 
 	//admin info dash
