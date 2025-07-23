@@ -113,6 +113,9 @@ func Admin(db *gorm.DB) {
 	apiV1.DELETE("/medicine/delete-medicine/:id", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		medicine.DeleteMedicine(c, db)
 	})
+	apiV1.DELETE("/medicine/delete-medicine-all", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		medicine.DeleteAllMedicines(c, db)
+	})
 
 	//cms
 	//carousel
