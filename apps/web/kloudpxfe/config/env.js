@@ -1,4 +1,4 @@
-const isLive = process.env.NODE_ENV === "production";
+const isLive = true;
 
 const baseUrls = {
   users: isLive ? "https://api.user.kloudpx.com" : "http://localhost:10003",
