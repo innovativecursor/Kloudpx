@@ -29,7 +29,7 @@ const ProductDeatilsCard = ({ details }) => {
           </h1>
           <SocialIcons />
         </div>
-        <div className="flex items-center  gap-3 mb-2 mt-8">
+        <div className="flex items-center  gap-3 mb-2 mt-5 sm:mt-8">
           {price ? (
             discountPercent > 0 ? (
               <div className="text-2xl flex items-center gap-5">
@@ -41,7 +41,7 @@ const ProductDeatilsCard = ({ details }) => {
                 </span>
 
                 <div className=" bg-blue-100 text-color  text-base px-5 py-1.5 rounded-full font-semibold z-10">
-                  {details?.discount}%
+                  {details?.discount}
                 </div>
               </div>
             ) : (
@@ -54,7 +54,7 @@ const ProductDeatilsCard = ({ details }) => {
           )}
         </div>
 
-        <p className="opacity-60 leading-relaxed items-start sm:mb-10 mb-6 mt-7  text-sm md:text-lg text-justify">
+        <p className="opacity-60 leading-relaxed items-start sm:mb-10 mb-4 mt-5 text-sm md:text-lg text-justify">
           {details?.description || "No description available."}
         </p>
 
@@ -69,7 +69,7 @@ const ProductDeatilsCard = ({ details }) => {
         </div>
       </div>
 
-<div className="w-full max-w-3xl mx-auto rounded-lg bg-[#f0f8ff]  text-sm mt-12">
+<div className="w-full max-w-3xl mx-auto rounded-lg bg-[#f0f8ff]  text-sm sm:mt-12 mt-7">
       {/* Delivery row */}
       <div className="flex items-start gap-4 p-4 border-b border-blue-100">
         <RiTruckLine className="w-8 h-8 mt-0.5 text-blue-900" />

@@ -7,6 +7,7 @@ import { useImageContext } from "./ImageContext";
 import { postAxiosCall, updateAxiosCall } from "../Axios/UniversalAxiosCalls";
 import { useCategoryContext } from "./CategoryContext";
 import { useNavigate } from "react-router-dom";
+import endpoints from "../config/endpoints";
 
 export const AddItemsContext = createContext();
 
@@ -97,24 +98,12 @@ const AddItemsProvider = ({ children }) => {
       isfeature: isfeature,
     };
 
-    // console.log("📦 Payload ready to send:", payload);
-
     try {
       if (medicineId) {
-        await updateAxiosCall(
-          "/v1/medicine/update-medicine",
-          // endpoints.medicine.update,
-
-          medicineId,
-          payload
-        );
+        await updateAxiosCall(endpoints.medicine.update(medicineId), payload);
         Swal.fire("✅ Success", "Medicine updated!", "success");
       } else {
-        await postAxiosCall(
-          "/v1/medicine/add-medicine",
-          // endpoints.medicine.add,
-          payload
-        );
+        await postAxiosCall(endpoints.medicine.add, payload);
         Swal.fire("✅ Success", "Medicine added!", "success");
       }
       setBrandName("");
@@ -164,7 +153,6 @@ const AddItemsProvider = ({ children }) => {
     }
   };
 
-  // console.log(uploadedImageIds);
 
   return (
     <AddItemsContext.Provider value={{ handleSubmit }}>

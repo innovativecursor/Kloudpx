@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { getAxiosCall } from "../Axios/UniversalAxiosCalls";
 import Swal from "sweetalert2";
+import endpoints from "../config/endpoints";
 
 export const AuthContext = createContext();
 
@@ -35,9 +36,7 @@ const AuthProvider = ({ children }) => {
 
   const fetchAdminInfo = async () => {
     try {
-      const res = await getAxiosCall("/v1/admin/admin-info");
-      // console.log(res, "res");
-
+      const res = await getAxiosCall(endpoints.admininfo.get);
       if (res && res.data) {
         return res.data;
       } else {
@@ -69,13 +68,6 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // const loginUser = (userData, token) => {
-  //   localStorage.setItem("access_token", token);
-  //   setUser(userData);
-  //   setToken(token);
-  //   setIsAuthenticated(true);
-  // };
-
   const logoutUser = () => {
     localStorage.removeItem("access_token");
     setUser(null);
@@ -98,29 +90,6 @@ const AuthProvider = ({ children }) => {
     return true;
   };
 
-  // --------- MEDICINES ---------
-  const getAllMedicines = async () => {
-    if (!checkToken()) {
-      setMedicineError("Token missing, please login.");
-      return;
-    }
-    try {
-      const res = await getAxiosCall("/v1/medicine/get-all-medicine");
-      // console.log(res, "medivine data");
-
-      if (res?.data?.medicines) {
-        setMedicines(res.data.medicines);
-        setMedicineError("");
-      } else {
-        setMedicineError("Failed to fetch medicines.");
-      }
-    } catch (error) {
-      setMedicineError("Failed to fetch medicines.");
-    }
-  };
-
-  // console.log(user);
-
   return (
     <AuthContext.Provider
       value={{
@@ -134,7 +103,6 @@ const AuthProvider = ({ children }) => {
         checkToken,
         medicines,
         medicineError,
-        getAllMedicines,
       }}
     >
       {children}

@@ -3,6 +3,7 @@ import { useImageContext } from "../../contexts/ImageContext";
 import { useLocation } from "react-router-dom";
 import imageCompression from "browser-image-compression";
 import { deleteAxiosCall } from "../../Axios/UniversalAxiosCalls";
+import endpoints from "../../config/endpoints";
 
 const ImageUploader = () => {
   const {
@@ -75,10 +76,9 @@ const ImageUploader = () => {
 
     try {
       const res = await deleteAxiosCall(
-        "/v1/itemimage/delete-itemimage",
-        imageIdToDelete
+        // "/v1/itemimage/delete-itemimage",
+        endpoints.itemimage.delete(imageIdToDelete)
       );
-      // console.log("🗑️ Deleted image successfully:", res);
 
       // Now update the UI
       const updatedUrls = [...existingImages];

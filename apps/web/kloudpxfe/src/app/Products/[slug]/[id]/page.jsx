@@ -35,7 +35,7 @@ const ProductDetails = () => {
   const images = details.images?.length > 0 ? details.images : [fallbackImage];
   const similarProduuct = productDetails?.related_medicines;
 
-  console.log(productDetails);
+  // console.log(productDetails);
 
   return (
     <div className=" pb-10 min-h-screen md:mt-52 sm:mt-48 mt-40">
@@ -61,7 +61,7 @@ const ProductDetails = () => {
         ) : null}
       </div>
 
- <ProDetailsDes />
+      <ProDetailsDes details={details} />
 
       <div className="mt-10 sm:mt-16 md:mt-24">
         <img

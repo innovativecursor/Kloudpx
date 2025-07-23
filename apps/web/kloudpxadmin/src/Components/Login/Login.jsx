@@ -16,7 +16,7 @@ const Login = () => {
     onSuccess: async (codeResponse) => {
       setLoading(true);
       try {
-        const res = await getAxiosCall(`/v1/auth/google/callback`, {
+        const res = await getAxiosCall(endpoints.auth.googleLogin, {
           code: codeResponse.code,
         });
 
