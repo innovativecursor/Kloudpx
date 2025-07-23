@@ -1,4 +1,4 @@
-import { baseUrls } from "./env";
+import { baseUrls } from "../../../config/env";
 
 const baseUrl = baseUrls.users;
 
