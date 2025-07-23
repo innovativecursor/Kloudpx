@@ -3,7 +3,9 @@ package uploadexcel
 import (
 	"fmt"
 	"net/http"
+	"reflect"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
@@ -193,6 +195,18 @@ func UploadMedicineExcel(c *gin.Context, db *gorm.DB) {
 			return ""
 		}
 
+		// Skip completely empty rows
+		isEmptyRow := true
+		for _, cell := range row {
+			if strings.TrimSpace(cell) != "" {
+				isEmptyRow = false
+				break
+			}
+		}
+		if isEmptyRow {
+			continue
+		}
+
 		unitOfMeasurement := getCell(8)
 		numberOfPiecesStr := getCell(17)
 		var numberOfPieces int
@@ -277,14 +291,43 @@ func UploadMedicineExcel(c *gin.Context, db *gorm.DB) {
 		fmt.Sscanf(getCell(19), "%d", &medicine.MaximumThreshold)
 		fmt.Sscanf(getCell(20), "%d", &medicine.EstimatedLeadTimeDays)
 
-		// Save to DB
-		if err := db.Create(&medicine).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to save medicine", i+2)})
+		var existingMedicines []models.Medicine
+		err := db.Where(
+			"brand_name = ? AND generic_id = ? AND supplier_id = ? AND power = ? AND unit_of_measurement = ? AND measurement_unit_value = ?",
+			medicine.BrandName, medicine.GenericID, medicine.SupplierID,
+			medicine.Power, medicine.UnitOfMeasurement, medicine.MeasurementUnitValue,
+		).Find(&existingMedicines).Error
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: DB error: %v", i+2, err)})
 			return
 		}
+
+		exactMatchFound := false
+		for _, m := range existingMedicines {
+			if reflect.DeepEqual(stripAutoFields(m), stripAutoFields(medicine)) {
+				exactMatchFound = true
+				break
+			}
+		}
+
+		if !exactMatchFound {
+			if err := db.Create(&medicine).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to create medicine", i+2)})
+				return
+			}
+		}
+
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Excel data uploaded successfully"})
+}
+func stripAutoFields(m models.Medicine) models.Medicine {
+	m.ID = 0
+	m.CreatedAt = time.Time{}
+	m.UpdatedAt = time.Time{}
+	m.DeletedAt = gorm.DeletedAt{}
+	return m
 }
 
 func UploadMidwivesExcel(c *gin.Context, db *gorm.DB) {

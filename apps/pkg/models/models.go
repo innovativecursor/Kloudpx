@@ -117,13 +117,15 @@ type Prescription struct {
 // Many-to-many (cart) between prescription and medicines
 type Cart struct {
 	gorm.Model
-	UserID         uint
-	PrescriptionID *uint         // Nullable — present only for prescribed medicines
-	Prescription   *Prescription // Nullable
-	MedicineID     uint
-	Medicine       Medicine
-	Quantity       int
-	IsOTC          bool // NEW: explicitly marks whether it’s OTC
+	UserID            uint
+	PrescriptionID    *uint         // Nullable — present only for prescribed medicines
+	Prescription      *Prescription // Nullable
+	MedicineID        uint
+	Medicine          Medicine
+	Quantity          int
+	IsOTC             bool // NEW: explicitly marks whether it’s OTC
+	CheckoutSessionID *uint
+	IsSavedForLater   bool `gorm:"default:false"`
 }
 
 type CarouselImage struct {
@@ -193,4 +195,26 @@ type Dentist struct {
 	MiddleName   string `json:"middle_name"`
 	Municipality string `json:"municipality"`
 	Province     string `json:"province"`
+}
+
+type Address struct {
+	gorm.Model
+	UserID        uint
+	User          User `gorm:"foreignKey:UserID"`
+	NameResidency string
+	Region        string
+	Province      string
+	City          string
+	ZipCode       string
+	IsDefault     bool
+}
+
+type CheckoutSession struct {
+	gorm.Model
+	UserID       uint
+	AddressID    *uint
+	DeliveryType string
+	DeliveryCost int
+	Status       string // pending, completed
+	CartItems    []Cart `gorm:"foreignKey:CheckoutSessionID"`
 }
