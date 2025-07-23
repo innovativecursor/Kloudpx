@@ -1,6 +1,7 @@
 import { createContext, useContext, useState } from "react";
 import { postAxiosCall } from "../Axios/UniversalAxiosCalls";
 import Swal from "sweetalert2";
+import endpoints from "../config/endpoints";
 
 export const ImageContext = createContext();
 
@@ -18,11 +19,7 @@ export const ImageProvider = ({ children }) => {
         item_id: itemId,
         images: cleanBase64Images,
       };
-
-      // console.log("📦 Sending to API:", payload);
-
-      const res = await postAxiosCall("/v1/itemimage/add-itemimage", payload);
-      // console.log("✅ res data is here:", res);
+      const res = await postAxiosCall(endpoints.itemimage.add, payload);
       const imageIds = res?.image_ids || [];
 
       setUploadedImageIds(imageIds);

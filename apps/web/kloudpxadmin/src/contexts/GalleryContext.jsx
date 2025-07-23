@@ -7,6 +7,7 @@ import {
   updateAxiosCall,
   deleteAxiosCall,
 } from "../Axios/UniversalAxiosCalls";
+import endpoints from "../config/endpoints";
 
 export const GalleryContext = createContext();
 
@@ -15,7 +16,7 @@ const GalleryProvider = ({ children }) => {
   const [Images, setImages] = useState([]);
 
   const getAllImages = async () => {
-    const res = await getAxiosCall("/v1/gallery/get-all-gallery-img");
+    const res = await getAxiosCall(endpoints.gallery.get);
     if (res?.data?.data) {
       setImages(res.data.data);
     }
@@ -29,7 +30,7 @@ const GalleryProvider = ({ children }) => {
         galleryimg: base64,
       };
 
-      const res = await postAxiosCall("/v1/gallery/add-gallery-img", payload);
+      const res = await postAxiosCall(endpoints.gallery.add, payload);
 
       if (res?.message) {
         Swal.fire("Success", res.message, "success");
@@ -44,7 +45,7 @@ const GalleryProvider = ({ children }) => {
 
   const toggleImagesStatus = async (id) => {
     try {
-      const res = await updateAxiosCall(`/v1/gallery/update-status`, id, {});
+      const res = await updateAxiosCall(endpoints.gallery.updateStatus(id), {});
       if (res?.message) {
         Swal.fire("Success", res.message, "success");
         await getAllImages();
@@ -55,8 +56,10 @@ const GalleryProvider = ({ children }) => {
   };
 
   const deleteImage = async (id) => {
+    console.log(id, "is here");
+    
     try {
-      const res = await deleteAxiosCall(`/v1/gallery/delete-gallery-img`, id);
+      const res = await deleteAxiosCall(endpoints.gallery.delete(id));
       if (res?.message) {
         Swal.fire("Success", res.message, "success");
         await getAllImages();

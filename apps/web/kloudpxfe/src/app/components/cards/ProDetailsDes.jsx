@@ -1,11 +1,121 @@
-import React from 'react'
+"use client";
+import React from "react";
+import sale2 from "@/assets/detailspic.svg";
+const ProDetailsDes = ({ details }) => {
+  console.log(details);
 
-const ProDetailsDes = () => {
   return (
-    <div>
-      
-    </div>
-  )
-}
+    <div className="responsive-mx pt-7 md:pt-16   grid grid-cols-1 lg:grid-cols-3 gap-16">
+      {/* LEFT: Product Description */}
+      <div className="lg:col-span-2">
+        <div className="flex flex-col mb-8">
+          <h2 className="md:text-2xl text-xl font-semibold">
+            Product Description
+          </h2>
 
-export default ProDetailsDes
+          <div className="w-full h-[2.5px] flex mt-2">
+            <div className="w-1/5 bg-[#0070ba] bg-opacity-20 h-full"></div>
+            <div className="w-4/5 bg-gray-100 h-full"></div>
+          </div>
+        </div>
+
+        <div className="bg-gray-100 shadow-md sm:p-6 p-4 rounded-lg mb-7">
+          <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
+            {details.brandname}: Your daily essential for vitality and
+            well-being
+          </h3>
+        </div>
+
+        <p className="text-gray-700 mb-7 w-full text-justify  leading-relaxed">
+          {details.description}
+        </p>
+
+        <h3 className="text-base font-medium text-gray-800 mb-3">
+          Benefits of {details.brandname}:
+        </h3>
+        <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line">
+          {details.benefits}
+        </p>
+
+        <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
+          <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
+            Key Ingredients
+          </h3>
+        </div>
+
+        <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
+          {details?.keyingredients}
+        </p>
+
+        <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
+          <h3 className="font-semibold tracking-wider sm:text-base text-smdark-text">
+            Recommendeddaily Allowance
+          </h3>
+        </div>
+
+        <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
+          {details?.recommendeddailyallowance}
+        </p>
+
+        <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
+          <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
+            Directions for use
+          </h3>
+        </div>
+
+        <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
+          {details?.directionsforuse}
+        </p>
+
+        <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
+          <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
+            Safety information
+          </h3>
+        </div>
+
+        <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
+          {details?.safetyinformation}
+        </p>
+
+        <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
+          <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
+            Atorage
+          </h3>
+        </div>
+
+        <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
+          {details?.storage}
+        </p>
+      </div>
+
+      {/* RIGHT: Promotional Card (Hidden on small screens) */}
+      <div className="">
+        <div className="">
+          <img
+            src={sale2.src}
+            alt="Pharmacist"
+            className="w-full object-cover h-full"
+          />
+          <div className="mx-10 mt-3 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-[20%] h-full bg-white/80 backdrop-blur-md z-10 pointer-events-none"></div>
+
+            <div className="bg-[#0070ba]/40 text-black w-full py-2 rounded-full relative z-0">
+              <div className="flex justify-center items-center">
+                <a
+                  // href="https://kloudpharma.com"
+                  className="text-sm cursor-pointer"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  www.kloudpharma.com
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProDetailsDes;

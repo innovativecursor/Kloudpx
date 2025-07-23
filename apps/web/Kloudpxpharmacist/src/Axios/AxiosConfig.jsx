@@ -2,9 +2,6 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { store } from "../store/index";
 
-const BASE_URL = "http://localhost:10002";
-// const BASE_URL = "https://api.pharmacist.kloudpx.com";
-
 const getToken = () => {
   if (typeof window === "undefined") return null;
   return (
@@ -14,7 +11,6 @@ const getToken = () => {
 };
 
 const instance = axios.create({
-  baseURL: BASE_URL,
   headers: {
     Accept: "*/*",
     "Content-Type": "application/json",

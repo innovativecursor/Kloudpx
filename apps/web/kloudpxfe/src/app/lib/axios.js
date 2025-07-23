@@ -4,14 +4,10 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { store } from "@/app/redux/store";
 
-const BASE_URL = "http://localhost:10003";
-// const BASE_URL = "https://api.user.kloudpxfe.com";
-
 const getToken = () =>
   typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
 const instance = axios.create({
-  baseURL: BASE_URL,
   headers: {
     Accept: "*/*",
     "Content-Type": "application/json",
@@ -37,6 +33,7 @@ const getAuthHeaders = (sendToken) => {
   return token ? { Authorization: token } : {};
 };
 
+// GET
 export const getAxiosCall = async (endpoint, params = {}, sendToken = true) => {
   store.dispatch({ type: "LOADING", payload: true });
   try {
@@ -54,6 +51,7 @@ export const getAxiosCall = async (endpoint, params = {}, sendToken = true) => {
   }
 };
 
+// POST
 export const postAxiosCall = async (endpoint, data, sendToken = true) => {
   store.dispatch({ type: "LOADING", payload: true });
   try {
@@ -71,6 +69,7 @@ export const postAxiosCall = async (endpoint, data, sendToken = true) => {
   }
 };
 
+// PUT
 export const updateAxiosCall = async (endpoint, id, data, sendToken = true) => {
   store.dispatch({ type: "LOADING", payload: true });
   try {
@@ -88,20 +87,7 @@ export const updateAxiosCall = async (endpoint, id, data, sendToken = true) => {
   }
 };
 
-// export const deleteAxiosCall = async (endpoint, id, sendToken = true) => {
-//   store.dispatch({ type: "LOADING", payload: true });
-//   try {
-//     const headers = getAuthHeaders(sendToken);
-//     const response = await instance.delete(`${endpoint}/${id}`, { headers });
-//     return response.data;
-//   } catch (error) {
-//     // showError(error);
-//     throw error;
-//   } finally {
-//     store.dispatch({ type: "LOADING", payload: false });
-//   }
-// };
-
+// DELETE
 export const deleteAxiosCall = async (endpoint, sendToken = true) => {
   store.dispatch({ type: "LOADING", payload: true });
   try {

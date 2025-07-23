@@ -22,6 +22,12 @@ const endpoints = {
     get: `${baseUrl}/v1/category/get-all-category`,
     add: `${baseUrl}/v1/category/add-category`,
   },
+  categoryIcons: {
+    get: `${baseUrl}/v1/category/get-all-category-icon`,
+  },
+  assignIcon: {
+    add: `${baseUrl}/v1/category/assign-icon`,
+  },
   medicine: {
     getAll: `${baseUrl}/v1/medicine/get-all-medicine`,
     add: `${baseUrl}/v1/medicine/add-medicine`,
@@ -30,16 +36,31 @@ const endpoints = {
   },
   itemimage: {
     add: `${baseUrl}/v1/itemimage/add-itemimage`,
+    delete: (id) => `${baseUrl}/v1/itemimage/delete-itemimage/${id}`,
   },
   carousel: {
     get: `${baseUrl}/v1/carousel/get-all-carousel-img`,
     add: `${baseUrl}/v1/carousel/add-carousel-img`,
+    updateStatus: (id) => `${baseUrl}/v1/carousel/update-status/${id}`,
+    delete: (id) => `${baseUrl}/v1/carousel/delete-carousel-img/${id}`,
   },
   userCount: {
     get: `${baseUrl}/v1/admin/admin-dash-userinfo`,
   },
   medicineCount: {
     get: `${baseUrl}/v1/admin/admin-dash-medicinecount`,
+  },
+  gallery: {
+    get: `${baseUrl}/v1/gallery/get-all-gallery-img`,
+    add: `${baseUrl}/v1/gallery/add-gallery-img`,
+    updateStatus: (id) => `${baseUrl}/v1/gallery/update-status/${id}`,
+    delete: (id) => `${baseUrl}/v1/gallery/delete-gallery-img/${id}`,
+  },
+  uploadExcel: {
+    add: `${baseUrl}/v1/excel/upload-excel`,
+  },
+  admininfo: {
+    get: `${baseUrl}/v1/admin/admin-info`,
   },
   protected: {
     basic: `${baseUrl}/api/v1/protected`,

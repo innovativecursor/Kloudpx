@@ -7,6 +7,7 @@ import {
   updateAxiosCall,
   deleteAxiosCall,
 } from "../Axios/UniversalAxiosCalls";
+import endpoints from "../config/endpoints";
 
 export const CarouselContext = createContext();
 
@@ -17,21 +18,21 @@ const CarouselProvider = ({ children }) => {
   const [allItemCount, setAllItemCount] = useState([]);
 
   const getAllCarouselImages = async () => {
-    const res = await getAxiosCall("/v1/carousel/get-all-carousel-img");
+    const res = await getAxiosCall(endpoints.carousel.get);
     if (res?.data?.data) {
       setCarouselImages(res.data.data);
     }
   };
 
   const getAllUserData = async () => {
-    const res = await getAxiosCall("/v1/admin/admin-dash-userinfo");
+    const res = await getAxiosCall(endpoints.userCount.get);
     if (res?.data) {
       setUserData(res.data);
     }
   };
 
   const getAllItemData = async () => {
-    const res = await getAxiosCall("/v1/admin/admin-dash-medicinecount");
+    const res = await getAxiosCall(endpoints.medicineCount.get);
     if (res?.data) {
       setAllItemCount(res.data);
     }
@@ -41,8 +42,7 @@ const CarouselProvider = ({ children }) => {
     try {
       const base64 = await convertToBase64(file);
       const payload = { carouselimage: base64 };
-
-      const res = await postAxiosCall("/v1/carousel/add-carousel-img", payload);
+      const res = await postAxiosCall(endpoints.carousel.add, payload);
       if (res?.message) {
         Swal.fire("Success", res.message, "success");
         getAllCarouselImages();
@@ -56,7 +56,10 @@ const CarouselProvider = ({ children }) => {
 
   const toggleCarouselStatus = async (id) => {
     try {
-      const res = await updateAxiosCall(`/v1/carousel/update-status`, id, {});
+      const res = await updateAxiosCall(
+        endpoints.carousel.updateStatus(id),
+        {}
+      );
       if (res?.message) {
         Swal.fire("Success", res.message, "success");
         await getAllCarouselImages();
@@ -68,7 +71,7 @@ const CarouselProvider = ({ children }) => {
 
   const deleteCarouselImage = async (id) => {
     try {
-      const res = await deleteAxiosCall(`/v1/carousel/delete-carousel-img`, id);
+      const res = await deleteAxiosCall(endpoints.carousel.delete(id));
       if (res?.message) {
         Swal.fire("Success", res.message, "success");
         await getAllCarouselImages();
