@@ -1,11 +1,9 @@
 const isLive = process.env.NODE_ENV === "production";
 
 const baseUrls = {
-  admin: isLive
-    ? process.env.NEXT_PUBLIC_ADMIN_BASE_URL
-    : "http://localhost:10001",
+  admin: isLive ? "https://api.admin.kloudpx.com" : "http://localhost:10001",
   pharmacist: isLive
-    ? process.env.NEXT_PUBLIC_PHARMACIST_BASE_URL
+    ? "https://api.pharmacist.kloudpx.com"
     : "http://localhost:10002",
 };
 
