@@ -4,14 +4,13 @@ import React, { useEffect } from "react";
 import { useParams } from "next/navigation";
 import SubTitle from "@/app/components/Titles/SubTitle";
 import ImageSwiper from "@/app/components/ImageSwiper/ImageSwiper";
-import QuantitySelector from "@/app/components/QuantitySelector/QuantitySelector";
-import SocialIcons from "@/app/components/SocialIcons/SocialIcons";
 import { useProductContext } from "@/app/contexts/ProductContext";
-import { useCartContext } from "@/app/contexts/CartContext";
 import { usePrescriptionContext } from "@/app/contexts/PrescriptionContext";
 import Prescription from "@/app/components/modal/Prescription";
-import AddToCart from "@/app/components/button/AddToCart";
 import ProductDeatilsCard from "@/app/components/cards/ProductDeatilsCard";
+import Cards from "@/app/components/cards/Cards";
+import ProductDescription from "@/app/components/ProductDescription/ProductDescription";
+import ProDetailsDes from "@/app/components/cards/ProDetailsDes";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -34,8 +33,9 @@ const ProductDetails = () => {
 
   const fallbackImage = "/assets/fallback.png";
   const images = details.images?.length > 0 ? details.images : [fallbackImage];
+  const similarProduuct = productDetails?.related_medicines;
 
-  console.log(details);
+  console.log(productDetails);
 
   return (
     <div className=" pb-10 min-h-screen md:mt-52 sm:mt-48 mt-40">
@@ -51,6 +51,24 @@ const ProductDetails = () => {
             <ProductDeatilsCard details={details} />
           </div>
         </div>
+      </div>
+
+      <div className="md:mt-16 sm:mt-12 mt-10">
+        {similarProduuct.length > 0 ? (
+          <div>
+            <Cards data={similarProduuct} title="Similar Produuct" />
+          </div>
+        ) : null}
+      </div>
+
+ <ProDetailsDes />
+
+      <div className="mt-10 sm:mt-16 md:mt-24">
+        <img
+          src="/assets/time.png"
+          alt="Upload"
+          className="w-full object-contain"
+        />
       </div>
 
       {/* Modal render here */}

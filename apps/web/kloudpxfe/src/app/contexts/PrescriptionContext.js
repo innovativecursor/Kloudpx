@@ -1,3 +1,5 @@
+
+
 import { createContext, useContext, useState } from "react";
 import toast from "react-hot-toast";
 import { useAuth } from "@/app/contexts/AuthContext";
@@ -60,10 +62,10 @@ export const PrescriptionProvider = ({ children }) => {
           setIsOpen(false);
           setLoading(false);
 
-          console.log("🧾 Debug Prescription Payload:");
-          console.log("prescriptionId:", prescriptionId);
-          console.log("medicineId:", medicineid);
-          console.log("quantity:", quantity);
+          // console.log("🧾 Debug Prescription Payload:");
+          // console.log("prescriptionId:", prescriptionId);
+          // console.log("medicineId:", medicineid);
+          // console.log("quantity:", quantity);
 
           if (!medicineid || !prescriptionId || !quantity) {
             console.error("❌ Missing data in prescription cart call", {

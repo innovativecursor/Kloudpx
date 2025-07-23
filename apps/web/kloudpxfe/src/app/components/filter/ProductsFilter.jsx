@@ -70,27 +70,53 @@ const ProductsFilter = () => {
           max={15000}
           values={priceRange}
           onChange={(values) => setPriceRange(values)}
-          renderTrack={({ props, children }) => (
-            <div
-              {...props}
-              className="h-1.5 bg-gray-200 rounded relative w-full"
-            >
+          // renderTrack={({ props, children }) => (
+          //   <div
+          //     {...props}
+          //     className="h-1.5 bg-gray-200 rounded relative w-full"
+          //   >
+          //     <div
+          //       className="absolute h-1.5 bg-[#0070ba] rounded"
+          //       style={{
+          //         left: `${(priceRange[0] / 15000) * 100}%`,
+          //         width: `${((priceRange[1] - priceRange[0]) / 15000) * 100}%`,
+          //       }}
+          //     />
+          //     {children}
+          //   </div>
+          // )}
+
+          renderTrack={({ props, children }) => {
+            const { key, ...rest } = props;
+            return (
               <div
-                className="absolute h-1.5 bg-[#0070ba] rounded"
-                style={{
-                  left: `${(priceRange[0] / 15000) * 100}%`,
-                  width: `${((priceRange[1] - priceRange[0]) / 15000) * 100}%`,
-                }}
+                key={key}
+                {...rest}
+                className="h-1.5 bg-gray-200 rounded relative w-full"
+              >
+                <div
+                  className="absolute h-1.5 bg-[#0070ba] rounded"
+                  style={{
+                    left: `${(priceRange[0] / 15000) * 100}%`,
+                    width: `${
+                      ((priceRange[1] - priceRange[0]) / 15000) * 100
+                    }%`,
+                  }}
+                />
+                {children}
+              </div>
+            );
+          }}
+          renderThumb={({ props }) => {
+            const { key, ...restProps } = props;
+            return (
+              <div
+                key={key}
+                {...restProps}
+                className="h-4 w-4 bg-[#0070ba] rounded-full cursor-pointer"
               />
-              {children}
-            </div>
-          )}
-          renderThumb={({ props }) => (
-            <div
-              {...props}
-              className="h-4 w-4 bg-[#0070ba] rounded-full cursor-pointer"
-            />
-          )}
+            );
+          }}
         />
         <div className="flex justify-between text-sm mt-2">
           <span>₱{priceRange[0].toFixed(2)}</span>
@@ -112,29 +138,37 @@ const ProductsFilter = () => {
           max={100}
           values={discountRange}
           onChange={(values) => setDiscountRange(values)}
-          renderTrack={({ props, children }) => (
-            <div
-              {...props}
-              className="h-1.5 bg-gray-200 rounded relative w-full"
-            >
+          renderTrack={({ props, children }) => {
+            const { key, ...restProps } = props;
+            return (
               <div
-                className="absolute h-1.5 bg-[#0070ba] rounded"
-                style={{
-                  left: `${(discountRange[0] / 100) * 100}%`,
-                  width: `${
-                    ((discountRange[1] - discountRange[0]) / 100) * 100
-                  }%`,
-                }}
+                key={key}
+                {...restProps}
+                className="h-1.5 bg-gray-200 rounded relative w-full"
+              >
+                <div
+                  className="absolute h-1.5 bg-[#0070ba] rounded"
+                  style={{
+                    left: `${(discountRange[0] / 100) * 100}%`,
+                    width: `${
+                      ((discountRange[1] - discountRange[0]) / 100) * 100
+                    }%`,
+                  }}
+                />
+                {children}
+              </div>
+            );
+          }}
+          renderThumb={({ props }) => {
+            const { key, ...restProps } = props;
+            return (
+              <div
+                key={key}
+                {...restProps}
+                className="h-4 w-4 bg-[#0070ba] rounded-full cursor-pointer"
               />
-              {children}
-            </div>
-          )}
-          renderThumb={({ props }) => (
-            <div
-              {...props}
-              className="h-4 w-4 bg-[#0070ba] rounded-full cursor-pointer"
-            />
-          )}
+            );
+          }}
         />
         <div className="flex justify-between text-sm mt-2">
           <span>{discountRange[0]}%</span>

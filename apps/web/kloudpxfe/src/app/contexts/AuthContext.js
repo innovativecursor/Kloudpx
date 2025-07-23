@@ -80,10 +80,11 @@ export const AuthProvider = ({ children }) => {
         logout,
         isAuthenticated: !!token,
         user,
-         isAuthLoaded,
+        isAuthLoaded,
       }}
     >
-      {children}
+      {/* {children} */}
+      {isAuthLoaded ? children : null}
     </AuthContext.Provider>
   );
 };
