@@ -1,6 +1,7 @@
 import { createContext, useContext, useState } from "react";
 import { getAxiosCall, postAxiosCall } from "../Axios/UniversalAxiosCalls";
 import { useAuthContext } from "./AuthContext";
+import endpoints from "../config/endpoints";
 
 export const DropdownContext = createContext();
 
@@ -14,7 +15,7 @@ const DropdownProvider = ({ children }) => {
   const fetchGenericOptions = async () => {
     if (!checkToken()) return;
     try {
-      const res = await getAxiosCall("/v1/generic/get-generic");
+      const res = await getAxiosCall(endpoints.generic.get);
       const data = res?.data?.generics || [];
       const formatted = data.map((item) => ({
         label: item.GenericName,
@@ -27,7 +28,7 @@ const DropdownProvider = ({ children }) => {
   const createGenericOption = async (inputValue) => {
     if (!checkToken()) return null;
     try {
-      const res = await postAxiosCall("/v1/generic/add-generic", {
+      const res = await postAxiosCall(endpoints.generic.add, {
         genericname: inputValue,
       });
       const created = res?.generic;
@@ -52,7 +53,7 @@ const DropdownProvider = ({ children }) => {
   const fetchSupplierOptions = async () => {
     if (!checkToken()) return;
     try {
-      const res = await getAxiosCall("/v1/supplier/get-all-supplier");
+      const res = await getAxiosCall(endpoints.supplier.get);
       const data = res?.data?.suppliers || [];
       const formatted = data.map((item) => ({
         label: item.SupplierName,
@@ -65,7 +66,7 @@ const DropdownProvider = ({ children }) => {
   const createSupplierOption = async (inputValue) => {
     if (!checkToken()) return null;
     try {
-      const res = await postAxiosCall("/v1/supplier/add-supplier", {
+      const res = await postAxiosCall(endpoints.supplier.add, {
         suppliername: inputValue,
       });
       const created = res?.supplier;

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getAxiosCall, postAxiosCall } from "../Axios/UniversalAxiosCalls";
+import endpoints from "../config/endpoints";
 
 export const CategoryContext = createContext();
 
@@ -13,7 +14,7 @@ const CategoryProvider = ({ children }) => {
 
   const fetchCategoryIcons = async () => {
     try {
-      const res = await getAxiosCall("/v1/category/get-all-category-icon");
+      const res = await getAxiosCall(endpoints.categoryIcons.get);
       const data = res?.data?.icons || [];
 
       const formatted = data.map((item) => ({
@@ -28,7 +29,7 @@ const CategoryProvider = ({ children }) => {
 
   const fetchCategoryOptions = async () => {
     try {
-      const res = await getAxiosCall("/v1/category/get-all-category");
+      const res = await getAxiosCall(endpoints.category.get);
       const categories = res?.data?.categories || [];
 
       const formatted = categories.map((item) => ({
@@ -37,7 +38,6 @@ const CategoryProvider = ({ children }) => {
         icon: item.CategoryIcon?.Icon || null,
         iconId: item.CategoryIconID || null,
       }));
-      // console.log("📦 All categories from API:", formatted);
       setCategoryOptions(formatted);
     } catch (error) {
       setCategoryError("Failed to load categories.");
@@ -46,13 +46,11 @@ const CategoryProvider = ({ children }) => {
 
   // ✅ 3. Create category
   const createCategoryOption = async (inputValue) => {
-    // console.log("🟢 Creating category:", inputValue);
     try {
-      const res = await postAxiosCall("/v1/category/add-category", {
+      const res = await postAxiosCall(endpoints.category.add, {
         category: inputValue,
       });
 
-      // console.log("✅ API Response from /add-category:", res);
       const created = res?.category;
 
       if (created) {
@@ -63,7 +61,6 @@ const CategoryProvider = ({ children }) => {
           iconId: created.CategoryIconID || null,
         };
 
-        // console.log("🆕 New category option:", newOption);
         setCategoryOptions((prev) => {
           const exists = prev.find((opt) => opt.value === newOption.value);
           if (!exists) return [...prev, newOption];
@@ -73,7 +70,6 @@ const CategoryProvider = ({ children }) => {
         setSelectedCategory(newOption);
 
         if (newOption.icon && newOption.iconId) {
-          // console.log("🎯 Auto-selecting icon:", newOption.icon);
           setSelectedCategoryIcon({
             label: newOption.icon,
             value: newOption.iconId,
@@ -98,10 +94,8 @@ const CategoryProvider = ({ children }) => {
       category_id: categoryId,
       icon_id: iconId,
     };
-
     try {
-      const res = await postAxiosCall("/v1/category/assign-icon", payload);
-      // console.log("✅ Icon assigned:", res);
+      const res = await postAxiosCall(endpoints.assignIcon.add, payload);
     } catch (error) {
       console.error("❌ Icon assign failed:", error);
     }
