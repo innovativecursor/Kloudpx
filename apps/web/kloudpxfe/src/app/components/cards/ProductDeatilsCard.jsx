@@ -41,7 +41,7 @@ const ProductDeatilsCard = ({ details }) => {
                 </span>
 
                 <div className=" bg-blue-100 text-color  text-base px-5 py-1.5 rounded-full font-semibold z-10">
-                  {details?.discount}%
+                  {details?.discount}
                 </div>
               </div>
             ) : (

@@ -30,62 +30,87 @@ const ProDetailsDes = ({ details }) => {
           {details.description}
         </p>
 
-        <h3 className="text-base font-medium text-gray-800 mb-3">
-          Benefits of {details.brandname}:
-        </h3>
+        {details.benefits && (
+          <>
+            <h3 className="text-base font-medium text-gray-800 mb-3">
+              Benefits of {details.benefits}:
+            </h3>
+          </>
+        )}
+
         <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line">
           {details.benefits}
         </p>
 
-        <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
-          <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
-            Key Ingredients
-          </h3>
-        </div>
+        {details?.keyingredients && (
+          <>
+            <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
+              <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
+                Key Ingredients
+              </h3>
+            </div>
 
-        <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
-          {details?.keyingredients}
-        </p>
+            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
+              {details?.keyingredients}
+            </p>
+          </>
+        )}
 
-        <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
-          <h3 className="font-semibold tracking-wider sm:text-base text-smdark-text">
-            Recommendeddaily Allowance
-          </h3>
-        </div>
+        {details?.recommendeddailyallowance && (
+          <>
+            <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
+              <h3 className="font-semibold tracking-wider sm:text-base text-smdark-text">
+                Recommendeddaily Allowance
+              </h3>
+            </div>
 
-        <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
-          {details?.recommendeddailyallowance}
-        </p>
+            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
+              {details?.recommendeddailyallowance}
+            </p>
+          </>
+        )}
 
-        <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
-          <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
-            Directions for use
-          </h3>
-        </div>
+        {details?.directionsforuse && (
+          <>
+            <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
+              <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
+                Directions for use
+              </h3>
+            </div>
 
-        <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
-          {details?.directionsforuse}
-        </p>
+            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
+              {details?.directionsforuse}
+            </p>
+          </>
+        )}
 
-        <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
-          <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
-            Safety information
-          </h3>
-        </div>
+        {details?.safetyinformation && (
+          <>
+            <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
+              <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
+                Safety information
+              </h3>
+            </div>
 
-        <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
-          {details?.safetyinformation}
-        </p>
+            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
+              {details?.safetyinformation}
+            </p>
+          </>
+        )}
 
-        <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
-          <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
-            Atorage
-          </h3>
-        </div>
+        {details?.storage && (
+          <>
+            <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
+              <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
+                Atorage
+              </h3>
+            </div>
 
-        <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
-          {details?.storage}
-        </p>
+            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
+              {details?.storage}
+            </p>
+          </>
+        )}
       </div>
 
       {/* RIGHT: Promotional Card (Hidden on small screens) */}
