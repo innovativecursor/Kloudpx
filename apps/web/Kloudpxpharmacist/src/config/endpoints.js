@@ -1,8 +1,6 @@
-const baseURLLive = "https://api.pharmacist.kloudpx.com";
-const baseURLDev = "http://localhost:10002";
+import { baseUrls } from "../../../../config/env";
 
-const isLive = false;
-const baseUrl = isLive ? baseURLLive : baseURLDev;
+const baseUrl = baseUrls.pharmacist;
 
 const endpoints = {
   auth: {

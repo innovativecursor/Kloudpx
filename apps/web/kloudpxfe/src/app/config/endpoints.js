@@ -1,8 +1,6 @@
-const baseURLLive = "https://api.user.kloudpx.com";
-const baseURLDev = "http://localhost:10003";
+import { baseUrls } from "./env";
 
-const isLive = false;
-const baseUrl = isLive ? baseURLLive : baseURLDev;
+const baseUrl = baseUrls.users;
 
 const endpoints = {
   auth: {
@@ -14,7 +12,8 @@ const endpoints = {
   },
   category: {
     getAll: `${baseUrl}/v1/user/get-categories-for-user`,
-    getItemsByCategory: (id) => `${baseUrl}/v1/user/get-items-by-categories/${id}`,
+    getItemsByCategory: (id) =>
+      `${baseUrl}/v1/user/get-items-by-categories/${id}`,
   },
   details: {
     get: (id) => `${baseUrl}/v1/user/medicine-details/${id}`,
@@ -49,7 +48,8 @@ const endpoints = {
     get: `${baseUrl}/v1/user/popular-medicines`,
   },
   search: {
-    get: (query) => `${baseUrl}/v1/user/search-medicine?q=${encodeURIComponent(query)}`,
+    get: (query) =>
+      `${baseUrl}/v1/user/search-medicine?q=${encodeURIComponent(query)}`,
   },
   prescription: {
     upload: `${baseUrl}/v1/user/upload-prescription`,

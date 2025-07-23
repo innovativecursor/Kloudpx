@@ -1,14 +1,18 @@
-const baseURLLive = "https://api.admin.kloudpx.com";
-const baseURLDev = "http://localhost:10001";
+// const baseURLLive = "https://api.admin.kloudpx.com";
+// const baseURLDev = "http://localhost:10001";
 
-const isLive = false;
-const baseUrl = isLive ? baseURLLive : baseURLDev;
+import { baseUrls } from "../../../../config/env";
+
+// const isLive = false;
+// const baseUrl = isLive ? baseURLLive : baseURLDev;
+
+const baseUrl = baseUrls.admin;
 
 const endpoints = {
   auth: {
     googleLogin: `${baseUrl}/v1/auth/google/callback`,
     refresh: `${baseUrl}/v1/auth/refresh`,
-    getCurrentUser: `${baseUrl}/v1/admin/admin-info`
+    getCurrentUser: `${baseUrl}/v1/admin/admin-info`,
   },
   generic: {
     get: `${baseUrl}/v1/generic/get-generic`,
