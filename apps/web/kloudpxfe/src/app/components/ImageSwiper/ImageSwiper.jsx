@@ -101,22 +101,6 @@
 
 // export default ImageSwiper;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 "use client";
 
 import React, { useState } from "react";
@@ -132,12 +116,16 @@ import "react-medium-image-zoom/dist/styles.css";
 const ImageSwiper = ({ images }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const fallbackImage = "/assets/fallback.png";
-  const safeImages = images?.length > 0 ? images : [fallbackImage];
+  // const safeImages = images?.length > 0 ? images : [fallbackImage];
+  const filteredImages =
+    images?.filter((img) => img && img.trim() !== "") || [];
+  const safeImages =
+    filteredImages.length > 0 ? filteredImages : [fallbackImage];
 
   return (
     <div className="md:w-[50%]">
       <div className="relative rounded-xl overflow-hidden">
-        <div className="flex flex-col pb-4 justify-center items-center bg-gray-50 shadow-md w-full h-full">
+        <div className="flex flex-col pb-4 justify-center items-center bg-[#F4F8FB] pt-4 shadow-md w-full h-full">
           <Swiper
             spaceBetween={10}
             navigation={false}
@@ -147,7 +135,7 @@ const ImageSwiper = ({ images }) => {
           >
             {safeImages.map((img, index) => (
               <SwiperSlide key={index}>
-                <div className="flex justify-center items-center w-full h-[80vh] p-4 overflow-hidden">
+                <div className="flex justify-center items-center w-full sm:h-[80vh] h-[50vh] p-4 overflow-hidden">
                   <Zoom>
                     <img
                       src={img || fallbackImage}

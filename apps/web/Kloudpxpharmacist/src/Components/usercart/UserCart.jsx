@@ -8,7 +8,7 @@ const UserCart = ({ details }) => {
 
   return (
     <div>
-      {prescriptionsCart.data && prescriptionsCart.data.length > 0 && (
+      {prescriptionsCart.data && prescriptionsCart.data?.length > 0 && (
         <div className="mt-10 max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-6">
           <h3 className="text-2xl font-semibold mb-6 text-gray-800 border-b pb-3">
             User's Cart

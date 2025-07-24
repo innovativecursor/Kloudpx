@@ -55,12 +55,11 @@ const Header = () => {
             {/* Cart Icon with Hover */}
             <div
               className="relative cursor-pointer"
-              onMouseEnter={() => setIsOpen(true)}
-              onMouseLeave={() => setIsOpen(false)}
+              onClick={() => setIsOpen(true)}
             >
               <FiShoppingCart className="md:text-3xl text-2xl font-light" />
               <span className="absolute -top-1 -right-1 text-[10px] bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center">
-                {cartLength}
+                {isAuthLoaded ? cartLength : 0}
               </span>
 
               {/* Cart Modal */}

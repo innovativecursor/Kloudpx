@@ -51,7 +51,7 @@ function Dropdown({ category }) {
         </span>
       </ul>
 
-      {open && category.category.length > 0 && (
+      {open && category.category?.length > 0 && (
         <ul className="navList-action newList-subNav category-subNav">
           {category.category.map((item) => (
             <div className="navList-action" key={item.id}>

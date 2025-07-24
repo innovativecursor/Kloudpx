@@ -2,12 +2,12 @@
 import React from "react";
 import sale2 from "@/assets/detailspic.svg";
 const ProDetailsDes = ({ details }) => {
-  console.log(details);
+  // console.log(details);
 
   return (
-    <div className="responsive-mx pt-7 md:pt-16   grid grid-cols-1 lg:grid-cols-3 gap-16">
+    <div className="responsive-mx pt-10  md:pt-16  sm:px-0 px-2 grid grid-cols-1 lg:grid-cols-3 sm:gap-16 gap-12">
       {/* LEFT: Product Description */}
-      <div className="lg:col-span-2">
+      <div className="lg:col-span-2 ">
         <div className="flex flex-col mb-8">
           <h2 className="md:text-2xl text-xl font-semibold">
             Product Description
@@ -32,15 +32,11 @@ const ProDetailsDes = ({ details }) => {
 
         {details.benefits && (
           <>
-            <h3 className="text-base font-medium text-gray-800 mb-3">
+            <h3 className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               Benefits of {details.benefits}:
             </h3>
           </>
         )}
-
-        <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line">
-          {details.benefits}
-        </p>
 
         {details?.keyingredients && (
           <>
@@ -50,7 +46,7 @@ const ProDetailsDes = ({ details }) => {
               </h3>
             </div>
 
-            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
+            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               {details?.keyingredients}
             </p>
           </>
@@ -59,12 +55,12 @@ const ProDetailsDes = ({ details }) => {
         {details?.recommendeddailyallowance && (
           <>
             <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
-              <h3 className="font-semibold tracking-wider sm:text-base text-smdark-text">
+              <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
                 Recommendeddaily Allowance
               </h3>
             </div>
 
-            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
+            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               {details?.recommendeddailyallowance}
             </p>
           </>
@@ -78,7 +74,7 @@ const ProDetailsDes = ({ details }) => {
               </h3>
             </div>
 
-            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
+            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               {details?.directionsforuse}
             </p>
           </>
@@ -92,7 +88,7 @@ const ProDetailsDes = ({ details }) => {
               </h3>
             </div>
 
-            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
+            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               {details?.safetyinformation}
             </p>
           </>
@@ -102,11 +98,11 @@ const ProDetailsDes = ({ details }) => {
           <>
             <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
               <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
-                Atorage
+                Satorage
               </h3>
             </div>
 
-            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full">
+            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               {details?.storage}
             </p>
           </>

@@ -19,6 +19,7 @@ export default function Hero() {
   return (
     <div className="responsive-mx md:mt-64 sm:mt-48 mt-40 ">
       <Swiper
+        key={carousel.length} 
         loop={true}
         pagination={{ clickable: true }}
         navigation={true}
@@ -33,6 +34,7 @@ export default function Hero() {
                 src={slide.ImageURL}
                 alt={slide.title1 || "Carousel Slide"}
                 className="w-full h-full rounded-md"
+                 loading="eager" 
               />
             </div>
           </SwiperSlide>

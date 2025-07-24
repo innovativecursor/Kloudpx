@@ -111,7 +111,7 @@ function Products() {
   ];
 
   useEffect(() => {
-    if (!twoCategory || twoCategory.length === 0) {
+    if (!twoCategory || twoCategory?.length === 0) {
       getTwoCategory();
     }
   }, []);

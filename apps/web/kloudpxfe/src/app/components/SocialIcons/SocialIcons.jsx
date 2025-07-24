@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import useModal from "@/app/hooks/useModal";
 
 const SocialIcons = () => {
@@ -10,33 +10,39 @@ const SocialIcons = () => {
     modalRef,
   } = useModal();
 
+  const [currentUrl, setCurrentUrl] = useState("");
+
+  useEffect(() => {
+    setCurrentUrl(window.location.href);
+  }, []);
+
   const shareOptions = [
     {
       name: "WhatsApp",
       icon: "ri-whatsapp-fill",
       color: "hover:bg-green-500 text-green-500",
-      link: `https://wa.me/?text=${encodeURIComponent(window.location.href)}`,
+      link: `https://wa.me/?text=${encodeURIComponent(currentUrl)}`,
     },
     {
       name: "Facebook",
       icon: "ri-facebook-fill",
       color: "hover:bg-blue-600 text-blue-600",
       link: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-        window.location.href
+        currentUrl
       )}`,
     },
     {
       name: "Viber",
       icon: "ri-phone-fill",
       color: "hover:bg-purple-600 text-purple-600",
-      link: `viber://forward?text=${encodeURIComponent(window.location.href)}`,
+      link: `viber://forward?text=${encodeURIComponent(currentUrl)}`,
     },
     {
       name: "Gmail",
       icon: "ri-mail-fill",
       color: "hover:bg-red-600 text-red-600",
       link: `mailto:?subject=Check this out&body=${encodeURIComponent(
-        window.location.href
+        currentUrl
       )}`,
     },
     {
@@ -44,8 +50,10 @@ const SocialIcons = () => {
       icon: "ri-link",
       color: "hover:bg-gray-500 text-gray-500",
       onClick: () => {
-        navigator.clipboard.writeText(window.location.href);
-        alert("Link copied to clipboard!");
+        if (currentUrl) {
+          navigator.clipboard.writeText(currentUrl);
+          alert("Link copied to clipboard!");
+        }
       },
     },
   ];
@@ -54,10 +62,10 @@ const SocialIcons = () => {
     <div className="relative">
       <button
         onClick={() => setIsModalOpen(true)}
-        className="w-10 h-10 rounded-full cursor-pointer flex items-center justify-center border border-gray-300 bg-white shadow-sm text-gray-600 hover:bg-gray-100"
+        className="sm:w-10 sm:h-10 w-7 h-7 rounded-full cursor-pointer flex items-center justify-center border border-gray-300 bg-white shadow-sm text-gray-600 hover:bg-gray-100"
         aria-label="Open Share Modal"
       >
-        <i className="ri-share-fill text-xl"></i>
+        <i className="ri-share-fill sm:text-xl text-sm"></i>
       </button>
 
       {isModalOpen && (

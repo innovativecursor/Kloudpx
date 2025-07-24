@@ -103,13 +103,13 @@ const SearchComponent = () => {
       {/* Dropdown for "Keep Shopping For" */}
       <div
         className={`dropdown ${
-          searchResults.length === 0 && searchQuery.length > 0
+          searchResults?.length === 0 && searchQuery?.length > 0
             ? "active"
             : "inactive"
         }`}
       >
         <ul className="dropdown-menu">
-          {searchResults.length === 0 && searchQuery.length > 0 && (
+          {searchResults?.length === 0 && searchQuery?.length > 0 && (
             <>
               <div>
                 <h5 className="header-search-KSF">Keep Shopping For</h5>

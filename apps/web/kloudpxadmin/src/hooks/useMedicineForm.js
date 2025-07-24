@@ -142,7 +142,7 @@ export default function useMedicineForm() {
   }, []);
 
   useEffect(() => {
-    if (!id || !medicines.length) return;
+    if (!id || !medicines?.length) return;
     setUploadedImageIds([]);
     setPreviewUrls([]);
     setMessage("");

@@ -18,7 +18,7 @@ const FeaturedBrand = ({ feature }) => {
 
   return (
     <>
-      {feature.length > 0 ? (
+      {feature?.length > 0 ? (
         <div>
           <TitleSlider
             title="Featured Brands"

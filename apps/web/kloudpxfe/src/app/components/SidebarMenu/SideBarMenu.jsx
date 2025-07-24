@@ -5,7 +5,7 @@ function SideBarMenu({ header, categories }) {
     <div className="sidebar-wrapper  sidebar--categories">
       <h5 className="sidebarBlock-heading">{header}</h5>
       <div className="block-content clearfix">
-        {categories.length > 0 &&
+        {categories?.length > 0 &&
           categories.map((_category) => {
             return (
               <>

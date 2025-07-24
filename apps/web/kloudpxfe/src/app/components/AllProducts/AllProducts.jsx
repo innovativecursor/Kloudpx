@@ -1,23 +1,32 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProductsCard from "@/app/components/cards/ProductsCard";
 import FeaturedBrand from "../featuredbrand/FeaturedBrand";
 import sale1 from "@/assets/1.svg";
 import sale2 from "@/assets/2.svg";
 import Pagination from "../Pagination/Pagination";
+import { useProductContext } from "@/app/contexts/ProductContext";
 
 const AllProducts = ({ selectedCategoryItems = [] }) => {
   const [currentPage, setCurrentPage] = useState(1);
-
+  const { getAllFeature, feature } = useProductContext();
   const first8 = selectedCategoryItems.slice(0, 8);
   const next4 = selectedCategoryItems.slice(8, 12);
   const afterImage4 = selectedCategoryItems.slice(12, 16);
   const remaining = selectedCategoryItems.slice(16);
 
-  const totalPages = remaining.length > 0 ? 2 : 1;
+  const totalPages = remaining?.length > 0 ? 2 : 1;
 
   const handlePrev = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
   const handleNext = () =>
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+
+  useEffect(() => {
+    getAllFeature();
+  }, []);
+
+  const handlePageClick = (page) => {
+    setCurrentPage(page);
+  };
 
   return (
     <>
@@ -25,11 +34,14 @@ const AllProducts = ({ selectedCategoryItems = [] }) => {
         <>
           <ProductsCard selectedCategoryItems={first8} />
 
-          <div className="bg-white flex justify-center">
-            <div className="mt-5 sm:mt-10 md:mt-12 bg-gray-200/70 rounded-xl sm:py-9 py-8 md:w-[63vw] w-[94vw] sm:px-6 px-4 overflow-hidden mb-10 sm:mb-20">
-              <FeaturedBrand />
+          {Array.isArray(feature) && feature?.length > 0 && (
+            <div className="bg-white flex justify-center">
+              <div className="mt-5 sm:mt-10 md:mt-12 bg-gray-200/70 rounded-xl sm:py-9 py-8 md:w-[63vw] w-[94vw] sm:px-6 px-4 overflow-hidden mb-10 sm:mb-20">
+                <FeaturedBrand feature={feature} />
+              </div>
             </div>
-          </div>
+          )}
+
           <ProductsCard selectedCategoryItems={next4} />
 
           <div className="flex justify-between items-center lg:mt-10 sm:mt-14 sm:gap-4 gap-2 mb-10 sm:mb-20">
@@ -57,6 +69,7 @@ const AllProducts = ({ selectedCategoryItems = [] }) => {
         currentPage={currentPage}
         handlePrev={handlePrev}
         handleNext={handleNext}
+        handlePageClick={handlePageClick}
       />
     </>
   );

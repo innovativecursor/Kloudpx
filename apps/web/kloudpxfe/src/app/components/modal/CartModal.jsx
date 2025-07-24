@@ -11,27 +11,32 @@ const CartModal = ({ isOpen, onClose }) => {
   const { token, isAuthLoaded } = useAuth();
   const router = useRouter();
   const { getCartData, removeFromCart, getAllCartData } = useCartContext();
-  const { data, loading } = getCartData;
+  // const { data, loading } = getCartData;
   const { goToProductPage } = useProductNavigation();
   const fallbackImage = "/assets/fallback.png";
   const [activeTab, setActiveTab] = useState("All");
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem("access_token");
-    if (token === null && !storedToken) {
-      router.push("/");
-    }
-  }, [token]);
+  const data = getCartData?.data || [];
+  const loading = getCartData?.loading || false;
 
   // useEffect(() => {
-  //   getAllCartData();
-  // }, []);
+  //   const storedToken = localStorage.getItem("access_token");
+  //   if (token === null && !storedToken) {
+  //     // router.push("/");
+  //     console.log("errror is coming...");
+  //     // return;
+  //   }
+  // }, [token]);
 
   useEffect(() => {
     if (token) {
       getAllCartData();
     }
-  }, [token])
+  }, [token]);
+
+  if (!isAuthLoaded) {
+    return null;
+  }
 
   const handleCheckout = () => {
     router.push("/Checkout");
@@ -64,6 +69,7 @@ const CartModal = ({ isOpen, onClose }) => {
       )}
 
       <div
+        onClick={(e) => e.stopPropagation()}
         className={classNames(
           "fixed top-0 right-0 w-[420px] max-w-full h-full bg-white z-50 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col",
           {
@@ -142,7 +148,6 @@ const CartModal = ({ isOpen, onClose }) => {
               const isUnsettled = item.prescription_status === "Unsettled";
               const isRejected = item.prescription_status === "Rejected";
 
-
               return (
                 <div
                   key={item.cart_id}
@@ -214,7 +219,6 @@ const CartModal = ({ isOpen, onClose }) => {
                         This item was rejected by the pharmacist.
                       </p>
                     )}
-
                   </div>
                 </div>
               );

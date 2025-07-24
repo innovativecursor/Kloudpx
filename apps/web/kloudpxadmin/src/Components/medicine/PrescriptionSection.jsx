@@ -40,7 +40,7 @@ const PrescriptionSection = ({
         previewUrls={previewUrls}
         message={message}
         id={id}
-        disabled={images.length >= 5 }
+        disabled={images?.length >= 5 }
         uploadedImageIds={uploadedImageIds}
         setUploadedImageIds={setUploadedImageIds}
         setPreviewUrls={setPreviewUrls}
