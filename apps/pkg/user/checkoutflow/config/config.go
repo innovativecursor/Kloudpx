@@ -15,3 +15,7 @@ type ReqDelivery struct {
 	AddressID         uint   `json:"addressid"`
 	DeliveryType      string `json:"deliverytype"`
 }
+
+type SelectAddress struct {
+	AddressID uint `json:"addressid"`
+}
