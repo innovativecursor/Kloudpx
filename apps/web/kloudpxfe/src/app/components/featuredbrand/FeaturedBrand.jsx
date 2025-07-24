@@ -11,21 +11,14 @@ import useSwiperNavigation from "@/app/hooks/useSwiperNavigation";
 import { useProductContext } from "@/app/contexts/ProductContext";
 import useProductNavigation from "@/app/hooks/useProductNavigation";
 
-const FeaturedBrand = () => {
+const FeaturedBrand = ({ feature }) => {
   const { prevRef, nextRef, setSwiperInstance } = useSwiperNavigation();
-  const { getAllFeature, feature } = useProductContext();
   const { goToProductPage } = useProductNavigation();
   const fallbackImage = "/assets/fallback.png";
 
-  useEffect(() => {
-    getAllFeature();
-  }, []);
-
-  // console.log(feature);
-
   return (
     <>
-      {feature.length > 0 ? (
+      {feature?.length > 0 ? (
         <div>
           <TitleSlider
             title="Featured Brands"

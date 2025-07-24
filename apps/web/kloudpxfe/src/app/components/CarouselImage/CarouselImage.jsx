@@ -50,13 +50,13 @@ function SliderImages({ images = [], currentImageURL, setCurrentImageURL }) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const nextSlide = () => {
-    const newIndex = (currentIndex + 1) % images.length;
+    const newIndex = (currentIndex + 1) % images?.length;
     setCurrentIndex(newIndex);
     setCurrentImageURL(images[newIndex].image);
   };
 
   const prevSlide = () => {
-    const newIndex = (currentIndex - 1 + images.length) % images.length;
+    const newIndex = (currentIndex - 1 + images?.length) % images?.length;
     setCurrentIndex(newIndex);
     setCurrentImageURL(images[newIndex].image);
   };

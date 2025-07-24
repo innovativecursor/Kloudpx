@@ -10,7 +10,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!allPrescriptions || allPrescriptions.length === 0) {
+    if (!allPrescriptions || allPrescriptions?.length === 0) {
       fetchAllPrescriptions();
     }
   }, []);

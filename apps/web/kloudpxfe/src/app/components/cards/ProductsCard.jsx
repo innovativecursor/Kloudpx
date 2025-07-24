@@ -24,12 +24,12 @@ const ProductCardItem = ({ item, fallbackImage }) => {
   );
 
   const slides =
-    validImages.length > 0
+    validImages?.length > 0
       ? validImages.map((url) => ({ FileName: url }))
       : [{ FileName: fallbackImage }];
 
   const onMouseEnter = () => {
-    if (swiperRef.current && swiperRef.current.swiper && slides.length > 1) {
+    if (swiperRef.current && swiperRef.current.swiper && slides?.length > 1) {
       swiperRef.current.swiper.slideNext();
     }
   };
@@ -122,7 +122,7 @@ const ProductsCard = ({ selectedCategoryItems }) => {
   return (
     <div>
       <div className="grid lg:grid-cols-4 lg:gap-5 space-y-7 md:space-y-10 sm:gap-10 gap-3 grid-cols-2 sm:mt-5 ">
-        {medicines.length > 0
+        {medicines?.length > 0
           ? medicines.map((item) => (
             <ProductCardItem
               key={item.id}

@@ -64,7 +64,7 @@ export const ProductProvider = ({ children }) => {
   };
 
   const getItemsByCategory = async (id) => {
-    if (id === selectedCategoryId && selectedCategoryItems.length > 0) return;
+    if (id === selectedCategoryId && selectedCategoryItems?.length > 0) return;
 
     try {
       const res = await getAxiosCall(

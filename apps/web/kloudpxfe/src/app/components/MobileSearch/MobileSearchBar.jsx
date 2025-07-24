@@ -96,13 +96,13 @@ const MobileSearchBar = () => {
       )}
       <div
         className={`dropdown-mobile ${
-          searchResults.length === 0 && searchQuery.length > 0
+          searchResults?.length === 0 && searchQuery?.length > 0
             ? "active"
             : "inactive"
         }`}
       >
         <ul className="dropdown-menu-mobile">
-          {searchResults.length === 0 && searchQuery.length > 0 && (
+          {searchResults?.length === 0 && searchQuery?.length > 0 && (
             <>
               <ul>
                 <h5 className="header-search-KSF">Keep Shopping For</h5>

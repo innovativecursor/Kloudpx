@@ -1,260 +1,84 @@
-import { useState, useEffect } from "react";
-import M from "materialize-css";
-import CountryDropdown from "../CountryDropdown/CountryDropdown";
-import CollapsibleWithRadioButton from "../CollapsibleWithRadioButton/CollapsibleWithRadioButton";
-import AddressesTabContent from "../AddressesTabContent/AddressesTabContent";
+import React from "react";
 
-function CheckoutContent() {
-  const [activeCollapsible, setActiveCollapsible] = useState(0); // State to track active collapsible
-
-  useEffect(() => {
-    // Initialize Materialize collapsible
-    const collapsibles = document.querySelectorAll(".collapsible");
-    M.Collapsible.init(collapsibles, {});
-  }, []); // Run only once after the component mounts
-
-  const handleNext = () => {
-    setActiveCollapsible(activeCollapsible + 1); // Move to the next collapsible
-  };
-
+const CheckoutContent = () => {
   return (
-    <div className="container">
-      <div className="row">
-        <div className="col l12 s12 m9">
-          <h4 className="cartItemsBlock-heading">Order Details</h4>
-        </div>
-        <div className="col l6 s12">
-          {/* Collapsible 2: Address Inputs */}
-          <ul
-            className="collapsible shadow-none-collap"
-            data-collapsible="accordion"
-          >
-            <li className={activeCollapsible === 1 ? "active" : ""}>
-              <div className="collapsible-header">
-                <h4>Shipping Address</h4>
-              </div>
-              <div className="collapsible-body">
-                {/* <div className="row">
-                  <div className="input-field col s6">
-                    <div className="input-group prepend">
-                      <div className="input-group-text input-account-grp-setting">
-                        <i className="material-icons register-person-icon input-account-icon">
-                          account_circle
-                        </i>
-                      </div>
-                      <input
-                        className="browser-default mobile"
-                        name="firstName"
-                        placeholder="First Name"
-                        type="text" // Change input type to text
-                      />
-                    </div>
-                  </div>
-                  <div className="input-field col s6">
-                    <div className="input-group prepend">
-                      <div className="input-group-text input-account-grp-setting">
-                        <i className="material-icons register-person-icon input-account-icon">
-                          account_circle
-                        </i>
-                      </div>
-                      <input
-                        className="browser-default mobile"
-                        name="lastName"
-                        placeholder="Last Name"
-                        type="text" // Change input type to text
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="input-field col s12">
-                    <div className="input-group prepend">
-                      <div className="input-group-text input-account-grp-setting">
-                        <i className="material-icons register-person-icon input-account-icon">
-                          home
-                        </i>
-                      </div>
-                      <input
-                        className="browser-default mobile"
-                        name="address"
-                        placeholder="Address"
-                        type="text" // Change input type to text
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="input-field col s12">
-                    <div className="input-group prepend">
-                      <div className="input-group-text input-account-grp-setting">
-                        <i className="material-icons register-person-icon input-account-icon">
-                          home
-                        </i>
-                      </div>
-                      <input
-                        className="browser-default mobile"
-                        name="confirmAddress"
-                        placeholder="Confirm Address"
-                        type="text" // Change input type to text
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="input-field col s6">
-                    <div className="input-group prepend">
-                      <div className="input-group-text input-account-grp-setting">
-                        <i className="material-icons register-person-icon input-account-icon">
-                          phone_iphone
-                        </i>
-                      </div>
-                      <input
-                        className="browser-default mobile"
-                        name="mobileNumber"
-                        placeholder="Mobile Number"
-                        type="number" // Change input type to text
-                      />
-                    </div>
-                  </div>
-                  <CountryDropdown />
-                </div>
-                <div className="row">
-                  <div className="input-field col s6">
-                    <div className="input-group prepend">
-                      <div className="input-group-text input-account-grp-setting">
-                        <i className="material-icons register-person-icon input-account-icon">
-                          flag
-                        </i>
-                      </div>
-                      <input
-                        className="browser-default mobile"
-                        name="state"
-                        placeholder="State/Province"
-                        type="text" // Change input type to text
-                      />
-                    </div>
-                  </div>
-                  <div className="input-field col s6">
-                    <div className="input-group prepend">
-                      <div className="input-group-text input-account-grp-setting">
-                        <i className="material-icons register-person-icon input-account-icon">
-                          local_shipping
-                        </i>
-                      </div>
-                      <input
-                        className="browser-default mobile"
-                        name="postalCode"
-                        placeholder="Postal Code"
-                        type="number" // Change input type to text
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="col s12">
-                    <label>
-                      <input
-                        type="checkbox"
-                        className="filled-in"
-                        checked="checked"
-                      />
-                      <span>
-                        My billing address is the same as my shipping address.
-                      </span>
-                    </label>
-                  </div>
-                </div> */}
-                <div className="col l12">
-                  <LinkddressesTabContent />
-                </div>
+    <div>
+      <div className="bg-[#0070ba]/12 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
+        <h3 className="font-semibold text-center dark-text tracking-wider sm:text-base text-sm dark-text">
+          2 items in your cart
+        </h3>
+      </div>
 
-                <button className="btn btn-secondary" onClick={handleNext}>
-                  Confirm Details
-                </button>
-              </div>
-            </li>
-          </ul>
-
-          {/* Collapsible 3: Payment Inputs */}
-          <ul
-            className="collapsible shadow-none-collap"
-            data-collapsible="accordion"
-          >
-            <li className={activeCollapsible === 2 ? "active" : ""}>
-              <div className="collapsible-header">
-                <h4>Payment</h4>
-              </div>
-              <div className="collapsible-body">
-                {/* <CollapsibleWithRadioButton /> */}
-                <button className="btn btn-secondary" onClick={handleNext}>
-                  Place to Order
-                </button>
-              </div>
-            </li>
-          </ul>
+      <div className="space-y-4">
+        <div className="bg-green-300 w-full py-3 px-6 rounded-sm flex justify-between items-center">
+          <div className="flex gap-2 items-center">
+            <img
+              src="/assets/fallback.png"
+              className="sm:w-12 sm:h-12 w-8 h-8"
+            />
+            <div className="flex flex-col">
+              <h1 className="font-light sm:text-[11px] text-[9px]">
+                Supplements
+              </h1>
+              <h1 className="font-semibold sm:text-base text-xs">
+                Magnesium Plus{" "}
+              </h1>
+            </div>
+          </div>
+          <div className="flex flex-col items-center">
+            <h1 className="font-medium sm:text-base text-xs">₱400.00</h1>
+            <div className="flex items-center gap-2">
+              <input
+                type="radio"
+                className="appearance-none bg-transparent border border-[#0070ba] cursor-pointer rounded-full sm:w-4 sm:h-4 w-2 h-2 checked:bg-blue-500"
+              />
+              <label className="text-[9px]">Save for Later</label>
+            </div>
+          </div>
         </div>
-        <div className="col l6 s12">
-          <div className="card">
-            <div className="card-content">
-              <div className="card-header-details-in-order-summary">
-                <p>Order Summary</p>
-                <p className="edit-cart">Edit cart</p>
-              </div>
-              <div className="divider"></div>
-              <div className="second-half-summary">
-                <div className="items-number-cart">
-                  <p>1 item</p>
-                </div>
-                <div className="img-and-final-price">
-                  <div>
-                    <div className="text-and-size">
-                      <img
-                        className="order-summary-img"
-                        src="https://cdn11.bigcommerce.com/s-j3ehq026w9/products/111/images/404/mug-today-is-a-good-day_1__54893.1580725321.220.290.jpg?c=1"
-                        alt=""
-                      />
-                      <div>
-                        <p className="items-on-order">
-                          1 x [Sample] Smith Journal 13
-                        </p>
-                        <p className="size-items">Size small</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <p className="order-price-summary">$650.00</p>
-                  </div>
-                </div>
-              </div>
-              <div className="divider"></div>
-              <div className="third-half-summary">
-                <div className="subtotal-summary-order">
-                  <p className="shop-text">Subtotal</p>
-                  <p className="shop-price">$650.00</p>
-                </div>
-                <div className="subtotal-summary-order">
-                  <p className="shop-text">Shipping</p>
-                  <p className="shop-price">--</p>
-                </div>
-                <div className="subtotal-summary-order">
-                  <p className="shop-text">Tax</p>
-                  <p className="shop-price">$0.00</p>
-                </div>
-                <div className="subtotal-summary-order">
-                  <p className="coupon-gift-text">Coupon/Gift Certificate</p>
-                </div>
-              </div>
-              <div className="divider"></div>
-              <div className="fourth-half-summary">
-                <h6>Total(USD)</h6>
-                <h3>$650.00</h3>
-              </div>
+        <div className="bg-green-300 w-full py-3 px-6 rounded-sm flex justify-between items-center">
+          <div className="flex gap-2 items-center">
+            <img
+              src="/assets/fallback.png"
+              className="sm:w-12 sm:h-12 w-8 h-8"
+            />
+            <div className="flex flex-col">
+              <h1 className="font-light sm:text-[11px] text-[9px]">
+                Supplements
+              </h1>
+              <h1 className="font-semibold sm:text-base text-xs">
+                Magnesium Plus{" "}
+              </h1>
+            </div>
+          </div>
+          <div className="flex flex-col items-center">
+            <h1 className="font-medium sm:text-base text-xs">₱400.00</h1>
+            <div className="flex items-center gap-2">
+              <input
+                type="radio"
+                className="appearance-none bg-transparent border border-[#0070ba] cursor-pointer rounded-full sm:w-4 sm:h-4 w-2 h-2 checked:bg-blue-500"
+              />
+              <label className="text-[9px]">Save for Later</label>
             </div>
           </div>
         </div>
       </div>
+
+      <div className="flex justify-between gap-5 sm:mt-10 mt-8 items-center">
+        <div className=" w-[40%]  ">
+          <button className="bg-[#0070BA]/10 text-black hover:bg-[#005c96]/50 w-full py-3 rounded-full font-light 
+          sm:text-[11px] text-[8px] cursor-pointer">
+            Proceed to Checkout
+          </button>
+        </div>
+        <div className=" w-[60%]  ">
+          <button className="bg-[#0070BA] text-white hover:bg-[#005c96]  sm:text-[11px] text-[8px]  w-full py-3 rounded-full font-semibold cursor-pointer">
+            Proceed to Checkout
+          </button>
+        </div>
+      </div>
     </div>
   );
-}
+};
 
 export default CheckoutContent;

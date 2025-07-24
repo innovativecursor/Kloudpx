@@ -75,7 +75,7 @@ export default function SearchBar() {
   return (
     <div
       ref={wrapperRef}
-      className="relative w-full lg:max-w-4xl md:max-w-lg max-w-full mx-auto"
+      className="relative lg:max-w-4xl md:max-w-lg w-full sm:mx-auto"
     >
       <div className="flex items-center md:h-14 h-12 bg-[#EDF4F6] rounded-full overflow-hidden border-2 border-transparent hover:border-[#0070ba] focus-within:border-[#0070ba] transition-all duration-200 cursor-pointer">
         <input
@@ -83,16 +83,20 @@ export default function SearchBar() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search for products, categories or brands..."
-          className="flex-grow px-6 md:py-4 py-2 bg-transparent text-sm text-gray-800 placeholder-gray-600 focus:outline-none placeholder:text-xs "
+          className="flex-grow px-6 md:py-4 py-2 bg-transparent text-sm w-60 sm:w-full text-gray-800 placeholder-gray-600 focus:outline-none sm:placeholder:text-xs placeholder:text-[10px]  "
         />
-        <button className="bg-[#006EBB] md:w-20 w-12 md:p-4 p-2">
+        {/* <button className="bg-[#006EBB] md:w-20 w-16 md:p-4 p-2">
           <i className="ri-search-line text-white text-2xl"></i>
+        </button> */}
+
+        <button className="bg-[#006EBB] w-12 md:w-20 p-2 md:p-4 flex justify-center items-center">
+          <i className="ri-search-line text-white text-xl md:text-2xl"></i>
         </button>
       </div>
 
       {showDropdown && (
         <ul className="absolute z-50 w-full py-4 px-4 bg-white rounded-2xl mt-4 thin-scrollbar border border-gray-300 max-h-96 overflow-y-auto shadow-md">
-          {results.length > 0 ? (
+          {results?.length > 0 ? (
             results.map((item, idx) => (
               <li
                 key={idx}

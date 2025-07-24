@@ -25,7 +25,7 @@ const ShopByDepartmentSection = ({ menuItems, openItems, toggleItem }) => {
               style={{ fontSize: "13px", fontWeight: 500 }}
             >
               <span>{menuItem.title}</span>
-              {menuItem.subItems.length > 0 && (
+              {menuItem.subItems?.length > 0 && (
                 <div style={{ position: "absolute", right: 0 }}>
                   {openItems[menuItem.id] ? (
                     <i style={{ fontSize: "20px" }} className="material-icons">
