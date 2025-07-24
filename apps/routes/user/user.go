@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/middleware"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/user/checkoutflow"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/oauthuser"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/uploadprescription"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/userflow"
@@ -101,6 +102,32 @@ func User(db *gorm.DB) {
 	})
 	apiV1.GET("/user/popular-medicines", func(c *gin.Context) {
 		userflow.GetPopularMedicines(c, db)
+	})
+
+	//checkout flow
+
+	apiV1.PUT("/user/save-for-later/:id", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		checkoutflow.ToggleSaveForLater(c, db)
+	})
+
+	apiV1.POST("/user/check-out", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		checkoutflow.InitiateCheckout(c, db)
+	})
+
+	apiV1.POST("/user/add-update-address", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		checkoutflow.AddOrUpdateAddress(c, db)
+	})
+
+	apiV1.GET("/user/get-address", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		checkoutflow.GetUserAddresses(c, db)
+	})
+
+	apiV1.POST("/user/select-address", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		checkoutflow.SelectAddressForCheckout(c, db)
+	})
+
+	apiV1.POST("/user/select-delivery-type", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		checkoutflow.SelectDeliveryType(c, db)
 	})
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
