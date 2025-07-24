@@ -229,7 +229,7 @@ const CartModal = ({ isOpen, onClose }) => {
               onClick={handleCheckout}
               disabled={hasUnsettledItems}
               className={classNames(
-                "w-full py-3 rounded-full font-semibold",
+                "w-full py-3 rounded-full font-semibold cursor-pointer",
                 hasUnsettledItems
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-[#0070BA] text-white hover:bg-[#005c96]"

@@ -9,15 +9,19 @@ import { useProductContext } from "@/app/contexts/ProductContext";
 import { useEffect } from "react";
 
 function Products() {
-  const { getTwoCategory, twoCategory, getAllPopular, popular } =
-    useProductContext();
+  const {
+    getTwoCategory,
+    twoCategory,
+    getAllPopular,
+    popular,
+    getAllFeature,
+    feature,
+  } = useProductContext();
 
   const firstCategory = twoCategory[0]?.medicines || [];
   const firstCategoryName = twoCategory[0]?.categoryname || null;
   const secondCategory = twoCategory[1]?.medicines || [];
   const secondCategoryName = twoCategory[1]?.categoryname || null;
-
-  // console.log(twoCategory);
 
   const articles = [
     {
@@ -69,7 +73,8 @@ function Products() {
       starsImg: "/assets/star.png",
       message:
         "The Lorem Ipsum we know today is derived from parts of the first book Liber Primus and its discussion on hedonism, the words of which had been altered, added and removed to make it nonsensical and improper Latin. It is not known exactly when the text gained its current traditional form.",
-      userImg: "/assets/image (11).png",
+      userImg:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHAfj5_vuHuJdjhETrkbtnpfUzSNmfySGqUA&s",
       name: "Maria L. -- Quezon City",
       date: "June 12, 2025",
     },
@@ -78,7 +83,8 @@ function Products() {
       starsImg: "/assets/star.png",
       message:
         "The Lorem Ipsum we know today is derived from parts of the first book Liber Primus and its discussion on hedonism, the words of which had been altered, added and removed to make it nonsensical and improper Latin. It is not known exactly when the text gained its current traditional form.",
-      userImg: "/assets/image (12).png",
+      userImg:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQLrmn8PP7TzIV8eX-hmIDxjCX0maCla6GgFxexeSuz494RgG9l2O-YWpZnBPCVBcYU628&usqp=CAU",
       name: "John D. -- Manila",
       date: "June 10, 2025",
     },
@@ -87,7 +93,8 @@ function Products() {
       starsImg: "/assets/star.png",
       message:
         "The Lorem Ipsum we know today is derived from parts of the first book Liber Primus and its discussion on hedonism, the words of which had been altered, added and removed to make it nonsensical and improper Latin. It is not known exactly when the text gained its current traditional form.",
-      userImg: "/assets/image (13).png",
+      userImg:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCI56rio-DbtP0aixth43jSTat_dblFtAC9V1-d2y1A3dGMk7J-bSbBamZ3F4HBadGueg&usqp=CAU",
       name: "Ana S. -- Cebu City",
       date: "June 8, 2025",
     },
@@ -96,7 +103,8 @@ function Products() {
       starsImg: "/assets/star.png",
       message:
         "The Lorem Ipsum we know today is derived from parts of the first book Liber Primus and its discussion on hedonism, the words of which had been altered, added and removed to make it nonsensical and improper Latin. It is not known exactly when the text gained its current traditional form.",
-      userImg: "/assets/image (12).png",
+      userImg:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQX-Es58QnSLqs62-kc9H0Ejm8OcorFloBT_wg3ia9P0IYFhiRLa-BuFPYq-vQ4qaEenuk&usqp=CAU",
       name: "Carlos M. -- Davao",
       date: "June 6, 2025",
     },
@@ -110,14 +118,13 @@ function Products() {
 
   useEffect(() => {
     getAllPopular();
+    getAllFeature();
   }, []);
-
-  // console.log(popular);
 
   return (
     <>
       <Category7 />
-      {popular.length > 0 ? (
+      {popular?.length > 0 ? (
         <div>
           <Cards data={popular} title="Popular Properties" />
         </div>
@@ -126,9 +133,12 @@ function Products() {
       <div className="mt-12 sm:mt-16 md:mt-20 lg:mt-28">
         <Cards data={firstCategory} title={firstCategoryName} />
       </div>
-      <div className="responsive-mx mt-12 sm:mt-16 md:mt-20 bg-gray-200/70 rounded-xl sm:py-12 py-8 sm:px-6 px-4">
-      <FeaturedBrand />
-      </div>
+
+      {Array.isArray(feature) && feature?.length > 0 && (
+        <div className="responsive-mx mt-12 sm:mt-16 md:mt-20 bg-gray-200/70 rounded-xl sm:py-12 py-8 sm:px-6 px-4">
+          <FeaturedBrand feature={feature} />
+        </div>
+      )}
       <div className="mt-12 sm:mt-16 md:mt-20 lg:mt-28">
         <Cards data={secondCategory} title={secondCategoryName} />
       </div>

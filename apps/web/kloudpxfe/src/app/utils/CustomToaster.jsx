@@ -2,14 +2,13 @@
 
 import { Toaster } from "react-hot-toast";
 
-// Icon wrapper with dark translucent bg & pulse animation
 const IconWrapper = ({ children, color }) => (
   <div
     style={{
       width: 32,
       height: 32,
       borderRadius: 8,
-      backgroundColor: `${color}33`, // 20% opacity
+      backgroundColor: `${color}33`, 
       display: "flex",
       alignItems: "center",
       justifyContent: "center",

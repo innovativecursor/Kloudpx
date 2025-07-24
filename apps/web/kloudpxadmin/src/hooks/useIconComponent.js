@@ -4,6 +4,7 @@ import * as AiIcons from "react-icons/ai";
 import * as BiIcons from "react-icons/bi";
 import * as GiIcons from "react-icons/gi";
 import * as RiIcons from "react-icons/ri";
+import * as TbIcons from "react-icons/tb";
 
 const iconLibraries = {
   Fa: FaIcons,

@@ -15,7 +15,7 @@ const ProductDeatilsCard = ({ details }) => {
   const discountedPrice = price - (price * discountPercent) / 100;
 
   return (
-    <div>
+    <div className="">
       <div className="">
         <div className="flex items-start gap-8 mb-6">
           <h2 className="sm:text-xl text-lg font-light text-color ">
@@ -69,34 +69,34 @@ const ProductDeatilsCard = ({ details }) => {
         </div>
       </div>
 
-<div className="w-full max-w-3xl mx-auto rounded-lg bg-[#f0f8ff]  text-sm sm:mt-12 mt-7">
-      {/* Delivery row */}
-      <div className="flex items-start gap-4 p-4 border-b border-blue-100">
-        <RiTruckLine className="w-8 h-8 mt-0.5 text-blue-900" />
-        <div>
-          <p className="font-semibold text-blue-950">Delivery by 20 July, 25</p>
-          <a href="#" className="underline text-xs mt-2">
-            Enter your postal code for Delivery Availability
-          </a>
-        </div>
-      </div>
-
-      {/* Return row */}
-      <div className="flex items-start gap-4 p-4">
-        <RiArrowGoBackLine className="w-8 h-8 mt-0.5 text-blue-900" />
-        <div>
-          <p className="font-semibold text-blue-950">Return Delivery</p>
-          <p className="text-gray-600 text-xs">
-            Free 30 Days Delivery Returns.{" "}
-            <a href="#" className="underline">
-              Details
+      <div className="w-full max-w-3xl mx-auto rounded-lg bg-[#f0f8ff]  text-sm sm:mt-12 mt-7">
+        {/* Delivery row */}
+        <div className="flex items-start gap-4 p-4 border-b border-blue-100">
+          <RiTruckLine className="w-8 h-8 mt-0.5 text-blue-900" />
+          <div>
+            <p className="font-semibold text-blue-950">
+              Delivery by 20 July, 25
+            </p>
+            <a href="#" className="underline text-xs mt-2">
+              Enter your postal code for Delivery Availability
             </a>
-          </p>
+          </div>
+        </div>
+
+        {/* Return row */}
+        <div className="flex items-start gap-4 p-4">
+          <RiArrowGoBackLine className="w-8 h-8 mt-0.5 text-blue-900" />
+          <div>
+            <p className="font-semibold text-blue-950">Return Delivery</p>
+            <p className="text-gray-600 text-xs">
+              Free 30 Days Delivery Returns.{" "}
+              <a href="#" className="underline">
+                Details
+              </a>
+            </p>
+          </div>
         </div>
       </div>
-    </div>
-
-
     </div>
   );
 };
