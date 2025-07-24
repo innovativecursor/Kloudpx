@@ -57,9 +57,9 @@ const ImageUploader = () => {
     }
 
     const totalCount =
-      base64Images.length +
-      compressedBase64Images.length +
-      existingImages.length;
+      base64Images?.length +
+      compressedBase64Images?.length +
+      existingImages?.length;
 
     if (totalCount > 5) {
       setError("❌ Max 5 images allowed (including existing).");
@@ -156,9 +156,9 @@ const ImageUploader = () => {
         ))}
       </div>
 
-      {(uploadedImageIds.length > 0 || existingImageIds.length > 0) && (
+      {(uploadedImageIds?.length > 0 || existingImageIds?.length > 0) && (
         <p className="text-green-600 text-sm">
-          ✅ Total {existingImageIds.length + uploadedImageIds.length} image(s)
+          ✅ Total {existingImageIds?.length + uploadedImageIds?.length} image(s)
           selected
         </p>
       )}

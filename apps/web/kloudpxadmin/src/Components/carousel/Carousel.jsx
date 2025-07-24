@@ -114,7 +114,7 @@ const Carousel = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
-            {carouselImages.length === 0 ? (
+            {carouselImages?.length === 0 ? (
               <tr>
                 <td
                   colSpan="4"

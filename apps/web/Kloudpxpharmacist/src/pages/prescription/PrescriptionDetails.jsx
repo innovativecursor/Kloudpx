@@ -33,7 +33,7 @@ const PrescriptionDetails = () => {
   };
 
   const renderCards = (data) => {
-    if (!data || data.length === 0) {
+    if (!data || data?.length === 0) {
       return <p className="text-gray-500 mt-4">No data available.</p>;
     }
 
@@ -104,7 +104,7 @@ const PrescriptionDetails = () => {
           }`}
           onClick={() => setActiveTab("past")}
         >
-          Past ({past.length})
+          Past ({past?.length})
         </button>
         <button
           className={`px-12 py-3 rounded-full ${
@@ -114,7 +114,7 @@ const PrescriptionDetails = () => {
           }`}
           onClick={() => setActiveTab("unsettled")}
         >
-          Unsettled ({unsettled.length})
+          Unsettled ({unsettled?.length})
         </button>
       </div>
 

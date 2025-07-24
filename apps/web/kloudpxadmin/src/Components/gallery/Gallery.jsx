@@ -111,7 +111,7 @@ const Gallery = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 bg-white">
-            {Images.length === 0 ? (
+            {Images?.length === 0 ? (
               <tr>
                 <td colSpan="5" className="text-center py-10 text-gray-400">
                   No images uploaded yet.

@@ -119,7 +119,7 @@ const CustomModal = ({ isOpen, onClose, selectedPrescription }) => {
               </h3>
 
               {Array.isArray(prescriptionCart) &&
-                prescriptionCart.length > 0 ? (
+                prescriptionCart?.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-sm text-left border">
                     <thead className="bg-gray-200 text-gray-700 font-semibold">

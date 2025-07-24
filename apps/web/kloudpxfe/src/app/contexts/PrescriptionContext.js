@@ -1,5 +1,4 @@
-
-
+"use client";
 import { createContext, useContext, useState } from "react";
 import toast from "react-hot-toast";
 import { useAuth } from "@/app/contexts/AuthContext";

@@ -26,7 +26,7 @@ const Page = () => {
     if (categoryIdFromUrl) {
       const id = parseInt(categoryIdFromUrl, 10);
       setSelectedCategoryId(id);
-      if (selectedCategoryItems.length === 0) {
+      if (selectedCategoryItems?.length === 0) {
         getItemsByCategory(id);
       }
       const cat = category.find((c) => c.ID === id);
@@ -46,7 +46,7 @@ const Page = () => {
         <div className="flex justify-between items-start md:mt-5 mt-4 dark-text font-medium">
           <div className="flex gap-1 lg:text-base md:text-sm">
             <p className="opacity-70">
-              Viewing {selectedCategoryItems.length} results of
+              Viewing {selectedCategoryItems?.length} results of
             </p>{" "}
             <span className="dark-text">"Medicine"</span>
           </div>

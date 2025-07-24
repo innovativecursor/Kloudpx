@@ -15,6 +15,7 @@ import * as TbIcons from "react-icons/tb";
 import * as MdIcons from "react-icons/md";
 import * as BiIcons from "react-icons/bi";
 import * as GiIcons from "react-icons/gi";
+import * as RiIcons from "react-icons/ri";
 import { generateSlug } from "@/app/utils/slugify";
 
 const getIconComponent = (iconName) => {

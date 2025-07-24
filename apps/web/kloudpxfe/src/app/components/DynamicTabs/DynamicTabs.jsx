@@ -25,7 +25,7 @@ function DynamicTabs({ items }) {
       <ul className="tabs col">
         {items.map((item, index) => (
           <li
-            className={`tab col s${Math.floor(12 / items.length)}`}
+            className={`tab col s${Math.floor(12 / items?.length)}`}
             key={index}
           >
             <Link

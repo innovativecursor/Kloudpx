@@ -48,7 +48,7 @@ const Hamburger = () => {
             className="fixed md:top-32 top-20 max-w-md bg-white max-h-96 overflow-y-scroll rounded-sm z-[99] thin-scrollbar"
           >
             {/* User Info */}
-            <div className="p-6">
+            <div className="pt-6 pb-3 px-6 ">
               <div className="flex items-center gap-3">
                 <img
                   src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
@@ -69,9 +69,9 @@ const Hamburger = () => {
             </div>
 
             {/* Menu Items from API */}
-            {category.length > 0 ? (
+            {category?.length > 0 ? (
               <div>
-                <ul className="space-y-1 font-normal text-xs">
+                <ul className="space-y-1 font-normal text-xs mb-5">
                   {category.map((item, index) => (
                     <li
                       key={index}
@@ -84,7 +84,7 @@ const Hamburger = () => {
                 </ul>
               </div>
             ) : (
-              <div className="text-center text-gray-500  text-xs mb-20 mt-6">
+              <div className="text-center text-gray-500  text-[9px] mb-20 mt-6">
                 No Category Available at the Moment.
               </div>
             )}

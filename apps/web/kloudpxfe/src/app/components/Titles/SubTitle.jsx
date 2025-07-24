@@ -6,7 +6,7 @@ const SubTitle = ({ paths }) => {
       {paths.map((item, index) => (
         <span key={index}>
           {item}
-          {index !== paths.length - 1 && (
+          {index !== paths?.length - 1 && (
             <i className="ri-arrow-right-s-line mx-1"></i>
           )}
         </span>

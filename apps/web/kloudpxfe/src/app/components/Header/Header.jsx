@@ -39,20 +39,7 @@ const Header = () => {
 
           {/* Right: User & Cart */}
           <div className="flex items-center gap-4">
-            {/* <div>
-              {!loading && user ? (
-                <UserProfile user={user} logout={logout} />
-              ) : (
-                <div
-                  onClick={!loading ? login : undefined}
-                  className="font-semibold sm:text-xs text-xs cursor-pointer"
-                >
-                  {loading ? "Signing In..." : "Login/Signup"}
-                </div>
-              )}
-            </div> */}
-
-             <div>
+            <div>
               {!isAuthLoaded ? null : !loading && user ? (
                 <UserProfile user={user} logout={logout} />
               ) : (
@@ -65,16 +52,14 @@ const Header = () => {
               )}
             </div>
 
-
             {/* Cart Icon with Hover */}
             <div
               className="relative cursor-pointer"
-              onMouseEnter={() => setIsOpen(true)}
-              onMouseLeave={() => setIsOpen(false)}
+              onClick={() => setIsOpen(true)}
             >
               <FiShoppingCart className="md:text-3xl text-2xl font-light" />
               <span className="absolute -top-1 -right-1 text-[10px] bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center">
-                {cartLength}
+                {isAuthLoaded ? cartLength : 0}
               </span>
 
               {/* Cart Modal */}
@@ -93,9 +78,9 @@ const Header = () => {
         <div className="flex-between-center border-t border-b border-gray-200">
           <div className="w-full px-3 md:px-[8vw] py-3 sm:py-2">
             <div className="flex items-center justify-center w-full">
-              <div className="w-fit bg-white">
+              {/* <div className="w-fit bg-white">
                 <Hamburger />
-              </div>
+              </div> */}
               <div className="w-full overflow-hidden">
                 <TopItems />
               </div>

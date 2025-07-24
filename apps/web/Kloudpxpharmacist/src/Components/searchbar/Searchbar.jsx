@@ -48,7 +48,7 @@ const Searchbar = () => {
         <div className="absolute z-50 w-full mt-1 bg-white border font-medium rounded-md shadow-lg max-h-60 overflow-y-auto">
           {searchLoading ? (
             <p className="p-3 text-sm text-gray-900">Loading...</p>
-          ) : searchResults && searchResults.length ? (
+          ) : searchResults && searchResults?.length ? (
             searchResults.map((item, idx) => (
               <div
                 key={idx}
