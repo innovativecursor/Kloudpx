@@ -16,10 +16,11 @@ const Page = () => {
 
   const {
     selectedCategoryItems,
-    selectedCategoryName,
+    selectedCategoryId,
     setSelectedCategoryId,
     setSelectedCategoryName,
     category,
+    setSelectedCategoryItems,
     getItemsByCategory,
   } = useProductContext();
   useEffect(() => {
@@ -64,7 +65,7 @@ const Page = () => {
         </div>
 
         <section className="flex mt-7">
-          <ProductsFilter />
+          <ProductsFilter setSelectedCategoryItems={setSelectedCategoryItems} />
           <div className="flex-1 md:ml-9">
             <AllProducts selectedCategoryItems={selectedCategoryItems} />
           </div>

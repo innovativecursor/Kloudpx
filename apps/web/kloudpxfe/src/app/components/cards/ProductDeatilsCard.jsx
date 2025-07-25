@@ -84,7 +84,7 @@ const ProductDeatilsCard = ({ details }) => {
         </div>
 
         {/* Return row */}
-        <div className="flex items-start gap-4 sm:p-4 p-3">
+        {/* <div className="flex items-start gap-4 sm:p-4 p-3">
           <RiArrowGoBackLine className="w-8 h-8 mt-0.5 text-blue-900" />
           <div>
             <p className="font-semibold text-blue-950 text-sm ">
@@ -94,7 +94,7 @@ const ProductDeatilsCard = ({ details }) => {
               Free 30 Days Delivery Returns. Details
             </p>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

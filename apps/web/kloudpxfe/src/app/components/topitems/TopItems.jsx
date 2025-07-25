@@ -7,7 +7,6 @@ import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
 import useSwiperNavigation from "@/app/hooks/useSwiperNavigation";
 import { useProductContext } from "@/app/contexts/ProductContext";
-import { useRouter } from "next/navigation";
 
 import * as FaIcons from "react-icons/fa";
 import * as AiIcons from "react-icons/ai";
@@ -16,7 +15,7 @@ import * as MdIcons from "react-icons/md";
 import * as BiIcons from "react-icons/bi";
 import * as GiIcons from "react-icons/gi";
 import * as RiIcons from "react-icons/ri";
-import { generateSlug } from "@/app/utils/slugify";
+import useCategoryHandler from "@/app/hooks/useCategoryHandler";
 
 const getIconComponent = (iconName) => {
   if (!iconName) return null;
@@ -43,24 +42,8 @@ const getIconComponent = (iconName) => {
 
 const TopItems = () => {
   const { prevRef, nextRef, setSwiperInstance } = useSwiperNavigation();
-  const {
-    category,
-    getItemsByCategory,
-    selectedCategoryId,
-    setSelectedCategoryId,
-    setSelectedCategoryName,
-  } = useProductContext();
-  const router = useRouter();
-
-  const handleCategoryClick = async (id) => {
-    const selected = category.find((cat) => cat.ID === id);
-    setSelectedCategoryId(id);
-    setSelectedCategoryName(selected?.CategoryName || "");
-    await getItemsByCategory(id);
-    const categorySlug =
-      selected?.CategoryName?.toLowerCase().replace(/\s+/g, "-") || "";
-    router.push(`/Products?${categorySlug}&category=${id}`);
-  };
+  const { category, selectedCategoryId } = useProductContext();
+  const { handleCategoryClick } = useCategoryHandler();
 
   return (
     <div className="w-full">
@@ -81,7 +64,8 @@ const TopItems = () => {
           return (
             <SwiperSlide key={item.ID || index} className="!w-auto">
               <div
-                onClick={() => handleCategoryClick(item.ID)}
+                // onClick={() => handleCategoryClick(item.ID)}
+                onClick={() => handleCategoryClick(item.ID, true)}
                 className={`flex items-center justify-center min-w-max md:px-5 px-2 gap-2 cursor-pointer transition-all duration-300 ease-in-out whitespace-nowrap h-[60px]
     ${
       selectedCategoryId === item.ID ? "text-[#0070ba]" : "hover:text-[#0070ba]"

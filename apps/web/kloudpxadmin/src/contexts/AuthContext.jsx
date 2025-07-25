@@ -14,13 +14,31 @@ const AuthProvider = ({ children }) => {
     localStorage.getItem("access_token") || null
   );
 
+  // useEffect(() => {
+  //   const initializeUser = async () => {
+
+  //     if (token && !user) {
+  //       const adminInfo = await fetchAdminInfo();
+  //       if (adminInfo) {
+  //         setUser(adminInfo);
+  //       }
+  //     }
+  //   };
+
+  //   initializeUser();
+  // }, [token]);
+
   useEffect(() => {
     const initializeUser = async () => {
-      if (token && !user) {
-        const adminInfo = await fetchAdminInfo();
-        if (adminInfo) {
-          setUser(adminInfo);
-        }
+      if (!token) return;
+
+      if (!user) {
+        try {
+          const adminInfo = await fetchAdminInfo();
+          if (adminInfo) {
+            setUser(adminInfo);
+          }
+        } catch (error) {}
       }
     };
 
@@ -35,6 +53,9 @@ const AuthProvider = ({ children }) => {
   // --------- AUTH FUNCTIONS ---------
 
   const fetchAdminInfo = async () => {
+    if (!token) {
+      return null;
+    }
     try {
       const res = await getAxiosCall(endpoints.admininfo.get);
       if (res && res.data) {

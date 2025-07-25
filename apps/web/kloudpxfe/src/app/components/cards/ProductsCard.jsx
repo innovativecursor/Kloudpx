@@ -9,15 +9,12 @@ import { generateSlug } from "@/app/utils/slugify";
 import AddToCart from "../button/AddToCart";
 import { usePrescriptionContext } from "@/app/contexts/PrescriptionContext";
 import Prescription from "../modal/Prescription";
+import useProductNavigation from "@/app/hooks/useProductNavigation";
 
 const ProductCardItem = ({ item, fallbackImage }) => {
   const router = useRouter();
   const swiperRef = useRef(null);
-
-  const handleCardClick = (id, genericname) => {
-    const slug = generateSlug(genericname);
-    router.push(`/Products/${slug}/${id}`);
-  };
+  const { goToProductPage } = useProductNavigation();
 
   const validImages = (item.images || []).filter(
     (img) => typeof img === "string" && img.trim() !== ""
@@ -40,15 +37,13 @@ const ProductCardItem = ({ item, fallbackImage }) => {
     }
   };
 
-
-
   return (
     <div
       className="w-full sm:h-[380px]  h-[240px]  bg-white rounded-xl border-2 border-gray-100 
       md:shadow-[0_8px_15px_-6px_rgba(0,0,0,0.5)] shadow-[0_2px_6px_-3px_rgba(0,0,0,0.4)] cursor-pointer transform transition-transform duration-300 hover:scale-105 hover:shadow-xl overflow-hidden"
     >
       <div
-        onClick={() => handleCardClick(item.id, item.genericname)}
+        onClick={() => goToProductPage(item.id, item.genericname)}
         className="relative  sm:h-64  flex items-center justify-center h-36 px-4 shadow bg-[#F6F5FA]"
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
@@ -99,7 +94,11 @@ const ProductCardItem = ({ item, fallbackImage }) => {
             ₱{item?.price.toFixed(2)}
           </p> */}
           <p className="font-semibold sm:text-base text-xs">
-            ₱{(item?.price - (item?.price * (parseFloat(item?.discount) || 0) / 100)).toFixed(2)}
+            ₱
+            {(
+              item?.price -
+              (item?.price * (parseFloat(item?.discount) || 0)) / 100
+            ).toFixed(2)}
           </p>
 
           <AddToCart
@@ -124,12 +123,12 @@ const ProductsCard = ({ selectedCategoryItems }) => {
       <div className="grid lg:grid-cols-4 lg:gap-5 space-y-7 md:space-y-10 sm:gap-10 gap-3 grid-cols-2 sm:mt-5 ">
         {medicines?.length > 0
           ? medicines.map((item) => (
-            <ProductCardItem
-              key={item.id}
-              item={item}
-              fallbackImage={fallbackImage}
-            />
-          ))
+              <ProductCardItem
+                key={item.id}
+                item={item}
+                fallbackImage={fallbackImage}
+              />
+            ))
           : null}
       </div>
       {isOpen && <Prescription />}

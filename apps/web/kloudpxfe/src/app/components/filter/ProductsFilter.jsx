@@ -1,42 +1,84 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Range } from "react-range";
 import { CiFilter } from "react-icons/ci";
 import { useProductContext } from "@/app/contexts/ProductContext";
+import useCategoryHandler from "@/app/hooks/useCategoryHandler";
+import useProductNavigation from "@/app/hooks/useProductNavigation";
 
-const ProductsFilter = () => {
-  const { category } = useProductContext();
-  const [priceRange, setPriceRange] = useState([50, 13350]);
-  const [discountRange, setDiscountRange] = useState([10, 90]);
+const ProductsFilter = ({ setSelectedCategoryItems }) => {
+  const {
+    category,
+    selectedCategoryId,
+    setSelectedCategoryId,
+    getFilteredItems,
+    priceRange,
+    setPriceRange,
+    discountRange,
+    setDiscountRange,
+    getAllBrand,
+    branded,
+  } = useProductContext();
+  const { handleCategoryClick } = useCategoryHandler();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const { goToProductPage } = useProductNavigation();
+  const handleSingleCategoryChange = (categoryId) => {
+    setSelectedCategoryId(categoryId);
+    handleCategoryClick(categoryId);
+    setIsMobileOpen(false);
+  };
 
-  const brands = [
-    { id: 1, name: "Brand One" },
-    { id: 2, name: "Brand Two" },
-    { id: 3, name: "Brand Three" },
-    { id: 4, name: "Brand Four" },
-  ];
+  useEffect(() => {
+    if (!selectedCategoryId) return;
+
+    const [minPrice, maxPrice] = priceRange;
+    const [minDiscount, maxDiscount] = discountRange;
+
+    getFilteredItems(
+      selectedCategoryId,
+      minPrice,
+      maxPrice,
+      minDiscount,
+      maxDiscount
+    );
+  }, [selectedCategoryId, priceRange, discountRange]);
+
+  useEffect(() => {
+    if (!branded || branded.length === 0) {
+      getAllBrand();
+    }
+  }, []);
+
+  console.log(branded, "my data");
 
   const FilterContent = () => (
     <div className="bg-gray-100 h-full overflow-y-auto p-5">
-      {/* Category */}
       <span className="font-medium text-lg tracking-wide dark-text">
         Category
       </span>
+
       {category?.map((item) => (
-        <div key={item.ID} className="flex justify-between items-center mt-3">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              className="w-4 h-4 bg-transparent accent-[#0070ba] cursor-pointer"
-            />
-            <span className="text-sm tracking-wider">
-              {(item?.CategoryName?.slice(0, 15) || "No CategoryName") +
-                (item?.CategoryName?.length > 20 ? "... " : "")}
-            </span>
-          </div>
-          <span>22</span>
+        <div
+          key={item.ID}
+          className={`flex items-center gap-2 mt-3 cursor-pointer rounded px-2 py-1
+      ${
+        selectedCategoryId === item.ID
+          ? "bg-[#0070ba]/10 text-[#0070ba]"
+          : "hover:text-[#0070ba]"
+      }`}
+        >
+          <input
+            type="checkbox"
+            checked={selectedCategoryId === item.ID}
+            onChange={() => handleSingleCategoryChange(item.ID)}
+            className="w-4 h-4 bg-transparent accent-[#0070ba] cursor-pointer"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <span className="text-sm tracking-wider">
+            {(item?.CategoryName?.slice(0, 15) || "No CategoryName") +
+              (item?.CategoryName?.length > 20 ? "... " : "")}
+          </span>
         </div>
       ))}
 
@@ -45,13 +87,16 @@ const ProductsFilter = () => {
         <span className="font-medium text-lg tracking-wide dark-text">
           Brands
         </span>
-        {brands.map((brand) => (
-          <div key={brand.id} className="flex items-center gap-2 mt-3">
+        {branded.map(({ brandname, id, genericname }) => (
+          <div key={id} className="flex items-center gap-2 mt-3">
             <input
               type="checkbox"
               className="w-4 h-4 bg-transparent accent-[#0070ba] cursor-pointer"
+              onClick={() => goToProductPage(id, genericname)}
             />
-            <span className="text-sm tracking-wider">{brand.name}</span>
+            <span className="text-sm cursor-pointer tracking-wider">
+              {brandname}
+            </span>
           </div>
         ))}
       </div>
@@ -64,28 +109,31 @@ const ProductsFilter = () => {
           </span>
           <i className="ri-arrow-drop-up-line text-xl"></i>
         </div>
+
         <Range
           step={50}
           min={0}
-          max={15000}
+          max={1000}
           values={priceRange}
           onChange={(values) => setPriceRange(values)}
-          // renderTrack={({ props, children }) => (
-          //   <div
-          //     {...props}
-          //     className="h-1.5 bg-gray-200 rounded relative w-full"
-          //   >
-          //     <div
-          //       className="absolute h-1.5 bg-[#0070ba] rounded"
-          //       style={{
-          //         left: `${(priceRange[0] / 15000) * 100}%`,
-          //         width: `${((priceRange[1] - priceRange[0]) / 15000) * 100}%`,
-          //       }}
-          //     />
-          //     {children}
-          //   </div>
-          // )}
+          onFinalChange={(values) => {
+            setPriceRange(values);
 
+            if (!selectedCategoryId) return;
+
+            const [minPrice, maxPrice] = values;
+            const [minDiscount, maxDiscount] = discountRange;
+
+            getFilteredItems(
+              selectedCategoryId,
+              minPrice,
+              maxPrice,
+              minDiscount,
+              maxDiscount
+            );
+
+            setIsMobileOpen(false);
+          }}
           renderTrack={({ props, children }) => {
             const { key, ...rest } = props;
             return (
@@ -97,10 +145,8 @@ const ProductsFilter = () => {
                 <div
                   className="absolute h-1.5 bg-[#0070ba] rounded"
                   style={{
-                    left: `${(priceRange[0] / 15000) * 100}%`,
-                    width: `${
-                      ((priceRange[1] - priceRange[0]) / 15000) * 100
-                    }%`,
+                    left: `${(priceRange[0] / 1000) * 100}%`,
+                    width: `${((priceRange[1] - priceRange[0]) / 1000) * 100}%`,
                   }}
                 />
                 {children}
@@ -118,9 +164,14 @@ const ProductsFilter = () => {
             );
           }}
         />
+
         <div className="flex justify-between text-sm mt-2">
-          <span>₱{priceRange[0].toFixed(2)}</span>
-          <span>₱{priceRange[1].toFixed(2)}</span>
+          <span>
+            ₱{priceRange[0] !== null ? priceRange[0].toFixed(2) : "0.00"}
+          </span>
+          <span>
+            ₱{priceRange[1] !== null ? priceRange[1].toFixed(2) : "0.00"}
+          </span>
         </div>
       </div>
 
@@ -132,18 +183,37 @@ const ProductsFilter = () => {
           </span>
           <i className="ri-arrow-drop-up-line text-xl"></i>
         </div>
+
         <Range
           step={1}
           min={0}
           max={100}
           values={discountRange}
           onChange={(values) => setDiscountRange(values)}
+          onFinalChange={(values) => {
+            setDiscountRange(values);
+
+            if (!selectedCategoryId) return;
+
+            const [minPrice, maxPrice] = priceRange;
+            const [minDiscount, maxDiscount] = values;
+
+            getFilteredItems(
+              selectedCategoryId,
+              minPrice,
+              maxPrice,
+              minDiscount,
+              maxDiscount
+            );
+
+            setIsMobileOpen(false);
+          }}
           renderTrack={({ props, children }) => {
-            const { key, ...restProps } = props;
+            const { key, ...rest } = props;
             return (
               <div
                 key={key}
-                {...restProps}
+                {...rest}
                 className="h-1.5 bg-gray-200 rounded relative w-full"
               >
                 <div
@@ -170,6 +240,7 @@ const ProductsFilter = () => {
             );
           }}
         />
+
         <div className="flex justify-between text-sm mt-2">
           <span>{discountRange[0]}%</span>
           <span>{discountRange[1]}%</span>

@@ -14,6 +14,8 @@ const endpoints = {
     getAll: `${baseUrl}/v1/user/get-categories-for-user`,
     getItemsByCategory: (id) =>
       `${baseUrl}/v1/user/get-items-by-categories/${id}`,
+    sortBy: (id) => `${baseUrl}/v1/user/sort-by/${id}`,
+    priceDiscountFilter: (id) => `${baseUrls.users}/v1/user/price-discount-filter/${id}`,
   },
   details: {
     get: (id) => `${baseUrl}/v1/user/medicine-details/${id}`,

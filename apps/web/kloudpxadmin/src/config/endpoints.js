@@ -31,6 +31,7 @@ const endpoints = {
     add: `${baseUrl}/v1/medicine/add-medicine`,
     update: (id) => `${baseUrl}/v1/medicine/update-medicine/${id}`,
     delete: (id) => `${baseUrl}/v1/medicine/delete-medicine/${id}`,
+    search: `${baseUrl}/v1/medicine/search-medicine`,
   },
   itemimage: {
     add: `${baseUrl}/v1/itemimage/add-itemimage`,

@@ -17,6 +17,17 @@ export const ProductProvider = ({ children }) => {
   const [trending, setTrending] = useState([]);
   const [feature, setFeature] = useState([]);
   const [popular, setPopular] = useState([]);
+  const [activeSort, setActiveSort] = useState("Popular");
+  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [discountRange, setDiscountRange] = useState([0, 100]);
+  const [branded, setBranded] = useState([]);
+
+  const sortParamMap = {
+    Popular: "popular",
+    Discounts: "discounts",
+    "Cost: high to Low": "high-to-low",
+    "Cost: Low to High": "low-to-high",
+  };
 
   const getAllMedicine = async () => {
     try {
@@ -24,6 +35,15 @@ export const ProductProvider = ({ children }) => {
       setAllMedicine(res?.data?.medicines || []);
     } catch (error) {
       setAllMedicine([]);
+    }
+  };
+
+  const getAllBrand = async () => {
+    try {
+      const res = await getAxiosCall(endpoints.branded.get, {}, false);
+      setBranded(res?.data?.medicines || []);
+    } catch (error) {
+      setBranded([]);
     }
   };
 
@@ -98,6 +118,59 @@ export const ProductProvider = ({ children }) => {
     }
   };
 
+  const getSortedItemsByCategory = async (categoryId, sortBy) => {
+    if (!categoryId) return;
+
+    try {
+      const sortParam = sortParamMap[sortBy] || "popular";
+      const res = await getAxiosCall(
+        endpoints.category.sortBy(categoryId),
+        { sort: sortParam },
+        false
+      );
+
+      setSelectedCategoryItems(res?.data?.medicines || []);
+    } catch (error) {
+      console.error("Failed to fetch sorted items by category", error);
+      setSelectedCategoryItems([]);
+    }
+  };
+
+
+  const getFilteredItems = async (
+    categoryId,
+    minPrice,
+    maxPrice,
+    minDiscount,
+    maxDiscount
+  ) => {
+    if (!categoryId) return;
+
+    try {
+      const params = {};
+
+      if (minPrice !== null && maxPrice !== null) {
+        params.min_price = minPrice;
+        params.max_price = maxPrice;
+      }
+      if (minDiscount !== null && maxDiscount !== null) {
+        params.min_discount = minDiscount;
+        params.max_discount = maxDiscount;
+      }
+
+      const res = await getAxiosCall(
+        endpoints.category.priceDiscountFilter(categoryId),
+        params,
+        false
+      );
+
+      setSelectedCategoryItems(res?.data?.medicines || []);
+    } catch (error) {
+      console.error("Failed to fetch filtered items:", error);
+      setSelectedCategoryItems([]);
+    }
+  };
+
   useEffect(() => {
     getCategory();
   }, []);
@@ -125,8 +198,20 @@ export const ProductProvider = ({ children }) => {
         getAllFeature,
         feature,
         getAllPopular,
-        popular
+        popular,
 
+        getSortedItemsByCategory,
+        activeSort,
+        setActiveSort,
+
+        setSelectedCategoryItems,
+        priceRange,
+        setPriceRange,
+        discountRange,
+        setDiscountRange,
+        getAllBrand,
+        branded,
+        getFilteredItems
       }}
     >
       {children}
