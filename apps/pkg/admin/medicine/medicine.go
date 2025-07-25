@@ -359,3 +359,48 @@ func DeleteAllMedicines(c *gin.Context, db *gorm.DB) {
 		"message": "All medicines and associated item images deleted successfully",
 	})
 }
+
+func SearchMedicinesForAdmin(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		logrus.Warn("Unauthorized access: user not found in context")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+
+	userObj, ok := user.(*models.Admin)
+	if !ok || userObj.ApplicationRole != "admin" {
+		logrus.WithField("user", user).Warn("Unauthorized access: invalid or unauthorized user object")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Only admins can search medicines"})
+		return
+	}
+
+	// Get query string
+	query := c.Query("q")
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Search query is required"})
+		return
+	}
+
+	// Fetch matching medicines
+	var medicines []models.Medicine
+	if err := db.Preload("Generic").
+		Preload("Category").
+		Preload("Category.CategoryIcon").
+		Preload("Supplier").
+		Preload("ItemImages").
+		Joins("LEFT JOIN categories ON categories.id = medicines.category_id").
+		Joins("LEFT JOIN generics ON generics.id = medicines.generic_id").
+		Where("medicines.brand_name LIKE ? OR categories.category_name LIKE ? OR generics.generic_name LIKE ?",
+			"%"+query+"%", "%"+query+"%", "%"+query+"%").
+		Find(&medicines).Error; err != nil {
+		logrus.WithError(err).Error("Failed to search medicines")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search medicines"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "Search results",
+		"medicines": medicines,
+	})
+}
