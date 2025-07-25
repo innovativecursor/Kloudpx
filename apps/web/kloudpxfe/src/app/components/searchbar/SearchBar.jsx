@@ -106,8 +106,8 @@ export default function SearchBar() {
               >
                 <div className="relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden border border-gray-200">
                   <Image
-                    src={item.images?.[0] || fallbackImage}
-                    alt={item.brandname}
+                    src={item.images?.[0] ? item.images[0] : fallbackImage}
+                    alt={item.brandname || "Image"}
                     fill
                     className="object-cover"
                   />

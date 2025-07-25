@@ -28,6 +28,8 @@ const getIconComponent = (iconName) => {
       return AiIcons[iconName];
     case "Tb":
       return TbIcons[iconName];
+    case "Ri":
+      return RiIcons[iconName];
     case "Md":
       return MdIcons[iconName];
     case "Bi":

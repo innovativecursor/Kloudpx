@@ -64,7 +64,7 @@ const ProductDeatilsCard = ({ details }) => {
           <AddToCart
             productDetails={details}
             title="Add To Cart"
-            className="bg-[#0070ba] w-full text-white sm:py-3 py-2.5 rounded-full cursor-pointer"
+            className="bg-[#0070ba] w-full flex items-center justify-center gap-2 text-white sm:py-3 py-2.5 rounded-full cursor-pointer"
           />
         </div>
       </div>
@@ -75,7 +75,7 @@ const ProductDeatilsCard = ({ details }) => {
           <RiTruckLine className="w-8 h-8 mt-0.5 text-blue-900" />
           <div>
             <p className="font-semibold text-blue-950 text-sm ">
-              Delivery by 20 July, 25
+           Your delivery will arrive within 2 days.
             </p>
             <p className=" text-xs sm:mt-2 mt-1 sm:text-xs text-[9px]">
               Enter your postal code for Delivery Availability
