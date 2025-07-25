@@ -104,6 +104,14 @@ func User(db *gorm.DB) {
 		userflow.GetPopularMedicines(c, db)
 	})
 
+	apiV1.GET("/user/sort-by/:category_id", func(c *gin.Context) {
+		userflow.GetItemsByCategoryWithSortAndFilter(c, db)
+	})
+
+	apiV1.GET("/user/price-discount-filter/:category_id", func(c *gin.Context) {
+		userflow.GetItemsByCategoryWithPriceAndDiscountFilter(c, db)
+	})
+
 	//checkout flow
 
 	apiV1.PUT("/user/save-for-later/:id", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {

@@ -117,6 +117,10 @@ func Admin(db *gorm.DB) {
 		medicine.DeleteAllMedicines(c, db)
 	})
 
+	apiV1.GET("/medicine/search-medicine", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		medicine.SearchMedicinesForAdmin(c, db)
+	})
+
 	//cms
 	//carousel
 	apiV1.POST("/carousel/add-carousel-img", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {

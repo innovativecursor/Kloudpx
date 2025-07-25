@@ -1031,3 +1031,221 @@ func GetPopularMedicines(c *gin.Context, db *gorm.DB) {
 		"medicines": response,
 	})
 }
+
+// product page filtering
+func GetItemsByCategoryWithSortAndFilter(c *gin.Context, db *gorm.DB) {
+	categoryIDParam := c.Param("category_id")
+	categoryID, err := strconv.Atoi(categoryIDParam)
+	if err != nil {
+		logrus.WithField("param", categoryIDParam).Warn("Invalid category ID format")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID"})
+		return
+	}
+
+	sort := c.Query("sort") // expected values: "popular", "discount", "high-to-low", "low-to-high"
+
+	// Get unique brand entries per category
+	var uniqueMedicineIDs []uint
+	if err := db.
+		Model(&models.Medicine{}).
+		Select("MIN(id)").
+		Where("category_id = ?", categoryID).
+		Group("brand_name").
+		Scan(&uniqueMedicineIDs).Error; err != nil {
+		logrus.WithError(err).Error("Failed to get distinct medicine IDs by category")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
+		return
+	}
+
+	query := db.Preload("Generic").
+		Preload("Supplier").
+		Preload("ItemImages").
+		Preload("Category").
+		Where("id IN ?", uniqueMedicineIDs)
+
+	// Sorting/Filtering
+	switch sort {
+	case "popular":
+		query = query.Order("created_at DESC")
+	case "discount":
+		query = query.Where("discount > ?", 0).Order("discount DESC")
+	case "high-to-low":
+		query = query.Order("CASE WHEN unit_of_measurement = 'per piece' THEN selling_price_per_piece ELSE selling_price_per_box END DESC")
+	case "low-to-high":
+		query = query.Order("CASE WHEN unit_of_measurement = 'per piece' THEN selling_price_per_piece ELSE selling_price_per_box END ASC")
+	default:
+		// No sort (default)
+	}
+
+	var medicines []models.Medicine
+	if err := query.Find(&medicines).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch medicines by category")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
+		return
+	}
+
+	var response []config.UserFacingMedicine
+	for _, med := range medicines {
+		var imageFilenames []string
+		for _, img := range med.ItemImages {
+			imageFilenames = append(imageFilenames, img.FileName)
+		}
+
+		price := med.SellingPricePerBox
+		if med.UnitOfMeasurement == "per piece" {
+			price = med.SellingPricePerPiece
+		}
+
+		response = append(response, config.UserFacingMedicine{
+			ID:                        med.ID,
+			BrandName:                 med.BrandName,
+			Power:                     med.Power,
+			GenericName:               med.Generic.GenericName,
+			Category:                  med.Category.CategoryName,
+			Description:               med.Description,
+			Discount:                  med.Discount,
+			Unit:                      med.UnitOfMeasurement,
+			MeasurementUnitValue:      med.MeasurementUnitValue,
+			NumberOfPiecesPerBox:      med.NumberOfPiecesPerBox,
+			Price:                     price,
+			TaxType:                   med.TaxType,
+			Prescription:              med.Prescription,
+			Benefits:                  med.Benefits,
+			KeyIngredients:            med.KeyIngredients,
+			RecommendedDailyAllowance: med.RecommendedDailyAllowance,
+			DirectionsForUse:          med.DirectionsForUse,
+			SafetyInformation:         med.SafetyInformation,
+			Storage:                   med.Storage,
+			Images:                    imageFilenames,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "Medicines fetched successfully by category",
+		"medicines": response,
+	})
+}
+
+func GetItemsByCategoryWithPriceAndDiscountFilter(c *gin.Context, db *gorm.DB) {
+	categoryIDParam := c.Param("category_id")
+	categoryID, err := strconv.Atoi(categoryIDParam)
+	if err != nil {
+		logrus.WithField("param", categoryIDParam).Warn("Invalid category ID format")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID"})
+		return
+	}
+
+	// Parse query params
+	minPriceStr := c.Query("min_price")
+	maxPriceStr := c.Query("max_price")
+	minDiscountStr := c.Query("min_discount")
+	maxDiscountStr := c.Query("max_discount")
+
+	var (
+		minPrice, maxPrice       float64
+		minDiscount, maxDiscount float64
+	)
+
+	// Defaults if not provided
+	if minPriceStr != "" {
+		minPrice, _ = strconv.ParseFloat(minPriceStr, 64)
+	}
+	if maxPriceStr != "" {
+		maxPrice, _ = strconv.ParseFloat(maxPriceStr, 64)
+	}
+	if minDiscountStr != "" {
+		minDiscount, _ = strconv.ParseFloat(minDiscountStr, 64)
+	}
+	if maxDiscountStr != "" {
+		maxDiscount, _ = strconv.ParseFloat(maxDiscountStr, 64)
+	}
+
+	var uniqueMedicineIDs []uint
+	if err := db.Model(&models.Medicine{}).
+		Select("MIN(id)").
+		Where("category_id = ?", categoryID).
+		Group("brand_name").
+		Scan(&uniqueMedicineIDs).Error; err != nil {
+		logrus.WithError(err).Error("Failed to get distinct medicine IDs by category")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
+		return
+	}
+
+	query := db.Preload("Generic").
+		Preload("Supplier").
+		Preload("ItemImages").
+		Preload("Category").
+		Where("id IN ?", uniqueMedicineIDs)
+
+	// Price filter (on both per piece and per box)
+	if minPrice > 0 {
+		query = query.Where(`
+			(CASE 
+				WHEN unit_of_measurement = 'per piece' THEN selling_price_per_piece 
+				ELSE selling_price_per_box 
+			END) >= ?`, minPrice)
+	}
+	if maxPrice > 0 {
+		query = query.Where(`
+			(CASE 
+				WHEN unit_of_measurement = 'per piece' THEN selling_price_per_piece 
+				ELSE selling_price_per_box 
+			END) <= ?`, maxPrice)
+	}
+
+	// Discount filter
+	if minDiscount > 0 {
+		query = query.Where("discount >= ?", minDiscount)
+	}
+	if maxDiscount > 0 {
+		query = query.Where("discount <= ?", maxDiscount)
+	}
+
+	var medicines []models.Medicine
+	if err := query.Find(&medicines).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch filtered medicines")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
+		return
+	}
+
+	var response []config.UserFacingMedicine
+	for _, med := range medicines {
+		var imageFilenames []string
+		for _, img := range med.ItemImages {
+			imageFilenames = append(imageFilenames, img.FileName)
+		}
+
+		price := med.SellingPricePerBox
+		if med.UnitOfMeasurement == "per piece" {
+			price = med.SellingPricePerPiece
+		}
+
+		response = append(response, config.UserFacingMedicine{
+			ID:                        med.ID,
+			BrandName:                 med.BrandName,
+			Power:                     med.Power,
+			GenericName:               med.Generic.GenericName,
+			Category:                  med.Category.CategoryName,
+			Description:               med.Description,
+			Discount:                  med.Discount,
+			Unit:                      med.UnitOfMeasurement,
+			MeasurementUnitValue:      med.MeasurementUnitValue,
+			NumberOfPiecesPerBox:      med.NumberOfPiecesPerBox,
+			Price:                     price,
+			TaxType:                   med.TaxType,
+			Prescription:              med.Prescription,
+			Benefits:                  med.Benefits,
+			KeyIngredients:            med.KeyIngredients,
+			RecommendedDailyAllowance: med.RecommendedDailyAllowance,
+			DirectionsForUse:          med.DirectionsForUse,
+			SafetyInformation:         med.SafetyInformation,
+			Storage:                   med.Storage,
+			Images:                    imageFilenames,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "Filtered medicines fetched successfully",
+		"medicines": response,
+	})
+}
