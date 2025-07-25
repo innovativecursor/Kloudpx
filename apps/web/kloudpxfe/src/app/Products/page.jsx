@@ -1,17 +1,18 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { useProductContext } from "../contexts/ProductContext";
 import ProductsFilter from "../components/filter/ProductsFilter";
 import AllProducts from "../components/AllProducts/AllProducts";
-// import SubTitle from "../components/Titles/SubTitle";
 import Hero from "../components/Hero/Hero";
 import Sorting from "../components/sorting/Sorting";
 
 const Page = () => {
   const searchParams = useSearchParams();
   const categoryIdFromUrl = searchParams.get("category");
+
+  const scrollRef = useRef(null);
 
   const {
     selectedCategoryItems,
@@ -21,7 +22,6 @@ const Page = () => {
     category,
     getItemsByCategory,
   } = useProductContext();
-
   useEffect(() => {
     if (categoryIdFromUrl) {
       const id = parseInt(categoryIdFromUrl, 10);
@@ -34,15 +34,22 @@ const Page = () => {
         setSelectedCategoryName(cat.CategoryName);
       }
     }
-  }, [categoryIdFromUrl, category]);
 
-  // console.log(selectedCategoryItems.length);
+    setTimeout(() => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 300);
+  }, [categoryIdFromUrl, category]);
 
   return (
     <div>
-      <Hero />
+      <div className="mt-40 md:mt-64 sm:mt-48">
+        <Hero />
+      </div>
+      <div ref={scrollRef} className="scroll-mt-[6rem] sm:scroll-mt-[11rem]" />
+
       <div className="responsive-mx pt-5 md:pt-7">
-        {/* <SubTitle paths={["Home", selectedCategoryName || "Category"]} /> */}
         <div className="flex justify-between items-start md:mt-5 mt-4 dark-text font-medium">
           <div className="flex gap-1 lg:text-base md:text-sm">
             <p className="opacity-70">
@@ -51,16 +58,17 @@ const Page = () => {
             <span className="dark-text">"Medicine"</span>
           </div>
 
-          <div className="">
+          <div>
             <Sorting />
           </div>
         </div>
-        <div className="flex mt-7">
+
+        <section className="flex mt-7">
           <ProductsFilter />
           <div className="flex-1 md:ml-9">
             <AllProducts selectedCategoryItems={selectedCategoryItems} />
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );

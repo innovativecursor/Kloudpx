@@ -37,12 +37,6 @@ function Footer() {
               <i className="ri-facebook-fill text-color text-xs"></i>
             </a>
 
-            {/* <div className="border border-[#0070BA] rounded-full w-5 h-5 flex justify-around items-center">
-              <i className="text-xs ri-whatsapp-line text-color"></i>
-            </div>
-            <div className="border border-[#0070BA] rounded-full w-5 h-5 flex justify-around items-center">
-              <i className="text-xs ri-instagram-line text-color"></i>
-            </div> */}
             <a
               href="https://ph.linkedin.com/in/kloud-house-873542159"
               target="_blank"
@@ -51,10 +45,6 @@ function Footer() {
             >
               <i className="text-xs ri-linkedin-fill text-color"></i>
             </a>
-            {/* 
-            <div className="border border-[#0070BA] rounded-full w-5 h-5 flex justify-around items-center">
-              <i className="text-xs ri-twitter-x-fill text-color"></i>
-            </div> */}
           </div>
         </div>
 
@@ -69,9 +59,6 @@ function Footer() {
               +639989721498
             </a>
 
-            {/* <p className="mt-1 font-semibold text-color md:text-lg">
-              +63-2-87728133
-            </p> */}
             <p className="mt-4 text-[10px] font-normal">
               Monday - Friday: 8:00 am - 5:00 pm
             </p>
@@ -113,16 +100,39 @@ function Footer() {
       </div>
 
       <hr className="border-b border-gray-200" />
-      <div className="flex-between-center items-center responsive-mx sm:my-6 my-3">
+      <div className="flex-between-center items-center responsive-mx md:pb-0 pb-12 sm:my-6 my-3">
         <p className="sm:text-[10px] text-[8px] cursor-pointer font-medium tracking-wider opacity-60">
           Copyright © 2025 KLOUD P&X - All Rights Reserved.{" "}
         </p>
-        <div className=" flex justify-end">
+
+        <div className="md:block hidden">
+          <a
+            href="https://www.innovativecursor.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sm:text-[11px] text-[7px] cursor-pointer text-gray-500 mt-1 sm:mt-0 select-none hover:text-blue-600 transition"
+          >
+            Powered by <span className="font-semibold">Innovative Cursor</span>
+          </a>
+        </div>
+
+        <div className=" flex flex-col items-end justify-end">
           <img
             src="/assets/visa.png"
             alt="Upload"
             className="object-contain cursor-pointer sm:max-w-[70%] max-w-[50%]"
           />
+          <div className="md:hidden block">
+            <a
+              href="https://www.innovativecursor.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="sm:text-[11px] text-[7px] cursor-pointer text-gray-500 mt-1 sm:mt-0 select-none hover:text-blue-600 transition"
+            >
+              Powered by{" "}
+              <span className="font-semibold">Innovative Cursor</span>
+            </a>
+          </div>
         </div>
       </div>
     </footer>

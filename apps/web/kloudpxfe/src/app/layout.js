@@ -16,7 +16,6 @@ import { store, persistor } from "@/app/redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 import Loader from "@/app/components/Loader/Loader";
 import CustomToaster from "./utils/NoSSRToaster";
-// import CustomToaster from "./utils/CustomToaster";
 
 export default function RootLayout({ children }) {
   return (
