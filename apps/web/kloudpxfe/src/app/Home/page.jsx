@@ -6,7 +6,10 @@ import HomeFloatingBtn from "@/app/components/HomeFloatingBtn/HomeFloatingBtn";
 function Home() {
   return (
     <div className="homepage">
-      <Hero />
+      <div className="mt-40 md:mt-64 sm:mt-48">
+        <Hero />
+      </div>
+
       <Products />
       <HomeFloatingBtn />
     </div>

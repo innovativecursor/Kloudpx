@@ -17,7 +17,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <div className="responsive-mx md:mt-64 sm:mt-48 mt-40 ">
+    <div className="responsive-mx ">
       <Swiper
         key={carousel.length} 
         loop={true}
