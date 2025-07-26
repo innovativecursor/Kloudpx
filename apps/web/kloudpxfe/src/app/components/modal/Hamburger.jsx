@@ -2,31 +2,15 @@
 
 import React, { useEffect } from "react";
 import { useProductContext } from "@/app/contexts/ProductContext";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/contexts/AuthContext";
 import useModal from "@/app/hooks/useModal";
+import useCategoryHandler from "@/app/hooks/useCategoryHandler";
 
 const Hamburger = () => {
   const { isOpen, setIsOpen, modalRef } = useModal();
   const { user } = useAuth();
-  const {
-    category,
-    getItemsByCategory,
-    setSelectedCategoryId,
-    setSelectedCategoryName,
-  } = useProductContext();
-  const router = useRouter();
-
-  const handleCategoryClick = async (id) => {
-    const selected = category.find((cat) => cat.ID === id);
-    setSelectedCategoryId(id);
-    setSelectedCategoryName(selected?.CategoryName || "");
-    await getItemsByCategory(id);
-    const categorySlug =
-      selected?.CategoryName?.toLowerCase().replace(/\s+/g, "-") || "";
-    router.push(`/Products?category=${id}&name=${categorySlug}`);
-    setIsOpen(false);
-  };
+  const { category } = useProductContext();
+  const { handleCategoryClick } = useCategoryHandler();
 
   return (
     <>
@@ -75,7 +59,12 @@ const Hamburger = () => {
                   {category.map((item, index) => (
                     <li
                       key={index}
-                      onClick={() => handleCategoryClick(item.ID)}
+                      onClick={() =>
+                        // handleCategoryClick(item.ID, () => setIsOpen(false))
+                        handleCategoryClick(item.ID, true, () =>
+                          setIsOpen(false)
+                        )
+                      }
                       className="px-6 py-2 hover:bg-[#0070BA]/20 hover:font-medium transition-all cursor-pointer"
                     >
                       {item.CategoryName}

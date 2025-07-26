@@ -4,9 +4,11 @@ import TrendingProducts from "@/app/components/trendingproducts/TrendingProducts
 import HealthArticles from "@/app/components/healtharticles/HealthArticles";
 import Testimonial from "@/app/components/testimonial/Testimonial";
 import FeaturedBrand from "@/app/components/featuredbrand/FeaturedBrand";
-import Faq from "@/app/components/faq/Faq";
+// import Faq from "@/app/components/FaqData/Faq";
 import { useProductContext } from "@/app/contexts/ProductContext";
 import { useEffect } from "react";
+import { faqData } from "../FaqData/FaqData";
+import Faq from "../FaqData/Faq";
 
 function Products() {
   const {
@@ -145,7 +147,7 @@ function Products() {
       <TrendingProducts />
       <HealthArticles articles={articles} />
       <Testimonial testimonials={testimonials} />
-      <Faq />
+      <Faq data={faqData} showAll={false} />
       <div className="mt-10 sm:mt-16 md:mt-20">
         <img
           src="/assets/time.png"

@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BiSortAlt2 } from "react-icons/bi";
+import { useProductContext } from "@/app/contexts/ProductContext";
 
 const options = [
   "Popular",
@@ -11,8 +12,20 @@ const options = [
 ];
 
 const Sorting = () => {
-  const [active, setActive] = useState("Popular");
+  const {
+    selectedCategoryId,
+    getSortedItemsByCategory,
+    activeSort,
+    setActiveSort,
+  } = useProductContext();
+
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  useEffect(() => {
+    if (selectedCategoryId) {
+      getSortedItemsByCategory(selectedCategoryId, activeSort);
+    }
+  }, [selectedCategoryId, activeSort]);
 
   return (
     <>
@@ -21,10 +34,10 @@ const Sorting = () => {
         {options.map((option) => (
           <button
             key={option}
-            onClick={() => setActive(option)}
+            onClick={() => setActiveSort(option)}
             className={`lg:px-5 md:px-3 py-2 rounded-md cursor-pointer lg:text-sm md:text-xs font-normal transition 
               ${
-                active === option
+                activeSort === option
                   ? "bg-blue-200 dark-text font-semibold"
                   : "bg-blue-50 text-gray-800 hover:bg-blue-100"
               }`}
@@ -42,45 +55,49 @@ const Sorting = () => {
           <BiSortAlt2 /> SORT
         </div>
       </div>
-
       {isMobileOpen && (
         <>
+          {/* Overlay */}
           <div
-            className="fixed inset-0 bg-black/40 z-40"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300"
             onClick={() => setIsMobileOpen(false)}
           />
 
-          {/* Drawer */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white z-50 p-5  h-[50vh] flex flex-col shadow-lg">
-            {/* Close button */}
-            {/* <button
-              className="self-end mb-4 text-black font-bold text-3xl leading-none"
-              onClick={() => setIsMobileOpen(false)}
-              aria-label="Close sorting menu"
-            >
-              &times;
-            </button> */}
+          {/* Bottom Sheet Modal */}
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl h-[55vh] p-6 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] transition-all duration-300">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4 border-b pb-2 border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-800">Sort By</h3>
+              <button
+                className="text-gray-500 text-2xl"
+                onClick={() => setIsMobileOpen(false)}
+              >
+                &times;
+              </button>
+            </div>
 
-            <span className="font-light opacity-70 text-base mb-5 border-b  border-gray-200 dark-text">
-              Sort by:
-            </span>
-
-            <div className="flex flex-col gap-5 overflow-y-auto">
+            {/* Options List */}
+            <div className="overflow-y-auto flex flex-col gap-2 h-full pr-1 custom-scroll">
               {options.map((option) => (
                 <button
                   key={option}
                   onClick={() => {
-                    setActive(option);
+                    setActiveSort(option);
                     setIsMobileOpen(false);
                   }}
-                  className={` rounded-md cursor-pointer text-sm  font-normal text-start transition 
-                  ${
-                    active === option
-                      ? " dark-text font-medium"
-                      : "  hover:bg-blue-100"
-                  }`}
+                  className={`flex items-center justify-between w-full px-4 py-3 text-sm rounded-xl transition-all duration-200
+              ${
+                activeSort === option
+                  ? "bg-blue-100 text-blue-700 font-semibold shadow-inner"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
                 >
-                  {option}
+                  <span>{option}</span>
+                  {activeSort === option && (
+                    <span className="text-blue-600 text-lg font-bold">
+                      &#10003;
+                    </span>
+                  )}
                 </button>
               ))}
             </div>

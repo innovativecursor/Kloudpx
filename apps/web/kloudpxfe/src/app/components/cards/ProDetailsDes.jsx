@@ -123,12 +123,12 @@ const ProDetailsDes = ({ details }) => {
             <div className="bg-[#0070ba]/40 text-black w-full py-2 rounded-full relative z-0">
               <div className="flex justify-center items-center">
                 <a
-                  // href="https://kloudpharma.com"
+                  href="https://kloudpx.com/"
                   className="text-sm cursor-pointer"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  www.kloudpharma.com
+                  www.kloudpx.com
                 </a>
               </div>
             </div>
