@@ -6,18 +6,23 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
 import useProductNavigation from "@/app/hooks/useProductNavigation";
+import { useCheckout } from "@/app/contexts/CheckoutContext";
 
 const CartModal = ({ isOpen, onClose }) => {
   const { token, isAuthLoaded } = useAuth();
   const router = useRouter();
   const { getCartData, removeFromCart, getAllCartData } = useCartContext();
-  // const { data, loading } = getCartData;
+  const { toggleSaveForLater, savedForLaterIds, doCheckout, } = useCheckout();
   const { goToProductPage } = useProductNavigation();
   const fallbackImage = "/assets/fallback.png";
   const [activeTab, setActiveTab] = useState("All");
 
   const data = getCartData?.data || [];
   const loading = getCartData?.loading || false;
+
+  const handleSaveForLater = async (cartId) => {
+    await toggleSaveForLater(cartId);
+  };
 
   // useEffect(() => {
   //   const storedToken = localStorage.getItem("access_token");
@@ -38,9 +43,14 @@ const CartModal = ({ isOpen, onClose }) => {
     return null;
   }
 
-  const handleCheckout = () => {
-    router.push("/Checkout");
-    onClose();
+  const handleCheckout = async () => {
+    try {
+      await doCheckout();
+      router.push("/Address");
+      onClose();
+    } catch (error) {
+      toast.error("Checkout failed, please try again.");
+    }
   };
 
   const handleDelete = (id) => {
@@ -176,10 +186,10 @@ const CartModal = ({ isOpen, onClose }) => {
                   <div className="flex-1">
                     <div className="flex justify-between items-start">
                       <div className="flex flex-col">
-                        <p className="text-base font-light text-[#0070ba]">
+                        <p className="text-sm font-light text-[#0070ba]">
                           {medicine?.genericname || "N/A"}
                         </p>
-                        <h4 className="font-medium text-base mb-1">
+                        <h4 className="font-medium text-sm mb-1">
                           {medicine?.brandname || "N/A"}
                         </h4>
                       </div>
@@ -192,7 +202,7 @@ const CartModal = ({ isOpen, onClose }) => {
                       </button>
                     </div>
 
-                    <div className="text-base mt-2 font-medium text-[#333]">
+                    <div className="text-base mt-1 font-medium text-[#333]">
                       {discountPercent > 0 ? (
                         <div className="text-sm font-semibold text-[#333]">
                           ₱{discountedPrice}
@@ -206,7 +216,22 @@ const CartModal = ({ isOpen, onClose }) => {
                         </p>
                       )}
                     </div>
-                    <span>Quantity: {item?.quantity}</span>
+                    <div className="flex justify-between items-center">
+                      <div className="text-sm">
+                        <span className="text-xs">Quantity:</span>{" "}
+                        {item?.quantity}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={savedForLaterIds.includes(item.cart_id)}
+                          onChange={() => handleSaveForLater(item.cart_id)}
+                          className="appearance-none bg-transparent border border-[#0070ba] cursor-pointer rounded-full sm:w-3 sm:h-3 w-1 h-1 checked:bg-blue-500"
+                        />
+                        <label className="text-[9px]">Save for Later</label>
+                      </div>
+                    </div>
 
                     {/* Prescription Status (optional label) */}
                     {isUnsettled && (

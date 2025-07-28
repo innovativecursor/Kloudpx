@@ -17,13 +17,11 @@ const Address = () => {
     <>
       <SubTitle
         paths={
-          showAddForm
-            ? ["Cart", "Checkout", "Address", "New Address"]
-            : ["Cart", "Checkout", "Address"]
+          showAddForm ? ["Cart", "Address", "New Address"] : ["Cart", "Address"]
         }
       />
 
-      <div className="pt-8 max-w-4xl mx-auto px-4">
+      <div className="pt-8 ">
         {/* Header */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">

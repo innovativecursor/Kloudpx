@@ -24,6 +24,7 @@ const endpoints = {
     add: `${baseUrl}/v1/user/add-to-cart-otc`,
     get: `${baseUrl}/v1/user/get-cart`,
     remove: (id) => `${baseUrl}/v1/user/remove-item-cart/${id}`,
+    saveForLater: `${baseUrl}/v1/user/save-for-later`,
   },
   prescriptioncart: {
     add: `${baseUrl}/v1/user/add-to-cart-medicine`,
@@ -52,6 +53,9 @@ const endpoints = {
   search: {
     get: (query) =>
       `${baseUrl}/v1/user/search-medicine?q=${encodeURIComponent(query)}`,
+  },
+  checkout: {
+    get: `${baseUrl}/v1/user/check-out`,
   },
   prescription: {
     upload: `${baseUrl}/v1/user/upload-prescription`,
