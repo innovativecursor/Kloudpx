@@ -3,7 +3,7 @@ import React from "react";
 const CheckoutContent = () => {
   return (
     <div>
-      <div className="bg-[#0070ba]/12 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
+      <div className="bg-[#EDF4F6] shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
         <h3 className="font-semibold text-center dark-text tracking-wider sm:text-base text-sm dark-text">
           2 items in your cart
         </h3>
@@ -66,9 +66,11 @@ const CheckoutContent = () => {
 
       <div className="flex justify-between gap-5 sm:mt-10 mt-8 items-center">
         <div className=" w-[40%]  ">
-          <button className="bg-[#0070BA]/10 text-black hover:bg-[#005c96]/50 w-full py-3 rounded-full font-light 
-          sm:text-[11px] text-[8px] cursor-pointer">
-            Proceed to Checkout
+          <button
+            className="bg-[#0070BA]/10 text-black hover:bg-[#005c96]/50 w-full py-3 rounded-full font-light 
+          sm:text-[11px] text-[8px] cursor-pointer"
+          >
+            Continue to Shop 
           </button>
         </div>
         <div className=" w-[60%]  ">

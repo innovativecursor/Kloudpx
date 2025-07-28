@@ -3,7 +3,7 @@ import Breadcrumbs from "../Breadcrumbs/Breadcrumbs";
 import M from "materialize-css";
 import OrdersTabContent from "../OrdersTabContent/OrdersTabContent";
 import MessagesTabContent from "../MessagesTabContent/MessagesTabContent";
-import AddressesTabContent from "../AddressesTabContent/AddressesTabContent";
+import AddressesTabContent from "../AddressesTabContent/Address";
 import WishListsTabContent from "../WishListsTabContent/WishListsTabContent";
 import AccountSettingsTabContent from "../AccountSettingsTabContent/AccountSettingsTabContent";
 import Link from "next/link";

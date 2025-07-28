@@ -6,7 +6,7 @@ const CheckoutProduct = () => {
   return (
     <div className="bg-blue-50 w-full rounded-lg py-5">
       <div className="flex gap-2 px-4 text-color items-center text-xs ">
-        <PiBusFill className="text-lg" /> Delivery By 20 july, 25
+        <PiBusFill className="text-lg" /> Your delivery will arrive within 2 days.
       </div>
       <div className="flex justify-center bg-red-500 md:w-full w-[80%] items-center mt-7">
         {/* <ImageSwiper /> */}
