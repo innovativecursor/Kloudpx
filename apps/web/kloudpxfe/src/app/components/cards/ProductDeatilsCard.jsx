@@ -19,13 +19,13 @@ const ProductDeatilsCard = ({ details }) => {
       <div className="">
         <div className="flex items-start gap-8 sm:mb-5 mb-4">
           <h2 className="lg:text-xl sm:text-lg text-sm font-light text-color ">
-            {details?.genericname || "General Medicine"}
+            {details?.brandname || "brandname Medicine"}
           </h2>
           {/* <SocialIcons /> */}
         </div>
         <div className="flex items-start sm:gap-8 gap-4">
           <h1 className="lg:text-4xl sm:text-2xl text-xl font-bold ">
-            {details?.brandname} {details?.power}
+            {details?.genericname} {details?.power}
           </h1>
           <SocialIcons />
         </div>
@@ -75,26 +75,13 @@ const ProductDeatilsCard = ({ details }) => {
           <RiTruckLine className="w-8 h-8 mt-0.5 text-blue-900" />
           <div>
             <p className="font-semibold text-blue-950 text-sm ">
-           Your delivery will arrive within 2 days.
+              Your delivery will arrive within 2 days.
             </p>
             <p className=" text-xs sm:mt-2 mt-1 sm:text-xs text-[9px]">
               Enter your postal code for Delivery Availability
             </p>
           </div>
         </div>
-
-        {/* Return row */}
-        {/* <div className="flex items-start gap-4 sm:p-4 p-3">
-          <RiArrowGoBackLine className="w-8 h-8 mt-0.5 text-blue-900" />
-          <div>
-            <p className="font-semibold text-blue-950 text-sm ">
-              Return Delivery
-            </p>
-            <p className="text-gray-600 sm:text-xs text-[9px]">
-              Free 30 Days Delivery Returns. Details
-            </p>
-          </div>
-        </div> */}
       </div>
     </div>
   );
