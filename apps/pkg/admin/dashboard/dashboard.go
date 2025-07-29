@@ -50,7 +50,7 @@ func GetDashboardUserSummary(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	var users []models.User
+	var users []models.Admin
 	if err := db.Find(&users).Error; err != nil {
 		logrus.WithError(err).Error("Failed to fetch users")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})

@@ -1,10 +1,16 @@
 package checkoutflow
 
 import (
+	"encoding/base64"
+	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	cfg "github.com/innovativecursor/Kloudpx/apps/pkg/config"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/getfileextension"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/s3helper"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/checkoutflow/config"
 	"gorm.io/gorm"
@@ -86,11 +92,77 @@ func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 			return
 		}
 
+		var response []config.CartResponse
+		for _, item := range linkedItems {
+			medicine := item.Medicine
+
+			// Collect all image filenames
+			var images []string
+			for _, img := range medicine.ItemImages {
+				images = append(images, img.FileName)
+			}
+
+			// Determine prescription status
+			prescriptionStatus := "Not Required"
+			if medicine.Prescription {
+				if item.PrescriptionID == nil {
+					prescriptionStatus = "Prescription Not Uploaded"
+				} else {
+					var pres models.Prescription
+					if err := db.First(&pres, *item.PrescriptionID).Error; err == nil {
+						switch pres.Status {
+						case "fulfilled":
+							prescriptionStatus = "Fulfilled"
+						case "unsettled":
+							prescriptionStatus = "Unsettled"
+						case "rejected":
+							prescriptionStatus = "Rejected"
+						default:
+							prescriptionStatus = "Prescription Not Uploaded"
+						}
+					} else {
+						prescriptionStatus = "Prescription Not Uploaded"
+					}
+				}
+			}
+
+			userMed := config.UserFacingMedicine{
+				ID:                        medicine.ID,
+				BrandName:                 medicine.BrandName,
+				Power:                     medicine.Power,
+				GenericName:               medicine.Generic.GenericName,
+				Discount:                  medicine.Discount,
+				Category:                  medicine.Category.CategoryName,
+				Description:               medicine.Description,
+				Unit:                      medicine.UnitOfMeasurement,
+				MeasurementUnitValue:      medicine.MeasurementUnitValue,
+				NumberOfPiecesPerBox:      medicine.NumberOfPiecesPerBox,
+				Price:                     medicine.SellingPricePerPiece,
+				TaxType:                   medicine.TaxType,
+				Prescription:              medicine.Prescription,
+				Benefits:                  medicine.Benefits,
+				KeyIngredients:            medicine.KeyIngredients,
+				RecommendedDailyAllowance: medicine.RecommendedDailyAllowance,
+				DirectionsForUse:          medicine.DirectionsForUse,
+				SafetyInformation:         medicine.SafetyInformation,
+				Storage:                   medicine.Storage,
+				Images:                    images,
+			}
+
+			response = append(response, config.CartResponse{
+				CartID:             item.ID,
+				Quantity:           item.Quantity,
+				Medicine:           userMed,
+				PrescriptionStatus: prescriptionStatus,
+			})
+		}
+
 		c.JSON(http.StatusOK, gin.H{
 			"message":             "Existing checkout session in progress",
 			"checkout_session_id": existingSession.ID,
-			"items":               linkedItems,
+			"items":               response,
 		})
+
 		return
 	}
 
@@ -122,11 +194,77 @@ func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 		}
 	}
 
+	var response []config.CartResponse
+	for _, item := range eligibleItems {
+		medicine := item.Medicine
+
+		// Collect all image filenames
+		var images []string
+		for _, img := range medicine.ItemImages {
+			images = append(images, img.FileName)
+		}
+
+		// Determine prescription status
+		prescriptionStatus := "Not Required"
+		if medicine.Prescription {
+			if item.PrescriptionID == nil {
+				prescriptionStatus = "Prescription Not Uploaded"
+			} else {
+				var pres models.Prescription
+				if err := db.First(&pres, *item.PrescriptionID).Error; err == nil {
+					switch pres.Status {
+					case "fulfilled":
+						prescriptionStatus = "Fulfilled"
+					case "unsettled":
+						prescriptionStatus = "Unsettled"
+					case "rejected":
+						prescriptionStatus = "Rejected"
+					default:
+						prescriptionStatus = "Prescription Not Uploaded"
+					}
+				} else {
+					prescriptionStatus = "Prescription Not Uploaded"
+				}
+			}
+		}
+
+		userMed := config.UserFacingMedicine{
+			ID:                        medicine.ID,
+			BrandName:                 medicine.BrandName,
+			Power:                     medicine.Power,
+			GenericName:               medicine.Generic.GenericName,
+			Discount:                  medicine.Discount,
+			Category:                  medicine.Category.CategoryName,
+			Description:               medicine.Description,
+			Unit:                      medicine.UnitOfMeasurement,
+			MeasurementUnitValue:      medicine.MeasurementUnitValue,
+			NumberOfPiecesPerBox:      medicine.NumberOfPiecesPerBox,
+			Price:                     medicine.SellingPricePerPiece,
+			TaxType:                   medicine.TaxType,
+			Prescription:              medicine.Prescription,
+			Benefits:                  medicine.Benefits,
+			KeyIngredients:            medicine.KeyIngredients,
+			RecommendedDailyAllowance: medicine.RecommendedDailyAllowance,
+			DirectionsForUse:          medicine.DirectionsForUse,
+			SafetyInformation:         medicine.SafetyInformation,
+			Storage:                   medicine.Storage,
+			Images:                    images,
+		}
+
+		response = append(response, config.CartResponse{
+			CartID:             item.ID,
+			Quantity:           item.Quantity,
+			Medicine:           userMed,
+			PrescriptionStatus: prescriptionStatus,
+		})
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message":             "Checkout session initiated",
 		"checkout_session_id": session.ID,
-		"items":               eligibleItems,
+		"items":               response,
 	})
+
 }
 
 func AddOrUpdateAddress(c *gin.Context, db *gorm.DB) {
@@ -157,6 +295,7 @@ func AddOrUpdateAddress(c *gin.Context, db *gorm.DB) {
 		addr.NameResidency = req.NameResidency
 		addr.Region = req.Region
 		addr.Province = req.Province
+		addr.Barangay = req.Barangay
 		addr.City = req.City
 		addr.ZipCode = req.ZipCode
 		addr.IsDefault = req.IsDefault
@@ -178,6 +317,7 @@ func AddOrUpdateAddress(c *gin.Context, db *gorm.DB) {
 		UserID:        userObj.ID,
 		NameResidency: req.NameResidency,
 		Region:        req.Region,
+		Barangay:      req.Barangay,
 		Province:      req.Province,
 		City:          req.City,
 		ZipCode:       req.ZipCode,
@@ -267,12 +407,13 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Fetch checkout session with cart items
+	// Fetch checkout session with cart items and preload related data
 	var session models.CheckoutSession
 	if err := db.
 		Preload("CartItems.Medicine.Generic").
 		Preload("CartItems.Medicine.Supplier").
 		Preload("CartItems.Medicine.Category.CategoryIcon").
+		Preload("CartItems.Medicine.ItemImages").
 		Preload("CartItems.Prescription").
 		Where("id = ? AND user_id = ?", dataConfig.CheckoutSessionID, userObj.ID).
 		First(&session).Error; err != nil {
@@ -280,15 +421,14 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// Fetch the address
 	var address models.Address
 	if dataConfig.AddressID == 0 {
-		// Use default address
 		if err := db.Where("user_id = ? AND is_default = ?", userObj.ID, true).First(&address).Error; err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "No default address found. Please select an address."})
 			return
 		}
 	} else {
-		// Use explicitly selected address
 		if err := db.First(&address, "id = ? AND user_id = ?", dataConfig.AddressID, userObj.ID).Error; err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Address not found"})
 			return
@@ -301,7 +441,6 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 	case "standard":
 		deliveryCost = CalculateStandardDelivery(address.ZipCode)
 	case "priority":
-		// This can be replaced with actual Lalamove API call
 		deliveryCost = 150
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid delivery type"})
@@ -318,13 +457,95 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// Build cart item response
+	var totalCost float64
+	var response []config.CartResponse
+
+	for _, item := range session.CartItems {
+		medicine := item.Medicine
+
+		// Collect images
+		var images []string
+		for _, img := range medicine.ItemImages {
+			images = append(images, img.FileName)
+		}
+
+		// Calculate discounted price
+		price := medicine.SellingPricePerPiece * float64(item.Quantity)
+		if medicine.Discount != "" {
+			discountStr := strings.TrimSuffix(medicine.Discount, "%")
+			discountVal, err := strconv.ParseFloat(discountStr, 64)
+			if err == nil {
+				price -= price * discountVal / 100
+			}
+		}
+		totalCost += price
+
+		// Determine prescription status
+		prescriptionStatus := "Not Required"
+		if medicine.Prescription {
+			if item.PrescriptionID == nil {
+				prescriptionStatus = "Prescription Not Uploaded"
+			} else {
+				var pres models.Prescription
+				if err := db.First(&pres, *item.PrescriptionID).Error; err == nil {
+					switch pres.Status {
+					case "fulfilled":
+						prescriptionStatus = "Fulfilled"
+					case "unsettled":
+						prescriptionStatus = "Unsettled"
+					case "rejected":
+						prescriptionStatus = "Rejected"
+					default:
+						prescriptionStatus = "Prescription Not Uploaded"
+					}
+				}
+			}
+		}
+
+		userMed := config.UserFacingMedicine{
+			ID:                        medicine.ID,
+			BrandName:                 medicine.BrandName,
+			Power:                     medicine.Power,
+			GenericName:               medicine.Generic.GenericName,
+			Discount:                  medicine.Discount,
+			Category:                  medicine.Category.CategoryName,
+			Description:               medicine.Description,
+			Unit:                      medicine.UnitOfMeasurement,
+			MeasurementUnitValue:      medicine.MeasurementUnitValue,
+			NumberOfPiecesPerBox:      medicine.NumberOfPiecesPerBox,
+			Price:                     medicine.SellingPricePerPiece,
+			TaxType:                   medicine.TaxType,
+			Prescription:              medicine.Prescription,
+			Benefits:                  medicine.Benefits,
+			KeyIngredients:            medicine.KeyIngredients,
+			RecommendedDailyAllowance: medicine.RecommendedDailyAllowance,
+			DirectionsForUse:          medicine.DirectionsForUse,
+			SafetyInformation:         medicine.SafetyInformation,
+			Storage:                   medicine.Storage,
+			Images:                    images,
+		}
+
+		response = append(response, config.CartResponse{
+			CartID:             item.ID,
+			Quantity:           item.Quantity,
+			Medicine:           userMed,
+			PrescriptionStatus: prescriptionStatus,
+		})
+	}
+
+	grandTotal := totalCost + float64(session.DeliveryCost)
+
+	// Return final response
 	c.JSON(http.StatusOK, gin.H{
-		"message":       "Delivery type selected successfully",
-		"delivery_cost": session.DeliveryCost,
-		"delivery_type": session.DeliveryType,
-		"cart_items":    session.CartItems,
-		"checkout_id":   session.ID,
-		"address":       address,
+		"message":             "Delivery type selected successfully",
+		"delivery_cost":       session.DeliveryCost,
+		"delivery_type":       session.DeliveryType,
+		"checkout_session_id": session.ID,
+		"address":             address,
+		"cart_items":          response,
+		"total_price":         totalCost,
+		"grand_total":         grandTotal,
 	})
 }
 
@@ -345,4 +566,97 @@ func CalculateStandardDelivery(zipCode string) int {
 	default:
 		return 100
 	}
+}
+
+func SubmitPayment(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	userObj, ok := user.(*models.User)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
+		return
+	}
+
+	var req config.SubmitPaymentRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
+		return
+	}
+
+	amountPaid, err := strconv.ParseFloat(req.AmountPaid, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid amount"})
+		return
+	}
+
+	decodedImage, err := base64.StdEncoding.DecodeString(req.ScreenshotBase64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid base64 image"})
+		return
+	}
+
+	cfg, err := cfg.Env()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Configuration error"})
+		return
+	}
+
+	profileType := "payment"
+	userType := "user"
+	uniqueID := s3helper.GenerateUniqueID().String()
+	userID := fmt.Sprintf("%d", userObj.ID)
+	imageName := "payment_screenshot"
+
+	err = s3helper.UploadToS3(
+		c.Request.Context(),
+		profileType,
+		userType,
+		cfg.S3.BucketName,
+		uniqueID,
+		userID,
+		imageName,
+		decodedImage,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload image"})
+		return
+	}
+
+	extension, _ := getfileextension.GetFileExtension(decodedImage)
+	screenshotURL := fmt.Sprintf(
+		"https://%s.s3.%s.amazonaws.com/%s/%s/%s/%s/%s.%s",
+		cfg.S3.BucketName,
+		cfg.S3.Region,
+		profileType,
+		userType,
+		uniqueID,
+		userID,
+		imageName,
+		extension,
+	)
+
+	sessionID, _ := strconv.Atoi(req.CheckoutSessionID)
+	orderNumber := s3helper.GenerateUniqueID().String()
+	payment := models.Payment{
+		UserID:            userObj.ID,
+		CheckoutSessionID: uint(sessionID),
+		OrderNumber:       orderNumber,
+		PaymentNumber:     req.PaymentNumber,
+		ScreenshotURL:     screenshotURL,
+		AmountPaid:        amountPaid,
+		Status:            "Pending",
+	}
+
+	if err := db.Create(&payment).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save payment"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Payment submitted successfully",
+		"payment": payment,
+	})
 }
