@@ -20,6 +20,9 @@ const CartModal = ({ isOpen, onClose }) => {
   const data = getCartData?.data || [];
   const loading = getCartData?.loading || false;
 
+  // console.log(getCartData);
+  
+
   const handleSaveForLater = async (cartId) => {
     await toggleSaveForLater(cartId);
   };

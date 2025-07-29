@@ -7,11 +7,13 @@ import DeliveryCart from "../components/DeliveryData/DeliveryCart";
 import { useCheckout } from "../contexts/CheckoutContext";
 
 const page = () => {
-  const { checkoutData } = useCheckout();
+  const { checkoutData, doCheckout } = useCheckout();
 
   useEffect(() => {
-    console.log("Checkout data updated:", checkoutData);
-  }, [checkoutData]);
+    if (!checkoutData || checkoutData.length === 0) {
+      doCheckout();
+    }
+  }, []);
 
   return (
     <div className=" pb-10 min-h-screen md:mt-52 sm:mt-48 mt-32">

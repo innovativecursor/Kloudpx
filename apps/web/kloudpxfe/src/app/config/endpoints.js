@@ -57,6 +57,10 @@ const endpoints = {
   checkout: {
     get: `${baseUrl}/v1/user/check-out`,
   },
+  address: {
+    add: `${baseUrl}/v1/user/add-update-address`,
+    get: `${baseUrl}/v1/user/get-address`,
+  },
   prescription: {
     upload: `${baseUrl}/v1/user/upload-prescription`,
   },
