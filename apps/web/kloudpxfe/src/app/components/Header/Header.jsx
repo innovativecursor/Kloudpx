@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Logo from "@/app/components/logo/Logo";
 import SearchBar from "@/app/components/searchbar/SearchBar";
 import TopItems from "@/app/components/topitems/TopItems";
@@ -11,20 +11,18 @@ import { useRouter } from "next/navigation";
 import { FiShoppingCart } from "react-icons/fi";
 import CartModal from "@/app/components/modal/CartModal";
 import useModal from "@/app/hooks/useModal";
-import UserProfile from "../Profile/UserProfile";
+import { RiAccountCircleLine } from "react-icons/ri";
 
 const Header = () => {
   const router = useRouter();
-  const { login, loading, user, token, logout, isAuthLoaded } = useAuth();
+  const { login, loading, user, isAuthLoaded } = useAuth();
   const { cartLength } = useCartContext();
   const { isOpen, setIsOpen, modalRef } = useModal();
 
   return (
     <div className="fixed top-0 left-0 right-0 z-40 bg-white shadow-sm">
       <div className="responsive-mx md:mt-2 sm:mt-5 mt-3">
-        {/* Top Row: Logo + SearchBar + Cart/User */}
         <div className="flex items-center justify-between gap-4 w-full">
-          {/* Left: Logo + Hamburger */}
           <div className="flex items-center gap-2">
             <div className="md:hidden block">
               <Hamburger />
@@ -38,10 +36,14 @@ const Header = () => {
           </div>
 
           {/* Right: User & Cart */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <div>
               {!isAuthLoaded ? null : !loading && user ? (
-                <UserProfile user={user} logout={logout} />
+                // <UserProfile user={user} logout={logout} />
+                <RiAccountCircleLine
+                  className="text-4xl cursor-pointer"
+                  onClick={() => router.push("/Profile")}
+                />
               ) : (
                 <div
                   onClick={!loading ? login : undefined}
