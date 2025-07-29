@@ -12,7 +12,7 @@ const CartModal = ({ isOpen, onClose }) => {
   const { token, isAuthLoaded } = useAuth();
   const router = useRouter();
   const { getCartData, removeFromCart, getAllCartData } = useCartContext();
-  const { toggleSaveForLater, savedForLaterIds, doCheckout, } = useCheckout();
+  const { toggleSaveForLater, savedForLaterIds, doCheckout } = useCheckout();
   const { goToProductPage } = useProductNavigation();
   const fallbackImage = "/assets/fallback.png";
   const [activeTab, setActiveTab] = useState("All");
@@ -21,7 +21,6 @@ const CartModal = ({ isOpen, onClose }) => {
   const loading = getCartData?.loading || false;
 
   // console.log(getCartData);
-  
 
   const handleSaveForLater = async (cartId) => {
     await toggleSaveForLater(cartId);
