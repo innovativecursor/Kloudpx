@@ -139,6 +139,7 @@ type GalleryImage struct {
 	ImageURL   string
 	IsActive   bool
 	ButtonText string
+	Link       string
 }
 
 type Midwives struct {
@@ -204,6 +205,7 @@ type Address struct {
 	NameResidency string
 	Region        string
 	Province      string
+	Barangay      string
 	City          string
 	ZipCode       string
 	IsDefault     bool
@@ -217,4 +219,17 @@ type CheckoutSession struct {
 	DeliveryCost int
 	Status       string // pending, completed
 	CartItems    []Cart `gorm:"foreignKey:CheckoutSessionID"`
+}
+
+type Payment struct {
+	gorm.Model
+	UserID            uint
+	CheckoutSessionID uint
+	OrderNumber       string
+	PaymentNumber     string
+	ScreenshotURL     string
+	AmountPaid        float64
+	Status            string // Not Paid, Partially Paid, Paid, Cancelled
+	User              User
+	CheckoutSession   CheckoutSession
 }

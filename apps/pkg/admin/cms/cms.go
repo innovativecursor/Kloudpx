@@ -284,6 +284,7 @@ func GalleryImageUpload(c *gin.Context, db *gorm.DB) {
 		ButtonText: uploadReq.ButtonText,
 		IsActive:   false,
 		ImageURL:   imageURL,
+		Link:       uploadReq.Link,
 	}
 
 	if err := db.Create(&gallery).Error; err != nil {
