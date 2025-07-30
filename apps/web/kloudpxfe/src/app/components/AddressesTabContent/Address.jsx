@@ -25,7 +25,7 @@ const Address = () => {
     }
   }, []);
 
-  console.log(selectedId);
+  console.log(getAllAddress);
 
   const handleAddress = async (id) => {
     selectedAddress(id);
@@ -57,66 +57,72 @@ const Address = () => {
         </div>
 
         {/* Saved Address */}
-        {!showAddForm && getAllAddress && getAllAddress.length > 0 && (
+        {!deliveryType && (
           <>
-            {getAllAddress.map((address, index) => (
-              <div
-                key={address.ID || index}
-                className="border border-[#0070ba] py-4 px-5 mt-10 flex justify-between gap-5 shadow items-start rounded-lg"
-              >
-                <div className="flex flex-col items-center">
-                  <IoMdHome className="text-2xl" />
-                  <span className="font-medium text-sm text-gray-800">
-                    Home
-                  </span>
-                </div>
-
-                <div>
-                  <p className="text-xs tracking-wide text-gray-600 text-justify">
-                    <span className="font-semibold">
-                      {address.NameResidency}
-                    </span>
-                    , {address.City}, {address.Region}, {address.Province},{" "}
-                    {address.ZipCode}
-                  </p>
-                </div>
-
-                <div className="flex gap-2">
-                  <div>
-                    <input
-                      type="radio"
-                      className="w-5 h-5 rounded-full"
-                      name="selectedAddress"
-                      checked={address.IsDefault === true}
-                      onChange={() => setSelectedId(address.ID)}
-                    />
-                  </div>
+            {!showAddForm && getAllAddress && getAllAddress.length > 0 && (
+              <>
+                {getAllAddress.map((address, index) => (
                   <div
-                    onClick={() => {
-                      setShowAddForm(true);
-                      handleEdit(address);
-                    }}
-                    className="cursor-pointer"
+                    key={address.ID || index}
+                    className="border border-[#0070ba] py-4 px-5 mt-10 flex justify-between gap-5 shadow items-start rounded-lg"
                   >
-                    <FaRegEdit className="text-xl" />
-                  </div>
-                </div>
-              </div>
-            ))}
+                    <div className="flex flex-col items-center">
+                      <IoMdHome className="text-2xl" />
+                      <span className="font-medium text-sm text-gray-800">
+                        Home
+                      </span>
+                    </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                if (!selectedId) {
-                  toast.error("Please select an address");
-                  return;
-                }
-                selectedAddress(selectedId);
-              }}
-              className="bg-[#0070BA] text-white w-full py-2.5 text-[10px] rounded-full font-medium hover:bg-[#005c96]"
-            >
-              Save & Proceed
-            </button>
+                    <div>
+                      <p className="text-xs tracking-wide text-gray-600 text-justify">
+                        <span className="font-semibold">
+                          {address.NameResidency}
+                        </span>
+                        , {address.City}, {address.Region}, {address.Province},{" "}
+                        {address.ZipCode}
+                      </p>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <div>
+                        <input
+                          type="radio"
+                          className="w-5 h-5 rounded-full"
+                          name="selectedAddress"
+                          checked={selectedId === address.ID}
+                          onChange={() => setSelectedId(address.ID)}
+                        />
+                      </div>
+                      <div
+                        onClick={() => {
+                          setShowAddForm(true);
+                          handleEdit(address);
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <FaRegEdit className="text-xl" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (selectedId) {
+                      selectedAddress(selectedId);
+                    }
+                    setDeliveryType(true);
+                  }}
+                  className="bg-[#0070BA] text-white w-full py-2.5 text-[10px] rounded-full font-medium hover:bg-[#005c96]"
+                >
+                  Save & Proceed
+                </button>
+              </>
+            )}
+
+            {/* Show New Address Form */}
+            {showAddForm && <NewAddress />}
           </>
         )}
 
