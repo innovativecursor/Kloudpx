@@ -20,7 +20,7 @@ func GetMedicinesForUser(c *gin.Context, db *gorm.DB) {
 	if err := db.
 		Model(&models.Medicine{}).
 		Select("MIN(id)").
-		Group("brand_name").
+		Group("brand_name, power").
 		Scan(&uniqueMedicineIDs).Error; err != nil {
 		logrus.WithError(err).Error("Failed to fetch distinct medicine IDs by brand name")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
@@ -520,7 +520,7 @@ func GetItemsByCategory(c *gin.Context, db *gorm.DB) {
 		Model(&models.Medicine{}).
 		Select("MIN(id)").
 		Where("category_id = ?", categoryID).
-		Group("brand_name").
+		Group("brand_name, power").
 		Scan(&uniqueMedicineIDs).Error; err != nil {
 		logrus.WithError(err).Error("Failed to get distinct medicine IDs by category")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
@@ -619,7 +619,7 @@ func GetBrandedMedicinesForUser(c *gin.Context, db *gorm.DB) {
 		Model(&models.Medicine{}).
 		Select("MIN(id)").
 		Where("is_brand = ?", true).
-		Group("brand_name").
+		Group("brand_name, power").
 		Scan(&uniqueMedicineIDs).Error; err != nil {
 		logrus.WithError(err).Error("Failed to fetch distinct branded medicine IDs")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch branded medicines"})
@@ -686,7 +686,7 @@ func GetFeaturedProductForUser(c *gin.Context, db *gorm.DB) {
 		Model(&models.Medicine{}).
 		Select("MIN(id)").
 		Where("is_feature = ?", true).
-		Group("brand_name").
+		Group("brand_name, power").
 		Scan(&uniqueMedicineIDs).Error; err != nil {
 		logrus.WithError(err).Error("Failed to fetch distinct featured medicine IDs")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch featured medicines"})
@@ -762,7 +762,7 @@ func GetTwoCategoriesWithItems(c *gin.Context, db *gorm.DB) {
 		err := db.Model(&models.Medicine{}).
 			Select("MIN(id)").
 			Where("category_id = ?", category.ID).
-			Group("brand_name").
+			Group("brand_name, power").
 			Scan(&uniqueMedicineIDs).Error
 
 		if err != nil {
@@ -1034,23 +1034,20 @@ func GetPopularMedicines(c *gin.Context, db *gorm.DB) {
 
 // product page filtering
 func GetItemsByCategoryWithSortAndFilter(c *gin.Context, db *gorm.DB) {
-	categoryIDParam := c.Param("category_id")
-	categoryID, err := strconv.Atoi(categoryIDParam)
-	if err != nil {
-		logrus.WithField("param", categoryIDParam).Warn("Invalid category ID format")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID"})
+	categoryIDs := c.QueryArray("category_ids")
+	if len(categoryIDs) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No category IDs provided"})
 		return
 	}
 
-	sort := c.Query("sort") // expected values: "popular", "discount", "high-to-low", "low-to-high"
+	sort := c.Query("sort")
 
-	// Get unique brand entries per category
 	var uniqueMedicineIDs []uint
 	if err := db.
 		Model(&models.Medicine{}).
 		Select("MIN(id)").
-		Where("category_id = ?", categoryID).
-		Group("brand_name").
+		Where("category_id IN ?", categoryIDs).
+		Group("brand_name, power").
 		Scan(&uniqueMedicineIDs).Error; err != nil {
 		logrus.WithError(err).Error("Failed to get distinct medicine IDs by category")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
@@ -1063,18 +1060,25 @@ func GetItemsByCategoryWithSortAndFilter(c *gin.Context, db *gorm.DB) {
 		Preload("Category").
 		Where("id IN ?", uniqueMedicineIDs)
 
-	// Sorting/Filtering
 	switch sort {
 	case "popular":
 		query = query.Order("created_at DESC")
 	case "discount":
 		query = query.Where("discount > ?", 0).Order("discount DESC")
 	case "high-to-low":
-		query = query.Order("CASE WHEN unit_of_measurement = 'per piece' THEN selling_price_per_piece ELSE selling_price_per_box END DESC")
+		query = query.Order(`
+			CASE 
+				WHEN unit_of_measurement = 'per piece' THEN selling_price_per_piece 
+				ELSE selling_price_per_box 
+			END DESC`)
 	case "low-to-high":
-		query = query.Order("CASE WHEN unit_of_measurement = 'per piece' THEN selling_price_per_piece ELSE selling_price_per_box END ASC")
+		query = query.Order(`
+			CASE 
+				WHEN unit_of_measurement = 'per piece' THEN selling_price_per_piece 
+				ELSE selling_price_per_box 
+			END ASC`)
 	default:
-		// No sort (default)
+		// No sort
 	}
 
 	var medicines []models.Medicine
@@ -1126,27 +1130,24 @@ func GetItemsByCategoryWithSortAndFilter(c *gin.Context, db *gorm.DB) {
 	})
 }
 
-func GetItemsByCategoryWithPriceAndDiscountFilter(c *gin.Context, db *gorm.DB) {
-	categoryIDParam := c.Param("category_id")
-	categoryID, err := strconv.Atoi(categoryIDParam)
-	if err != nil {
-		logrus.WithField("param", categoryIDParam).Warn("Invalid category ID format")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID"})
-		return
-	}
+// product page filtering
+func GetFilteredAndSortedMedicines(c *gin.Context, db *gorm.DB) {
+	var (
+		medicines         []models.Medicine
+		uniqueMedicineIDs []uint
+		categoryIDs       = c.QueryArray("category_ids")
+		brandNames        = c.QueryArray("brands")
+		minPriceStr       = c.Query("min_price")
+		maxPriceStr       = c.Query("max_price")
+		minDiscountStr    = c.Query("min_discount")
+		maxDiscountStr    = c.Query("max_discount")
+	)
 
-	// Parse query params
-	minPriceStr := c.Query("min_price")
-	maxPriceStr := c.Query("max_price")
-	minDiscountStr := c.Query("min_discount")
-	maxDiscountStr := c.Query("max_discount")
-
+	// Parse price and discount filters
 	var (
 		minPrice, maxPrice       float64
 		minDiscount, maxDiscount float64
 	)
-
-	// Defaults if not provided
 	if minPriceStr != "" {
 		minPrice, _ = strconv.ParseFloat(minPriceStr, 64)
 	}
@@ -1160,24 +1161,30 @@ func GetItemsByCategoryWithPriceAndDiscountFilter(c *gin.Context, db *gorm.DB) {
 		maxDiscount, _ = strconv.ParseFloat(maxDiscountStr, 64)
 	}
 
-	var uniqueMedicineIDs []uint
-	if err := db.Model(&models.Medicine{}).
-		Select("MIN(id)").
-		Where("category_id = ?", categoryID).
-		Group("brand_name").
-		Scan(&uniqueMedicineIDs).Error; err != nil {
-		logrus.WithError(err).Error("Failed to get distinct medicine IDs by category")
+	// Step 1: Base Query (by categories & brand names)
+	baseQuery := db.Model(&models.Medicine{})
+	if len(categoryIDs) > 0 {
+		baseQuery = baseQuery.Where("category_id IN ?", categoryIDs)
+	}
+	if len(brandNames) > 0 {
+		baseQuery = baseQuery.Where("brand_name IN ?", brandNames)
+	}
+
+	// Step 2: Get unique brand entries per selected filters
+	if err := baseQuery.Select("MIN(id)").Group("brand_name, power").Scan(&uniqueMedicineIDs).Error; err != nil {
+		logrus.WithError(err).Error("Failed to get distinct medicine IDs")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
 		return
 	}
 
+	// Step 3: Build full query
 	query := db.Preload("Generic").
 		Preload("Supplier").
 		Preload("ItemImages").
 		Preload("Category").
 		Where("id IN ?", uniqueMedicineIDs)
 
-	// Price filter (on both per piece and per box)
+	// Step 4: Apply price filter
 	if minPrice > 0 {
 		query = query.Where(`
 			(CASE 
@@ -1193,22 +1200,26 @@ func GetItemsByCategoryWithPriceAndDiscountFilter(c *gin.Context, db *gorm.DB) {
 			END) <= ?`, maxPrice)
 	}
 
-	// Discount filter
+	// Step 5: Apply discount filter
 	if minDiscount > 0 {
-		query = query.Where("discount >= ?", minDiscount)
+		query = query.Where("CAST(discount AS FLOAT) >= ?", minDiscount)
 	}
 	if maxDiscount > 0 {
-		query = query.Where("discount <= ?", maxDiscount)
+		query = query.Where("CAST(discount AS FLOAT) <= ?", maxDiscount)
 	}
 
-	var medicines []models.Medicine
+	// Step 7: Execute final query
 	if err := query.Find(&medicines).Error; err != nil {
-		logrus.WithError(err).Error("Failed to fetch filtered medicines")
+		logrus.WithError(err).Error("Failed to fetch medicines")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
 		return
 	}
 
+	// Step 8: Format response
 	var response []config.UserFacingMedicine
+	categoryIDMap := make(map[uint]bool)
+	var filteredCategoryIDs []uint
+
 	for _, med := range medicines {
 		var imageFilenames []string
 		for _, img := range med.ItemImages {
@@ -1242,10 +1253,17 @@ func GetItemsByCategoryWithPriceAndDiscountFilter(c *gin.Context, db *gorm.DB) {
 			Storage:                   med.Storage,
 			Images:                    imageFilenames,
 		})
+
+		if _, exists := categoryIDMap[med.CategoryID]; !exists {
+			categoryIDMap[med.CategoryID] = true
+			filteredCategoryIDs = append(filteredCategoryIDs, med.CategoryID)
+		}
 	}
 
+	// Step 9: Final JSON response
 	c.JSON(http.StatusOK, gin.H{
-		"message":   "Filtered medicines fetched successfully",
-		"medicines": response,
+		"message":      "Medicines fetched successfully with filters",
+		"medicines":    response,
+		"category_ids": filteredCategoryIDs,
 	})
 }
