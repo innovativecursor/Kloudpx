@@ -407,7 +407,6 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Fetch checkout session with cart items and preload related data
 	var session models.CheckoutSession
 	if err := db.
 		Preload("CartItems.Medicine.Generic").
@@ -421,7 +420,6 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Fetch the address
 	var address models.Address
 	if dataConfig.AddressID == 0 {
 		if err := db.Where("user_id = ? AND is_default = ?", userObj.ID, true).First(&address).Error; err != nil {
@@ -435,42 +433,9 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 		}
 	}
 
-	// Determine delivery cost
-	var deliveryCost int
-	switch dataConfig.DeliveryType {
-	case "standard":
-		deliveryCost = CalculateStandardDelivery(address.ZipCode)
-	case "priority":
-		deliveryCost = 150
-	default:
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid delivery type"})
-		return
-	}
-
-	// Update session
-	session.AddressID = &address.ID
-	session.DeliveryType = dataConfig.DeliveryType
-	session.DeliveryCost = deliveryCost
-
-	if err := db.Save(&session).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update delivery info"})
-		return
-	}
-
-	// Build cart item response
 	var totalCost float64
-	var response []config.CartResponse
-
 	for _, item := range session.CartItems {
 		medicine := item.Medicine
-
-		// Collect images
-		var images []string
-		for _, img := range medicine.ItemImages {
-			images = append(images, img.FileName)
-		}
-
-		// Calculate discounted price
 		price := medicine.SellingPricePerPiece * float64(item.Quantity)
 		if medicine.Discount != "" {
 			discountStr := strings.TrimSuffix(medicine.Discount, "%")
@@ -480,8 +445,42 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 			}
 		}
 		totalCost += price
+	}
 
-		// Determine prescription status
+	deliveryCost := 0
+	codFee := 0.0
+
+	switch dataConfig.DeliveryType {
+	case "standard":
+		deliveryCost = CalculateStandardDelivery(address.ZipCode)
+	case "priority":
+		deliveryCost = 150
+	case "cod":
+		deliveryCost = CalculateStandardDelivery(address.ZipCode)
+		codFee = totalCost * 0.0275
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid delivery type"})
+		return
+	}
+
+	session.AddressID = &address.ID
+	session.DeliveryType = dataConfig.DeliveryType
+	session.DeliveryCost = deliveryCost + int(codFee)
+
+	if err := db.Save(&session).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update delivery info"})
+		return
+	}
+
+	var response []config.CartResponse
+	for _, item := range session.CartItems {
+		medicine := item.Medicine
+
+		var images []string
+		for _, img := range medicine.ItemImages {
+			images = append(images, img.FileName)
+		}
+
 		prescriptionStatus := "Not Required"
 		if medicine.Prescription {
 			if item.PrescriptionID == nil {
@@ -534,12 +533,12 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 		})
 	}
 
-	grandTotal := totalCost + float64(session.DeliveryCost)
+	grandTotal := totalCost + float64(deliveryCost) + codFee
 
-	// Return final response
 	c.JSON(http.StatusOK, gin.H{
 		"message":             "Delivery type selected successfully",
-		"delivery_cost":       session.DeliveryCost,
+		"delivery_cost":       deliveryCost,
+		"cod_fee":             codFee,
 		"delivery_type":       session.DeliveryType,
 		"checkout_session_id": session.ID,
 		"address":             address,
@@ -658,5 +657,29 @@ func SubmitPayment(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Payment submitted successfully",
 		"payment": payment,
+	})
+}
+
+func PreviewPaymentScreenshot(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	_, ok := user.(*models.User)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
+		return
+	}
+	paymentID := c.Param("id")
+
+	var payment models.Payment
+	if err := db.First(&payment, paymentID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Payment not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"screenshot_url": payment.ScreenshotURL,
 	})
 }

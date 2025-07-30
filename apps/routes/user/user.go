@@ -104,14 +104,13 @@ func User(db *gorm.DB) {
 		userflow.GetPopularMedicines(c, db)
 	})
 
-	apiV1.GET("/user/sort-by/:category_id", func(c *gin.Context) {
+	apiV1.GET("/user/sorting", func(c *gin.Context) {
 		userflow.GetItemsByCategoryWithSortAndFilter(c, db)
 	})
 
-	apiV1.GET("/user/price-discount-filter/:category_id", func(c *gin.Context) {
-		userflow.GetItemsByCategoryWithPriceAndDiscountFilter(c, db)
+	apiV1.GET("/user/filter", func(c *gin.Context) {
+		userflow.GetFilteredAndSortedMedicines(c, db)
 	})
-
 	//checkout flow
 
 	apiV1.PUT("/user/save-for-later/:id", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
@@ -136,6 +135,14 @@ func User(db *gorm.DB) {
 
 	apiV1.POST("/user/select-delivery-type", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
 		checkoutflow.SelectDeliveryType(c, db)
+	})
+
+	apiV1.POST("/user/submit-payment", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		checkoutflow.SubmitPayment(c, db)
+	})
+
+	apiV1.GET("/user/get-payment-slip", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		checkoutflow.PreviewPaymentScreenshot(c, db)
 	})
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
