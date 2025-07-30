@@ -61,6 +61,9 @@ const endpoints = {
     add: `${baseUrl}/v1/user/add-update-address`,
     get: `${baseUrl}/v1/user/get-address`,
   },
+  selectedAddress: {
+    add: `${baseUrl}/v1/user/select-address`,
+  },
   prescription: {
     upload: `${baseUrl}/v1/user/upload-prescription`,
   },

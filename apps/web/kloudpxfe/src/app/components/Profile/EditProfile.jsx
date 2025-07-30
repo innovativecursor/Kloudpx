@@ -17,8 +17,10 @@ const EditProfile = () => {
   };
 
   return (
-    <div className="bg-blue-50/20 p-8 rounded-xl shadow-sm max-w-3xl space-y-6">
-      <h2 className="text-xl font-semibold mb-4">My Profile</h2>
+    <div className="bg-blue-50/20 p-8 rounded-xl shadow-sm md:max-w-3xl w-full space-y-6">
+      <h2 className="text-xl md:text-start text-center font-semibold mb-4">
+        My Profile
+      </h2>
 
       <div className="space-y-10 my-8">
         <div>

@@ -33,19 +33,19 @@ export default function RootLayout({ children }) {
               <Loader />
               <AuthProvider>
                 <ProductProvider>
-                  <CartProvider>
-                    <PrescriptionProvider>
-                      <ImageProvider>
-                        <CheckoutProvider>
+                  <CheckoutProvider>
+                    <CartProvider>
+                      <PrescriptionProvider>
+                        <ImageProvider>
                           <Header />
                           <main className="flex-1">{children}</main>
                           <Footer />
                           {/* <Toaster position="bottom-right" reverseOrder={false} /> */}
                           <CustomToaster />
-                        </CheckoutProvider>
-                      </ImageProvider>
-                    </PrescriptionProvider>
-                  </CartProvider>
+                        </ImageProvider>
+                      </PrescriptionProvider>
+                    </CartProvider>
+                  </CheckoutProvider>
                 </ProductProvider>
               </AuthProvider>
             </PersistGate>

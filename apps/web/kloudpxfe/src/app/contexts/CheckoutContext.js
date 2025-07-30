@@ -18,6 +18,7 @@ export const CheckoutProvider = ({ children }) => {
     province: "",
     city: "",
     zipcode: "",
+    barangay: "",
     isdefault: false,
   });
 
@@ -58,8 +59,6 @@ export const CheckoutProvider = ({ children }) => {
   const doCheckout = async () => {
     try {
       const res = await postAxiosCall(endpoints.checkout.get, {}, true);
-      // console.log("my res data", res);
-
       setCheckoutData(res || []);
     } catch (error) {
       setCheckoutData([]);
@@ -73,6 +72,7 @@ export const CheckoutProvider = ({ children }) => {
       region: address.Region,
       province: address.Province,
       city: address.City,
+      barangay: address.Barangay,
       zipcode: address.ZipCode,
 
       isdefault: address.IsDefault,
@@ -88,18 +88,20 @@ export const CheckoutProvider = ({ children }) => {
         region: formData.region,
         province: formData.province,
         city: formData.city,
+        barangay: formData.barangay,
         zipcode: formData.zipcode,
 
         isdefault: formData.isdefault,
       };
 
-      // Send ID if editing
+
       if (formData.id) {
         payload.id = formData.id;
       }
 
       const res = await postAxiosCall(endpoints.address.add, payload, true);
-
+      console.log(res);
+      await selectedAddress(response.data.ID);
       toast.success(
         formData.id
           ? "Address updated successfully!"
@@ -113,6 +115,7 @@ export const CheckoutProvider = ({ children }) => {
         region: "",
         province: "",
         city: "",
+        barangay: "",
         zipcode: "",
 
         isdefault: false,
@@ -136,6 +139,26 @@ export const CheckoutProvider = ({ children }) => {
     }
   };
 
+
+  const selectedAddress = async (id) => {
+    console.log(id);
+
+    try {
+      const res = await postAxiosCall(
+        endpoints.selectedAddress.add,
+        { addressid: id },
+        true
+      );
+      console.log("Address selected:", res);
+      toast.success("Address selected successfully!");
+    } catch (error) {
+      console.error("Error selecting address:", error.message);
+      toast.error("Something went wrong!");
+    }
+  };
+
+
+
   return (
     <CheckoutContext.Provider
       value={{
@@ -149,6 +172,8 @@ export const CheckoutProvider = ({ children }) => {
         fetchAddressData,
         getAllAddress,
         handleEdit,
+        selectedAddress,
+
       }}
     >
       {children}

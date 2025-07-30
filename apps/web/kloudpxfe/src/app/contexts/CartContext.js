@@ -5,11 +5,13 @@ import toast from "react-hot-toast";
 import { useAuth } from "./AuthContext";
 import { postAxiosCall, getAxiosCall, deleteAxiosCall } from "@/app/lib/axios";
 import endpoints from "../config/endpoints";
+import { useCheckout } from "./CheckoutContext";
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const { token } = useAuth();
+  const { doCheckout } = useCheckout();
   const [cartItems, setCartItems] = useState([]);
   const [getCartData, setGetCartData] = useState({ data: [], loading: false });
 
@@ -62,6 +64,7 @@ export const CartProvider = ({ children }) => {
       await deleteAxiosCall(endpoints.cart.remove(id), true);
       toast.success("Item removed from cart!");
       getAllCartData();
+      doCheckout();
     } catch (error) {
       console.error("Remove item error", error);
       toast.error("Failed to remove item");
