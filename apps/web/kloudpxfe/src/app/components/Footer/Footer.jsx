@@ -10,22 +10,22 @@ function Footer() {
               alt="Upload"
               className="object-contain max-w-[25%] cursor-pointer"
             />
-            <p className="font-bold md:text-2xl text-xl tracking-wide">
+            <h2 className="font-bold md:text-2xl text-xl tracking-wide">
               Kloud Pharma
-            </p>
+            </h2>
           </div>
-          <p className="text-[10px] mt-4 font-medium opacity-60 tracking-wide">
+          <h1 className="text-[10px] mt-4 font-medium opacity-60 tracking-wide">
             Unit B, Emerald Jade Green Building, 282 Epifanio de los Santos Ave,
             Mandaluyong City, 1550 Metro Manila, Philippines
-          </p>
+          </h1>
           <a
             href="https://maps.app.goo.gl/QZdyqMRUBCszKHE17"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <p className="mt-5 underline text-[10px] font-medium opacity-70 tracking-wide">
+            <h2 className="mt-5 underline text-[10px] font-medium opacity-70 tracking-wide">
               Shop On Map
-            </p>
+            </h2>
           </a>
           <div className="flex items-center gap-2 mt-8 cursor-pointer">
             <a
@@ -51,7 +51,7 @@ function Footer() {
         <div className=" tracking-wide flex items-stretch">
           <div className="sm:w-px w-0 bg-gray-100"></div>
           <div className="sm:px-8 sm:py-6 sm:flex-1">
-            <p className="font-semibold text-color text-xs">NeeD Help</p>
+            <h1 className="font-semibold text-color text-xs">NeeD Help</h1>
             <a
               href="tel:+639989721498"
               className="text-color mt-5 font-semibold md:text-lg block"
@@ -59,12 +59,12 @@ function Footer() {
               +639989721498
             </a>
 
-            <p className="mt-4 text-[10px] font-normal">
+            <h1 className="mt-4 text-[10px] font-normal">
               Monday - Friday: 8:00 am - 5:00 pm
-            </p>
-            <p className="mt-2 text-[10px] font-normal">
+            </h1>
+            <h1 className="mt-2 text-[10px] font-normal">
               Saturday - Sunday: Closed
-            </p>
+            </h1>
             <div className="flex items-center gap-2 mt-6 text-color font-semibold text-xs">
               <i className="ri-mail-send-line text-base font-light"></i>
               <a href="mailto:kloudpx@kloudpx.com" className="text-color">
@@ -101,9 +101,9 @@ function Footer() {
 
       <hr className="border-b border-gray-200" />
       <div className="flex-between-center items-center responsive-mx md:pb-0 pb-12 sm:my-6 my-3">
-        <p className="sm:text-[10px] text-[8px] cursor-pointer font-medium tracking-wider opacity-60">
+        <h1 className="sm:text-[10px] text-[8px] cursor-pointer font-medium tracking-wider opacity-60">
           Copyright © 2025 KLOUD P&X - All Rights Reserved.{" "}
-        </p>
+        </h1>
 
         <div className="md:block hidden">
           <a

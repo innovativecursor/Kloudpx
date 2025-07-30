@@ -40,17 +40,17 @@ const Testimonial = ({ testimonials }) => {
                 alt="stars"
                 className="object-contain mt-2 w-[30%]"
               />
-              <p className="text-[10px] opacity-60 text-center mt-3 tracking-wide">
+              <h1 className="text-[10px] opacity-60 text-center mt-3 tracking-wide">
                 "{item.message}"
-              </p>
+              </h1>
               <img
                 src={item.userImg}
                 alt="user"
                 className="object-cover   w-[20%]  mt-4 rounded-full"
               />
-              <p className="tracking-wide text-[10px] font-normal mt-3">
+              <h1 className="tracking-wide text-[10px] font-normal mt-3">
                 {item.name}
-              </p>
+              </h1>
               <span className="text-[10px] opacity-80 mt-1">{item.date}</span>
             </div>
           </SwiperSlide>

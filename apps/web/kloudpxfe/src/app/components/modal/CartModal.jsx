@@ -104,9 +104,9 @@ const CartModal = ({ isOpen, onClose }) => {
         <div className="p-4 flex justify-between items-center">
           <div>
             <h2 className="text-2xl font-semibold">Cart</h2>
-            <p className="text-base opacity-50">
+            <h2 className="text-base opacity-50">
               {data?.length || 0} Items in your cart
-            </p>
+            </h2>
           </div>
           <button
             className="text-[#0070ba] cursor-pointer font-medium flex items-center gap-1"
@@ -137,11 +137,11 @@ const CartModal = ({ isOpen, onClose }) => {
         {/* Cart Items */}
         <div className="flex-1 overflow-y-auto thin-scrollbar px-4 md:space-y-4 space-y-8 mt-7">
           {loading ? (
-            <p className="text-center text-gray-500 mt-8">Loading cart...</p>
+            <h2 className="text-center text-gray-500 mt-8">Loading cart...</h2>
           ) : !filteredData || filteredData.length === 0 ? (
-            <p className="text-center text-gray-500 mt-8">
+            <h2 className="text-center text-gray-500 mt-8">
               No items in this category.
-            </p>
+            </h2>
           ) : (
             filteredData.map((item) => {
               const medicine = item?.medicine;
@@ -188,9 +188,9 @@ const CartModal = ({ isOpen, onClose }) => {
                   <div className="flex-1">
                     <div className="flex justify-between items-start">
                       <div className="flex flex-col">
-                        <p className="text-sm font-light text-[#0070ba]">
+                        <h2 className="text-sm font-light text-[#0070ba]">
                           {medicine?.genericname || "N/A"}
-                        </p>
+                        </h2>
                         <h4 className="font-medium text-sm mb-1">
                           {medicine?.brandname || "N/A"}
                         </h4>
@@ -213,9 +213,9 @@ const CartModal = ({ isOpen, onClose }) => {
                           </span>
                         </div>
                       ) : (
-                        <p className="text-sm font-semibold text-[#333]">
+                        <h2 className="text-sm font-semibold text-[#333]">
                           ₱{price}
-                        </p>
+                        </h2>
                       )}
                     </div>
                     <div className="flex justify-between items-center">

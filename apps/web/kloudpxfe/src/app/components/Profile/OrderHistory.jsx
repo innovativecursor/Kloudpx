@@ -152,13 +152,13 @@ const OrderHistory = () => {
                         className="w-16 h-16 object-cover rounded-md"
                       />
                       <div className="flex-1">
-                        <p className="text-xs text-[#0070ba] font-medium">
+                        <h1 className="text-xs text-[#0070ba] font-medium">
                           {item.category}
-                        </p>
+                        </h1>
                         <h4 className="font-semibold text-sm sm:text-base">
                           {item.name}
                         </h4>
-                        <p className="text-sm font-medium">₱{item.price}</p>
+                        <h1 className="text-sm font-medium">₱{item.price}</h1>
                         <span className="text-xs">Qty: {item.quantity}</span>
                       </div>
                     </div>

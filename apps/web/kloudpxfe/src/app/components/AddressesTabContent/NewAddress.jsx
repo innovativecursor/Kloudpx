@@ -1,8 +1,10 @@
+"use client";
 import React from "react";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
 
 const NewAddress = () => {
-  const { handleSubmit, handleChange, formData, selectedAddress  } = useCheckout();
+  const { handleSubmit, handleChange, formData, selectedAddress } =
+    useCheckout();
 
   return (
     <div>
@@ -48,9 +50,7 @@ const NewAddress = () => {
         </div>
 
         <div>
-          <label className="font-medium text-xs dark-text">
-             Barangay
-          </label>
+          <label className="font-medium text-xs dark-text">Barangay</label>
           <input
             type="text"
             name="barangay"

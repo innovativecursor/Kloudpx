@@ -30,9 +30,9 @@ const DeliveryType = () => {
             <h3 className="font-medium tracking-wide text-base text-[#00243f]">
               Standard Delivery
             </h3>
-            <p className="text-xs tracking-wide text-gray-600">
+            <span className="text-xs tracking-wide text-gray-600">
               Get your medicines delivered next day.
-            </p>
+            </span>
           </div>
         </div>
         <span className="text-[#00243f] font-medium text-lg">₱0</span>
@@ -61,9 +61,9 @@ const DeliveryType = () => {
             <h3 className="font-medium tracking-wide text-base text-[#00243f]">
               Priority Delivery
             </h3>
-            <p className="text-xs tracking-wide text-gray-600">
+            <span className="text-xs tracking-wide text-gray-600">
               Get your medicines delivered on the same day.
-            </p>
+            </span>
           </div>
         </div>
         <span className="text-[#00243f] font-medium text-lg">₱20</span>

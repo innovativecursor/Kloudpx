@@ -101,7 +101,7 @@ export const CheckoutProvider = ({ children }) => {
 
       const res = await postAxiosCall(endpoints.address.add, payload, true);
       console.log(res);
-      await selectedAddress(response.data.ID);
+      // await selectedAddress(res.data.ID);
       toast.success(
         formData.id
           ? "Address updated successfully!"

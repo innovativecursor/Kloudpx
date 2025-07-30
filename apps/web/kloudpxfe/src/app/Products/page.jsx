@@ -53,9 +53,9 @@ const Page = () => {
       <div className="responsive-mx pt-5 md:pt-7">
         <div className="flex justify-between items-start md:mt-5 mt-4 dark-text font-medium">
           <div className="flex gap-1 lg:text-base md:text-sm">
-            <p className="opacity-70">
+            <span className="opacity-70">
               Viewing {selectedCategoryItems?.length} results of
-            </p>{" "}
+            </span>
             <span className="dark-text">"Medicine"</span>
           </div>
 

@@ -52,9 +52,9 @@ const DeliveryCart = () => {
               <div className="flex-1">
                 <div className="flex justify-between items-start">
                   <div className="flex flex-col">
-                    <p className="text-sm font-light text-[#0070ba]">
+                    <span className="text-sm font-light text-[#0070ba]">
                       {medicine.generic_name || "Generic Name"}
-                    </p>
+                    </span>
                     <h4 className="font-medium text-base mb-1">
                       {medicine.brand_name || "Brand Name"}
                     </h4>
@@ -77,9 +77,9 @@ const DeliveryCart = () => {
                       </span>
                     </div>
                   ) : (
-                    <p className="text-sm font-semibold text-[#333]">
+                    <span className="text-sm font-semibold text-[#333]">
                       ₱{price}
-                    </p>
+                    </span>
                   )}
                 </div>
                 <span className="text-xs">Quantity: {item.quantity || 0}</span>
@@ -99,7 +99,7 @@ const DeliveryCart = () => {
             <AiFillProduct className="text-xs" />
             <span className="text-sm font-medium">Item</span>
           </div>
-          <p className="text-sm font-semibold text-[#333]">₱220</p>
+          <span className="text-sm font-semibold text-[#333]">₱220</span>
         </div>
 
         <div className="flex justify-between items-center px-6 mt-3">
@@ -107,7 +107,7 @@ const DeliveryCart = () => {
             <MdDeliveryDining className="text-base" />
             <span className="text-sm font-medium">Delivery Change</span>
           </div>
-          <p className="text-sm font-semibold text-[#333]">₱220</p>
+            <span className="text-sm font-semibold text-[#333]">₱220</span>
         </div>
 
         <div className="flex justify-between items-center px-6 mt-3">
@@ -115,7 +115,7 @@ const DeliveryCart = () => {
             <MdLocalOffer className="text-base" />
             <span className="text-sm font-medium">Offer discount</span>
           </div>
-          <p className="text-sm font-semibold text-[#333]">₱220</p>
+       <span className="text-sm font-semibold text-[#333]">₱220</span>
         </div>
 
         <div className="flex justify-between items-center px-6 mt-3">
@@ -123,13 +123,13 @@ const DeliveryCart = () => {
             <FaSortAmountUp className="text-base" />
             <span className="text-sm font-medium">Gst</span>
           </div>
-          <p className="text-sm font-semibold text-[#333]">12%</p>
+            <span className="text-sm font-semibold text-[#333]">₱220</span>
         </div>
 
         <div className="w-full h-[0.5px] mt-7 bg-[#0070ba]"></div>
         <div className="flex justify-between pb-5 items-center px-6 mt-3">
           <span className="text-sm font-semibold">Total Amount</span>
-          <p className="text-sm font-semibold text-[#333]">₱220</p>
+             <span className="text-sm font-semibold text-[#333]">₱220</span>
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+"use client";
 import Cards from "@/app/components/cards/Cards";
 import Category7 from "@/app/components/category7/Category7";
 import TrendingProducts from "@/app/components/trendingproducts/TrendingProducts";

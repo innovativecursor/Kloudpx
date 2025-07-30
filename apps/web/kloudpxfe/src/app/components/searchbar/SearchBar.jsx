@@ -131,15 +131,15 @@ export default function SearchBar() {
                     className="object-contain"
                   />
                 </div>
-                <p className="text-gray-600 md:text-base sm:text-sm text-xs font-medium">
+                <div className="text-gray-600 md:text-base sm:text-sm text-xs font-medium">
                   Oops! No matches found for{" "}
                   <span className="text-[#006EBB] font-semibold">
                     {searchTerm}
                   </span>
-                </p>
-                <p className="sm:text-sm text-xs text-gray-500">
+                </div>
+                <h1 className="sm:text-sm text-xs text-gray-500">
                   Get in touch with our pharmacist instead?
-                </p>
+                </h1>
                 <div className="flex sm:text-sm text-[9px] items-center gap-2 text-[#006EBB] font-medium mt-1">
                   <i className="ri-phone-line"></i>
                   <span>Call a pharmacist: +63 998 972 1498</span>
