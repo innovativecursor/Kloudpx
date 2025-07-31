@@ -22,6 +22,11 @@ const Page = () => {
     category,
     setSelectedCategoryItems,
     getItemsByCategory,
+    filteredMedicines,
+    selectedCategories,
+    selectedBrands,
+    priceRange,
+    discountRange,
   } = useProductContext();
   useEffect(() => {
     if (categoryIdFromUrl) {
@@ -53,9 +58,27 @@ const Page = () => {
       <div className="responsive-mx pt-5 md:pt-7">
         <div className="flex justify-between items-start md:mt-5 mt-4 dark-text font-medium">
           <div className="flex gap-1 lg:text-base md:text-sm">
-            <span className="opacity-70">
+            {/* <span className="opacity-70">
               Viewing {selectedCategoryItems?.length} results of
+            </span> */}
+            <span className="opacity-70">
+              Viewing{" "}
+              {
+                (filteredMedicines.length > 0
+                  ? filteredMedicines
+                  : selectedCategories.length > 0 ||
+                    selectedBrands.length > 0 ||
+                    priceRange[0] > 0 ||
+                    priceRange[1] < 1000 ||
+                    discountRange[0] > 0 ||
+                    discountRange[1] < 100
+                  ? []
+                  : selectedCategoryItems
+                )?.length
+              }{" "}
+              results of
             </span>
+
             <span className="dark-text">"Medicine"</span>
           </div>
 
@@ -67,7 +90,29 @@ const Page = () => {
         <section className="flex mt-7">
           <ProductsFilter setSelectedCategoryItems={setSelectedCategoryItems} />
           <div className="flex-1 md:ml-9">
-            <AllProducts selectedCategoryItems={selectedCategoryItems} />
+            {/* <AllProducts selectedCategoryItems={selectedCategoryItems} /> */}
+            {/* <AllProducts
+              selectedCategoryItems={
+                filteredMedicines.length > 0
+                  ? filteredMedicines
+                  : selectedCategoryItems
+              }
+            /> */}
+            <AllProducts
+              selectedCategoryItems={
+                filteredMedicines.length > 0
+                  ? filteredMedicines
+                  : filteredMedicines.length === 0 &&
+                    (selectedCategories.length > 0 ||
+                      selectedBrands.length > 0 ||
+                      priceRange[0] > 0 ||
+                      priceRange[1] < 1000 ||
+                      discountRange[0] > 0 ||
+                      discountRange[1] < 100)
+                  ? [] // filters applied but no result
+                  : selectedCategoryItems // default view
+              }
+            />
           </div>
         </section>
       </div>

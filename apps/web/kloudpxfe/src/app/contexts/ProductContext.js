@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import endpoints from "../config/endpoints";
 import { getAxiosCall } from "@/app/lib/axios";
+import axios from "axios";
 
 const ProductContext = createContext();
 
@@ -18,9 +19,79 @@ export const ProductProvider = ({ children }) => {
   const [feature, setFeature] = useState([]);
   const [popular, setPopular] = useState([]);
   const [activeSort, setActiveSort] = useState("Popular");
+
+  const [branded, setBranded] = useState([]);
+
+  // Filters
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedBrands, setSelectedBrands] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [discountRange, setDiscountRange] = useState([0, 100]);
-  const [branded, setBranded] = useState([]);
+  const [filteredMedicines, setFilteredMedicines] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchFilteredMedicines();
+  }, [selectedCategories, selectedBrands, priceRange, discountRange]);
+
+  const fetchFilteredMedicines = async () => {
+    const isFilterActive =
+      selectedCategories.length > 0 ||
+      selectedBrands.length > 0 ||
+      priceRange[0] > 0 ||
+      priceRange[1] < 1000 ||
+      discountRange[0] > 0 ||
+      discountRange[1] < 100;
+
+    if (!isFilterActive) {
+      setFilteredMedicines([]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+
+      selectedCategories.forEach((catId) => {
+        params.append("category_ids", catId.toString());
+      });
+
+      selectedBrands.forEach((brand) => {
+        params.append("brands", brand);
+      });
+
+      if (priceRange[0] > 0) params.append("min_price", priceRange[0]);
+      if (priceRange[1] < 1000) params.append("max_price", priceRange[1]);
+
+      if (discountRange[0] > 0) params.append("min_discount", discountRange[0]);
+      if (discountRange[1] < 100)
+        params.append("max_discount", discountRange[1]);
+
+      const res = await axios.get("http://localhost:10003/v1/user/filter", {
+        params,
+      });
+
+      console.log(res?.data);
+
+      setFilteredMedicines(res?.data?.medicines || []);
+    } catch (err) {
+      console.error("Failed to fetch filtered medicines", err);
+      setFilteredMedicines([]);
+    }
+    setLoading(false);
+  };
+
+  const handleCategoryChange = (id) => {
+    setSelectedCategories((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+    );
+  };
+
+  const handleBrandChange = (brand) => {
+    setSelectedBrands((prev) =>
+      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]
+    );
+  };
 
   const sortParamMap = {
     Popular: "popular",
@@ -118,59 +189,6 @@ export const ProductProvider = ({ children }) => {
     }
   };
 
-  const getSortedItemsByCategory = async (categoryId, sortBy) => {
-    if (!categoryId) return;
-
-    try {
-      const sortParam = sortParamMap[sortBy] || "popular";
-      const res = await getAxiosCall(
-        endpoints.category.sortBy(categoryId),
-        { sort: sortParam },
-        false
-      );
-
-      setSelectedCategoryItems(res?.data?.medicines || []);
-    } catch (error) {
-      console.error("Failed to fetch sorted items by category", error);
-      setSelectedCategoryItems([]);
-    }
-  };
-
-
-  const getFilteredItems = async (
-    categoryId,
-    minPrice,
-    maxPrice,
-    minDiscount,
-    maxDiscount
-  ) => {
-    if (!categoryId) return;
-
-    try {
-      const params = {};
-
-      if (minPrice !== null && maxPrice !== null) {
-        params.min_price = minPrice;
-        params.max_price = maxPrice;
-      }
-      if (minDiscount !== null && maxDiscount !== null) {
-        params.min_discount = minDiscount;
-        params.max_discount = maxDiscount;
-      }
-
-      const res = await getAxiosCall(
-        endpoints.category.priceDiscountFilter(categoryId),
-        params,
-        false
-      );
-
-      setSelectedCategoryItems(res?.data?.medicines || []);
-    } catch (error) {
-      console.error("Failed to fetch filtered items:", error);
-      setSelectedCategoryItems([]);
-    }
-  };
-
   useEffect(() => {
     getCategory();
   }, []);
@@ -200,7 +218,6 @@ export const ProductProvider = ({ children }) => {
         getAllPopular,
         popular,
 
-        getSortedItemsByCategory,
         activeSort,
         setActiveSort,
 
@@ -211,7 +228,18 @@ export const ProductProvider = ({ children }) => {
         setDiscountRange,
         getAllBrand,
         branded,
-        getFilteredItems
+
+        selectedCategories,
+        handleCategoryChange,
+        selectedBrands,
+        handleBrandChange,
+        priceRange,
+        setPriceRange,
+        discountRange,
+        setDiscountRange,
+        filteredMedicines,
+        loading,
+        getAllBrand,
       }}
     >
       {children}

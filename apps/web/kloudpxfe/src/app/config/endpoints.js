@@ -68,6 +68,9 @@ const endpoints = {
   deliveryType: {
     add: `${baseUrl}/v1/user/select-delivery-type`,
   },
+  // filters: {
+
+  // },
   prescription: {
     upload: `${baseUrl}/v1/user/upload-prescription`,
   },
