@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 import SubTitle from "../components/Titles/SubTitle";
 import { useAuth } from "../contexts/AuthContext";
 import UserMenu from "../components/Profile/UserMenu";
@@ -8,23 +8,33 @@ import EditProfile from "../components/Profile/EditProfile";
 import PrescriptionHistoty from "../components/Profile/PrescriptionHistoty";
 // import OrderHistory from "../components/Profile/OrderHistory";
 import { FaPaperclip } from "react-icons/fa";
+import { useCartContext } from "../contexts/CartContext";
 
 const ProfilePage = () => {
   const fallbackImage = "/assets/fallback.png";
-  const { user } = useAuth();
+  const { user, setToken, setUser } = useAuth();
+  const { clearCart } = useCartContext();
   const [activeTab, setActiveTab] = useState("");
+  const router = useRouter();
+
+  const logout = () => {
+    localStorage.removeItem("access_token");
+    // sessionStorage.removeItem("access_token");
+    setToken(null);
+    setUser(null);
+    clearCart();
+    router.push("/");
+  };
 
   return (
     <div className="mt-40 md:mt-64 sm:mt-48 mb-24 responsive-mx flex md:flex-row flex-col justify-start gap-10 items-start">
       <div className="md:w-64 w-full">
         {/* Sidebar */}
         <SubTitle paths={["Home", "Profile"]} />
-        {/* <UserMenu setActiveTab={setActiveTab} /> */}
         <UserMenu setActiveTab={setActiveTab} activeTab={activeTab} />
       </div>
 
       <main className="flex-1">
-        {/* Profile info block */}
         <div
           className={`
       flex items-start gap-4 mb-8
@@ -38,18 +48,29 @@ const ProfilePage = () => {
               My Profile
             </h1>
             <div className="flex gap-5 mt-8">
-              <Image
+              {/* <Image
                 src={fallbackImage}
                 alt="Profile"
                 width={70}
                 height={70}
                 className="rounded-full object-cover"
+              /> */}
+              <img
+                src={fallbackImage}
+                alt="Profile"
+                className="rounded-full object-cover sm:w-20 sm:h-20 w-12 h-12"
               />
               <div>
                 <h2 className="text-base font-semibold">
                   {user?.first_name} {user?.last_name}
                 </h2>
                 <h2 className="text-sm mt-1 font-medium">{user?.email}</h2>
+                <button
+                  onClick={logout}
+                  className="mt-3 text-base cursor-pointer text-red-600 hover:underline"
+                >
+                  Logout
+                </button>
               </div>
             </div>
           </div>

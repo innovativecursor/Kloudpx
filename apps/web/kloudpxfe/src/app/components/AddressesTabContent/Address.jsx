@@ -2,22 +2,28 @@
 
 import React, { useEffect, useState } from "react";
 import { FaLocationDot, FaPlus } from "react-icons/fa6";
-import { IoMdHome } from "react-icons/io";
 import SubTitle from "../Titles/SubTitle";
 import NewAddress from "./NewAddress";
 import DeliveryType from "../DeliveryData/DeliveryType";
 import Screener from "../DeliveryData/Screener";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
+import { IoMdHome } from "react-icons/io";
 import { FaRegEdit } from "react-icons/fa";
-import toast from "react-hot-toast";
 
 const Address = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [deliveryType, setDeliveryType] = useState(false);
+  const [deliverySuccess, setDeliverySuccess] = useState(false);
   const [screener, setScreener] = useState(false);
-  const { fetchAddressData, getAllAddress, handleEdit, selectedAddress } =
-    useCheckout();
-  const [selectedId, setSelectedId] = useState(null);
+  // const [selectedId, setSelectedId] = useState(0);
+  const {
+    fetchAddressData,
+    getAllAddress,
+    handleEdit,
+    selectedAddress,
+    selectedId,
+    setSelectedId,
+  } = useCheckout();
 
   useEffect(() => {
     if (Array.isArray(getAllAddress) && getAllAddress.length === 0) {
@@ -25,36 +31,39 @@ const Address = () => {
     }
   }, []);
 
-  console.log(getAllAddress);
-
-  const handleAddress = async (id) => {
-    selectedAddress(id);
-  };
+  // console.log(selectedId, "my id ");
 
   return (
     <>
       <SubTitle
         paths={
-          showAddForm ? ["Cart", "Address", "New Address"] : ["Cart", "Address"]
+          deliveryType
+            ? ["Cart", "Address", "Delivery Type"]
+            : showAddForm
+            ? ["Cart", "Address", "New Address"]
+            : ["Cart", "Address"]
         }
       />
 
       <div className="pt-8 ">
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <FaLocationDot className="text-2xl" />
-            <span className="font-medium text-lg">Add Address</span>
+
+        {!deliveryType && (
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <FaLocationDot className="text-2xl" />
+              <span className="font-medium text-lg">Add Address</span>
+            </div>
+            {!showAddForm && (
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="bg-[#0070BA] cursor-pointer text-white hover:bg-[#005c96] sm:text-[11px] text-[8px] w-32 flex justify-center items-center py-2 gap-2 rounded-full font-semibold"
+              >
+                <FaPlus /> <span>Add</span>
+              </button>
+            )}
           </div>
-          {!showAddForm && (
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="bg-[#0070BA] cursor-pointer text-white hover:bg-[#005c96] sm:text-[11px] text-[8px] w-32 flex justify-center items-center py-2 gap-2 rounded-full font-semibold"
-            >
-              <FaPlus /> <span>Add</span>
-            </button>
-          )}
-        </div>
+        )}
 
         {/* Saved Address */}
         {!deliveryType && (
@@ -69,21 +78,21 @@ const Address = () => {
                     <div className="flex flex-col items-center">
                       <IoMdHome className="text-2xl" />
                       <span className="font-medium text-sm text-gray-800">
-                        Home
+                        {address?.Barangay}
                       </span>
                     </div>
 
                     <div>
-                      <p className="text-xs tracking-wide text-gray-600 text-justify">
+                      <div className="text-xs tracking-wide text-gray-600 text-justify">
                         <span className="font-semibold">
-                          {address.NameResidency}
+                          {address?.NameResidency}
                         </span>
-                        , {address.City}, {address.Region}, {address.Province},{" "}
-                        {address.ZipCode}
-                      </p>
+                        , {address?.City}, {address?.Region},{" "}
+                        {address?.Province}, {address?.ZipCode}
+                      </div>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 mt8">
                       <div>
                         <input
                           type="radio"
@@ -114,25 +123,24 @@ const Address = () => {
                     }
                     setDeliveryType(true);
                   }}
-                  className="bg-[#0070BA] text-white w-full py-2.5 text-[10px] rounded-full font-medium hover:bg-[#005c96]"
+                  className="bg-[#0070BA] text-white md:mt-10 mt-8 w-full py-2.5 text-[10px] rounded-full font-medium hover:bg-[#005c96]"
                 >
                   Save & Proceed
                 </button>
               </>
             )}
 
-            {/* Show New Address Form */}
-            {showAddForm && <NewAddress />}
+            {showAddForm && <NewAddress setShowAddForm={setShowAddForm} />}
           </>
         )}
 
-        {/* Add Address Form */}
-        {showAddForm && <NewAddress />}
+        {/* {deliveryType && <DeliveryType />}
+        <Screener /> */}
 
-        {deliveryType && <DeliveryType />}
-        {/* <DeliveryType /> */}
-
-        <Screener />
+        {deliveryType && !deliverySuccess && (
+          <DeliveryType setDeliverySuccess={setDeliverySuccess} />
+        )}
+        {deliverySuccess && <Screener />}
       </div>
     </>
   );

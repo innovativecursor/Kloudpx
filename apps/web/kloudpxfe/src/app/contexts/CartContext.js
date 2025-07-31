@@ -100,14 +100,18 @@ export const CartProvider = ({ children }) => {
 
   const cartLength = getCartData?.data?.length || 0;
 
-  // console.log(cartItems);
+  const clearCart = () => {
+    setCartItems([]);
+    setGetCartData({ data: [], loading: false });
+  };
+
 
   return (
     <CartContext.Provider
       value={{
         cartItems,
         addToCart,
-
+        clearCart,
         getQuantity,
         increaseQuantity,
         decreaseQuantity,

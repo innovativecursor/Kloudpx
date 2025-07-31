@@ -10,6 +10,9 @@ const CheckoutContext = createContext();
 export const CheckoutProvider = ({ children }) => {
   const [savedForLaterIds, setSavedForLaterIds] = useState([]);
   const [checkoutData, setCheckoutData] = useState([]);
+  const [selectedId, setSelectedId] = useState(0);
+  const [selected, setSelected] = useState("standard");
+  const [deliveryData, setDeliveryData] = useState([]);
   const [getAllAddress, setGetAllAddress] = useState([]);
   const [formData, setFormData] = useState({
     id: null,
@@ -94,21 +97,19 @@ export const CheckoutProvider = ({ children }) => {
         isdefault: formData.isdefault,
       };
 
-
       if (formData.id) {
         payload.id = formData.id;
       }
 
       const res = await postAxiosCall(endpoints.address.add, payload, true);
       console.log(res);
-      // await selectedAddress(res.data.ID);
+
       toast.success(
         formData.id
           ? "Address updated successfully!"
           : "Address saved successfully!"
       );
 
-      // Reset form after add/update
       setFormData({
         id: null,
         nameresidency: "",
@@ -120,8 +121,6 @@ export const CheckoutProvider = ({ children }) => {
 
         isdefault: false,
       });
-
-      // Refresh list
       fetchAddressData();
     } catch (error) {
       console.error("API error:", error);
@@ -132,17 +131,14 @@ export const CheckoutProvider = ({ children }) => {
   const fetchAddressData = async () => {
     try {
       const res = await getAxiosCall(endpoints.address.get, {}, true);
-      // console.log(res);
       setGetAllAddress(res?.data || []);
     } catch (error) {
       setGetAllAddress([]);
     }
   };
 
-
   const selectedAddress = async (id) => {
-    console.log(id);
-
+    // console.log(id);
     try {
       const res = await postAxiosCall(
         endpoints.selectedAddress.add,
@@ -157,7 +153,26 @@ export const CheckoutProvider = ({ children }) => {
     }
   };
 
-
+  const addDeliveryData = async () => {
+    try {
+      const res = await postAxiosCall(
+        endpoints.deliveryType.add,
+        {
+          checkoutsessionid: checkoutData?.checkout_session_id,
+          addressid: selectedId,
+          deliverytype: selected,
+        },
+        true
+      );
+      // console.log("Delivery type:", res);
+      setDeliveryData(res || []);
+      toast.success("Delivery type selected successfully!");
+    } catch (error) {
+      console.error("Error selecting address:", error.message);
+      toast.error("Something went wrong!");
+      setDeliveryData([]);
+    }
+  };
 
   return (
     <CheckoutContext.Provider
@@ -173,7 +188,12 @@ export const CheckoutProvider = ({ children }) => {
         getAllAddress,
         handleEdit,
         selectedAddress,
-
+        selectedId,
+        setSelectedId,
+        selected,
+        setSelected,
+        addDeliveryData,
+        deliveryData
       }}
     >
       {children}

@@ -2,14 +2,17 @@
 import React from "react";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
 
-const NewAddress = () => {
-  const { handleSubmit, handleChange, formData, selectedAddress } =
-    useCheckout();
+const NewAddress = ({ setShowAddForm }) => {
+  const { handleSubmit, handleChange, formData } = useCheckout();
+
+  const onSubmit = async (e) => {
+    await handleSubmit(e);
+    setShowAddForm(false);
+  };
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className="mt-10 grid grid-cols-1 gap-5">
-        {/* nameresidency */}
+      <form onSubmit={onSubmit} className="mt-10 grid grid-cols-1 gap-5">
         <div>
           <label className="font-medium text-xs dark-text">
             Name of Residency

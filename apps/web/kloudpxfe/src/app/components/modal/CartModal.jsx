@@ -108,12 +108,12 @@ const CartModal = ({ isOpen, onClose }) => {
               {data?.length || 0} Items in your cart
             </h2>
           </div>
-          <button
+          {/* <button
             className="text-[#0070ba] cursor-pointer font-medium flex items-center gap-1"
             onClick={() => router.push("/")}
           >
             <i className="ri-add-line text-xl"></i> Add more
-          </button>
+          </button> */}
         </div>
 
         {/* Tabs */}

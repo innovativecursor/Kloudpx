@@ -1,22 +1,21 @@
-import React from "react";
-import { AiFillProduct } from "react-icons/ai";
-import { MdDeliveryDining } from "react-icons/md";
-import { MdLocalOffer } from "react-icons/md";
-import { FaSortAmountUp } from "react-icons/fa";
+import React, { useEffect } from "react";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
 import { useCartContext } from "@/app/contexts/CartContext";
+import BillingDetails from "./BillingDetails";
 
 const DeliveryCart = () => {
-  const { checkoutData } = useCheckout();
+  const { checkoutData, deliveryData } = useCheckout();
   const items = checkoutData?.items || [];
   const { removeFromCart } = useCartContext();
+  const fallbackImage = "/assets/fallback.png";
 
   const handleDelete = (id) => {
-    // console.log("Delete cart item with ID:", id);
     removeFromCart(id);
   };
 
-  const fallbackImage = "/assets/fallback.png";
+  useEffect(() => {}, [deliveryData]);
+
+  // console.log("Delivery Data updated:", deliveryData);
 
   return (
     <div>
@@ -88,49 +87,9 @@ const DeliveryCart = () => {
           );
         })}
 
-        <div className="w-full h-[0.5px] mt-7 bg-[#0070ba]"></div>
-
-        <div className="flex  font-semibold text-black px-6 pt-8 items-center text-base ">
-          Billing Details
-        </div>
-
-        <div className="flex justify-between items-center px-6 mt-3">
-          <div className="flex gap-1  items-center">
-            <AiFillProduct className="text-xs" />
-            <span className="text-sm font-medium">Item</span>
-          </div>
-          <span className="text-sm font-semibold text-[#333]">₱220</span>
-        </div>
-
-        <div className="flex justify-between items-center px-6 mt-3">
-          <div className="flex gap-1  items-center">
-            <MdDeliveryDining className="text-base" />
-            <span className="text-sm font-medium">Delivery Change</span>
-          </div>
-            <span className="text-sm font-semibold text-[#333]">₱220</span>
-        </div>
-
-        <div className="flex justify-between items-center px-6 mt-3">
-          <div className="flex gap-1  items-center">
-            <MdLocalOffer className="text-base" />
-            <span className="text-sm font-medium">Offer discount</span>
-          </div>
-       <span className="text-sm font-semibold text-[#333]">₱220</span>
-        </div>
-
-        <div className="flex justify-between items-center px-6 mt-3">
-          <div className="flex gap-1  items-center">
-            <FaSortAmountUp className="text-base" />
-            <span className="text-sm font-medium">Gst</span>
-          </div>
-            <span className="text-sm font-semibold text-[#333]">₱220</span>
-        </div>
-
-        <div className="w-full h-[0.5px] mt-7 bg-[#0070ba]"></div>
-        <div className="flex justify-between pb-5 items-center px-6 mt-3">
-          <span className="text-sm font-semibold">Total Amount</span>
-             <span className="text-sm font-semibold text-[#333]">₱220</span>
-        </div>
+        {deliveryData?.delivery_type && (
+          <BillingDetails deliveryData={deliveryData} />
+        )}
       </div>
     </div>
   );
