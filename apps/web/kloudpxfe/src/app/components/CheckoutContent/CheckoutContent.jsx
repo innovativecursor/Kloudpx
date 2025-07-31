@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 
 const CheckoutContent = () => {
@@ -70,7 +71,7 @@ const CheckoutContent = () => {
             className="bg-[#0070BA]/10 text-black hover:bg-[#005c96]/50 w-full py-3 rounded-full font-light 
           sm:text-[11px] text-[8px] cursor-pointer"
           >
-            Continue to Shop 
+            Continue to Shop
           </button>
         </div>
         <div className=" w-[60%]  ">

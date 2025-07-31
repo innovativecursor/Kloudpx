@@ -1,15 +1,18 @@
+"use client";
 import React, { useState } from "react";
 
 const PrescriptionHistoty = () => {
   const [activeTab, setActiveTab] = useState("current");
   const fallbackImage = "/assets/fallback.png";
   return (
-    <div className="bg-blue-50/20 p-8 rounded-xl  max-w-3xl space-y-6">
-      <h2 className="text-xl font-semibold mb-4">Prescription Summary</h2>
-      <div className="flex border-b border-gray-300">
+    <div className="bg-blue-50/20 md:p-8 p-2 rounded-xl  md:max-w-3xl w-full space-y-6">
+      <h2 className="text-xl md:text-start text-center font-semibold mb-4">
+        Prescription Summary
+      </h2>
+      <div className="flex border-b mt-12 border-gray-300">
         {/* Current Tab */}
         <button
-          className={`flex-1 text-center py-2 font-semibold ${
+          className={`flex-1 text-center cursor-pointer py-2 font-semibold ${
             activeTab === "current"
               ? "text-blue-600 border-b-2 border-blue-600"
               : "text-gray-600 hover:text-blue-600"
@@ -21,7 +24,7 @@ const PrescriptionHistoty = () => {
 
         {/* Past Tab */}
         <button
-          className={`flex-1 text-center py-2 font-semibold ${
+          className={`flex-1 text-center cursor-pointer py-2 font-semibold ${
             activeTab === "past"
               ? "text-blue-600 border-b-2 border-blue-600"
               : "text-gray-600 hover:text-blue-600"

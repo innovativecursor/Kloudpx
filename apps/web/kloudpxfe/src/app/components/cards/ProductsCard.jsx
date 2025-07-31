@@ -83,23 +83,23 @@ const ProductCardItem = ({ item, fallbackImage }) => {
               (item?.genericname?.length > 22 ? "..." : "")}
           </h1>
 
-          <p className="sm:text-[13px] text-[11px] font-medium tracking-wide mt-2">
+          <span className="sm:text-[13px] text-[11px] font-medium tracking-wide mt-2">
             {(item?.brandname?.slice(0, 25) || "No brandname") +
               (item?.brandname?.length > 25 ? "..." : "")}
-          </p>
+          </span>
         </div>
         <div className="flex justify-between sm:mt-3 mt-2 pb-2 items-center">
           {/* <p className="font-semibold sm:text-base text-xs">
             {" "}
             ₱{item?.price.toFixed(2)}
           </p> */}
-          <p className="font-semibold sm:text-base text-xs">
+          <span className="font-semibold sm:text-base text-xs">
             ₱
             {(
               item?.price -
               (item?.price * (parseFloat(item?.discount) || 0)) / 100
             ).toFixed(2)}
-          </p>
+          </span>
 
           <AddToCart
             title="Add To Cart"

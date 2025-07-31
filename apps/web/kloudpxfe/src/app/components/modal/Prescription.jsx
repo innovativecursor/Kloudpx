@@ -60,9 +60,9 @@ const Prescription = () => {
                 <h2 className="sm:text-3xl text-xl font-semibold md:mb-2">
               Upload Prescription
             </h2>
-            <p className="text-sm opacity-50 mt-4 font-medium mb-6 text-center">
+            <h1 className="text-sm opacity-50 mt-4 font-medium mb-6 text-center">
               Please upload image of valid prescription from your doctor.
-            </p>
+            </h1>
 
             <label className="flex flex-col items-center justify-center border-2 border-dashed border-[#0070BA]/40 rounded-lg p-4 w-48 h-48 cursor-pointer hover:border-[#0070BA]">
               <img
@@ -70,9 +70,9 @@ const Prescription = () => {
                 alt="Upload New"
                 className="w-20 h-20 mb-2"
               />
-              <p className="text-base font-semibold text-[#0070BA]">
+              <h1 className="text-base font-semibold text-[#0070BA]">
                 Upload New
-              </p>
+              </h1>
 
               <input
                 type="file"
@@ -91,10 +91,10 @@ const Prescription = () => {
 
             <hr className="border opacity-70 border-gray-300 mt-8 mb-6 w-full" />
 
-            <p className="text-sm tracking-wide text-center">
+            <h1 className="text-sm tracking-wide text-center">
               <span className="font-bold text-[#0070BA]">Note:</span> Always
               upload a clean version of your prescription for better result.
-            </p>
+            </h1>
             {/* <div className="flex flex-col justify-center items-center md:p-4">
             <h2 className="sm:text-3xl text-xl font-semibold md:mb-2">
               Upload Prescription
@@ -159,19 +159,19 @@ const Prescription = () => {
                     className="object-contain w-full p-5 h-full rounded-md"
                   />
                 ) : (
-                  <p className="text-center text-sm opacity-60">
+                  <h1 className="text-center text-sm opacity-60">
                     Upload Prescription
-                  </p>
+                  </h1>
                 )}
               </div>
               <div className="flex flex-col items-center justify-center tracking-wider mt-5">
-                <p className="sm:text-lg text-base font-semibold text-gray-700 mt-2">
+                <h1 className="sm:text-lg text-base font-semibold text-gray-700 mt-2">
                   Doctor Signature & Stamp:
-                </p>
-                <p className="text-center opacity-60 md:text-sm text-xs mt-2">
+                </h1>
+                <h1 className="text-center opacity-60 md:text-sm text-xs mt-2">
                   The prescription with signature and stamp of doctor to be
                   considered valid.
-                </p>
+                </h1>
               </div>
             </div>
           </div>

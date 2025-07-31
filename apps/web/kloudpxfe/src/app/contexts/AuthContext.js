@@ -64,20 +64,22 @@ export const AuthProvider = ({ children }) => {
     },
   });
 
-  const logout = () => {
-    localStorage.removeItem("access_token");
-    // sessionStorage.removeItem("access_token");
-    setToken(null);
-    setUser(null);
-    router.push("/");
-  };
+  // const logout = () => {
+  //   localStorage.removeItem("access_token");
+  //   // sessionStorage.removeItem("access_token");
+  //   setToken(null);
+  //   setUser(null);
+  //   router.push("/");
+  // };
 
   return (
     <AuthContext.Provider
       value={{
         token,
         login,
-        logout,
+        setToken,
+        setUser,
+        // logout,
         isAuthenticated: !!token,
         user,
         isAuthLoaded,

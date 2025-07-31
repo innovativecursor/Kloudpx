@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { Pagination, Modal } from "antd";
 import "antd/dist/reset.css";
-import Image from "next/image";
 
 const allOrders = Array.from({ length: 20 }, (_, i) => ({
   orderNumber: `XYT3456${222 + i}`,
@@ -61,47 +60,49 @@ const OrderHistory = () => {
   };
 
   return (
-    <div className="max-w-3xl my-16 bg-white rounded-lg shadow overflow-hidden">
-      <table className="w-full table-auto text-left">
-        <thead className="bg-[#0070ba] text-sm font-light text-white">
-          <tr>
-            <th className="py-5 px-6">Order Number</th>
-            <th className="py-5 px-6">Transaction ID</th>
-            <th className="py-5 px-6">Customer Name</th>
-            <th className="py-5 px-6">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedOrders.map((order, index) => (
-            <tr
-              key={order.orderNumber}
-              onClick={() => openModal(order)}
-              className="border-b border-gray-100 cursor-pointer font-light hover:bg-gray-50 text-sm transition"
-            >
-              <td className="py-5 px-6">{order.orderNumber}</td>
-              <td className="py-5 px-6">{order.transactionId}</td>
-              <td className="py-5 px-6">{order.customerName}</td>
-              <td className="py-5 px-6">
-                <select
-                  value={order.status}
-                  onClick={(e) => e.stopPropagation()} // Prevent modal on dropdown click
-                  onChange={(e) => handleStatusChange(index, e.target.value)}
-                  className="bg-blue-50 text-blue-900 py-1 px-3 rounded-lg cursor-pointer focus:outline-none"
-                >
-                  {statusOptions.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
-              </td>
+    <div className="max-w-3xl my-16 bg-white rounded-lg shadow overflow-hidden ">
+      <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300">
+        <table className="md:min-w-[700px] w-full text-left">
+          <thead className="bg-[#0070ba] text-sm font-light text-white">
+            <tr>
+              <th className="py-5 px-6">Order Number</th>
+              <th className="py-5 px-6">Transaction ID</th>
+              <th className="py-5 px-6">Customer Name</th>
+              <th className="py-5 px-6">Status</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {paginatedOrders.map((order, index) => (
+              <tr
+                key={order.orderNumber}
+                onClick={() => openModal(order)}
+                className="border-b border-gray-100 cursor-pointer font-light hover:bg-gray-50 text-sm transition"
+              >
+                <td className="py-5 px-6">{order.orderNumber}</td>
+                <td className="py-5 px-6">{order.transactionId}</td>
+                <td className="py-5 px-6">{order.customerName}</td>
+                <td className="py-5 px-6">
+                  <select
+                    value={order.status}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => handleStatusChange(index, e.target.value)}
+                    className="bg-blue-50 text-blue-900 py-1 px-3 rounded-lg cursor-pointer focus:outline-none"
+                  >
+                    {statusOptions.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <div className="flex items-center justify-between px-6 py-4">
-        <div className="text-sm text-gray-600">
+      <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 text-sm gap-2">
+        <div className="text-gray-600">
           Showing {(currentPage - 1) * pageSize + 1} -{" "}
           {Math.min(currentPage * pageSize, allOrders.length)} of{" "}
           {allOrders.length} records
@@ -123,9 +124,9 @@ const OrderHistory = () => {
         width={900}
       >
         {selectedOrder && (
-          <div className="p-4">
-            <div className="shadow">
-              <h2 className="text-xl font-semibold mb-1">
+          <div className="p-2 sm:p-4">
+            <div className="shadow-sm">
+              <h2 className="text-lg sm:text-xl font-semibold mb-1">
                 {selectedOrder.customerName}
               </h2>
               <p className="text-sm text-gray-500 mb-4">
@@ -133,55 +134,43 @@ const OrderHistory = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6 sm:mt-10">
               {/* Product Details */}
-
               <div>
-                <div className="bg-[#EDF4F6] w-full rounded-lg py-5">
-                  <div className="flex  font-semibold text-black px-6 py-3 items-center text-lg ">
+                <div className="bg-[#EDF4F6] rounded-lg py-4 px-4 sm:px-6">
+                  <h3 className="text-base sm:text-lg font-semibold mb-4">
                     Product Details
-                  </div>
-                  <div className="flex items-center gap-4 md:py-6 px-10 shadow-xs transition">
-                    <div>
+                  </h3>
+                  {selectedOrder.items.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-4 mb-4 transition"
+                    >
                       <img
-                        src={fallbackImage}
-                        alt="product"
-                        className="w-20 h-20 object-cover rounded-md"
+                        src={item.image || fallbackImage}
+                        alt={item.name}
+                        className="w-16 h-16 object-cover rounded-md"
                       />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <div className="flex flex-col">
-                          <p className="text-sm font-light text-[#0070ba]">
-                            Supplements Vitamins
-                          </p>
-                          <h4 className="font-medium text-base mb-1">
-                            Sugar Free Gold
-                          </h4>
-                        </div>
-                        <button
-                          //   onClick={() => handleDelete(item.cart_id)}
-                          className="ml-2 cursor-pointer font-light text-gray-400"
-                          title="Remove"
-                        >
-                          <i className="ri-close-circle-line text-2xl font-light"></i>
-                        </button>
+                      <div className="flex-1">
+                        <h1 className="text-xs text-[#0070ba] font-medium">
+                          {item.category}
+                        </h1>
+                        <h4 className="font-semibold text-sm sm:text-base">
+                          {item.name}
+                        </h4>
+                        <h1 className="text-sm font-medium">₱{item.price}</h1>
+                        <span className="text-xs">Qty: {item.quantity}</span>
                       </div>
-
-                      <div className="text-base mt-2 font-medium text-[#333]">
-                        <p className="text-sm font-semibold text-[#333]">
-                          ₱220
-                        </p>
-                      </div>
-                      <span className="text-xs">Quantity: 3</span>
                     </div>
-                  </div>
+                  ))}
                 </div>
               </div>
 
               {/* Billing Details */}
               <div>
-                <h3 className="text-lg font-semibold mb-4">Billing Details</h3>
+                <h3 className="text-base sm:text-lg font-semibold mb-4">
+                  Billing Details
+                </h3>
                 <div className="text-sm space-y-2">
                   <div className="flex justify-between">
                     <span>Order date</span>
@@ -192,7 +181,7 @@ const OrderHistory = () => {
                     <span>{selectedOrder.paymentType}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Item</span>
+                    <span>Item Total</span>
                     <span>₱{selectedOrder.total}</span>
                   </div>
                   <div className="flex justify-between">
@@ -208,7 +197,7 @@ const OrderHistory = () => {
                     <span>{selectedOrder.gst}</span>
                   </div>
                   <hr className="my-2" />
-                  <div className="flex justify-between font-semibold text-md">
+                  <div className="flex justify-between font-semibold">
                     <span>Total amount</span>
                     <span>₱{selectedOrder.total}</span>
                   </div>

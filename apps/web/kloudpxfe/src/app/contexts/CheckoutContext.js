@@ -10,6 +10,9 @@ const CheckoutContext = createContext();
 export const CheckoutProvider = ({ children }) => {
   const [savedForLaterIds, setSavedForLaterIds] = useState([]);
   const [checkoutData, setCheckoutData] = useState([]);
+  const [selectedId, setSelectedId] = useState(0);
+  const [selected, setSelected] = useState("standard");
+  const [deliveryData, setDeliveryData] = useState([]);
   const [getAllAddress, setGetAllAddress] = useState([]);
   const [formData, setFormData] = useState({
     id: null,
@@ -18,6 +21,7 @@ export const CheckoutProvider = ({ children }) => {
     province: "",
     city: "",
     zipcode: "",
+    barangay: "",
     isdefault: false,
   });
 
@@ -58,8 +62,6 @@ export const CheckoutProvider = ({ children }) => {
   const doCheckout = async () => {
     try {
       const res = await postAxiosCall(endpoints.checkout.get, {}, true);
-      // console.log("my res data", res);
-
       setCheckoutData(res || []);
     } catch (error) {
       setCheckoutData([]);
@@ -73,6 +75,7 @@ export const CheckoutProvider = ({ children }) => {
       region: address.Region,
       province: address.Province,
       city: address.City,
+      barangay: address.Barangay,
       zipcode: address.ZipCode,
 
       isdefault: address.IsDefault,
@@ -88,17 +91,18 @@ export const CheckoutProvider = ({ children }) => {
         region: formData.region,
         province: formData.province,
         city: formData.city,
+        barangay: formData.barangay,
         zipcode: formData.zipcode,
 
         isdefault: formData.isdefault,
       };
 
-      // Send ID if editing
       if (formData.id) {
         payload.id = formData.id;
       }
 
       const res = await postAxiosCall(endpoints.address.add, payload, true);
+      console.log(res);
 
       toast.success(
         formData.id
@@ -106,19 +110,17 @@ export const CheckoutProvider = ({ children }) => {
           : "Address saved successfully!"
       );
 
-      // Reset form after add/update
       setFormData({
         id: null,
         nameresidency: "",
         region: "",
         province: "",
         city: "",
+        barangay: "",
         zipcode: "",
 
         isdefault: false,
       });
-
-      // Refresh list
       fetchAddressData();
     } catch (error) {
       console.error("API error:", error);
@@ -129,10 +131,46 @@ export const CheckoutProvider = ({ children }) => {
   const fetchAddressData = async () => {
     try {
       const res = await getAxiosCall(endpoints.address.get, {}, true);
-      // console.log(res);
       setGetAllAddress(res?.data || []);
     } catch (error) {
       setGetAllAddress([]);
+    }
+  };
+
+  const selectedAddress = async (id) => {
+    // console.log(id);
+    try {
+      const res = await postAxiosCall(
+        endpoints.selectedAddress.add,
+        { addressid: id },
+        true
+      );
+      console.log("Address selected:", res);
+      toast.success("Address selected successfully!");
+    } catch (error) {
+      console.error("Error selecting address:", error.message);
+      toast.error("Something went wrong!");
+    }
+  };
+
+  const addDeliveryData = async () => {
+    try {
+      const res = await postAxiosCall(
+        endpoints.deliveryType.add,
+        {
+          checkoutsessionid: checkoutData?.checkout_session_id,
+          addressid: selectedId,
+          deliverytype: selected,
+        },
+        true
+      );
+      // console.log("Delivery type:", res);
+      setDeliveryData(res || []);
+      toast.success("Delivery type selected successfully!");
+    } catch (error) {
+      console.error("Error selecting address:", error.message);
+      toast.error("Something went wrong!");
+      setDeliveryData([]);
     }
   };
 
@@ -149,6 +187,13 @@ export const CheckoutProvider = ({ children }) => {
         fetchAddressData,
         getAllAddress,
         handleEdit,
+        selectedAddress,
+        selectedId,
+        setSelectedId,
+        selected,
+        setSelected,
+        addDeliveryData,
+        deliveryData
       }}
     >
       {children}

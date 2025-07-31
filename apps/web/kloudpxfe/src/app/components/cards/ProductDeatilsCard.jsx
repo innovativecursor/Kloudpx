@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import QuantitySelector from "../QuantitySelector/QuantitySelector";
 import AddToCart from "../button/AddToCart";
@@ -54,9 +55,9 @@ const ProductDeatilsCard = ({ details }) => {
           )}
         </div>
 
-        <p className="opacity-60 leading-relaxed items-start sm:mb-6 mb-3 sm:mt-5 mt-4 sm:text-sm text-xs md:text-lg text-justify">
+        <span className="opacity-60 leading-relaxed items-start sm:mb-6 mb-3 sm:mt-5 mt-4 sm:text-sm text-xs md:text-lg text-justify">
           {details?.description || "No description available."}
-        </p>
+        </span>
 
         <div className="flex justify-between sm:flex-row flex-col md:gap-10 gap-5  items-center">
           <QuantitySelector medicineid={details.id} />
@@ -74,12 +75,12 @@ const ProductDeatilsCard = ({ details }) => {
         <div className="flex items-start sm:gap-4 gap-2 sm:p-4 p-3 border-b border-blue-100">
           <RiTruckLine className="w-8 h-8 mt-0.5 text-blue-900" />
           <div>
-            <p className="font-semibold text-blue-950 text-sm ">
+            <span className="font-semibold text-blue-950 text-sm ">
               Your delivery will arrive within 2 days.
-            </p>
-            <p className=" text-xs sm:mt-2 mt-1 sm:text-xs text-[9px]">
+            </span>
+            <span className=" text-xs sm:mt-2 mt-1 sm:text-xs text-[9px]">
               Enter your postal code for Delivery Availability
-            </p>
+            </span>
           </div>
         </div>
       </div>

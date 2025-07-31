@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import ProductsCard from "@/app/components/cards/ProductsCard";
 import FeaturedBrand from "../featuredbrand/FeaturedBrand";

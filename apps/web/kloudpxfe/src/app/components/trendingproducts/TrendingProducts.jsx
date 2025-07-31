@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect } from "react";
 import { useProductContext } from "@/app/contexts/ProductContext";
 import useProductNavigation from "@/app/hooks/useProductNavigation";
@@ -48,12 +49,12 @@ const TrendingProducts = ({}) => {
                 />
               </div>
               <div className="sm:w-[65%] w-full sm:mt-0 mt-2">
-                <p className="font-semibold text-[10px] sm:mt-2 tracking-wide mt-1">
+                <h1 className="font-semibold text-[10px] sm:mt-2 tracking-wide mt-1">
                   {product.genericname}
-                </p>
-                <p className="font-semibold text-[10px] sm:mt-2 tracking-wide mt-1">
+                </h1>
+                <h1 className="font-semibold text-[10px] sm:mt-2 tracking-wide mt-1">
                   {product.brandname}
-                </p>
+                </h1>
                 <div className="flex gap-2 items-center sm:mt-2 text-[10px] tracking-wide mt-1">
                   {hasDiscount ? (
                     <>

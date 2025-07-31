@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { BiSortAlt2 } from "react-icons/bi";
 import { useProductContext } from "@/app/contexts/ProductContext";
 
@@ -12,33 +12,27 @@ const options = [
 ];
 
 const Sorting = () => {
-  const {
-    selectedCategoryId,
-    getSortedItemsByCategory,
-    activeSort,
-    setActiveSort,
-  } = useProductContext();
-
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const { activeSort, setActiveSort } = useProductContext();
 
-  useEffect(() => {
-    if (selectedCategoryId) {
-      getSortedItemsByCategory(selectedCategoryId, activeSort);
-    }
-  }, [selectedCategoryId, activeSort]);
+  const handleSort = (option) => {
+    setActiveSort(option);
+    setIsMobileOpen(false);
+  };
 
   return (
     <>
+      {/* 🌐 Desktop View */}
       <div className="hidden md:flex items-center lg:gap-4 md:gap-3 flex-wrap">
         <span className="font-medium dark-text mr-3">Sort by:</span>
         {options.map((option) => (
           <button
             key={option}
-            onClick={() => setActiveSort(option)}
+            onClick={() => handleSort(option)}
             className={`lg:px-5 md:px-3 py-2 rounded-md cursor-pointer lg:text-sm md:text-xs font-normal transition 
               ${
                 activeSort === option
-                  ? "bg-blue-200 dark-text font-semibold"
+                  ? "bg-[#0070ba] text-white"
                   : "bg-blue-50 text-gray-800 hover:bg-blue-100"
               }`}
           >
@@ -47,14 +41,18 @@ const Sorting = () => {
         ))}
       </div>
 
+      {/* 📱 Mobile Sort Button */}
       <div
         className="fixed bottom-0 left-0 w-1/2 bg-white text-sm dark-text border-t border-gray-300 shadow-md text-center py-3 md:hidden cursor-pointer z-30 font-medium"
         onClick={() => setIsMobileOpen(true)}
       >
         <div className="flex justify-center items-center">
-          <BiSortAlt2 /> SORT
+          <BiSortAlt2 className="mr-1" />
+          SORT
         </div>
       </div>
+
+      {/* 📱 Mobile Modal */}
       {isMobileOpen && (
         <>
           {/* Overlay */}
@@ -63,7 +61,7 @@ const Sorting = () => {
             onClick={() => setIsMobileOpen(false)}
           />
 
-          {/* Bottom Sheet Modal */}
+          {/* Bottom Sheet */}
           <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl h-[55vh] p-6 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] transition-all duration-300">
             {/* Header */}
             <div className="flex items-center justify-between mb-4 border-b pb-2 border-gray-200">
@@ -76,28 +74,20 @@ const Sorting = () => {
               </button>
             </div>
 
-            {/* Options List */}
+            {/* Options */}
             <div className="overflow-y-auto flex flex-col gap-2 h-full pr-1 custom-scroll">
               {options.map((option) => (
                 <button
                   key={option}
-                  onClick={() => {
-                    setActiveSort(option);
-                    setIsMobileOpen(false);
-                  }}
+                  onClick={() => handleSort(option)}
                   className={`flex items-center justify-between w-full px-4 py-3 text-sm rounded-xl transition-all duration-200
-              ${
-                activeSort === option
-                  ? "bg-blue-100 text-blue-700 font-semibold shadow-inner"
-                  : "text-gray-700 hover:bg-gray-100"
-              }`}
+                    ${
+                      activeSort === option
+                        ? "bg-[#0070ba] text-white"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`}
                 >
                   <span>{option}</span>
-                  {activeSort === option && (
-                    <span className="text-blue-600 text-lg font-bold">
-                      &#10003;
-                    </span>
-                  )}
                 </button>
               ))}
             </div>

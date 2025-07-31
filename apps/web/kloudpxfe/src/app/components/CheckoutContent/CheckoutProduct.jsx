@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import ImageSwiper from "../ImageSwiper/ImageSwiper";
 import { PiBusFill } from "react-icons/pi";
@@ -31,9 +32,9 @@ const CheckoutProduct = () => {
           </div>
         </div>
 
-        <p className="opacity-60 leading-relaxed items-start mb-4 mt-5 text-sm md:text-lg text-justify">
+        <span className="opacity-60 leading-relaxed items-start mb-4 mt-5 text-sm md:text-lg text-justify">
           description available
-        </p>
+        </span>
       </div>
     </div>
   );

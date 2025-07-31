@@ -36,12 +36,12 @@ const HealthArticles = ({ articles }) => {
                                 alt="Article"
                                 className="object-contain"
                             />
-                            <p className="mt-3 tracking-wide text-[10px] opacity-80">
+                            <h1 className="mt-3 tracking-wide text-[10px] opacity-80">
                                 Posted on - <span className="text-color">{article.date}</span>
-                            </p>
-                            <p className="mt-2 text-[10px] font-medium tracking-wide">
+                            </h1>
+                            <h1 className="mt-2 text-[10px] font-medium tracking-wide">
                                 {article.title}
-                            </p>
+                            </h1>
                             <span className="text-[10px] underline opacity-70 tracking-wide">
                                 Read more
                             </span>

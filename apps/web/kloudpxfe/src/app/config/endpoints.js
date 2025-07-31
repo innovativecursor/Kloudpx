@@ -15,7 +15,8 @@ const endpoints = {
     getItemsByCategory: (id) =>
       `${baseUrl}/v1/user/get-items-by-categories/${id}`,
     sortBy: (id) => `${baseUrl}/v1/user/sort-by/${id}`,
-    priceDiscountFilter: (id) => `${baseUrls.users}/v1/user/price-discount-filter/${id}`,
+    priceDiscountFilter: (id) =>
+      `${baseUrls.users}/v1/user/price-discount-filter/${id}`,
   },
   details: {
     get: (id) => `${baseUrl}/v1/user/medicine-details/${id}`,
@@ -60,6 +61,18 @@ const endpoints = {
   address: {
     add: `${baseUrl}/v1/user/add-update-address`,
     get: `${baseUrl}/v1/user/get-address`,
+  },
+  selectedAddress: {
+    add: `${baseUrl}/v1/user/select-address`,
+  },
+  deliveryType: {
+    add: `${baseUrl}/v1/user/select-delivery-type`,
+  },
+  filters: {
+    get: `${baseUrl}/v1/user/filter`,
+  },
+  sorting: {
+    get: `${baseUrl}/v1/user/sorting`,
   },
   prescription: {
     upload: `${baseUrl}/v1/user/upload-prescription`,

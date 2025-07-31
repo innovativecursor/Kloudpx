@@ -1,17 +1,18 @@
+"use client";
 import React from "react";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
 
-const NewAddress = () => {
-  const {
-    handleSubmit,
-    handleChange,
-    formData,
-  } = useCheckout();
+const NewAddress = ({ setShowAddForm }) => {
+  const { handleSubmit, handleChange, formData } = useCheckout();
+
+  const onSubmit = async (e) => {
+    await handleSubmit(e);
+    setShowAddForm(false);
+  };
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className="mt-10 grid grid-cols-1 gap-5">
-        {/* nameresidency */}
+      <form onSubmit={onSubmit} className="mt-10 grid grid-cols-1 gap-5">
         <div>
           <label className="font-medium text-xs dark-text">
             Name of Residency
@@ -51,6 +52,17 @@ const NewAddress = () => {
           />
         </div>
 
+        <div>
+          <label className="font-medium text-xs dark-text">Barangay</label>
+          <input
+            type="text"
+            name="barangay"
+            value={formData.barangay}
+            onChange={handleChange}
+            placeholder="e.g., Office 1"
+            className="w-full border-2 px-4 py-2 mt-1 rounded-lg text-xs border-gray-300"
+          />
+        </div>
 
         {/* city */}
         <div>

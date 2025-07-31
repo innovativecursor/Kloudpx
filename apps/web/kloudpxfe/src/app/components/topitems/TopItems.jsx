@@ -76,9 +76,9 @@ const TopItems = () => {
                 ) : (
                   <div className="md:text-2xl text-base w-[1em] h-[1em]" />
                 )}
-                <p className="sm:text-sm text-[11px] font-normal tracking-wide">
+                <h1 className="sm:text-sm text-[11px] font-normal tracking-wide">
                   {item.CategoryName}
-                </p>
+                </h1>
               </div>
             </SwiperSlide>
           );

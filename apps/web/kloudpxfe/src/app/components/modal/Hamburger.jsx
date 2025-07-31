@@ -40,14 +40,14 @@ const Hamburger = () => {
                   className="w-8 h-8 rounded-full"
                 />
                 <div className="text-[10px] tracking-wider font-normal">
-                  <p>
+                  <div>
                     <span className="opacity-70">Welcome back,</span>{" "}
                     <span className="font-semibold text-[#0070BA]">
                       {user?.first_name}
                       {user?.last_name}
                     </span>
-                  </p>
-                  <p>{user?.email}</p>
+                  </div>
+                  <h1>{user?.email}</h1>
                 </div>
               </div>
             </div>

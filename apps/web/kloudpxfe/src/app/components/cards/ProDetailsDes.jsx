@@ -26,9 +26,9 @@ const ProDetailsDes = ({ details }) => {
           </h3>
         </div>
 
-        <p className="text-gray-700 mb-7 w-full text-justify  leading-relaxed">
+        <span className="text-gray-700 mb-7 w-full text-justify  leading-relaxed">
           {details.description}
-        </p>
+        </span>
 
         {details.benefits && (
           <>
@@ -46,9 +46,9 @@ const ProDetailsDes = ({ details }) => {
               </h3>
             </div>
 
-            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
+            <span className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               {details?.keyingredients}
-            </p>
+            </span>
           </>
         )}
 
@@ -60,9 +60,9 @@ const ProDetailsDes = ({ details }) => {
               </h3>
             </div>
 
-            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
+            <span className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               {details?.recommendeddailyallowance}
-            </p>
+            </span>
           </>
         )}
 
@@ -74,9 +74,9 @@ const ProDetailsDes = ({ details }) => {
               </h3>
             </div>
 
-            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
+            <span className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               {details?.directionsforuse}
-            </p>
+            </span>
           </>
         )}
 
@@ -88,9 +88,9 @@ const ProDetailsDes = ({ details }) => {
               </h3>
             </div>
 
-            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
+            <span className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               {details?.safetyinformation}
-            </p>
+            </span>
           </>
         )}
 
@@ -102,9 +102,9 @@ const ProDetailsDes = ({ details }) => {
               </h3>
             </div>
 
-            <p className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
+            <span className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               {details?.storage}
-            </p>
+            </span>
           </>
         )}
       </div>
