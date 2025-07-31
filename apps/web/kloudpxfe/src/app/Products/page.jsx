@@ -90,14 +90,6 @@ const Page = () => {
         <section className="flex mt-7">
           <ProductsFilter setSelectedCategoryItems={setSelectedCategoryItems} />
           <div className="flex-1 md:ml-9">
-            {/* <AllProducts selectedCategoryItems={selectedCategoryItems} /> */}
-            {/* <AllProducts
-              selectedCategoryItems={
-                filteredMedicines.length > 0
-                  ? filteredMedicines
-                  : selectedCategoryItems
-              }
-            /> */}
             <AllProducts
               selectedCategoryItems={
                 filteredMedicines.length > 0
@@ -109,8 +101,8 @@ const Page = () => {
                       priceRange[1] < 1000 ||
                       discountRange[0] > 0 ||
                       discountRange[1] < 100)
-                  ? [] // filters applied but no result
-                  : selectedCategoryItems // default view
+                  ? []
+                  : selectedCategoryItems
               }
             />
           </div>
