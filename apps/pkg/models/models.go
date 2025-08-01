@@ -43,6 +43,7 @@ type CategoryIcon struct {
 
 type Medicine struct {
 	gorm.Model
+	ItemCode                  string `gorm:"uniqueIndex;default:null"`
 	BrandName                 string `gorm:"not null"`
 	IsBrand                   bool
 	InhouseBrand              bool

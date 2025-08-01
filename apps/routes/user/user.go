@@ -10,6 +10,7 @@ import (
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/checkoutflow"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/oauthuser"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/uploadprescription"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/user/useraccount"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/userflow"
 	"github.com/innovativecursor/Kloudpx/apps/routes/getapiroutes"
 	"gorm.io/gorm"
@@ -147,6 +148,11 @@ func User(db *gorm.DB) {
 
 	apiV1.GET("/user/get-payment-slip", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
 		checkoutflow.PreviewPaymentScreenshot(c, db)
+	})
+
+	//user account
+	apiV1.GET("/user/prescription history", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		useraccount.GetUserPrescriptionHistory(c, db)
 	})
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)

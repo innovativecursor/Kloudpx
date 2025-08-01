@@ -863,7 +863,6 @@ func GetTwoCategoriesWithItems(c *gin.Context, db *gorm.DB) {
 	})
 }
 
-// search bar
 func SearchMedicinesForUser(c *gin.Context, db *gorm.DB) {
 	query := c.Query("q")
 	if query == "" {
@@ -872,12 +871,28 @@ func SearchMedicinesForUser(c *gin.Context, db *gorm.DB) {
 	}
 
 	var medicines []models.Medicine
+	searchTerm := "%" + query + "%"
+
 	if err := db.Preload("Generic").
 		Preload("Category").
 		Preload("ItemImages").
 		Joins("LEFT JOIN categories ON categories.id = medicines.category_id").
-		Where("medicines.brand_name LIKE ? OR categories.category_name LIKE ?", "%"+query+"%", "%"+query+"%").
+		Joins("LEFT JOIN generics ON generics.id = medicines.generic_id").
+		Where(`
+			generics.generic_name LIKE ? 
+			OR medicines.brand_name LIKE ? 
+			OR categories.category_name LIKE ?
+		`, searchTerm, searchTerm, searchTerm).
+		Order(gorm.Expr(`
+			CASE
+				WHEN generics.generic_name LIKE ? THEN 1
+				WHEN medicines.brand_name LIKE ? THEN 2
+				WHEN categories.category_name LIKE ? THEN 3
+				ELSE 4
+			END
+		`, searchTerm, searchTerm, searchTerm)).
 		Find(&medicines).Error; err != nil {
+
 		logrus.WithError(err).Error("Failed to search medicines")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search medicines"})
 		return
