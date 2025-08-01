@@ -1,6 +1,7 @@
 package config
 
 type MedicineData struct {
+	ItemCode                  string  `json:"itemcode"`
 	BrandName                 string  `json:"brandname" binding:"required"`
 	IsBrand                   bool    `json:"isbrand"`
 	InhouseBrand              bool    `json:"inhousebrand"`
