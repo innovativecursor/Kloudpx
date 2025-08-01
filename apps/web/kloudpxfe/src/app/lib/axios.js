@@ -34,8 +34,30 @@ const getAuthHeaders = (sendToken) => {
 };
 
 // GET
-export const getAxiosCall = async (endpoint, params = {}, sendToken = true) => {
-  store.dispatch({ type: "LOADING", payload: true });
+// export const getAxiosCall = async (endpoint, params = {}, sendToken = true) => {
+//   store.dispatch({ type: "LOADING", payload: true });
+//   try {
+//     const headers = getAuthHeaders(sendToken);
+//     const response = await instance.get(endpoint, {
+//       headers,
+//       params,
+//     });
+//     return response;
+//   } catch (error) {
+//     // showError(error);
+//     throw error;
+//   } finally {
+//     store.dispatch({ type: "LOADING", payload: false });
+//   }
+// };
+
+
+
+export const getAxiosCall = async (endpoint, params = {}, sendToken = true, useGlobalLoader = true) => {
+  if (useGlobalLoader) {
+    store.dispatch({ type: "LOADING", payload: true });
+  }
+
   try {
     const headers = getAuthHeaders(sendToken);
     const response = await instance.get(endpoint, {
@@ -44,12 +66,15 @@ export const getAxiosCall = async (endpoint, params = {}, sendToken = true) => {
     });
     return response;
   } catch (error) {
-    // showError(error);
     throw error;
   } finally {
-    store.dispatch({ type: "LOADING", payload: false });
+    if (useGlobalLoader) {
+      store.dispatch({ type: "LOADING", payload: false });
+    }
   }
 };
+
+
 
 // POST
 export const postAxiosCall = async (endpoint, data, sendToken = true) => {

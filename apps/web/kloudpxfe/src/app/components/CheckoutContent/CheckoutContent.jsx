@@ -6,7 +6,7 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
-const CheckoutContent = () => {
+const CheckoutContent = ({ setSelectedProduct }) => {
   const { token } = useAuth();
   const router = useRouter();
   const { getCartData, getAllCartData } = useCartContext();
@@ -76,7 +76,8 @@ const CheckoutContent = () => {
             return (
               <div
                 key={item.cart_id}
-                className={`w-full py-3 px-6 rounded-sm flex justify-between  items-center ${bgClass}`}
+                className={`w-full py-3 px-6 rounded-sm cursor-pointer flex justify-between  items-center ${bgClass}`}
+                onClick={() => setSelectedProduct(item)}
               >
                 <div className="flex gap-2 items-center">
                   <img

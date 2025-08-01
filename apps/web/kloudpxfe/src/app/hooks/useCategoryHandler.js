@@ -9,11 +9,10 @@ const useCategoryHandler = () => {
     getItemsByCategory,
     setSelectedCategoryId,
     setSelectedCategoryName,
-    setActiveSort,
-    priceRange,
-    setPriceRange,
-    discountRange,
-    setDiscountRange,
+    // priceRange,
+    // setPriceRange,
+    // discountRange,
+    // setDiscountRange,
   } = useProductContext();
 
   const router = useRouter();
@@ -21,7 +20,7 @@ const useCategoryHandler = () => {
   const handleCategoryClick = async (
     id,
     fromHamburger = false,
-    onSuccessCallback = () => {}
+    onSuccessCallback = () => { }
   ) => {
     const selected = category.find((cat) => cat.ID === id);
     if (!selected) return;
@@ -32,9 +31,8 @@ const useCategoryHandler = () => {
 
     setSelectedCategoryId(id);
     setSelectedCategoryName(selected?.CategoryName || "");
-    setActiveSort("Popular");
-    setPriceRange([0, 1000]);
-    setDiscountRange([0, 100]);
+    // setPriceRange([0, 1000]);
+    // setDiscountRange([0, 100]);
     await getItemsByCategory(id);
 
     const categorySlug =

@@ -14,8 +14,8 @@ const PrescriptionHistoty = () => {
         <button
           className={`flex-1 text-center cursor-pointer py-2 font-semibold ${
             activeTab === "current"
-              ? "text-blue-600 border-b-2 border-blue-600"
-              : "text-gray-600 hover:text-blue-600"
+              ? "text-[#0070ba] border-b-2 border-[#0070ba]"
+              : "text-gray-600 hover:text-[#0070ba]"
           }`}
           onClick={() => setActiveTab("current")}
         >
@@ -26,8 +26,8 @@ const PrescriptionHistoty = () => {
         <button
           className={`flex-1 text-center cursor-pointer py-2 font-semibold ${
             activeTab === "past"
-              ? "text-blue-600 border-b-2 border-blue-600"
-              : "text-gray-600 hover:text-blue-600"
+              ? "text-[#0070ba] border-b-2 border-[#0070ba]"
+              : "text-gray-600 hover:text-[#0070ba]"
           }`}
           onClick={() => setActiveTab("past")}
         >
@@ -38,9 +38,9 @@ const PrescriptionHistoty = () => {
       {/* Content */}
       <div className="p-4 min-h-[120px]">
         {activeTab === "current" ? (
-          <div>Current Prescriptions Content here...</div>
+          <div>Current Prescriptions here...</div>
         ) : (
-          <div>Past Prescriptions Content here...</div>
+          <div>Past Prescriptions here...</div>
         )}
       </div>
 

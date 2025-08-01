@@ -6,25 +6,19 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
 import useProductNavigation from "@/app/hooks/useProductNavigation";
-import { useCheckout } from "@/app/contexts/CheckoutContext";
+// import { useCheckout } from "@/app/contexts/CheckoutContext";
 
 const CartModal = ({ isOpen, onClose }) => {
   const { token, isAuthLoaded } = useAuth();
   const router = useRouter();
   const { getCartData, removeFromCart, getAllCartData } = useCartContext();
-  const { toggleSaveForLater, savedForLaterIds, doCheckout } = useCheckout();
+  // const { toggleSaveForLater, savedForLaterIds, doCheckout } = useCheckout();
   const { goToProductPage } = useProductNavigation();
   const fallbackImage = "/assets/fallback.png";
   const [activeTab, setActiveTab] = useState("All");
 
   const data = getCartData?.data || [];
   const loading = getCartData?.loading || false;
-
-  // console.log(getCartData);
-
-  // const handleSaveForLater = async (cartId) => {
-  //   await toggleSaveForLater(cartId);
-  // };
 
   useEffect(() => {
     if (token) {
@@ -35,16 +29,6 @@ const CartModal = ({ isOpen, onClose }) => {
   if (!isAuthLoaded) {
     return null;
   }
-
-  // const handleCheckout = async () => {
-  //   try {
-  //     await doCheckout();
-  //     router.push("/Address");
-  //     onClose();
-  //   } catch (error) {
-  //     toast.error("Checkout failed, please try again.");
-  //   }
-  // };
 
   const handleCheckout = async () => {
     router.push("/Checkout");
@@ -63,10 +47,6 @@ const CartModal = ({ isOpen, onClose }) => {
       return item.prescription_status !== "Not Required";
     return true;
   });
-
-  // const hasUnsettledItems = filteredData.some(
-  //   (item) => item.prescription_status === "Unsettled"
-  // );
 
   return (
     <>
@@ -217,19 +197,9 @@ const CartModal = ({ isOpen, onClose }) => {
                         <span className="text-xs">Quantity:</span>{" "}
                         {item?.quantity}
                       </div>
-
-                      {/* <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={savedForLaterIds.includes(item.cart_id)}
-                          onChange={() => handleSaveForLater(item.cart_id)}
-                          className="appearance-none bg-transparent border border-[#0070ba] cursor-pointer rounded-full sm:w-3 sm:h-3 w-1 h-1 checked:bg-blue-500"
-                        />
-                        <label className="text-[9px]">Save for Later</label>
-                      </div> */}
                     </div>
 
-                    {/* Prescription Status (optional label) */}
+                    {/* Prescription Status  */}
                     {isUnsettled && (
                       <p className="text-xs text-red-500 mt-1">
                         Waiting for pharmacist approval before purchase
@@ -247,33 +217,16 @@ const CartModal = ({ isOpen, onClose }) => {
           )}
         </div>
 
-        {/* Checkout Button */}
-        {/* {filteredData?.length > 0 && (
-          <div className="p-4">
+        {token && data.length > 0 && (
+          <div className="p-4 ">
             <button
               onClick={handleCheckout}
-              disabled={hasUnsettledItems}
-              className={classNames(
-                "w-full py-3 rounded-full font-semibold cursor-pointer",
-                hasUnsettledItems
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-[#0070BA] text-white hover:bg-[#005c96]"
-              )}
+              className="w-full py-3 rounded-full text-sm font-semibold cursor-pointer bg-[#0070BA] text-white hover:bg-[#005c96]"
             >
               Proceed to Checkout
             </button>
           </div>
-        )} */}
-
-        <div className="p-4">
-          <button
-            onClick={handleCheckout}
-            // disabled={hasUnsettledItems}
-            className="w-full py-3 rounded-full font-semibold cursor-pointer bg-[#0070BA] text-white hover:bg-[#005c96]"
-          >
-            Proceed to Checkout
-          </button>
-        </div>
+        )}
       </div>
     </>
   );

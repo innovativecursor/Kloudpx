@@ -13,6 +13,8 @@ const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(
     localStorage.getItem("access_token") || null
   );
+  const [prescriptionRequired, setPrescriptionRequired] = useState(false);
+
   useEffect(() => {
     const initializeUser = async () => {
       if (!token || token === "null" || token.trim() === "") return;
@@ -23,6 +25,8 @@ const AuthProvider = ({ children }) => {
           const adminInfo = await fetchAdminInfo();
           if (adminInfo) {
             setUser(adminInfo);
+          } else {
+            logoutUser(); 
           }
         } catch (error) {
           console.error("initializeUser error:", error);
@@ -32,11 +36,6 @@ const AuthProvider = ({ children }) => {
 
     initializeUser();
   }, [token, isAuthenticated]);
-
-  const [prescriptionRequired, setPrescriptionRequired] = useState(false);
-
-  const [medicines, setMedicines] = useState([]);
-  const [medicineError, setMedicineError] = useState("");
 
   // --------- AUTH FUNCTIONS ---------
 
@@ -110,8 +109,6 @@ const AuthProvider = ({ children }) => {
         setPrescriptionRequired,
         token,
         checkToken,
-        medicines,
-        medicineError,
       }}
     >
       {children}

@@ -5,7 +5,7 @@ import { useImageContext } from "@/app/contexts/ImagesContext";
 
 const Category7 = () => {
   const { galleryImages, getGalleryImages } = useImageContext();
-  console.log(galleryImages);
+  // console.log(galleryImages);
 
   const allImages = Array.isArray(galleryImages?.data)
     ? galleryImages.data

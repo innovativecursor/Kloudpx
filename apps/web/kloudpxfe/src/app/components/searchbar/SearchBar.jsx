@@ -23,6 +23,7 @@ export default function SearchBar() {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const searchbar = "/assets/searchbar.jpg";
   const fallbackImage = "/assets/fallback.png";
@@ -39,21 +40,48 @@ export default function SearchBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // const fetchSuggestions = debounce(async (query) => {
+  //   if (!query.trim()) {
+  //     setResults([]);
+  //     setShowDropdown(false);
+  //     return;
+  //   }
+
+  //   try {
+  //     const res = await getAxiosCall(endpoints.search.get(query), {}, false);
+  //     // console.log(res);
+  //     setResults(res?.data?.medicines || []);
+  //     setShowDropdown(true);
+  //   } catch (error) {
+  //     console.error("Search error:", error);
+  //     setResults([]);
+  //   }
+  // }, 300);
+
   const fetchSuggestions = debounce(async (query) => {
     if (!query.trim()) {
       setResults([]);
       setShowDropdown(false);
+      setLoading(false);
       return;
     }
 
     try {
-      const res = await getAxiosCall(endpoints.search.get(query), {}, false);
-      // console.log(res);
+      setLoading(true);
+      // const res = await getAxiosCall(endpoints.search.get(query), {}, false);
+      const res = await getAxiosCall(
+        endpoints.search.get(query),
+        {},
+        false,
+        false
+      );
       setResults(res?.data?.medicines || []);
       setShowDropdown(true);
     } catch (error) {
       console.error("Search error:", error);
       setResults([]);
+    } finally {
+      setLoading(false);
     }
   }, 300);
 
@@ -89,8 +117,16 @@ export default function SearchBar() {
           <i className="ri-search-line text-white text-2xl"></i>
         </button> */}
 
-        <button className="bg-[#006EBB] w-12 md:w-20 p-2 md:p-4 flex justify-center items-center">
+        {/* <button className="bg-[#006EBB] w-12 md:w-20 p-2 md:p-4 flex justify-center items-center">
           <i className="ri-search-line text-white text-xl md:text-2xl"></i>
+        </button> */}
+
+        <button className="bg-[#006EBB] w-12 md:w-20 p-2 md:p-4 flex justify-center items-center">
+          {loading ? (
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          ) : (
+            <i className="ri-search-line text-white text-xl md:text-2xl"></i>
+          )}
         </button>
       </div>
 

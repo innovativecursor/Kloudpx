@@ -10,7 +10,7 @@ const CheckoutContext = createContext();
 export const CheckoutProvider = ({ children }) => {
   const [savedForLaterIds, setSavedForLaterIds] = useState([]);
   const [checkoutData, setCheckoutData] = useState([]);
-  const [selectedId, setSelectedId] = useState(0);
+  const [selectedId, setSelectedId] = useState(null);
   const [selected, setSelected] = useState("standard");
   const [deliveryData, setDeliveryData] = useState([]);
   const [getAllAddress, setGetAllAddress] = useState([]);
@@ -40,7 +40,7 @@ export const CheckoutProvider = ({ children }) => {
         {},
         true
       );
-      console.log(res);
+      // console.log(res);
 
       const isSaved = res.save_for_later;
 
@@ -102,7 +102,7 @@ export const CheckoutProvider = ({ children }) => {
       }
 
       const res = await postAxiosCall(endpoints.address.add, payload, true);
-      console.log(res);
+      // console.log(res);
 
       toast.success(
         formData.id
@@ -138,7 +138,7 @@ export const CheckoutProvider = ({ children }) => {
   };
 
   const selectedAddress = async (id) => {
-    // console.log(id);
+    console.log(id);
     try {
       const res = await postAxiosCall(
         endpoints.selectedAddress.add,
@@ -193,7 +193,7 @@ export const CheckoutProvider = ({ children }) => {
         selected,
         setSelected,
         addDeliveryData,
-        deliveryData
+        deliveryData,
       }}
     >
       {children}

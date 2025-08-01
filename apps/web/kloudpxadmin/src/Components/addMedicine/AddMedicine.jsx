@@ -64,6 +64,7 @@ const AddMedicine = () => {
       dosageForm: data.DosageForm,
       packaging: data.Packaging,
       marketer: data.Marketer,
+      itemcode: data.ItemCode,
       benefits: data.Benefits,
       keyingredients: data.KeyIngredients,
       recommendeddailyallowance: data.RecommendedDailyAllowance,
@@ -176,6 +177,10 @@ const AddMedicine = () => {
           name="marketer"
           placeholder="Enter marketer name"
         />
+      </div>
+
+      <div className="my-10">
+        <Input label="Itemcode" name="itemcode" placeholder="Enter itemcode" />
       </div>
 
       {/* Full-width components */}

@@ -171,6 +171,12 @@ export const getMedicineColumns = ({ handleEdit, deleteMedicine }) => [
     key: "Marketer",
     align: "center",
   },
+    {
+    title: "Itemcode",
+    dataIndex: "ItemCode",
+    key: "ItemCode",
+    align: "center",
+  },
   {
     title: "Benefits",
     dataIndex: "Benefits",

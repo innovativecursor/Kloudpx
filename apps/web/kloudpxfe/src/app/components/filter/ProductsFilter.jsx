@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 const ProductsFilter = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [showAll, setShowAll] = useState(false);
 
   const {
     category,
@@ -24,7 +25,12 @@ const ProductsFilter = () => {
     getAllBrand,
     isMobileOpen,
     setIsMobileOpen,
+    activeSort,
+    setActiveSort,
+    fetchFilteredMedicines,
   } = useProductContext();
+
+  const visibleBrands = showAll ? branded : branded.slice(0, 20);
 
   useEffect(() => {
     if (!branded || branded.length === 0) {
@@ -38,19 +44,16 @@ const ProductsFilter = () => {
 
     selectedCategories.forEach((id) => handleCategoryChange(id));
     selectedBrands.forEach((brand) => handleBrandChange(brand));
+    setActiveSort("");
     setIsMobileOpen(false);
+    fetchFilteredMedicines(null);
     const categoryId = searchParams.get("category");
     const categorySlug = searchParams.get("name");
-
-    if (categoryId) {
-      await getItemsByCategory(Number(categoryId));
-    }
 
     let newUrl = "/Products";
     if (categoryId && categorySlug) {
       newUrl += `?category=${categoryId}&name=${categorySlug}`;
     }
-
     router.push(newUrl);
   };
 
@@ -58,7 +61,7 @@ const ProductsFilter = () => {
     <div className="bg-gray-100 h-full overflow-y-auto p-5">
       <div className="flex justify-end ">
         <button
-          className="text-sm text-black font-medium underline"
+          className="text-sm text-black font-medium cursor-pointer underline"
           onClick={handleClearAll}
         >
           Clear All
@@ -87,20 +90,30 @@ const ProductsFilter = () => {
       {/* Brands Filter */}
       <div className="mt-8">
         <span className="font-medium text-lg">Brands</span>
-        {branded?.map(({ brandname, id }) => (
+
+        {visibleBrands.map((brand, index) => (
           <label
-            key={id}
+            key={index}
             className="flex items-center gap-2 mt-3 cursor-pointer"
           >
             <input
               type="checkbox"
-              checked={selectedBrands.includes(brandname)}
-              onChange={() => handleBrandChange(brandname)}
+              checked={selectedBrands.includes(brand)}
+              onChange={() => handleBrandChange(brand)}
               className="w-4 h-4 accent-[#0070ba] cursor-pointer"
             />
-            <span className="text-sm">{brandname}</span>
+            <span className="text-sm">{brand}</span>
           </label>
         ))}
+
+        {branded.length > 20 && (
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className="mt-3 text-sm text-[#0070ba] underline cursor-pointer"
+          >
+            {showAll ? "Show Less" : "Show More"}
+          </button>
+        )}
       </div>
 
       {/* Price Filter */}
