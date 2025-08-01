@@ -5,14 +5,14 @@ import { useSearchParams } from "next/navigation";
 import { useProductContext } from "../contexts/ProductContext";
 import ProductsFilter from "../components/filter/ProductsFilter";
 import AllProducts from "../components/AllProducts/AllProducts";
-import Hero from "../components/Hero/Hero";
+// import Hero from "../components/Hero/Hero";
 import Sorting from "../components/sorting/Sorting";
 
 const Page = () => {
   const searchParams = useSearchParams();
   const categoryIdFromUrl = searchParams.get("category");
 
-  const scrollRef = useRef(null);
+  // const scrollRef = useRef(null);
 
   const {
     selectedCategoryItems,
@@ -41,26 +41,25 @@ const Page = () => {
       }
     }
 
-    setTimeout(() => {
-      if (scrollRef.current) {
-        scrollRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 300);
+    // setTimeout(() => {
+    //   if (scrollRef.current) {
+    //     scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    //   }
+    // }, 300);
   }, [categoryIdFromUrl, category]);
 
   return (
-    <div>
-      <div className="mt-40 md:mt-64 sm:mt-48">
+    <div className="md:mt-56 sm:mt-40 mt-32">
+      {/* <div className="mt-40 md:mt-64 sm:mt-48">
         <Hero />
-      </div>
-      <div ref={scrollRef} className="scroll-mt-[6rem] sm:scroll-mt-[11rem]" />
+      </div> */}
+      <div
+      // ref={scrollRef} className="scroll-mt-[6rem] sm:scroll-mt-[11rem]"
+      />
 
       <div className="responsive-mx pt-5 md:pt-7">
         <div className="flex justify-between items-start md:mt-5 mt-4 dark-text font-medium">
           <div className="flex gap-1 lg:text-base md:text-sm">
-            {/* <span className="opacity-70">
-              Viewing {selectedCategoryItems?.length} results of
-            </span> */}
             <span className="opacity-70">
               Viewing{" "}
               {
@@ -88,7 +87,7 @@ const Page = () => {
         </div>
 
         <section className="flex mt-7">
-          <ProductsFilter setSelectedCategoryItems={setSelectedCategoryItems} />
+          <ProductsFilter />
           <div className="flex-1 md:ml-9">
             <AllProducts
               selectedCategoryItems={

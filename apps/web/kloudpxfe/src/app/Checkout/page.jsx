@@ -15,7 +15,7 @@ const page = () => {
             <CheckoutContent />
           </div>
           <div className="md:w-[40%] w-full">
-            <CheckoutProduct />
+            {/* <CheckoutProduct /> */}
           </div>
         </div>
       </div>

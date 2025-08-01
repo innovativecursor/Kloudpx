@@ -12,6 +12,8 @@ const Gallery = () => {
 
   const [file, setFile] = useState(null);
   const [buttonText, setButtonText] = useState("");
+  const [link, setLink] = useState("");
+
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
@@ -22,9 +24,10 @@ const Gallery = () => {
     if (!file) return alert("Please select an image");
     if (!buttonText.trim()) return alert("Please enter button text");
 
-    await uploadGalleryImage(file, buttonText);
+    await uploadGalleryImage(file, buttonText, link);
     setFile(null);
     setButtonText("");
+    setLink("");
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -71,21 +74,28 @@ const Gallery = () => {
             placeholder="Enter Button Text"
             value={buttonText}
             onChange={(e) => setButtonText(e.target.value)}
-            className="p-3 border rounded-md w-full focus:ring focus:ring-indigo-200"
+            className="p-3 border border-gray-600 rounded-md w-full focus:ring focus:ring-indigo-200"
           />
 
-          <button
-            onClick={handleUpload}
-            disabled={!file || !buttonText}
-            className={`w-full py-3 rounded-md font-semibold text-white transition ${
-              file && buttonText
-                ? "bg-indigo-600 hover:bg-indigo-700"
-                : "bg-indigo-300 cursor-not-allowed"
-            }`}
-          >
-            Upload Image
-          </button>
+          <input
+            type="text"
+            placeholder="Enter Link (optional)"
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
+            className="p-3 border border-gray-600 rounded-md w-full focus:ring focus:ring-indigo-200"
+          />
         </div>
+        <button
+          onClick={handleUpload}
+          disabled={!file || !buttonText}
+          className={`w-full py-3 rounded-md mt-6 font-semibold text-white transition ${
+            file && buttonText
+              ? "bg-indigo-600 hover:bg-indigo-700"
+              : "bg-indigo-300 cursor-not-allowed"
+          }`}
+        >
+          Upload Image
+        </button>
       </div>
 
       {/* Gallery Table */}
@@ -102,6 +112,10 @@ const Gallery = () => {
               <th className="px-6 py-3 text-left text-sm font-medium text-indigo-700 uppercase">
                 Button Text
               </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-indigo-700 uppercase">
+                Link
+              </th>
+
               <th className="px-6 py-3 text-left text-sm font-medium text-indigo-700 uppercase">
                 Status
               </th>
@@ -133,6 +147,16 @@ const Gallery = () => {
                   <td className="px-6 py-4 text-sm text-gray-700 font-semibold">
                     {img.ButtonText}
                   </td>
+                  <td className="px-6 py-4 text-sm text-blue-600 underline">
+                    <a
+                      href={img.Link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {img.Link ? "Open" : "N/A"}
+                    </a>
+                  </td>
+
                   <td className="px-6 py-4">
                     <span
                       className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${

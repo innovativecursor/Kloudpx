@@ -1,19 +1,22 @@
 "use client";
+import Link from "next/link";
 function Footer() {
   return (
     <footer className="mt-8 sm:mt-16">
       <div className="grid sm:grid-cols-3 grid-cols-1 gap-7 responsive-mx sm:pb-10 pb-6">
         <div className="">
-          <div className="flex items-center gap-2">
-            <img
-              src="/assets/logo.webp"
-              alt="Upload"
-              className="object-contain max-w-[25%] cursor-pointer"
-            />
-            <h2 className="font-bold md:text-2xl text-xl tracking-wide">
-              Kloud Pharma
-            </h2>
-          </div>
+          <Link href="/">
+            <div className="flex items-center gap-2 cursor-pointer">
+              <img
+                src="/assets/logo.webp"
+                alt="Upload"
+                className="object-contain max-w-[25%]"
+              />
+              <h2 className="font-bold md:text-2xl text-xl tracking-wide">
+                Kloud Pharma
+              </h2>
+            </div>
+          </Link>
           <h1 className="text-[10px] mt-4 font-medium opacity-60 tracking-wide">
             Unit B, Emerald Jade Green Building, 282 Epifanio de los Santos Ave,
             Mandaluyong City, 1550 Metro Manila, Philippines
@@ -79,12 +82,20 @@ function Footer() {
           <div className="flex flex-col text-xs">
             <h1 className="text-color font-semibold ">Quick Links</h1>
             <ul className="mt-4 text-[10px] space-y-5 font-normal cursor-pointer">
-              <li>Home</li>
+              <li>
+                <Link href="/" className="hover:underline">
+                  Home
+                </Link>
+              </li>
               <li>About Us</li>
               <li>Shop Products</li>
               <li>Blog/ Health Tips</li>
               <li>Contact Us</li>
-              <li>FAQS</li>
+              <li>
+                <Link href="/Faq" className="hover:underline">
+                  FAQS
+                </Link>
+              </li>
             </ul>
           </div>
           <div className="flex flex-col text-xs">

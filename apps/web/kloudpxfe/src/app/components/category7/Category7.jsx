@@ -5,6 +5,7 @@ import { useImageContext } from "@/app/contexts/ImagesContext";
 
 const Category7 = () => {
   const { galleryImages, getGalleryImages } = useImageContext();
+  console.log(galleryImages);
 
   const allImages = Array.isArray(galleryImages?.data)
     ? galleryImages.data
@@ -27,8 +28,17 @@ const Category7 = () => {
         alt={image.ButtonText || `Gallery ${index + 1}`}
         className="w-full h-full  rounded-md transition duration-300"
       />
-      <div className="absolute inset-0 flex items-center justify-center bg-black/50 cursor-pointer opacity-0 group-hover:opacity-100 transition duration-300">
+      {/* <div className="absolute inset-0 flex items-center justify-center bg-black/50 cursor-pointer opacity-0 group-hover:opacity-100 transition duration-300">
         <PrimaryButton title={image.ButtonText || "View"} />
+      </div> */}
+      <div className="absolute inset-0 flex items-center justify-center bg-black/50 cursor-pointer opacity-0 group-hover:opacity-100 transition duration-300">
+        {image.Link ? (
+          <a href={image.Link} className="inline-block">
+            <PrimaryButton title={image.ButtonText || "View"} />
+          </a>
+        ) : (
+          <PrimaryButton title={image.ButtonText || "View"} />
+        )}
       </div>
     </div>
   );
@@ -63,8 +73,17 @@ const Category7 = () => {
               alt={rightImage.ButtonText || "Gallery"}
               className="w-full h-full rounded-md transition duration-300 group-hover:opacity-60"
             />
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50 cursor-pointer opacity-0 group-hover:opacity-100 transition duration-300">
+            {/* <div className="absolute inset-0 flex items-center justify-center bg-black/50 cursor-pointer opacity-0 group-hover:opacity-100 transition duration-300">
               <PrimaryButton title={rightImage.ButtonText || "View"} />
+            </div> */}
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 cursor-pointer opacity-0 group-hover:opacity-100 transition duration-300">
+              {rightImage.Link ? (
+                <a href={rightImage.Link} className="inline-block">
+                  <PrimaryButton title={rightImage.ButtonText || "View"} />
+                </a>
+              ) : (
+                <PrimaryButton title={rightImage.ButtonText || "View"} />
+              )}
             </div>
           </div>
         )}
