@@ -17,37 +17,6 @@ const DeliveryType = ({ setDeliverySuccess }) => {
 
   return (
     <div className="mt-10">
-      {/* Standard Delivery */}
-      <label
-        htmlFor="standard"
-        className={`flex justify-between items-center py-5 px-6 rounded-xl cursor-pointer border ${
-          selected === "standard"
-            ? "bg-[#EDF4F6] border-[#0070BA]"
-            : "bg-[#EDF4F6] border-transparent"
-        } mb-4 transition-all`}
-      >
-        <div className="flex items-center gap-4">
-          <input
-            type="radio"
-            id="standard"
-            name="delivery"
-            value="standard"
-            checked={selected === "standard"}
-            onChange={() => setSelected("standard")}
-            className="accent-[#0070BA] mt-1 w-5 h-5"
-          />
-          <div>
-            <h3 className="font-medium tracking-wide text-base text-[#00243f]">
-              Standard Delivery
-            </h3>
-            <span className="text-xs tracking-wide text-gray-600">
-              Get your medicines delivered next day.
-            </span>
-          </div>
-        </div>
-        {/* <span className="text-[#00243f] font-medium text-lg">₱0</span> */}
-      </label>
-
       {/* Priority Delivery */}
       <label
         htmlFor="priority"
@@ -77,6 +46,37 @@ const DeliveryType = ({ setDeliverySuccess }) => {
           </div>
         </div>
         {/* <span className="text-[#00243f] font-medium text-lg">₱20</span> */}
+      </label>
+
+      {/* Standard Delivery */}
+      <label
+        htmlFor="standard"
+        className={`flex justify-between items-center py-5 px-6 rounded-xl cursor-pointer border ${
+          selected === "standard"
+            ? "bg-[#EDF4F6] border-[#0070BA]"
+            : "bg-[#EDF4F6] border-transparent"
+        } mb-4 transition-all`}
+      >
+        <div className="flex items-center gap-4">
+          <input
+            type="radio"
+            id="standard"
+            name="delivery"
+            value="standard"
+            checked={selected === "standard"}
+            onChange={() => setSelected("standard")}
+            className="accent-[#0070BA] mt-1 w-5 h-5"
+          />
+          <div>
+            <h3 className="font-medium tracking-wide text-base text-[#00243f]">
+              Standard Delivery
+            </h3>
+            <span className="text-xs tracking-wide text-gray-600">
+              Get your medicines delivered next day.
+            </span>
+          </div>
+        </div>
+        {/* <span className="text-[#00243f] font-medium text-lg">₱0</span> */}
       </label>
 
       {/* Cash on Delivery */}

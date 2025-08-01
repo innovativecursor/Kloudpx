@@ -6,6 +6,7 @@ import sale1 from "@/assets/1.svg";
 import sale2 from "@/assets/2.svg";
 import Pagination from "../Pagination/Pagination";
 import { useProductContext } from "@/app/contexts/ProductContext";
+import { FiAlertCircle } from "react-icons/fi";
 
 const AllProducts = ({ selectedCategoryItems = [] }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,30 +34,47 @@ const AllProducts = ({ selectedCategoryItems = [] }) => {
     <>
       {currentPage === 1 && (
         <>
-          <ProductsCard selectedCategoryItems={first8} />
-
-          {Array.isArray(feature) && feature?.length > 0 && (
-            <div className="bg-white flex justify-center">
-              <div className="mt-5 sm:mt-10 md:mt-12 bg-gray-200/70 rounded-xl sm:py-9 py-8 md:w-[63vw] w-[94vw] sm:px-6 px-4 overflow-hidden mb-10 sm:mb-20">
-                <FeaturedBrand feature={feature} />
-              </div>
+          {first8.length === 0 ? (
+            <div className="flex flex-col justify-center items-center w-full h-96  text-red-600">
+              <FiAlertCircle className="sm:text-4xl text-2xl mb-2" />
+              <p className="sm:text-base text-xs font-semibold">
+                No products found
+              </p>
             </div>
+          ) : (
+            <ProductsCard selectedCategoryItems={first8} />
+          )}
+
+          {first8.length !== 0 && (
+            <>
+              {Array.isArray(feature) && feature.length > 0 && (
+                <div className="bg-white flex justify-center">
+                  <div className="mt-5 sm:mt-10 md:mt-12 bg-gray-200/70 rounded-xl sm:py-9 py-8 md:w-[63vw] w-[94vw] sm:px-6 px-4 overflow-hidden mb-10 sm:mb-20">
+                    <FeaturedBrand feature={feature} />
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           <ProductsCard selectedCategoryItems={next4} />
 
-          <div className="flex justify-between items-center lg:mt-10 sm:mt-14 sm:gap-4 gap-2 mb-10 sm:mb-20">
-            <img
-              className="lg:h-[26vw] md:h-[25vw]  h-[37vw] w-auto object-contain"
-              src={sale1.src}
-              alt="sale1"
-            />
-            <img
-              className="lg:h-[26vw] md:h-[25vw] h-[37vw] w-auto object-contain"
-              src={sale2.src}
-              alt="sale2"
-            />
-          </div>
+          {first8.length !== 0 && (
+            <>
+              <div className="flex justify-between items-center lg:mt-10 sm:mt-14 sm:gap-4 gap-2 mb-10 sm:mb-20">
+                <img
+                  className="lg:h-[26vw] md:h-[25vw]  h-[37vw] w-auto object-contain"
+                  src={sale1.src}
+                  alt="sale1"
+                />
+                <img
+                  className="lg:h-[26vw] md:h-[25vw] h-[37vw] w-auto object-contain"
+                  src={sale2.src}
+                  alt="sale2"
+                />
+              </div>
+            </>
+          )}
 
           <ProductsCard selectedCategoryItems={afterImage4} />
         </>

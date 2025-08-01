@@ -22,18 +22,9 @@ const CartModal = ({ isOpen, onClose }) => {
 
   // console.log(getCartData);
 
-  const handleSaveForLater = async (cartId) => {
-    await toggleSaveForLater(cartId);
-  };
-
-  // useEffect(() => {
-  //   const storedToken = localStorage.getItem("access_token");
-  //   if (token === null && !storedToken) {
-  //     // router.push("/");
-  //     console.log("errror is coming...");
-  //     // return;
-  //   }
-  // }, [token]);
+  // const handleSaveForLater = async (cartId) => {
+  //   await toggleSaveForLater(cartId);
+  // };
 
   useEffect(() => {
     if (token) {
@@ -45,14 +36,19 @@ const CartModal = ({ isOpen, onClose }) => {
     return null;
   }
 
+  // const handleCheckout = async () => {
+  //   try {
+  //     await doCheckout();
+  //     router.push("/Address");
+  //     onClose();
+  //   } catch (error) {
+  //     toast.error("Checkout failed, please try again.");
+  //   }
+  // };
+
   const handleCheckout = async () => {
-    try {
-      await doCheckout();
-      router.push("/Address");
-      onClose();
-    } catch (error) {
-      toast.error("Checkout failed, please try again.");
-    }
+    router.push("/Checkout");
+    onClose();
   };
 
   const handleDelete = (id) => {
@@ -68,11 +64,9 @@ const CartModal = ({ isOpen, onClose }) => {
     return true;
   });
 
-  const hasUnsettledItems = filteredData.some(
-    (item) => item.prescription_status === "Unsettled"
-  );
-
-  // console.log(data, "my data is here");
+  // const hasUnsettledItems = filteredData.some(
+  //   (item) => item.prescription_status === "Unsettled"
+  // );
 
   return (
     <>
@@ -224,7 +218,7 @@ const CartModal = ({ isOpen, onClose }) => {
                         {item?.quantity}
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      {/* <div className="flex items-center gap-2">
                         <input
                           type="checkbox"
                           checked={savedForLaterIds.includes(item.cart_id)}
@@ -232,7 +226,7 @@ const CartModal = ({ isOpen, onClose }) => {
                           className="appearance-none bg-transparent border border-[#0070ba] cursor-pointer rounded-full sm:w-3 sm:h-3 w-1 h-1 checked:bg-blue-500"
                         />
                         <label className="text-[9px]">Save for Later</label>
-                      </div>
+                      </div> */}
                     </div>
 
                     {/* Prescription Status (optional label) */}
@@ -254,7 +248,7 @@ const CartModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Checkout Button */}
-        {filteredData?.length > 0 && (
+        {/* {filteredData?.length > 0 && (
           <div className="p-4">
             <button
               onClick={handleCheckout}
@@ -269,7 +263,17 @@ const CartModal = ({ isOpen, onClose }) => {
               Proceed to Checkout
             </button>
           </div>
-        )}
+        )} */}
+
+        <div className="p-4">
+          <button
+            onClick={handleCheckout}
+            // disabled={hasUnsettledItems}
+            className="w-full py-3 rounded-full font-semibold cursor-pointer bg-[#0070BA] text-white hover:bg-[#005c96]"
+          >
+            Proceed to Checkout
+          </button>
+        </div>
       </div>
     </>
   );

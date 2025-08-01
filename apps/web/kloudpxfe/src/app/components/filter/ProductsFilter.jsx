@@ -77,7 +77,7 @@ const ProductsFilter = () => {
               type="checkbox"
               checked={selectedCategories.includes(item.ID)}
               onChange={() => handleCategoryChange(item.ID)}
-              className="w-4 h-4 accent-[#0070ba]"
+              className="w-4 h-4 accent-[#0070ba] cursor-pointer"
             />
             <span className="text-sm">{item.CategoryName}</span>
           </label>
@@ -96,7 +96,7 @@ const ProductsFilter = () => {
               type="checkbox"
               checked={selectedBrands.includes(brandname)}
               onChange={() => handleBrandChange(brandname)}
-              className="w-4 h-4 accent-[#0070ba]"
+              className="w-4 h-4 accent-[#0070ba] cursor-pointer"
             />
             <span className="text-sm">{brandname}</span>
           </label>
@@ -129,19 +129,16 @@ const ProductsFilter = () => {
               {children}
             </div>
           )}
-          // renderThumb={({ props }) => (
-          //   <div
-          //     {...props}
-          //     className="h-4 w-4 bg-[#0070ba] rounded-full cursor-pointer"
-          //   />
-          // )}
-          renderThumb={({ props, key }) => (
-            <div
-              key={key}
-              {...props}
-              className="h-4 w-4 bg-[#0070ba] rounded-full cursor-pointer"
-            />
-          )}
+          renderThumb={({ props, index }) => {
+            const { key, ...restProps } = props;
+            return (
+              <div
+                key={index}
+                {...restProps}
+                className="h-4 w-4 bg-[#0070ba] rounded-full cursor-pointer"
+              />
+            );
+          }}
         />
         <div className="flex justify-between text-sm mt-2">
           <span>₱{priceRange[0]}</span>
@@ -177,20 +174,16 @@ const ProductsFilter = () => {
               {children}
             </div>
           )}
-          // renderThumb={({ props }) => (
-          //   <div
-          //     {...props}
-          //     className="h-4 w-4 bg-[#0070ba] rounded-full cursor-pointer"
-          //   />
-          // )}
-
-          renderThumb={({ props, key }) => (
-            <div
-              key={key}
-              {...props}
-              className="h-4 w-4 bg-[#0070ba] rounded-full cursor-pointer"
-            />
-          )}
+          renderThumb={({ props, index }) => {
+            const { key, ...restProps } = props;
+            return (
+              <div
+                key={index}
+                {...restProps}
+                className="h-4 w-4 bg-[#0070ba] rounded-full cursor-pointer"
+              />
+            );
+          }}
         />
         <div className="flex justify-between text-sm mt-2">
           <span>{discountRange[0]}%</span>

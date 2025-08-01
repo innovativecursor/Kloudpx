@@ -31,17 +31,17 @@ const Address = () => {
     }
   }, []);
 
-  // console.log(selectedId, "my id ");
+  console.log(getAllAddress, "my add ");
 
   return (
     <>
       <SubTitle
         paths={
           deliveryType
-            ? ["Cart", "Address", "Delivery Type"]
+            ? ["Cart", "Checkout", "Address", "Delivery Type"]
             : showAddForm
-            ? ["Cart", "Address", "New Address"]
-            : ["Cart", "Address"]
+            ? ["Cart", "Checkout", "Address", "New Address"]
+            : ["Cart", "Checkout", "Address"]
         }
       />
 

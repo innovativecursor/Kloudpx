@@ -22,12 +22,13 @@ const GalleryProvider = ({ children }) => {
     }
   };
 
-  const uploadGalleryImage = async (file, buttonText) => {
+  const uploadGalleryImage = async (file, buttonText, link) => {
     try {
       const base64 = await convertToBase64(file);
       const payload = {
         buttontext: buttonText,
         galleryimg: base64,
+        link: link || null,
       };
 
       const res = await postAxiosCall(endpoints.gallery.add, payload);
@@ -57,7 +58,7 @@ const GalleryProvider = ({ children }) => {
 
   const deleteImage = async (id) => {
     console.log(id, "is here");
-    
+
     try {
       const res = await deleteAxiosCall(endpoints.gallery.delete(id));
       if (res?.message) {
