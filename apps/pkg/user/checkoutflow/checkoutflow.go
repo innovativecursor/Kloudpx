@@ -372,15 +372,27 @@ func SelectAddressForCheckout(c *gin.Context, db *gorm.DB) {
 	}
 
 	var req config.SelectAddress
-	if err := c.ShouldBindJSON(&req); err != nil || req.AddressID == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid address ID"})
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
 		return
 	}
 
 	var address models.Address
-	if err := db.First(&address, "id = ? AND user_id = ?", req.AddressID, userObj.ID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Address not found"})
-		return
+
+	if req.AddressID == 0 {
+		// Try to fetch default address
+		err := db.Where("user_id = ? AND is_default = ?", userObj.ID, true).First(&address).Error
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "No default address found. Please select an address manually."})
+			return
+		}
+	} else {
+		// Use user-selected address
+		err := db.First(&address, "id = ? AND user_id = ?", req.AddressID, userObj.ID).Error
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Selected address not found"})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
