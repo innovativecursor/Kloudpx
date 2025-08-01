@@ -80,6 +80,36 @@ func GetMedicinesForUser(c *gin.Context, db *gorm.DB) {
 	})
 }
 
+func GetAllBrandNames(c *gin.Context, db *gorm.DB) {
+	var uniqueMedicineIDs []uint
+	var brandNames []string
+
+	if err := db.
+		Model(&models.Medicine{}).
+		Select("MIN(id)").
+		Group("brand_name").
+		Scan(&uniqueMedicineIDs).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch distinct medicine IDs by brand name")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch brand names"})
+		return
+	}
+	if err := db.
+		Model(&models.Medicine{}).
+		Distinct("brand_name").
+		Where("id IN ?", uniqueMedicineIDs).
+		Order("brand_name ASC").
+		Pluck("brand_name", &brandNames).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch brand names")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch brand names"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":     "Brand names fetched successfully",
+		"brand_names": brandNames,
+	})
+}
+
 func GetMedicineDetailsByID(c *gin.Context, db *gorm.DB) {
 	medicineIDParam := c.Param("medicine_id")
 	medicineID, err := strconv.Atoi(medicineIDParam)
@@ -619,7 +649,7 @@ func GetBrandedMedicinesForUser(c *gin.Context, db *gorm.DB) {
 		Model(&models.Medicine{}).
 		Select("MIN(id)").
 		Where("is_brand = ?", true).
-		Group("brand_name, power").
+		Group("brand_name").
 		Scan(&uniqueMedicineIDs).Error; err != nil {
 		logrus.WithError(err).Error("Failed to fetch distinct branded medicine IDs")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch branded medicines"})
@@ -1033,102 +1063,102 @@ func GetPopularMedicines(c *gin.Context, db *gorm.DB) {
 }
 
 // product page filtering
-func GetItemsByCategoryWithSortAndFilter(c *gin.Context, db *gorm.DB) {
-	categoryIDs := c.QueryArray("category_ids")
-	if len(categoryIDs) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No category IDs provided"})
-		return
-	}
+// func GetItemsByCategoryWithSortAndFilter(c *gin.Context, db *gorm.DB) {
+// 	categoryIDs := c.QueryArray("category_ids")
+// 	if len(categoryIDs) == 0 {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "No category IDs provided"})
+// 		return
+// 	}
 
-	sort := c.Query("sort")
+// 	sort := c.Query("sort")
 
-	var uniqueMedicineIDs []uint
-	if err := db.
-		Model(&models.Medicine{}).
-		Select("MIN(id)").
-		Where("category_id IN ?", categoryIDs).
-		Group("brand_name, power").
-		Scan(&uniqueMedicineIDs).Error; err != nil {
-		logrus.WithError(err).Error("Failed to get distinct medicine IDs by category")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
-		return
-	}
+// 	var uniqueMedicineIDs []uint
+// 	if err := db.
+// 		Model(&models.Medicine{}).
+// 		Select("MIN(id)").
+// 		Where("category_id IN ?", categoryIDs).
+// 		Group("brand_name, power").
+// 		Scan(&uniqueMedicineIDs).Error; err != nil {
+// 		logrus.WithError(err).Error("Failed to get distinct medicine IDs by category")
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
+// 		return
+// 	}
 
-	query := db.Preload("Generic").
-		Preload("Supplier").
-		Preload("ItemImages").
-		Preload("Category").
-		Where("id IN ?", uniqueMedicineIDs)
+// 	query := db.Preload("Generic").
+// 		Preload("Supplier").
+// 		Preload("ItemImages").
+// 		Preload("Category").
+// 		Where("id IN ?", uniqueMedicineIDs)
 
-	switch sort {
-	case "popular":
-		query = query.Order("created_at DESC")
-	case "discount":
-		query = query.Where("discount > ?", 0).Order("discount DESC")
-	case "high-to-low":
-		query = query.Order(`
-			CASE 
-				WHEN unit_of_measurement = 'per piece' THEN selling_price_per_piece 
-				ELSE selling_price_per_box 
-			END DESC`)
-	case "low-to-high":
-		query = query.Order(`
-			CASE 
-				WHEN unit_of_measurement = 'per piece' THEN selling_price_per_piece 
-				ELSE selling_price_per_box 
-			END ASC`)
-	default:
-		// No sort
-	}
+// 	switch sort {
+// 	case "popular":
+// 		query = query.Order("created_at DESC")
+// 	case "discount":
+// 		query = query.Where("discount > ?", 0).Order("discount DESC")
+// 	case "high-to-low":
+// 		query = query.Order(`
+// 			CASE
+// 				WHEN unit_of_measurement = 'per piece' THEN selling_price_per_piece
+// 				ELSE selling_price_per_box
+// 			END DESC`)
+// 	case "low-to-high":
+// 		query = query.Order(`
+// 			CASE
+// 				WHEN unit_of_measurement = 'per piece' THEN selling_price_per_piece
+// 				ELSE selling_price_per_box
+// 			END ASC`)
+// 	default:
+// 		// No sort
+// 	}
 
-	var medicines []models.Medicine
-	if err := query.Find(&medicines).Error; err != nil {
-		logrus.WithError(err).Error("Failed to fetch medicines by category")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
-		return
-	}
+// 	var medicines []models.Medicine
+// 	if err := query.Find(&medicines).Error; err != nil {
+// 		logrus.WithError(err).Error("Failed to fetch medicines by category")
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
+// 		return
+// 	}
 
-	var response []config.UserFacingMedicine
-	for _, med := range medicines {
-		var imageFilenames []string
-		for _, img := range med.ItemImages {
-			imageFilenames = append(imageFilenames, img.FileName)
-		}
+// 	var response []config.UserFacingMedicine
+// 	for _, med := range medicines {
+// 		var imageFilenames []string
+// 		for _, img := range med.ItemImages {
+// 			imageFilenames = append(imageFilenames, img.FileName)
+// 		}
 
-		price := med.SellingPricePerBox
-		if med.UnitOfMeasurement == "per piece" {
-			price = med.SellingPricePerPiece
-		}
+// 		price := med.SellingPricePerBox
+// 		if med.UnitOfMeasurement == "per piece" {
+// 			price = med.SellingPricePerPiece
+// 		}
 
-		response = append(response, config.UserFacingMedicine{
-			ID:                        med.ID,
-			BrandName:                 med.BrandName,
-			Power:                     med.Power,
-			GenericName:               med.Generic.GenericName,
-			Category:                  med.Category.CategoryName,
-			Description:               med.Description,
-			Discount:                  med.Discount,
-			Unit:                      med.UnitOfMeasurement,
-			MeasurementUnitValue:      med.MeasurementUnitValue,
-			NumberOfPiecesPerBox:      med.NumberOfPiecesPerBox,
-			Price:                     price,
-			TaxType:                   med.TaxType,
-			Prescription:              med.Prescription,
-			Benefits:                  med.Benefits,
-			KeyIngredients:            med.KeyIngredients,
-			RecommendedDailyAllowance: med.RecommendedDailyAllowance,
-			DirectionsForUse:          med.DirectionsForUse,
-			SafetyInformation:         med.SafetyInformation,
-			Storage:                   med.Storage,
-			Images:                    imageFilenames,
-		})
-	}
+// 		response = append(response, config.UserFacingMedicine{
+// 			ID:                        med.ID,
+// 			BrandName:                 med.BrandName,
+// 			Power:                     med.Power,
+// 			GenericName:               med.Generic.GenericName,
+// 			Category:                  med.Category.CategoryName,
+// 			Description:               med.Description,
+// 			Discount:                  med.Discount,
+// 			Unit:                      med.UnitOfMeasurement,
+// 			MeasurementUnitValue:      med.MeasurementUnitValue,
+// 			NumberOfPiecesPerBox:      med.NumberOfPiecesPerBox,
+// 			Price:                     price,
+// 			TaxType:                   med.TaxType,
+// 			Prescription:              med.Prescription,
+// 			Benefits:                  med.Benefits,
+// 			KeyIngredients:            med.KeyIngredients,
+// 			RecommendedDailyAllowance: med.RecommendedDailyAllowance,
+// 			DirectionsForUse:          med.DirectionsForUse,
+// 			SafetyInformation:         med.SafetyInformation,
+// 			Storage:                   med.Storage,
+// 			Images:                    imageFilenames,
+// 		})
+// 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message":   "Medicines fetched successfully by category",
-		"medicines": response,
-	})
-}
+// 	c.JSON(http.StatusOK, gin.H{
+// 		"message":   "Medicines fetched successfully by category",
+// 		"medicines": response,
+// 	})
+// }
 
 // product page filtering
 func GetFilteredAndSortedMedicines(c *gin.Context, db *gorm.DB) {
@@ -1141,6 +1171,7 @@ func GetFilteredAndSortedMedicines(c *gin.Context, db *gorm.DB) {
 		maxPriceStr       = c.Query("max_price")
 		minDiscountStr    = c.Query("min_discount")
 		maxDiscountStr    = c.Query("max_discount")
+		sort              = c.Query("sort") // "popular", "discount", "high-to-low", "low-to-high"
 	)
 
 	// Parse price and discount filters
@@ -1161,7 +1192,6 @@ func GetFilteredAndSortedMedicines(c *gin.Context, db *gorm.DB) {
 		maxDiscount, _ = strconv.ParseFloat(maxDiscountStr, 64)
 	}
 
-	// Step 1: Base Query (by categories & brand names)
 	baseQuery := db.Model(&models.Medicine{})
 	if len(categoryIDs) > 0 {
 		baseQuery = baseQuery.Where("category_id IN ?", categoryIDs)
@@ -1170,21 +1200,18 @@ func GetFilteredAndSortedMedicines(c *gin.Context, db *gorm.DB) {
 		baseQuery = baseQuery.Where("brand_name IN ?", brandNames)
 	}
 
-	// Step 2: Get unique brand entries per selected filters
 	if err := baseQuery.Select("MIN(id)").Group("brand_name, power").Scan(&uniqueMedicineIDs).Error; err != nil {
 		logrus.WithError(err).Error("Failed to get distinct medicine IDs")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
 		return
 	}
 
-	// Step 3: Build full query
 	query := db.Preload("Generic").
 		Preload("Supplier").
 		Preload("ItemImages").
 		Preload("Category").
 		Where("id IN ?", uniqueMedicineIDs)
 
-	// Step 4: Apply price filter
 	if minPrice > 0 {
 		query = query.Where(`
 			(CASE 
@@ -1200,7 +1227,6 @@ func GetFilteredAndSortedMedicines(c *gin.Context, db *gorm.DB) {
 			END) <= ?`, maxPrice)
 	}
 
-	// Step 5: Apply discount filter
 	if minDiscount > 0 {
 		query = query.Where("CAST(discount AS FLOAT) >= ?", minDiscount)
 	}
@@ -1208,14 +1234,31 @@ func GetFilteredAndSortedMedicines(c *gin.Context, db *gorm.DB) {
 		query = query.Where("CAST(discount AS FLOAT) <= ?", maxDiscount)
 	}
 
-	// Step 7: Execute final query
+	switch sort {
+	case "popular":
+		query = query.Order("created_at DESC")
+	case "discount":
+		query = query.Where("discount > ?", 0).Order("discount DESC")
+	case "high-to-low":
+		query = query.Order(`
+			CASE 
+				WHEN unit_of_measurement = 'per piece' THEN selling_price_per_piece 
+				ELSE selling_price_per_box 
+			END DESC`)
+	case "low-to-high":
+		query = query.Order(`
+			CASE 
+				WHEN unit_of_measurement = 'per piece' THEN selling_price_per_piece 
+				ELSE selling_price_per_box 
+			END ASC`)
+	}
+
 	if err := query.Find(&medicines).Error; err != nil {
 		logrus.WithError(err).Error("Failed to fetch medicines")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
 		return
 	}
 
-	// Step 8: Format response
 	var response []config.UserFacingMedicine
 	categoryIDMap := make(map[uint]bool)
 	var filteredCategoryIDs []uint
@@ -1260,7 +1303,6 @@ func GetFilteredAndSortedMedicines(c *gin.Context, db *gorm.DB) {
 		}
 	}
 
-	// Step 9: Final JSON response
 	c.JSON(http.StatusOK, gin.H{
 		"message":      "Medicines fetched successfully with filters",
 		"medicines":    response,

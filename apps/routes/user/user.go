@@ -41,6 +41,10 @@ func User(db *gorm.DB) {
 		userflow.GetMedicinesForUser(c, db)
 	})
 
+	apiV1.GET("/user/get-all-brands", func(c *gin.Context) {
+		userflow.GetAllBrandNames(c, db)
+	})
+
 	apiV1.GET("/user/medicine-details/:medicine_id", func(c *gin.Context) {
 		userflow.GetMedicineDetailsByID(c, db)
 	})
@@ -104,9 +108,9 @@ func User(db *gorm.DB) {
 		userflow.GetPopularMedicines(c, db)
 	})
 
-	apiV1.GET("/user/sorting", func(c *gin.Context) {
-		userflow.GetItemsByCategoryWithSortAndFilter(c, db)
-	})
+	// apiV1.GET("/user/sorting", func(c *gin.Context) {
+	// 	userflow.GetItemsByCategoryWithSortAndFilter(c, db)
+	// })
 
 	apiV1.GET("/user/filter", func(c *gin.Context) {
 		userflow.GetFilteredAndSortedMedicines(c, db)
