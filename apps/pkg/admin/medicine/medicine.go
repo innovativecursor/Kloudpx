@@ -1,8 +1,11 @@
 package medicine
 
 import (
+	"fmt"
+	"math/rand"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/medicine/config"
@@ -10,6 +13,12 @@ import (
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
+
+func generateItemCode() string {
+	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
+	random := rand.Intn(1000)
+	return fmt.Sprintf("ITEM-%d-%03d", timestamp, random)
+}
 
 func AddMedicine(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
@@ -45,7 +54,12 @@ func AddMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	itemCode := payload.ItemCode
+	if itemCode == "" {
+		itemCode = generateItemCode()
+	}
 	newMedicine := models.Medicine{
+		ItemCode:                  itemCode,
 		BrandName:                 payload.BrandName,
 		IsBrand:                   payload.IsBrand,
 		InhouseBrand:              payload.InhouseBrand,

@@ -161,6 +161,10 @@ func Admin(db *gorm.DB) {
 		uploadexcel.UploadMedicineExcel(c, db)
 	})
 
+	apiV1.GET("/excel/download-excel", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		uploadexcel.DownloadMedicineExcel(c, db)
+	})
+
 	apiV1.POST("/excel/upload-midwives-excel", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		uploadexcel.UploadMidwivesExcel(c, db)
 	})
