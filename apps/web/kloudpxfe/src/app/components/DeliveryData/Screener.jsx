@@ -11,7 +11,7 @@ const Screener = () => {
   const { deliveryData } = useCheckout();
 
   const handleFileChange = (e) => {
-    // setSelectedFile(URL.createObjectURL(e.target.files[0]));
+    setSelectedFile(URL.createObjectURL(e.target.files[0]));
   };
 
   useEffect(() => {}, [deliveryData]);

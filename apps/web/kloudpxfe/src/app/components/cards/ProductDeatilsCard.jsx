@@ -72,15 +72,15 @@ const ProductDeatilsCard = ({ details }) => {
 
       <div className="w-full mx-auto rounded-lg bg-[#EDF4F6]   sm:mt-12 mt-7">
         {/* Delivery row */}
-        <div className="flex items-start sm:gap-4 gap-2 sm:p-4 p-3 border-b border-blue-100">
+        <div className="flex tracking-wide items-start sm:gap-4 gap-2 sm:p-4 p-3 border-b border-blue-100">
           <RiTruckLine className="w-8 h-8 mt-0.5 text-blue-900" />
           <div>
-            <span className="font-semibold text-blue-950 text-sm ">
+            <h1 className="font-semibold text-blue-950 text-sm ">
               Your delivery will arrive within 2 days.
-            </span>
-            <span className=" text-xs sm:mt-2 mt-1 sm:text-xs text-[9px]">
+            </h1>
+            <h1 className=" text-xs sm:mt-2 mt-1 sm:text-xs text-[9px]">
               Enter your postal code for Delivery Availability
-            </span>
+            </h1>
           </div>
         </div>
       </div>

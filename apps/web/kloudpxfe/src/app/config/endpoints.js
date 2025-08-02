@@ -37,7 +37,8 @@ const endpoints = {
     get: `${baseUrl}/v1/user/get-gallery-img-user`,
   },
   branded: {
-    get: `${baseUrl}/v1/user/get-branded-medicine`,
+    // get: `${baseUrl}/v1/user/get-branded-medicine`,
+    get: `${baseUrl}/v1/user/get-all-brands`,
   },
   twocategory: {
     get: `${baseUrl}/v1/user/get-two-categories-for-user`,

@@ -13,6 +13,7 @@ const ProductContext = createContext();
 export const ProductProvider = ({ children }) => {
   const router = useRouter();
   const [allMedicine, setAllMedicine] = useState([]);
+  const [activeSort, setActiveSort] = useState("");
   const [category, setCategory] = useState([]);
   const [selectedCategoryItems, setSelectedCategoryItems] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
@@ -22,9 +23,7 @@ export const ProductProvider = ({ children }) => {
   const [trending, setTrending] = useState([]);
   const [feature, setFeature] = useState([]);
   const [popular, setPopular] = useState([]);
-  const [activeSort, setActiveSort] = useState("Popular");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-
   const [branded, setBranded] = useState([]);
 
   // Filters
@@ -34,72 +33,6 @@ export const ProductProvider = ({ children }) => {
   const [discountRange, setDiscountRange] = useState([0, 100]);
   const [filteredMedicines, setFilteredMedicines] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fetchFilteredMedicines();
-  }, [selectedCategories, selectedBrands, priceRange, discountRange]);
-
-  const fetchFilteredMedicines = async () => {
-    const isFilterActive =
-      selectedCategories.length > 0 ||
-      selectedBrands.length > 0 ||
-      priceRange[0] > 0 ||
-      priceRange[1] < 1000 ||
-      discountRange[0] > 0 ||
-      discountRange[1] < 100;
-
-    if (!isFilterActive) {
-      setFilteredMedicines([]);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-
-      selectedCategories.forEach((catId) => {
-        params.append("category_ids", catId.toString());
-      });
-
-      selectedBrands.forEach((brand) => {
-        params.append("brands", brand);
-      });
-
-      if (priceRange[0] > 0) params.append("min_price", priceRange[0]);
-      if (priceRange[1] < 1000) params.append("max_price", priceRange[1]);
-
-      if (discountRange[0] > 0) params.append("min_discount", discountRange[0]);
-      if (discountRange[1] < 100)
-        params.append("max_discount", discountRange[1]);
-
-      router.push(`/Products?${params.toString()}`);
-      setIsMobileOpen(false);
-      // console.log(params.toString(), "👉 Final Query Params");
-
-      const res = await getAxiosCall(endpoints.filters.get, params, false);
-      setFilteredMedicines(res?.data?.medicines || []);
-    } catch (err) {
-      console.error("Failed to fetch filtered medicines", err);
-      setFilteredMedicines([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const categoryId = searchParams.get("category");
-    const categorySlug = searchParams.get("name");
-
-    if (categoryId) {
-      setSelectedCategoryId(Number(categoryId));
-      if (categorySlug) {
-        const name = categorySlug.replace(/-/g, " ");
-        setSelectedCategoryName(name);
-      }
-      getItemsByCategory(Number(categoryId));
-    }
-  }, []);
 
   const handleCategoryChange = (id) => {
     setSelectedCategories((prev) =>
@@ -111,13 +44,6 @@ export const ProductProvider = ({ children }) => {
     setSelectedBrands((prev) =>
       prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]
     );
-  };
-
-  const sortParamMap = {
-    Popular: "popular",
-    Discounts: "discounts",
-    "Cost: high to Low": "high-to-low",
-    "Cost: Low to High": "low-to-high",
   };
 
   const getAllMedicine = async () => {
@@ -132,7 +58,9 @@ export const ProductProvider = ({ children }) => {
   const getAllBrand = async () => {
     try {
       const res = await getAxiosCall(endpoints.branded.get, {}, false);
-      setBranded(res?.data?.medicines || []);
+      // console.log(res, "");
+      
+      setBranded(res?.data?.brand_names || []);
     } catch (error) {
       setBranded([]);
     }
@@ -209,44 +137,72 @@ export const ProductProvider = ({ children }) => {
     }
   };
 
-  const fetchSortedMedicines = async () => {
-    console.log("🔁 fetchSortedMedicines called");
+  const fetchFilteredMedicines = async (sort = activeSort) => {
+    const isFilterActive =
+      selectedCategories.length > 0 ||
+      selectedBrands.length > 0 ||
+      priceRange[0] > 0 ||
+      priceRange[1] < 1000 ||
+      discountRange[0] > 0 ||
+      discountRange[1] < 100;
 
-    const searchParams = new URLSearchParams(window.location.search);
-    const sortValue = sortParamMap[activeSort];
-
-    const categoryIds = searchParams.getAll("category_ids"); // ✅ gets all category_ids[]
-    console.log("📦 category_ids from URL:", categoryIds);
-
-    if (!categoryIds.length || !sortValue) {
-      console.log("⛔ Skipping fetch: No categories or sort selected");
+    if (!isFilterActive && !sort) {
+      setFilteredMedicines([]);
       return;
     }
 
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      categoryIds.forEach((id) => params.append("category_ids", id));
-      params.append("sort", sortValue);
 
-      // const res = await axios.get("http://localhost:10003/v1/user/sorting", {
-      //   params,
-      // });
+      selectedCategories.forEach((catId) => {
+        params.append("category_ids", catId.toString());
+      });
 
-      const res = await getAxiosCall(endpoints.sorting.get, params, false);
+      selectedBrands.forEach((brand) => {
+        params.append("brands", brand);
+      });
 
+      if (priceRange[0] > 0) params.append("min_price", priceRange[0]);
+      if (priceRange[1] < 1000) params.append("max_price", priceRange[1]);
+
+      if (discountRange[0] > 0) params.append("min_discount", discountRange[0]);
+      if (discountRange[1] < 100)
+        params.append("max_discount", discountRange[1]);
+
+      if (sort) params.append("sort", sort);
+
+      router.push(`/Products?${params.toString()}`);
+      setIsMobileOpen(false);
+
+      const res = await getAxiosCall(endpoints.filters.get, params, false);
       setFilteredMedicines(res?.data?.medicines || []);
-    } catch (error) {
-      console.error("❌ Failed to fetch sorted medicines:", error);
+    } catch (err) {
+      console.error("Failed to fetch filtered medicines", err);
       setFilteredMedicines([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (filteredMedicines.length > 0) {
-      fetchSortedMedicines();
+    const searchParams = new URLSearchParams(window.location.search);
+    const categoryId = searchParams.get("category");
+    const categorySlug = searchParams.get("name");
+
+    if (categoryId) {
+      setSelectedCategoryId(Number(categoryId));
+      if (categorySlug) {
+        const name = categorySlug.replace(/-/g, " ");
+        setSelectedCategoryName(name);
+      }
+      getItemsByCategory(Number(categoryId));
     }
-  }, [activeSort]);
+  }, []);
+
+  useEffect(() => {
+    fetchFilteredMedicines();
+  }, [selectedCategories, selectedBrands, priceRange, discountRange]);
 
   useEffect(() => {
     getCategory();
@@ -277,9 +233,6 @@ export const ProductProvider = ({ children }) => {
         getAllPopular,
         popular,
 
-        activeSort,
-        setActiveSort,
-
         setSelectedCategoryItems,
         priceRange,
         setPriceRange,
@@ -302,6 +255,9 @@ export const ProductProvider = ({ children }) => {
         setSelectedCategories,
         isMobileOpen,
         setIsMobileOpen,
+        fetchFilteredMedicines,
+        activeSort,
+        setActiveSort,
       }}
     >
       {children}

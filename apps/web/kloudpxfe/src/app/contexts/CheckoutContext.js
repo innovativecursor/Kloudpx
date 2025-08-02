@@ -40,7 +40,7 @@ export const CheckoutProvider = ({ children }) => {
         {},
         true
       );
-      console.log(res);
+      // console.log(res);
 
       const isSaved = res.save_for_later;
 
@@ -102,7 +102,7 @@ export const CheckoutProvider = ({ children }) => {
       }
 
       const res = await postAxiosCall(endpoints.address.add, payload, true);
-      console.log(res);
+      // console.log(res);
 
       toast.success(
         formData.id
@@ -193,7 +193,7 @@ export const CheckoutProvider = ({ children }) => {
         selected,
         setSelected,
         addDeliveryData,
-        deliveryData
+        deliveryData,
       }}
     >
       {children}
