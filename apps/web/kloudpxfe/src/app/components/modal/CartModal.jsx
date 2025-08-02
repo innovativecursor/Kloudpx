@@ -6,13 +6,13 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
 import useProductNavigation from "@/app/hooks/useProductNavigation";
-import { useCheckout } from "@/app/contexts/CheckoutContext";
+// import { useCheckout } from "@/app/contexts/CheckoutContext";
 
 const CartModal = ({ isOpen, onClose }) => {
   const { token, isAuthLoaded } = useAuth();
   const router = useRouter();
   const { getCartData, removeFromCart, getAllCartData } = useCartContext();
-  const { toggleSaveForLater, savedForLaterIds, doCheckout } = useCheckout();
+  // const { toggleSaveForLater, savedForLaterIds, doCheckout } = useCheckout();
   const { goToProductPage } = useProductNavigation();
   const fallbackImage = "/assets/fallback.png";
   const [activeTab, setActiveTab] = useState("All");
@@ -217,14 +217,16 @@ const CartModal = ({ isOpen, onClose }) => {
           )}
         </div>
 
-        <div className="p-4">
-          <button
-            onClick={handleCheckout}
-            className="w-full py-3 rounded-full text-sm font-semibold cursor-pointer bg-[#0070BA] text-white hover:bg-[#005c96]"
-          >
-            Proceed to Checkout
-          </button>
-        </div>
+        {token && data.length > 0 && (
+          <div className="p-4 ">
+            <button
+              onClick={handleCheckout}
+              className="w-full py-3 rounded-full text-sm font-semibold cursor-pointer bg-[#0070BA] text-white hover:bg-[#005c96]"
+            >
+              Proceed to Checkout
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

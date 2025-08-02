@@ -20,7 +20,8 @@ const FormDataProvider = ({ children }) => {
     recommendeddailyallowance: "",
     directionsforuse: "",
     safetyinformation: "",
-    storage: ""
+    storage: "",
+    itemcode: ""
   });
 
   const [isBranded, setIsBranded] = useState(false);

@@ -9,8 +9,13 @@ import { getAxiosCall } from "../../Axios/UniversalAxiosCalls";
 import endpoints from "../../config/endpoints";
 
 const AllMedicine = () => {
-  const { medicines, fetchMedicines, deleteMedicine, uploadExcel } =
-    useGetDataContext();
+  const {
+    medicines,
+    fetchMedicines,
+    deleteMedicine,
+    uploadExcel,
+    handleDownloadExcel,
+  } = useGetDataContext();
   const navigate = useNavigate();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,6 +28,8 @@ const AllMedicine = () => {
   useEffect(() => {
     fetchMedicines();
   }, []);
+
+  // console.log(medicines);
 
   // 🧠 Debounced search handler
   const handleSearch = async (value) => {
@@ -38,11 +45,7 @@ const AllMedicine = () => {
     setIsSearching(true);
 
     try {
-      const res = await getAxiosCall(
-        // `http://localhost:10001/v1/medicine/search-medicine`,
-        endpoints.medicine.search,
-        { q: trimmed }
-      );
+      const res = await getAxiosCall(endpoints.medicine.search, { q: trimmed });
 
       console.log(res?.data);
 
@@ -115,6 +118,13 @@ const AllMedicine = () => {
               className="hidden"
             />
           </label>
+
+          <button
+            onClick={handleDownloadExcel}
+            className="bg-green-600 text-white px-8 py-3 rounded hover:bg-green-700 transition"
+          >
+            Download Excel
+          </button>
         </div>
       </div>
 

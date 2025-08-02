@@ -6,6 +6,7 @@ import {
 } from "../Axios/UniversalAxiosCalls";
 import Swal from "sweetalert2";
 import endpoints from "../config/endpoints";
+import axios from "axios";
 
 export const GetDataContext = createContext();
 
@@ -67,9 +68,45 @@ const GetDataProvider = ({ children }) => {
     }
   };
 
+  const handleDownloadExcel = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+
+      const response = await axios.get(endpoints.download.get, {
+        responseType: "blob",
+        headers: {
+          Authorization: `${token}`,
+          Accept: "*/*",
+        },
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "medicine_data.xlsx");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("Excel download failed", error);
+      Swal.fire({
+        title: "Error",
+        text: "Download failed. Try again!",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
+  };
+
   return (
     <GetDataContext.Provider
-      value={{ medicines, fetchMedicines, deleteMedicine, uploadExcel }}
+      value={{
+        medicines,
+        fetchMedicines,
+        deleteMedicine,
+        uploadExcel,
+        handleDownloadExcel,
+      }}
     >
       {children}
     </GetDataContext.Provider>

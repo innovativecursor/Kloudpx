@@ -61,6 +61,9 @@ const endpoints = {
   admininfo: {
     get: `${baseUrl}/v1/admin/admin-info`,
   },
+  download: {
+    get: `${baseUrl}/v1/excel/download-excel`,
+  },
   protected: {
     basic: `${baseUrl}/api/v1/protected`,
     admin: `${baseUrl}/api/v1/admin`,
