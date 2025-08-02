@@ -9,6 +9,7 @@ import Screener from "../DeliveryData/Screener";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
 import { IoMdHome } from "react-icons/io";
 import { FaRegEdit } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const Address = () => {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -118,10 +119,24 @@ const Address = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    if (selectedId) {
-                      selectedAddress(selectedId);
+                    let selectedAddressId = selectedId;
+
+                    if (!selectedAddressId) {
+                      const defaultAddress = getAllAddress.find(
+                        (addr) => addr.IsDefault === true
+                      );
+                      if (defaultAddress) {
+                        selectedAddressId = defaultAddress.ID;
+                      }
                     }
-                    setDeliveryType(true);
+
+                    if (selectedAddressId) {
+                      selectedAddress(selectedAddressId);
+                      setSelectedId(selectedAddressId);
+                      setDeliveryType(true);
+                    } else {
+                      toast.error("Please select an address");
+                    }
                   }}
                   className="bg-[#0070BA] text-white md:mt-10 mt-8 w-full py-2.5 text-[10px] rounded-full font-medium hover:bg-[#005c96]"
                 >
@@ -133,9 +148,6 @@ const Address = () => {
             {showAddForm && <NewAddress setShowAddForm={setShowAddForm} />}
           </>
         )}
-
-        {/* {deliveryType && <DeliveryType />}
-        <Screener /> */}
 
         {deliveryType && !deliverySuccess && (
           <DeliveryType setDeliverySuccess={setDeliverySuccess} />
