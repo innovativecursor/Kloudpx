@@ -15,12 +15,10 @@ const ImageSwiper = ({ images }) => {
   const [isClient, setIsClient] = useState(false);
   const fallbackImage = "/assets/fallback.png";
 
-  // Mark client rendered
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // Filter valid images - remove empty strings or invalid
   const filteredImages =
     images?.filter((img) => typeof img === "string" && img.trim() !== "") || [];
   const safeImages =
@@ -38,7 +36,6 @@ const ImageSwiper = ({ images }) => {
     }
   }, [thumbsSwiper]);
 
-  // Helper component to render image or fallback if invalid
   const SafeImage = ({ src, alt, className }) => {
     if (typeof src !== "string" || src.trim() === "") {
       return <img src={fallbackImage} alt={alt} className={className} />;
@@ -48,7 +45,7 @@ const ImageSwiper = ({ images }) => {
 
   return (
     <div className="md:w-[50%]">
-      <div className="relative rounded-xl overflow-hidden">
+      <div className="relative rounded-xl">
         <div className="flex flex-col pb-4 justify-center items-center bg-[#F4F8FB] pt-4 shadow-md w-full h-full">
           <Swiper
             spaceBetween={10}
@@ -58,15 +55,35 @@ const ImageSwiper = ({ images }) => {
             className="w-full h-full"
           >
             {safeImages.map((img, index) => (
+              // <SwiperSlide key={index}>
+              //   <div className="flex justify-center items-center w-full sm:h-[80vh] h-[50vh] p-4 overflow-hidden">
+              //     <Zoom>
+              //       <SafeImage
+              //         src={img}
+              //         alt={`product-${index}`}
+              //         className="max-w-full max-h-full"
+              //       />
+              //     </Zoom>
+              //   </div>
+              // </SwiperSlide>
+
               <SwiperSlide key={index}>
-                <div className="flex justify-center items-center w-full sm:h-[80vh] h-[50vh] p-4 overflow-hidden">
-                  <Zoom>
-                    <SafeImage
-                      src={img}
+                <div className="flex justify-center items-center w-full sm:h-[80vh] h-[50vh] p-4 bg-white">
+                  {isClient ? (
+                    <Zoom>
+                      <img
+                        src={img || fallbackImage}
+                        alt={`product-${index}`}
+                        className="object-contain max-h-[70vh] max-w-full"
+                      />
+                    </Zoom>
+                  ) : (
+                    <img
+                      src={img || fallbackImage}
                       alt={`product-${index}`}
-                      className="max-w-full max-h-full"
+                      className="object-contain max-h-[70vh] max-w-full"
                     />
-                  </Zoom>
+                  )}
                 </div>
               </SwiperSlide>
             ))}

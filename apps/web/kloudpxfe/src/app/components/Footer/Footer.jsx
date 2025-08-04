@@ -21,7 +21,7 @@ function Footer() {
             Unit B, Emerald Jade Green Building, 282 Epifanio de los Santos Ave,
             Mandaluyong City, 1550 Metro Manila, Philippines
           </h1>
-          <a
+          {/* <a
             href="https://maps.app.goo.gl/QZdyqMRUBCszKHE17"
             target="_blank"
             rel="noopener noreferrer"
@@ -29,7 +29,20 @@ function Footer() {
             <h2 className="mt-5 underline text-[10px] font-medium opacity-70 tracking-wide">
               Shop On Map
             </h2>
-          </a>
+          </a> */}
+          <div className="w-full mt-4" style={{ height: "200px" }}>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3860.410933793691!2d121.04991531509362!3d14.579738079658887!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397c83f60179b4f%3A0x4146deeab6e6d285!2sEmerald%20Jade%20Green%20Building!5e0!3m2!1sen!2sph!4v1691089012345!5m2!1sen!2sph"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Emerald Jade Green Building Location"
+            ></iframe>
+          </div>
+
           <div className="flex items-center gap-2 mt-8 cursor-pointer">
             <a
               href="https://www.facebook.com/p/Kloud-Pharma-and-Exchange-Inc-61570477360673/"
@@ -88,7 +101,11 @@ function Footer() {
                 </Link>
               </li>
               <li>About Us</li>
-              <li>Shop Products</li>
+              <li>
+                <Link href="/Products" className="hover:underline">
+                  Shop Products
+                </Link>
+              </li>
               <li>Blog/ Health Tips</li>
               <li>Contact Us</li>
               <li>
@@ -111,7 +128,7 @@ function Footer() {
       </div>
 
       <hr className="border-b border-gray-200" />
-      <div className="flex-between-center items-center responsive-mx md:pb-0 pb-12 sm:my-6 my-3">
+      <div className="flex-between-center items-center responsive-mx md:pb-0 pb-2 sm:my-6 my-3">
         <h1 className="sm:text-[10px] text-[8px] cursor-pointer font-medium tracking-wider opacity-60">
           Copyright © 2025 KLOUD P&X - All Rights Reserved.{" "}
         </h1>

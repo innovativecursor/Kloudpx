@@ -51,10 +51,10 @@ const DeliveryCart = () => {
               <div className="flex-1">
                 <div className="flex justify-between items-start">
                   <div className="flex flex-col">
-                    <span className="text-sm font-light text-[#0070ba]">
+                    <h1 className="text-sm font-medium text-[#0070ba]">
                       {medicine.generic_name || "Generic Name"}
-                    </span>
-                    <h4 className="font-medium text-base mb-1">
+                    </h1>
+                    <h4 className="font-light text-sm mb-1">
                       {medicine.brand_name || "Brand Name"}
                     </h4>
                   </div>

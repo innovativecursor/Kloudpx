@@ -31,14 +31,11 @@ const ProductDetails = () => {
   }
 
   const fallbackImage = "/assets/fallback.png";
-  // const images = details.images?.length > 0 ? details.images : [fallbackImage];
   const filteredImages =
     details.images?.filter((img) => img && img.trim() !== "") || [];
   const images = filteredImages.length > 0 ? filteredImages : [fallbackImage];
 
   const similarProduuct = productDetails?.related_medicines;
-
-  // console.log(productDetails);
 
   return (
     <div className=" pb-10 min-h-screen md:mt-52 sm:mt-48 mt-36">

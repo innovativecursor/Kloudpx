@@ -21,12 +21,9 @@ const CheckoutProduct = ({ product }) => {
       : fallbackImage;
 
   const price = medicine?.price || 0;
-  const discountPercent =
-    parseFloat(medicine?.discount?.replace("%", "")) || 0;
+  const discountPercent = parseFloat(medicine?.discount?.replace("%", "")) || 0;
 
-  const discountedPrice = (
-    price - (price * discountPercent) / 100
-  ).toFixed(2);
+  const discountedPrice = (price - (price * discountPercent) / 100).toFixed(2);
 
   return (
     <div className="bg-blue-50 w-full rounded-lg py-5">
@@ -48,10 +45,10 @@ const CheckoutProduct = ({ product }) => {
       {/* Product Info */}
       <div className="mt-8 px-4">
         <h2 className="sm:text-sm text-xs font-light text-color mb-1">
-          {medicine?.category || "Category"}
+          {medicine?.brandname || "brandname"}
         </h2>
         <h1 className="sm:text-2xl text-base font-bold text-gray-800">
-          {medicine?.brandname || "N/A"}
+          {medicine?.genericname || "N/A"}
         </h1>
 
         {/* Price Section */}

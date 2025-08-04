@@ -86,10 +86,10 @@ const CheckoutContent = ({ setSelectedProduct }) => {
                     className="sm:w-12 sm:h-12 w-8 h-8 object-cover rounded"
                   />
                   <div className="flex flex-col">
-                    <h1 className="font-light sm:text-[11px] text-[9px]">
+                    <h1 className="font-medium sm:text-sm text-xs">
                       {medicine?.genericname || "N/A"}
                     </h1>
-                    <h1 className="font-semibold sm:text-base text-xs">
+                    <h1 className="font-light sm:text-[11px] text-[9px]">
                       {medicine?.brandname || "N/A"}
                     </h1>
 
@@ -110,14 +110,14 @@ const CheckoutContent = ({ setSelectedProduct }) => {
                   <h1 className="font-medium sm:text-base text-xs">
                     {discountPercent > 0 ? (
                       <div className="text-sm font-semibold text-[#333]">
-                        ₱{discountedPrice}
+                        ₱ {discountedPrice}
                         <span className="text-xs line-through text-gray-400 ml-2">
-                          ₱{price}
+                          ₱ {price}
                         </span>
                       </div>
                     ) : (
                       <h2 className="text-sm font-semibold text-[#333]">
-                        ₱{price}
+                        ₱ {price}
                       </h2>
                     )}
                   </h1>

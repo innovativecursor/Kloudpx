@@ -40,7 +40,7 @@ export const CheckoutProvider = ({ children }) => {
         {},
         true
       );
-      // console.log(res);
+      console.log(res);
 
       const isSaved = res.save_for_later;
 
@@ -56,6 +56,7 @@ export const CheckoutProvider = ({ children }) => {
       return isSaved;
     } catch (error) {
       console.error("Error toggling save for later:", error);
+      return false;
     }
   };
 

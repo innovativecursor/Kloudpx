@@ -34,31 +34,24 @@ const ProfilePage = () => {
         <UserMenu setActiveTab={setActiveTab} activeTab={activeTab} />
       </div>
 
-      <main className="flex-1">
+      <main className="flex-1 w-full">
         <div
           className={`
-      flex items-start gap-4 mb-8
+      flex items-start gap-4 sm:mb-8 mb-4
       ${""}
       ${activeTab === "account" ? "block" : "hidden"} 
       md:flex
     `}
         >
-          <div>
+          <div className="  w-full">
             <h1 className="text-2xl md:text-start text-center font-semibold mb-6">
               My Profile
             </h1>
-            <div className="flex gap-5 mt-8">
-              {/* <Image
-                src={fallbackImage}
-                alt="Profile"
-                width={70}
-                height={70}
-                className="rounded-full object-cover"
-              /> */}
+            <div className="flex justify-center md:justify-start gap-5 sm:mt-8">
               <img
                 src={fallbackImage}
                 alt="Profile"
-                className="rounded-full object-cover sm:w-20 sm:h-20 w-12 h-12"
+                className="rounded-full object-cover sm:w-16 sm:h-16 w-12 h-12"
               />
               <div>
                 <h2 className="text-base font-semibold">
