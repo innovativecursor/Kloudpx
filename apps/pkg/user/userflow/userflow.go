@@ -276,7 +276,7 @@ func AddToCartOTC(c *gin.Context, db *gorm.DB) {
 	}
 
 	// Check stock
-	availableStock, err := itemscalculation.CalculateTotalStockByBrandName(db, medicine.BrandName)
+	availableStock, err := itemscalculation.CalculateTotalStockByBrandName(db, medicine.BrandName, medicine.Power)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Stock check failed"})
 		return
@@ -350,7 +350,7 @@ func AddToCartMedicine(c *gin.Context, db *gorm.DB) {
 	}
 
 	// Check stock
-	availableStock, err := itemscalculation.CalculateTotalStockByBrandName(db, medicine.BrandName)
+	availableStock, err := itemscalculation.CalculateTotalStockByBrandName(db, medicine.BrandName, medicine.Power)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Stock check failed"})
 		return

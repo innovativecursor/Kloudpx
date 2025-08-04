@@ -65,7 +65,7 @@ func GetUserPrescriptionHistory(c *gin.Context, db *gorm.DB) {
 	db.Preload("User").Where("user_id = ? AND status = ?", userID, "fulfilled").Find(&past)
 
 	var unsettled []models.Prescription
-	db.Preload("User").Where("user_id = ? AND status = ?", userID, "unsettled").Find(&unsettled)
+	db.Preload("User").Where("user_id = ? AND status IN ?", userID, []string{"fulfilled", "rejected"}).Find(&past)
 
 	c.JSON(http.StatusOK, gin.H{
 		"past":      past,

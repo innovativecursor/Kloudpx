@@ -22,25 +22,39 @@ func ToggleSaveForLater(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
-	_, ok := user.(*models.User)
+	userObj, ok := user.(*models.User)
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
 		return
 	}
 
 	cartID := c.Param("id")
-
 	var cart models.Cart
-	if err := db.First(&cart, cartID).Error; err != nil {
+	if err := db.First(&cart, "id = ? AND user_id = ?", cartID, userObj.ID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Cart item not found"})
 		return
 	}
 
 	cart.IsSavedForLater = !cart.IsSavedForLater
-	db.Save(&cart)
 
-	c.JSON(http.StatusOK, gin.H{"message": "Cart item updated", "save_for_later": cart.IsSavedForLater})
+	// Clear session link if saving for later
+	if cart.IsSavedForLater {
+		cart.CheckoutSessionID = nil
+	}
+
+	// Re-enable for checkout if marked active again
+	// (It will only be picked up in next session if eligible)
+	if err := db.Save(&cart).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart item"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":        "Cart item updated",
+		"save_for_later": cart.IsSavedForLater,
+	})
 }
+
 func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 	// Get authenticated user
 	user, exists := c.Get("user")
@@ -54,17 +68,16 @@ func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Check if a pending checkout session already exists
+	// Check for existing pending session
 	var existingSession models.CheckoutSession
 	err := db.Where("user_id = ? AND status = ?", userObj.ID, "pending").First(&existingSession).Error
 	sessionExists := err == nil
 
-	// Fetch eligible cart items not saved for later and not yet linked to a session
+	// Fetch all active (not saved) cart items
 	var cartItems []models.Cart
 	if err := db.Preload("Medicine").
 		Preload("Prescription").
-		Where("user_id = ? AND is_saved_for_later = ? AND checkout_session_id IS NULL",
-			userObj.ID, false).
+		Where("user_id = ? AND is_saved_for_later = false", userObj.ID).
 		Find(&cartItems).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart items"})
 		return
@@ -81,98 +94,29 @@ func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 		}
 	}
 
-	// If no new eligible items but existing session exists, still allow progression
 	if len(eligibleItems) == 0 && sessionExists {
-		// Fetch already linked items for the existing session
+		// No new items but existing session exists — return session items
 		var linkedItems []models.Cart
 		if err := db.Preload("Medicine").
-			Where("checkout_session_id = ?", existingSession.ID).
+			Where("checkout_session_id = ? AND is_saved_for_later = false", existingSession.ID).
 			Find(&linkedItems).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch session items"})
 			return
 		}
-
-		var response []config.CartResponse
-		for _, item := range linkedItems {
-			medicine := item.Medicine
-
-			// Collect all image filenames
-			var images []string
-			for _, img := range medicine.ItemImages {
-				images = append(images, img.FileName)
-			}
-
-			// Determine prescription status
-			prescriptionStatus := "Not Required"
-			if medicine.Prescription {
-				if item.PrescriptionID == nil {
-					prescriptionStatus = "Prescription Not Uploaded"
-				} else {
-					var pres models.Prescription
-					if err := db.First(&pres, *item.PrescriptionID).Error; err == nil {
-						switch pres.Status {
-						case "fulfilled":
-							prescriptionStatus = "Fulfilled"
-						case "unsettled":
-							prescriptionStatus = "Unsettled"
-						case "rejected":
-							prescriptionStatus = "Rejected"
-						default:
-							prescriptionStatus = "Prescription Not Uploaded"
-						}
-					} else {
-						prescriptionStatus = "Prescription Not Uploaded"
-					}
-				}
-			}
-
-			userMed := config.UserFacingMedicine{
-				ID:                        medicine.ID,
-				BrandName:                 medicine.BrandName,
-				Power:                     medicine.Power,
-				GenericName:               medicine.Generic.GenericName,
-				Discount:                  medicine.Discount,
-				Category:                  medicine.Category.CategoryName,
-				Description:               medicine.Description,
-				Unit:                      medicine.UnitOfMeasurement,
-				MeasurementUnitValue:      medicine.MeasurementUnitValue,
-				NumberOfPiecesPerBox:      medicine.NumberOfPiecesPerBox,
-				Price:                     medicine.SellingPricePerPiece,
-				TaxType:                   medicine.TaxType,
-				Prescription:              medicine.Prescription,
-				Benefits:                  medicine.Benefits,
-				KeyIngredients:            medicine.KeyIngredients,
-				RecommendedDailyAllowance: medicine.RecommendedDailyAllowance,
-				DirectionsForUse:          medicine.DirectionsForUse,
-				SafetyInformation:         medicine.SafetyInformation,
-				Storage:                   medicine.Storage,
-				Images:                    images,
-			}
-
-			response = append(response, config.CartResponse{
-				CartID:             item.ID,
-				Quantity:           item.Quantity,
-				Medicine:           userMed,
-				PrescriptionStatus: prescriptionStatus,
-			})
-		}
-
 		c.JSON(http.StatusOK, gin.H{
 			"message":             "Existing checkout session in progress",
 			"checkout_session_id": existingSession.ID,
-			"items":               response,
+			"items":               buildCartResponse(linkedItems, db),
 		})
-
 		return
 	}
 
-	// If no eligible items at all (first time), block checkout
 	if len(eligibleItems) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "No eligible items available for checkout"})
 		return
 	}
 
-	// Create new session if not found
+	// Create session if needed
 	session := existingSession
 	if !sessionExists {
 		session = models.CheckoutSession{
@@ -185,26 +129,42 @@ func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 		}
 	}
 
-	// Link eligible items to the session
+	// Link eligible items not already linked
 	for i := range eligibleItems {
-		eligibleItems[i].CheckoutSessionID = &session.ID
-		if err := db.Save(&eligibleItems[i]).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart items"})
-			return
+		if eligibleItems[i].CheckoutSessionID == nil {
+			eligibleItems[i].CheckoutSessionID = &session.ID
+			if err := db.Save(&eligibleItems[i]).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart items"})
+				return
+			}
 		}
 	}
 
-	var response []config.CartResponse
-	for _, item := range eligibleItems {
-		medicine := item.Medicine
+	// Fetch all linked items again (some might’ve been linked in past)
+	var finalItems []models.Cart
+	if err := db.Preload("Medicine").
+		Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
+		Find(&finalItems).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load session cart items"})
+		return
+	}
 
-		// Collect all image filenames
+	c.JSON(http.StatusOK, gin.H{
+		"message":             "Checkout session initiated",
+		"checkout_session_id": session.ID,
+		"items":               buildCartResponse(finalItems, db),
+	})
+}
+func buildCartResponse(cartItems []models.Cart, db *gorm.DB) []config.CartResponse {
+	var response []config.CartResponse
+
+	for _, item := range cartItems {
+		medicine := item.Medicine
 		var images []string
 		for _, img := range medicine.ItemImages {
 			images = append(images, img.FileName)
 		}
 
-		// Determine prescription status
 		prescriptionStatus := "Not Required"
 		if medicine.Prescription {
 			if item.PrescriptionID == nil {
@@ -222,8 +182,6 @@ func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 					default:
 						prescriptionStatus = "Prescription Not Uploaded"
 					}
-				} else {
-					prescriptionStatus = "Prescription Not Uploaded"
 				}
 			}
 		}
@@ -259,12 +217,7 @@ func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 		})
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message":             "Checkout session initiated",
-		"checkout_session_id": session.ID,
-		"items":               response,
-	})
-
+	return response
 }
 
 func AddOrUpdateAddress(c *gin.Context, db *gorm.DB) {
