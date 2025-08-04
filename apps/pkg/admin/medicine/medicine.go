@@ -389,15 +389,15 @@ func SearchMedicinesForAdmin(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Get query string
 	query := c.Query("q")
 	if query == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Search query is required"})
 		return
 	}
 
-	// Fetch matching medicines
+	searchTerm := "%" + query + "%"
 	var medicines []models.Medicine
+
 	if err := db.Preload("Generic").
 		Preload("Category").
 		Preload("Category.CategoryIcon").
@@ -405,9 +405,21 @@ func SearchMedicinesForAdmin(c *gin.Context, db *gorm.DB) {
 		Preload("ItemImages").
 		Joins("LEFT JOIN categories ON categories.id = medicines.category_id").
 		Joins("LEFT JOIN generics ON generics.id = medicines.generic_id").
-		Where("medicines.brand_name LIKE ? OR categories.category_name LIKE ? OR generics.generic_name LIKE ?",
-			"%"+query+"%", "%"+query+"%", "%"+query+"%").
+		Where(`
+			generics.generic_name LIKE ? 
+			OR medicines.brand_name LIKE ? 
+			OR categories.category_name LIKE ?
+		`, searchTerm, searchTerm, searchTerm).
+		Order(gorm.Expr(`
+			CASE
+				WHEN generics.generic_name LIKE ? THEN 1
+				WHEN medicines.brand_name LIKE ? THEN 2
+				WHEN categories.category_name LIKE ? THEN 3
+				ELSE 4
+			END
+		`, searchTerm, searchTerm, searchTerm)).
 		Find(&medicines).Error; err != nil {
+
 		logrus.WithError(err).Error("Failed to search medicines")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search medicines"})
 		return
