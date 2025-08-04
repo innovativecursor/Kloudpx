@@ -4,25 +4,27 @@ import React from "react";
 import { PiBusFill } from "react-icons/pi";
 
 const CheckoutProduct = ({ product }) => {
-  if (!product) {
+
+  if (!product) return null;
+
+
+  if (!product?.medicine) {
     return (
-      <div className="bg-blue-50 w-full rounded-lg py-10 px-5 text-center text-gray-500">
-        Please select a product from the left to view details.
+      <div className="bg-blue-50 w-full rounded-lg py-10 px-5 text-center text-gray-900">
+        No Product Found 
       </div>
     );
   }
 
-  const medicine = product?.medicine;
+  const medicine = product.medicine;
   const fallbackImage = "/assets/fallback.png";
-
   const imageUrl =
-    Array.isArray(medicine?.images) && medicine.images[0]
+    Array.isArray(medicine.images) && medicine.images[0]
       ? medicine.images[0]
       : fallbackImage;
 
   const price = medicine?.price || 0;
   const discountPercent = parseFloat(medicine?.discount?.replace("%", "")) || 0;
-
   const discountedPrice = (price - (price * discountPercent) / 100).toFixed(2);
 
   return (
@@ -66,9 +68,9 @@ const CheckoutProduct = ({ product }) => {
                   {discountPercent}%
                 </div>
               </>
-            ) : (
+            ) : price > 0 ? (
               <span className="font-medium text-[#333]">₱{price}</span>
-            )}
+            ) : null}
           </div>
         </div>
 

@@ -11,8 +11,17 @@ const page = () => {
   const { getCartData } = useCartContext();
 
   useEffect(() => {
-    if (getCartData?.data && getCartData.data.length > 0) {
-      setSelectedProduct(getCartData.data[0]);
+    const validItems =
+      getCartData?.data?.filter(
+        (item) =>
+          item.prescription_status !== "Unsettled" &&
+          item.prescription_status !== "Rejected"
+      ) || [];
+
+    if (validItems.length > 0) {
+      setSelectedProduct(validItems[0]);
+    } else {
+      setSelectedProduct(null);
     }
   }, [getCartData?.data]);
 

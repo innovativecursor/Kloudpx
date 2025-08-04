@@ -32,7 +32,7 @@ const Address = () => {
     }
   }, []);
 
-  console.log(getAllAddress, "my add ");
+  // console.log(getAllAddress, "my add ");
 
   return (
     <>

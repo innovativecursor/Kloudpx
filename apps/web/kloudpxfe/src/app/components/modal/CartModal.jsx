@@ -14,6 +14,7 @@ const CartModal = ({ isOpen, onClose }) => {
   const { goToProductPage } = useProductNavigation();
   const fallbackImage = "/assets/fallback.png";
   const [activeTab, setActiveTab] = useState("All");
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   const data = getCartData?.data || [];
   const loading = getCartData?.loading || false;
@@ -28,9 +29,19 @@ const CartModal = ({ isOpen, onClose }) => {
     return null;
   }
 
+  // const handleCheckout = async () => {
+  //   router.push("/Checkout");
+  //   onClose();
+  // };
+
   const handleCheckout = async () => {
-    router.push("/Checkout");
-    onClose();
+    setCheckoutLoading(true);
+    try {
+      router.push("/Checkout");
+    } finally {
+      onClose();
+      setCheckoutLoading(false);
+    }
   };
 
   const handleDelete = (id) => {
@@ -220,11 +231,23 @@ const CartModal = ({ isOpen, onClose }) => {
 
         {token && data.length > 0 && (
           <div className="p-4 ">
-            <button
+            {/* <button
               onClick={handleCheckout}
               className="w-full py-3 rounded-full text-sm font-semibold cursor-pointer bg-[#0070BA] text-white hover:bg-[#005c96]"
             >
               Proceed to Checkout
+            </button> */}
+            <button
+              onClick={handleCheckout}
+              disabled={checkoutLoading}
+              className={classNames(
+                "w-full py-3 rounded-full text-sm font-semibold cursor-pointer text-white transition",
+                checkoutLoading
+                  ? "bg-[#7aaed8] cursor-not-allowed"
+                  : "bg-[#0070BA] hover:bg-[#005c96]"
+              )}
+            >
+              {checkoutLoading ? "Processing..." : "Proceed to Checkout"}
             </button>
           </div>
         )}

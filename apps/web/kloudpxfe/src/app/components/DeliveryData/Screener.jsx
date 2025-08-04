@@ -7,7 +7,7 @@ import { FaPaperclip } from "react-icons/fa";
 const Screener = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [gcashNumber, setGcashNumber] = useState("");
-
+  const qr = "/assets/qr.png";
   const { deliveryData } = useCheckout();
 
   const handleFileChange = (e) => {
@@ -21,8 +21,9 @@ const Screener = () => {
   return (
     <div className="w-full mt-10 py-8 px-6 bg-[#EDF4F6] rounded-lg ">
       <div className="">
-        <div className="flex justify-between md:flex-row flex-col items-start">
-          <div>
+        <div className="flex justify-between md:flex-row flex-col items-start gap-6">
+          {/* Left: Payment Info */}
+          <div className="flex-1">
             <h2 className="font-semibold tracking-wide text-2xl text-[#00243f] mb-2">
               Pay via Gcash
             </h2>
@@ -33,11 +34,13 @@ const Screener = () => {
               ₱{deliveryData?.grand_total?.toFixed(2)}
             </h1>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow">
+
+          {/* Right: QR Image */}
+          <div className="bg-white  p-2 rounded-lg shadow-md flex justify-center items-center max-w-xs w-full">
             <img
-              src="/qr-code.png"
+              src={qr}
               alt="QR Code"
-              className="lg:w-40 lg:h-40 sm:w-32 sm:h-32 w-full h-full object-contain"
+              className="object-contain lg:h-80 lg:w-96 md:w-72 md:h-60"
             />
           </div>
         </div>
