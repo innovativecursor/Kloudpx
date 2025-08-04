@@ -9,10 +9,6 @@ const useCategoryHandler = () => {
     getItemsByCategory,
     setSelectedCategoryId,
     setSelectedCategoryName,
-    // priceRange,
-    // setPriceRange,
-    // discountRange,
-    // setDiscountRange,
   } = useProductContext();
 
   const router = useRouter();
@@ -31,8 +27,7 @@ const useCategoryHandler = () => {
 
     setSelectedCategoryId(id);
     setSelectedCategoryName(selected?.CategoryName || "");
-    // setPriceRange([0, 1000]);
-    // setDiscountRange([0, 100]);
+
     await getItemsByCategory(id);
 
     const categorySlug =

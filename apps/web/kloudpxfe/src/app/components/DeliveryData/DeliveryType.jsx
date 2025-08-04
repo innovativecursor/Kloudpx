@@ -38,7 +38,7 @@ const DeliveryType = ({ setDeliverySuccess }) => {
           />
           <div>
             <h3 className="font-medium tracking-wide text-base text-[#00243f]">
-              Priority Delivery
+              On-Demand Delivery
             </h3>
             <span className="text-xs tracking-wide text-gray-600">
               Get your medicines delivered on the same day.

@@ -49,9 +49,11 @@ export const ProductProvider = ({ children }) => {
   const getAllMedicine = async () => {
     try {
       const res = await getAxiosCall(endpoints.medicine.get, {}, false);
-      setAllMedicine(res?.data?.medicines || []);
+      // setAllMedicine(res?.data?.medicines || []);
+      setSelectedCategoryItems(res?.data?.medicines || []);
     } catch (error) {
-      setAllMedicine([]);
+      // setAllMedicine([]);
+      console.error("Error fetching all medicines", err);
     }
   };
 
@@ -59,7 +61,7 @@ export const ProductProvider = ({ children }) => {
     try {
       const res = await getAxiosCall(endpoints.branded.get, {}, false);
       // console.log(res, "");
-      
+
       setBranded(res?.data?.brand_names || []);
     } catch (error) {
       setBranded([]);

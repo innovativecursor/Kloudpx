@@ -100,6 +100,8 @@ export default function SearchBar() {
     setShowDropdown(false);
   };
 
+  // console.log(results);
+
   return (
     <div
       ref={wrapperRef}
@@ -150,9 +152,11 @@ export default function SearchBar() {
                 </div>
                 <div className="flex flex-col">
                   <span className="font-medium text-gray-800 text-[15px]">
+                    {item.genericname}
+                  </span>
+                  <span className="text-xs text-gray-500">
                     {item.brandname}
                   </span>
-                  <span className="text-xs text-gray-500">{item.category}</span>
                 </div>
               </li>
             ))

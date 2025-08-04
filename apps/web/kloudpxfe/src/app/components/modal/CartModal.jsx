@@ -6,13 +6,11 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
 import useProductNavigation from "@/app/hooks/useProductNavigation";
-// import { useCheckout } from "@/app/contexts/CheckoutContext";
 
 const CartModal = ({ isOpen, onClose }) => {
   const { token, isAuthLoaded } = useAuth();
   const router = useRouter();
   const { getCartData, removeFromCart, getAllCartData } = useCartContext();
-  // const { toggleSaveForLater, savedForLaterIds, doCheckout } = useCheckout();
   const { goToProductPage } = useProductNavigation();
   const fallbackImage = "/assets/fallback.png";
   const [activeTab, setActiveTab] = useState("All");
@@ -82,12 +80,15 @@ const CartModal = ({ isOpen, onClose }) => {
               {data?.length || 0} Items in your cart
             </h2>
           </div>
-          {/* <button
+          <button
             className="text-[#0070ba] cursor-pointer font-medium flex items-center gap-1"
-            onClick={() => router.push("/")}
+            onClick={() => {
+              onClose();
+              router.push("/Products");
+            }}
           >
             <i className="ri-add-line text-xl"></i> Add more
-          </button> */}
+          </button>
         </div>
 
         {/* Tabs */}
@@ -162,10 +163,10 @@ const CartModal = ({ isOpen, onClose }) => {
                   <div className="flex-1">
                     <div className="flex justify-between items-start">
                       <div className="flex flex-col">
-                        <h2 className="text-sm font-light text-[#0070ba]">
+                        <h2 className="text-sm font-medium text-[#0070ba]">
                           {medicine?.genericname || "N/A"}
                         </h2>
-                        <h4 className="font-medium text-sm mb-1">
+                        <h4 className="font-light text-sm mb-1">
                           {medicine?.brandname || "N/A"}
                         </h4>
                       </div>
@@ -181,14 +182,14 @@ const CartModal = ({ isOpen, onClose }) => {
                     <div className="text-base mt-1 font-medium text-[#333]">
                       {discountPercent > 0 ? (
                         <div className="text-sm font-semibold text-[#333]">
-                          ₱{discountedPrice}
+                          ₱ {discountedPrice}
                           <span className="text-xs line-through text-gray-400 ml-2">
-                            ₱{price}
+                            ₱ {price}
                           </span>
                         </div>
                       ) : (
                         <h2 className="text-sm font-semibold text-[#333]">
-                          ₱{price}
+                          ₱ {price}
                         </h2>
                       )}
                     </div>
