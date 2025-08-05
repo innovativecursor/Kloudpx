@@ -550,60 +550,70 @@ func SubmitPayment(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	if req.PaymentNumber == "" && req.ScreenshotBase64 == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Either payment_number or screenshot_base64 must be provided"})
+		return
+	}
+
 	amountPaid, err := strconv.ParseFloat(req.AmountPaid, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid amount"})
 		return
 	}
 
-	decodedImage, err := base64.StdEncoding.DecodeString(req.ScreenshotBase64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid base64 image"})
-		return
+	var screenshotURL string
+
+	if req.ScreenshotBase64 != "" {
+		decodedImage, err := base64.StdEncoding.DecodeString(req.ScreenshotBase64)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid base64 image"})
+			return
+		}
+
+		cfg, err := cfg.Env()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Configuration error"})
+			return
+		}
+
+		profileType := "payment"
+		userType := "user"
+		uniqueID := s3helper.GenerateUniqueID().String()
+		userID := fmt.Sprintf("%d", userObj.ID)
+		imageName := "payment_screenshot"
+
+		err = s3helper.UploadToS3(
+			c.Request.Context(),
+			profileType,
+			userType,
+			cfg.S3.BucketName,
+			uniqueID,
+			userID,
+			imageName,
+			decodedImage,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload image"})
+			return
+		}
+
+		extension, _ := getfileextension.GetFileExtension(decodedImage)
+		screenshotURL = fmt.Sprintf(
+			"https://%s.s3.%s.amazonaws.com/%s/%s/%s/%s/%s.%s",
+			cfg.S3.BucketName,
+			cfg.S3.Region,
+			profileType,
+			userType,
+			uniqueID,
+			userID,
+			imageName,
+			extension,
+		)
 	}
-
-	cfg, err := cfg.Env()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Configuration error"})
-		return
-	}
-
-	profileType := "payment"
-	userType := "user"
-	uniqueID := s3helper.GenerateUniqueID().String()
-	userID := fmt.Sprintf("%d", userObj.ID)
-	imageName := "payment_screenshot"
-
-	err = s3helper.UploadToS3(
-		c.Request.Context(),
-		profileType,
-		userType,
-		cfg.S3.BucketName,
-		uniqueID,
-		userID,
-		imageName,
-		decodedImage,
-	)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload image"})
-		return
-	}
-
-	extension, _ := getfileextension.GetFileExtension(decodedImage)
-	screenshotURL := fmt.Sprintf(
-		"https://%s.s3.%s.amazonaws.com/%s/%s/%s/%s/%s.%s",
-		cfg.S3.BucketName,
-		cfg.S3.Region,
-		profileType,
-		userType,
-		uniqueID,
-		userID,
-		imageName,
-		extension,
-	)
 
 	sessionID, _ := strconv.Atoi(req.CheckoutSessionID)
 	orderNumber := s3helper.GenerateUniqueID().String()
+
 	payment := models.Payment{
 		UserID:            userObj.ID,
 		CheckoutSessionID: uint(sessionID),
@@ -619,9 +629,73 @@ func SubmitPayment(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	var session models.CheckoutSession
+	if err := db.First(&session, payment.CheckoutSessionID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Checkout session not found"})
+		return
+	}
+	session.Status = "completed"
+	if err := db.Save(&session).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update session status"})
+		return
+	}
+
+	var address models.Address
+	if err := db.First(&address, session.AddressID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch delivery address"})
+		return
+	}
+	fullAddress := fmt.Sprintf("%s, %s, %s, %s, %s", address.NameResidency, address.Barangay, address.City, address.Province, address.ZipCode)
+
+	var cartItems []models.Cart
+	if err := db.Preload("Medicine").
+		Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
+		Find(&cartItems).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart items"})
+		return
+	}
+
+	var totalCost float64
+	for _, item := range cartItems {
+		price := item.Medicine.SellingPricePerPiece * float64(item.Quantity)
+		if item.Medicine.Discount != "" {
+			discountStr := strings.TrimSuffix(item.Medicine.Discount, "%")
+			discountVal, err := strconv.ParseFloat(discountStr, 64)
+			if err == nil {
+				price -= price * discountVal / 100
+			}
+		}
+		totalCost += price
+	}
+	grandTotal := totalCost + float64(session.DeliveryCost)
+
+	order := models.Order{
+		UserID:            userObj.ID,
+		CheckoutSessionID: session.ID,
+		OrderNumber:       orderNumber,
+		TotalAmount:       grandTotal,
+		DeliveryAddress:   fullAddress,
+		DeliveryType:      session.DeliveryType,
+		Status:            "processing",
+	}
+
+	if err := db.Create(&order).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create order summary"})
+		return
+	}
+
+	if err := db.Model(&models.Cart{}).
+		Where("checkout_session_id = ?", session.ID).
+		Update("checkout_session_id", nil).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to clear session from cart items"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Payment submitted successfully",
-		"payment": payment,
+		"message":       "Payment submitted successfully",
+		"payment":       payment,
+		"order_number":  orderNumber,
+		"order_summary": order,
 	})
 }
 
