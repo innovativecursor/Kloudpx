@@ -6,5 +6,6 @@ export const Menu = {
   ],
   Carousel: [{ text: "Add Carousel", link: "/carousel" }],
   Gallery: [{ text: "Add Images", link: "/gallery" }],
+  Orders: [{ text: "All Orders", link: "/allorders" }],
   Invoices: [{ text: "Order History", link: "/orderHistory" }],
 };

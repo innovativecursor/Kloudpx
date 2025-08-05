@@ -40,6 +40,7 @@ import UpdateMedicine from "../Components/addMedicine/UpdateMedicine";
 import { useAuthContext } from "../contexts/AuthContext";
 import Carousel from "../Components/carousel/Carousel";
 import Gallery from "../Components/gallery/Gallery";
+import AllOrders from "../pages/AllOrders";
 
 function Navigation(props) {
   const location = useLocation();
@@ -77,6 +78,7 @@ function Navigation(props) {
                 <Route path="/addMedicine" element={<AddMedicine />} />
                 <Route path="/carousel" element={<Carousel />} />
                 <Route path="/gallery" element={<Gallery />} />
+                <Route path="/allorders" element={<AllOrders />} />
                 {/* <Route path="/addMedicine/edit/:id" element={<AddMedicine />} /> */}
                 <Route path="/edit-medicine" element={<AddMedicine />} />
 

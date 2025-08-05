@@ -138,7 +138,7 @@ const Address = () => {
                       toast.error("Please select an address");
                     }
                   }}
-                  className="bg-[#0070BA] text-white md:mt-10 mt-8 w-full py-2.5 text-[10px] rounded-full font-medium hover:bg-[#005c96]"
+                  className="bg-[#0070BA] text-white cursor-pointer md:mt-10 mt-8 w-full py-2.5 text-[10px] rounded-full font-medium hover:bg-[#005c96]"
                 >
                   Save & Proceed
                 </button>
