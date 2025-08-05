@@ -72,11 +72,15 @@ const endpoints = {
   filters: {
     get: `${baseUrl}/v1/user/filter`,
   },
-  // sorting: {
-  //   get: `${baseUrl}/v1/user/sorting`,
-  // },
   prescription: {
     upload: `${baseUrl}/v1/user/upload-prescription`,
+  },
+
+  paymentSubmit: {
+    add: `${baseUrl}/v1/user/submit-payment`,
+  },
+  paymentslip: {
+    get: `${baseUrl}/v1/user/get-payment-slip`,
   },
 };
 
