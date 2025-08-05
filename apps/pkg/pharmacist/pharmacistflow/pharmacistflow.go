@@ -37,7 +37,7 @@ func GetUsersWithPrescriptionSummary(c *gin.Context, db *gorm.DB) {
 			   CONCAT(u.first_name, ' ', u.last_name) as name,
 			   u.email,
 			   MAX(p.status) as prescription_status,
-			   SUM(CASE WHEN p.status = 'fulfilled' THEN 1 ELSE 0 END) as past_prescription,
+			   SUM(CASE WHEN p.status IN ('fulfilled', 'rejected') THEN 1 ELSE 0 END) AS past_prescription,
 			   SUM(CASE WHEN p.status = 'unsettled' THEN 1 ELSE 0 END) as pending_prescription
 		FROM prescriptions p
 		JOIN users u ON p.user_id = u.id
@@ -62,10 +62,14 @@ func GetUserPrescriptionHistory(c *gin.Context, db *gorm.DB) {
 	userID := c.Param("user_id")
 
 	var past []models.Prescription
-	db.Preload("User").Where("user_id = ? AND status = ?", userID, "fulfilled").Find(&past)
+	db.Preload("User").
+		Where("user_id = ? AND status IN ?", userID, []string{"fulfilled", "rejected"}).
+		Find(&past)
 
 	var unsettled []models.Prescription
-	db.Preload("User").Where("user_id = ? AND status IN ?", userID, []string{"fulfilled", "rejected"}).Find(&past)
+	db.Preload("User").
+		Where("user_id = ? AND status = ?", userID, "unsettled").
+		Find(&unsettled)
 
 	c.JSON(http.StatusOK, gin.H{
 		"past":      past,
