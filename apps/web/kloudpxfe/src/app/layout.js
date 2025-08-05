@@ -16,6 +16,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import Loader from "@/app/components/Loader/Loader";
 import CustomToaster from "./utils/NoSSRToaster";
 import { CheckoutProvider } from "./contexts/CheckoutContext";
+import { PaymentProvider } from "./contexts/PaymentContext";
 
 export default function RootLayout({ children }) {
   return (
@@ -36,13 +37,15 @@ export default function RootLayout({ children }) {
                   <CheckoutProvider>
                     <CartProvider>
                       <PrescriptionProvider>
-                        <ImageProvider>
-                          <Header />
-                          <main className="flex-1">{children}</main>
-                          <Footer />
-                          {/* <Toaster position="bottom-right" reverseOrder={false} /> */}
-                          <CustomToaster />
-                        </ImageProvider>
+                        <PaymentProvider>
+                          <ImageProvider>
+                            <Header />
+                            <main className="flex-1">{children}</main>
+                            <Footer />
+                            {/* <Toaster position="bottom-right" reverseOrder={false} /> */}
+                            <CustomToaster />
+                          </ImageProvider>
+                        </PaymentProvider>
                       </PrescriptionProvider>
                     </CartProvider>
                   </CheckoutProvider>
