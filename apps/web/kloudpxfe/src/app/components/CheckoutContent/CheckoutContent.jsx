@@ -16,6 +16,14 @@ const CheckoutContent = ({ setSelectedProduct }) => {
   const data = getCartData?.data || [];
   const loading = getCartData?.loading || false;
 
+  const validItems = data?.filter(
+    (item) =>
+      item.prescription_status !== "Unsettled" &&
+      item.prescription_status !== "Rejected"
+  );
+
+  const itemCount = validItems?.length || 0;
+
   useEffect(() => {
     if (token) {
       getAllCartData();
@@ -35,21 +43,21 @@ const CheckoutContent = ({ setSelectedProduct }) => {
     }
   };
 
-  const itemCount = data?.length || 0;
-
   return (
     <div>
+      {/* Cart Header */}
       <div className="bg-[#EDF4F6] shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
         <h3 className="font-semibold text-center dark-text tracking-wider sm:text-base text-sm dark-text">
           {itemCount} item{itemCount !== 1 && "s"} in your cart
         </h3>
       </div>
 
+      {/* Cart Items */}
       {loading ? (
         <p className="text-center text-gray-500">Loading cart...</p>
       ) : (
         <div className="space-y-4">
-          {data?.map((item) => {
+          {validItems.map((item) => {
             const medicine = item?.medicine;
             const imageUrl =
               Array.isArray(medicine?.images) && medicine.images[0]
@@ -64,19 +72,12 @@ const CheckoutContent = ({ setSelectedProduct }) => {
               (price * discountPercent) / 100
             ).toFixed(2);
 
-            const isUnsettled = item.prescription_status === "Unsettled";
-            const isRejected = item.prescription_status === "Rejected";
-
-            const bgClass = isUnsettled
-              ? "bg-gray-200 opacity-60 pointer-events-none"
-              : isRejected
-              ? "bg-red-100 border border-red-400"
-              : "bg-green-50";
+            const bgClass = "bg-green-50";
 
             return (
               <div
                 key={item.cart_id}
-                className={`w-full py-3 px-6 rounded-sm cursor-pointer flex justify-between  items-center ${bgClass}`}
+                className={`w-full py-3 px-6 rounded-sm cursor-pointer flex justify-between items-center ${bgClass}`}
                 onClick={() => setSelectedProduct(item)}
               >
                 <div className="flex gap-2 items-center">
@@ -92,17 +93,6 @@ const CheckoutContent = ({ setSelectedProduct }) => {
                     <h1 className="font-light sm:text-[11px] text-[9px]">
                       {medicine?.brandname || "N/A"}
                     </h1>
-
-                    {isUnsettled && (
-                      <p className="text-[10px] text-red-600">
-                        Waiting for pharmacist approval
-                      </p>
-                    )}
-                    {isRejected && (
-                      <p className="text-[10px] text-red-600">
-                        Rejected by pharmacist
-                      </p>
-                    )}
                   </div>
                 </div>
 
@@ -137,6 +127,7 @@ const CheckoutContent = ({ setSelectedProduct }) => {
         </div>
       )}
 
+      {/* Action Buttons */}
       <div className="flex justify-between gap-5 sm:mt-10 mt-8 items-center">
         <div className="w-[40%]">
           <button
@@ -148,8 +139,13 @@ const CheckoutContent = ({ setSelectedProduct }) => {
         </div>
         <div className="w-[60%]">
           <button
-            className="bg-[#0070BA] text-white hover:bg-[#005c96] sm:text-[11px] text-[8px] w-full py-3 rounded-full font-semibold cursor-pointer"
-            onClick={handleCheckout}
+            className={`bg-[#0070BA] text-white hover:bg-[#005c96] sm:text-[11px] text-[8px] w-full py-3 rounded-full font-semibold ${
+              itemCount === 0
+                ? "opacity-50 cursor-not-allowed"
+                : "cursor-pointer"
+            }`}
+            onClick={itemCount === 0 ? null : handleCheckout}
+            disabled={itemCount === 0}
           >
             Proceed to Checkout
           </button>

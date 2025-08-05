@@ -26,7 +26,7 @@ const AuthProvider = ({ children }) => {
           if (adminInfo) {
             setUser(adminInfo);
           } else {
-            logoutUser(); 
+            logoutUser();
           }
         } catch (error) {
           console.error("initializeUser error:", error);
