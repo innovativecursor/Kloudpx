@@ -24,7 +24,7 @@ type SelectAddress struct {
 type SubmitPaymentRequest struct {
 	CheckoutSessionID string `json:"checkout_session_id"`
 	PaymentNumber     string `json:"payment_number"`
-	AmountPaid        string `json:"amount_paid"`
+	Remark            string `json:"remark"`
 	ScreenshotBase64  string `json:"screenshot_base64"`
 }
 type UserFacingMedicine struct {
