@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import useModal from "@/app/hooks/useModal";
+import toast from "react-hot-toast";
 
 const SocialIcons = () => {
   const {
@@ -52,7 +53,7 @@ const SocialIcons = () => {
       onClick: () => {
         if (currentUrl) {
           navigator.clipboard.writeText(currentUrl);
-          alert("Link copied to clipboard!");
+          toast.success("Link copied to clipboard!");
         }
       },
     },
