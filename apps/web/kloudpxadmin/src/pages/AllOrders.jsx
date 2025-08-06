@@ -43,7 +43,7 @@ const AllOrders = () => {
                 </td>
                 <td className="px-4 py-3">{order.customer_name}</td>
                 <td className="px-4 py-3 font-semibold">
-                  ₹{order.amount_paid}
+                  {order.amount_paid}
                 </td>
                 <td className="px-4 py-3">{order.payment_number}</td>
                 <td className="px-4 py-3 capitalize">{order.delivery_type}</td>
