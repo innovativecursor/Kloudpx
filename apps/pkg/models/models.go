@@ -229,7 +229,7 @@ type Payment struct {
 	OrderNumber       string
 	PaymentNumber     string
 	ScreenshotURL     string
-	AmountPaid        float64
+	Remark            float64
 	Status            string // Not Paid, Partially Paid, Paid, Cancelled
 	User              User
 	CheckoutSession   CheckoutSession
