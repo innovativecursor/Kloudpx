@@ -11,6 +11,7 @@ import (
 	cfg "github.com/innovativecursor/Kloudpx/apps/pkg/config"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/getfileextension"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/s3helper"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/userinfo"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/checkoutflow/config"
 	"gorm.io/gorm"
@@ -588,7 +589,7 @@ func SubmitPayment(c *gin.Context, db *gorm.DB) {
 		}
 		grandTotal := totalCost + float64(session.DeliveryCost)
 
-		orderNumber := s3helper.GenerateUniqueID().String()
+		orderNumber := userinfo.GenerateOrderNumber()
 		order := models.Order{
 			UserID:            userObj.ID,
 			CheckoutSessionID: session.ID,
@@ -683,7 +684,7 @@ func SubmitPayment(c *gin.Context, db *gorm.DB) {
 		)
 	}
 
-	orderNumber := s3helper.GenerateUniqueID().String()
+	orderNumber := userinfo.GenerateOrderNumber()
 	payment := models.Payment{
 		UserID:            userObj.ID,
 		CheckoutSessionID: uint(sessionID),
