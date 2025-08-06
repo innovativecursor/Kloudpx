@@ -18,7 +18,7 @@ const DeliveryType = ({ setDeliverySuccess }) => {
   return (
     <div className="mt-10">
       {/* Priority Delivery */}
-      <label
+      {/* <label
         htmlFor="priority"
         className={`flex justify-between items-center py-5 px-6 rounded-xl cursor-pointer border ${
           selected === "priority"
@@ -45,8 +45,7 @@ const DeliveryType = ({ setDeliverySuccess }) => {
             </span>
           </div>
         </div>
-        {/* <span className="text-[#00243f] font-medium text-lg">₱20</span> */}
-      </label>
+      </label> */}
 
       {/* Standard Delivery */}
       <label
