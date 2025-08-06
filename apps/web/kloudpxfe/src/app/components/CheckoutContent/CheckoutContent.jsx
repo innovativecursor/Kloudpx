@@ -75,51 +75,98 @@ const CheckoutContent = ({ setSelectedProduct }) => {
             const bgClass = "bg-green-50";
 
             return (
+              // <div
+              //   key={item.cart_id}
+              //   className={`w-full py-3 sm:px-6 px-3 rounded-sm cursor-pointer flex justify-between items-center ${bgClass}`}
+              //   onClick={() => setSelectedProduct(item)}
+              // >
+              //   <div className="flex gap-2 items-center">
+              //     <img
+              //       src={imageUrl}
+              //       alt="product"
+              //       className="sm:w-12 sm:h-12 w-8 h-8 object-cover rounded"
+              //     />
+              //     <div className="flex flex-col">
+              //       <h1 className="font-medium sm:text-sm text-[10px]">
+              //         {medicine?.genericname || "N/A"}
+              //       </h1>
+              //       <h1 className="font-light sm:text-[11px] text-[9px]">
+              //         {medicine?.brandname || "N/A"}
+              //       </h1>
+              //     </div>
+              //   </div>
+
+              //   <div className="flex flex-col items-center">
+              //     <h1 className="font-medium sm:text-base text-xs">
+              //       {discountPercent > 0 ? (
+              //         <div className="text-sm font-semibold text-[#333]">
+              //           ₱ {discountedPrice}
+              //           <span className="text-xs line-through text-gray-400 ml-2">
+              //             ₱ {price}
+              //           </span>
+              //         </div>
+              //       ) : (
+              //         <h2 className="text-sm font-semibold text-[#333]">
+              //           ₱ {price}
+              //         </h2>
+              //       )}
+              //     </h1>
+              //     <div className="flex items-center gap-2">
+              //       <input
+              //         type="checkbox"
+              //         checked={savedForLaterIds.includes(item.cart_id)}
+              //         onChange={() => handleSaveForLater(item.cart_id)}
+              //         className="appearance-none bg-transparent border border-[#0070ba] cursor-pointer rounded-full sm:w-4 sm:h-4 w-2 h-2 checked:bg-blue-500"
+              //       />
+              //       <label className="text-[9px]">Save for Later</label>
+              //     </div>
+              //   </div>
+              // </div>
+
               <div
                 key={item.cart_id}
-                className={`w-full py-3 px-6 rounded-sm cursor-pointer flex justify-between items-center ${bgClass}`}
+                className={`w-full py-3 sm:px-6 px-3 rounded-sm cursor-pointer flex justify-between items-center ${bgClass}`}
                 onClick={() => setSelectedProduct(item)}
               >
-                <div className="flex gap-2 items-center">
+                <div className="flex items-center gap-3">
                   <img
                     src={imageUrl}
                     alt="product"
-                    className="sm:w-12 sm:h-12 w-8 h-8 object-cover rounded"
+                    className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-md "
                   />
                   <div className="flex flex-col">
-                    <h1 className="font-medium sm:text-sm text-xs">
+                    <span className="font-semibold text-xs sm:text-sm truncate max-w-[140px]">
                       {medicine?.genericname || "N/A"}
-                    </h1>
-                    <h1 className="font-light sm:text-[11px] text-[9px]">
+                    </span>
+                    <span className="text-gray-500 text-[11px] sm:text-[13px] truncate max-w-[140px]">
                       {medicine?.brandname || "N/A"}
-                    </h1>
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-center">
-                  <h1 className="font-medium sm:text-base text-xs">
-                    {discountPercent > 0 ? (
-                      <div className="text-sm font-semibold text-[#333]">
-                        ₱ {discountedPrice}
-                        <span className="text-xs line-through text-gray-400 ml-2">
-                          ₱ {price}
-                        </span>
-                      </div>
-                    ) : (
-                      <h2 className="text-sm font-semibold text-[#333]">
+                <div className="flex flex-col items-end gap-1">
+                  {discountPercent > 0 ? (
+                    <div className="text-xs sm:text-sm font-semibold text-[#333]">
+                      ₱ {discountedPrice}
+                      <span className="text-[10px] sm:text-xs line-through text-gray-400 ml-1">
                         ₱ {price}
-                      </h2>
-                    )}
-                  </h1>
-                  <div className="flex items-center gap-2">
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="text-xs sm:text-sm font-semibold text-[#333]">
+                      ₱ {price}
+                    </div>
+                  )}
+
+                  <label className="flex items-center gap-1 text-[10px] sm:text-xs cursor-pointer select-none">
                     <input
                       type="checkbox"
                       checked={savedForLaterIds.includes(item.cart_id)}
                       onChange={() => handleSaveForLater(item.cart_id)}
-                      className="appearance-none bg-transparent border border-[#0070ba] cursor-pointer rounded-full sm:w-4 sm:h-4 w-2 h-2 checked:bg-blue-500"
+                      className="w-3 h-3 sm:w-4 sm:h-4 rounded-full border border-blue-600  cursor-pointer checked:bg-blue-500"
                     />
-                    <label className="text-[9px]">Save for Later</label>
-                  </div>
+                    Save for Later
+                  </label>
                 </div>
               </div>
             );

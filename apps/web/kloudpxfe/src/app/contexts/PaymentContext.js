@@ -13,6 +13,7 @@ export const PaymentProvider = ({ children }) => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [gcashNumber, setGcashNumber] = useState("");
     const [amountPaid, setAmountPaid] = useState("");
+    const [orderSuccess, setOrderSuccess] = useState([]);
     const { checkoutData } = useCheckout();
     const router = useRouter();
 
@@ -60,15 +61,22 @@ export const PaymentProvider = ({ children }) => {
                 payload,
                 true
             );
+            // console.log(res);
+            setOrderSuccess(res || [])
             toast.success("Payment submitted successfully!");
+            router.push("/Success");
             setGcashNumber("");
             setAmountPaid("");
             setSelectedFile(null);
-            router.push("/Success");
+
         } catch (error) {
             toast.error("Something went wrong!");
+            setOrderSuccess([])
         }
     };
+
+    // console.log(orderSuccess);
+    
 
     return (
         <PaymentContext.Provider
@@ -81,6 +89,7 @@ export const PaymentProvider = ({ children }) => {
                 amountPaid,
                 setAmountPaid,
                 handleSubmit,
+                orderSuccess,
             }}
         >
             {children}

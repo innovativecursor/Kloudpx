@@ -17,6 +17,7 @@ import AddItemsProvider from "./contexts/AddItemsContext.jsx";
 import { MeasurementProvider } from "./contexts/MeasurementContext.jsx";
 import FormDataProvider from "./contexts/FormDataContext.jsx";
 import GetDataProvider from "./contexts/GetDataContext.jsx";
+import OrderProvider from "./contexts/OrderContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <GoogleOAuthProvider clientId="573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com">
@@ -33,7 +34,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                         <GetDataProvider>
                           <CarouselProvider>
                             <GalleryProvider>
-                              <App />
+                              <OrderProvider>
+                                <App />
+                              </OrderProvider>
                             </GalleryProvider>
                           </CarouselProvider>
                         </GetDataProvider>

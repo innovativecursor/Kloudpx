@@ -64,10 +64,14 @@ const endpoints = {
   download: {
     get: `${baseUrl}/v1/excel/download-excel`,
   },
+  allorders: {
+    get: `${baseUrl}/v1/admin/order-history`,
+  },
   protected: {
     basic: `${baseUrl}/api/v1/protected`,
     admin: `${baseUrl}/api/v1/admin`,
   },
+
 };
 
 export default endpoints;
