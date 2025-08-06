@@ -6,7 +6,6 @@ import endpoints from "../config/endpoints";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-
 const PaymentContext = createContext();
 
 export const PaymentProvider = ({ children }) => {
@@ -14,7 +13,7 @@ export const PaymentProvider = ({ children }) => {
     const [gcashNumber, setGcashNumber] = useState("");
     const [amountPaid, setAmountPaid] = useState("");
     const [orderSuccess, setOrderSuccess] = useState([]);
-    const { checkoutData } = useCheckout();
+    const { checkoutData, deliveryData } = useCheckout();
     const router = useRouter();
 
     const handleFileChange = (e) => {
@@ -29,54 +28,57 @@ export const PaymentProvider = ({ children }) => {
     };
 
     const handleSubmit = async () => {
-        const cleanedBase64 = selectedFile?.split(",")[1];
+        const isCOD = deliveryData?.delivery_type === "cod";
 
-        const payload = {
-            checkout_session_id: String(checkoutData?.checkout_session_id),
-            payment_number: gcashNumber.trim(),
-            amount_paid: parseFloat(amountPaid).toFixed(2),
-            screenshot_base64: cleanedBase64,
-        };
+        console.log("isCOD:", isCOD);
 
-        if (!payload.checkout_session_id) {
+        const payload = isCOD
+            ? { checkout_session_id: String(checkoutData?.checkout_session_id) }
+            : {
+                checkout_session_id: String(checkoutData?.checkout_session_id),
+                payment_number: gcashNumber,
+                remark: String(amountPaid),
+                screenshot_base64: selectedFile,
+            };
+
+        console.log(payload);
+
+        // Validation
+        if (!payload.checkout_session_id && !payload.checkout_sessionid) {
             toast.error("Checkout session ID is missing.");
             return;
         }
 
-        if (!payload.amount_paid || isNaN(payload.amount_paid)) {
-            toast.error("Please enter a valid amount.");
-            return;
+        if (!isCOD) {
+            if (!amountPaid || isNaN(amountPaid)) {
+                toast.error("Please enter a valid amount.");
+                return;
+            }
+            if (!gcashNumber && !selectedFile) {
+                toast.error("Please provide either payment number or screenshot.");
+                return;
+            }
         }
-
-        if (!payload.payment_number && !payload.screenshot_base64) {
-            toast.error("Please provide either payment number or screenshot.");
-            return;
-        }
-
-        console.log(payload);
-
         try {
             const res = await postAxiosCall(
                 endpoints.paymentSubmit.add,
                 payload,
                 true
             );
-            // console.log(res);
-            setOrderSuccess(res || [])
+            setOrderSuccess(res || []);
             toast.success("Payment submitted successfully!");
             router.push("/Success");
-            setGcashNumber("");
-            setAmountPaid("");
-            setSelectedFile(null);
 
+            if (!isCOD) {
+                setGcashNumber("");
+                setAmountPaid("");
+                setSelectedFile(null);
+            }
         } catch (error) {
             toast.error("Something went wrong!");
-            setOrderSuccess([])
+            setOrderSuccess([]);
         }
     };
-
-    // console.log(orderSuccess);
-    
 
     return (
         <PaymentContext.Provider

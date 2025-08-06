@@ -82,7 +82,7 @@ const Screener = () => {
       <div className="mt-4">
         <input
           type="number"
-          placeholder="Amount Paid"
+          placeholder="please enter remark"
           value={amountPaid}
           onChange={(e) => setAmountPaid(e.target.value)}
           className="w-full border-b border-[#00243f] bg-transparent text-sm py-2 px-1 outline-none placeholder:text-[#00243f]"
@@ -102,3 +102,11 @@ const Screener = () => {
 };
 
 export default Screener;
+
+
+
+
+
+
+
+

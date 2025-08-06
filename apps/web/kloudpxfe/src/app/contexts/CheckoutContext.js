@@ -146,7 +146,7 @@ export const CheckoutProvider = ({ children }) => {
         { addressid: id },
         true
       );
-      console.log("Address selected:", res);
+      // console.log("Address selected:", res);
       toast.success("Address selected successfully!");
     } catch (error) {
       console.error("Error selecting address:", error.message);

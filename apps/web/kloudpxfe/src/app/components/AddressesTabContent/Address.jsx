@@ -10,6 +10,7 @@ import { useCheckout } from "@/app/contexts/CheckoutContext";
 import { IoMdHome } from "react-icons/io";
 import { FaRegEdit } from "react-icons/fa";
 import toast from "react-hot-toast";
+import Cod from "../DeliveryData/Cod";
 
 const Address = () => {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -24,6 +25,7 @@ const Address = () => {
     selectedAddress,
     selectedId,
     setSelectedId,
+    deliveryData,
   } = useCheckout();
 
   useEffect(() => {
@@ -32,7 +34,7 @@ const Address = () => {
     }
   }, []);
 
-  // console.log(getAllAddress, "my add ");
+  // console.log(deliveryData, "my add ");
 
   return (
     <>
@@ -149,7 +151,11 @@ const Address = () => {
         {deliveryType && !deliverySuccess && (
           <DeliveryType setDeliverySuccess={setDeliverySuccess} />
         )}
-        {deliverySuccess && <Screener />}
+        {deliverySuccess && deliveryData?.delivery_type === "cod" ? (
+          <Cod />
+        ) : (
+          deliverySuccess && <Screener />
+        )}
       </div>
     </>
   );
