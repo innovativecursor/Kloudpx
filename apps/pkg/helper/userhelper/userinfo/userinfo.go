@@ -1,7 +1,10 @@
 package userinfo
 
 import (
+	"fmt"
 	"log"
+	"math/rand"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/adminhelper/jwthelper"
@@ -31,4 +34,9 @@ func AddUserInfo(c *gin.Context, db *gorm.DB, email, firstName, lastName string)
 	}
 
 	return jwtToken, nil
+}
+
+func GenerateOrderNumber() string {
+	rand.Seed(time.Now().UnixNano())
+	return fmt.Sprintf("%08d", rand.Intn(1e8))
 }
