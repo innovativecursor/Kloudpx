@@ -13,6 +13,7 @@ import (
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/itemimage"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/medicine"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/oauth"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/orders"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/supplier"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/uploadexcel"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/middleware"
@@ -198,6 +199,10 @@ func Admin(db *gorm.DB) {
 		dashboard.GetMedicineCountSummary(c, db)
 	})
 
+	//orders
+	apiV1.GET("/admin/order-history", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		orders.GetAllOrders(c, db)
+	})
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
 	router.Run(":" + port)

@@ -234,3 +234,16 @@ type Payment struct {
 	User              User
 	CheckoutSession   CheckoutSession
 }
+
+type Order struct {
+	gorm.Model
+	UserID            uint
+	CheckoutSessionID uint
+	OrderNumber       string
+	TotalAmount       float64
+	DeliveryAddress   string
+	DeliveryType      string
+	Status            string          // e.g., "processing", "queued", "completed"
+	User              User            `gorm:"foreignKey:UserID"`
+	CheckoutSession   CheckoutSession `gorm:"foreignKey:CheckoutSessionID"`
+}
