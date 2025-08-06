@@ -10,6 +10,7 @@ import { useCheckout } from "@/app/contexts/CheckoutContext";
 import { IoMdHome } from "react-icons/io";
 import { FaRegEdit } from "react-icons/fa";
 import toast from "react-hot-toast";
+import Cod from "../DeliveryData/Cod";
 
 const Address = () => {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -24,6 +25,7 @@ const Address = () => {
     selectedAddress,
     selectedId,
     setSelectedId,
+    deliveryData,
   } = useCheckout();
 
   useEffect(() => {
@@ -32,7 +34,7 @@ const Address = () => {
     }
   }, []);
 
-  // console.log(getAllAddress, "my add ");
+  // console.log(deliveryData, "my add ");
 
   return (
     <>
@@ -74,30 +76,27 @@ const Address = () => {
                 {getAllAddress.map((address, index) => (
                   <div
                     key={address.ID || index}
-                    className="border border-[#0070ba] py-4 px-5 mt-10 flex justify-between gap-5 shadow items-start rounded-lg"
+                    className="border border-[#0070ba] w-full py-4 px-2  mt-10 flex justify-between sm:gap-5 gap-2 shadow items-center rounded-lg"
                   >
-                    <div className="flex flex-col items-center">
-                      <IoMdHome className="text-2xl" />
-                      <span className="font-medium text-sm text-gray-800">
-                        {address?.Barangay}
+                    <div className="flex flex-col  items-center text-center sm:w-1/6 sm:min-w-[80px] sm:max-w-[100px] w-12">
+                      <IoMdHome className="sm:text-2xl text-xl text-[#0070ba]" />
+                      <span className="font-medium sm:text-[10px] text-[9px] text-gray-800 break-words mt-1 w-full overflow-hidden text-ellipsis">
+                        {address?.NameResidency}
                       </span>
                     </div>
 
-                    <div>
-                      <div className="text-xs tracking-wide text-gray-600 text-justify">
-                        <span className="font-semibold">
-                          {address?.NameResidency}
-                        </span>
-                        , {address?.City}, {address?.Region},{" "}
-                        {address?.Province}, {address?.ZipCode}
+                    <div className="w-[70%] ">
+                      <div className="text-xs  tracking-wide text-gray-600 text-center">
+                        {address?.City}, {address?.Region}, {address?.Province},{" "}
+                        {address?.ZipCode}
                       </div>
                     </div>
 
-                    <div className="flex gap-2 mt8">
+                    <div className="flex w-[12%] sm:w-[10%]  gap-2 ">
                       <div>
                         <input
                           type="radio"
-                          className="w-5 h-5 rounded-full"
+                          className="sm:w-5 sm:h-5 cursor-pointer w-4 h-4 rounded-full"
                           name="selectedAddress"
                           checked={selectedId === address.ID}
                           onChange={() => setSelectedId(address.ID)}
@@ -110,7 +109,7 @@ const Address = () => {
                         }}
                         className="cursor-pointer"
                       >
-                        <FaRegEdit className="text-xl" />
+                        <FaRegEdit className="sm:text-xl" />
                       </div>
                     </div>
                   </div>
@@ -152,7 +151,11 @@ const Address = () => {
         {deliveryType && !deliverySuccess && (
           <DeliveryType setDeliverySuccess={setDeliverySuccess} />
         )}
-        {deliverySuccess && <Screener />}
+        {deliverySuccess && deliveryData?.delivery_type === "cod" ? (
+          <Cod />
+        ) : (
+          deliverySuccess && <Screener />
+        )}
       </div>
     </>
   );

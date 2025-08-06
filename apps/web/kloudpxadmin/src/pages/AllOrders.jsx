@@ -10,6 +10,8 @@ const AllOrders = () => {
     }
   }, []);
 
+  console.log(allOrders);
+
   return (
     <div className="md:p-4 mt-16 mx-[4vw]">
       <h1 className="text-3xl text-[#0070ba] font-bold text-center mb-6">
@@ -23,7 +25,7 @@ const AllOrders = () => {
               <th className="px-4 py-4 text-left">#</th>
               <th className="px-4 py-4 text-left">Order ID</th>
               <th className="px-4 py-4 text-left">Customer</th>
-              <th className="px-4 py-4 text-left">Amount</th>
+              <th className="px-4 py-4 text-left">remark</th>
               <th className="px-4 py-4 text-left">Payment No</th>
               <th className="px-4 py-4 text-left">Delivery</th>
               <th className="px-4 py-4 text-left">Status</th>
@@ -42,9 +44,7 @@ const AllOrders = () => {
                   {order.order_number}
                 </td>
                 <td className="px-4 py-3">{order.customer_name}</td>
-                <td className="px-4 py-3 font-semibold">
-                  ₹{order.amount_paid}
-                </td>
+                <td className="px-4 py-3 font-semibold">{order.remark}</td>
                 <td className="px-4 py-3">{order.payment_number}</td>
                 <td className="px-4 py-3 capitalize">{order.delivery_type}</td>
                 <td className="px-4 py-3">

@@ -15,6 +15,9 @@ const DeliveryType = ({ setDeliverySuccess }) => {
     }
   };
 
+  // console.log(selected);
+  
+
   return (
     <div className="mt-10">
       {/* Priority Delivery */}

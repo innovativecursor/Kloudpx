@@ -3,33 +3,28 @@ import Link from "next/link";
 function Footer() {
   return (
     <footer className="mt-8 sm:mt-16">
-      <div className="grid sm:grid-cols-3 grid-cols-1 gap-7 responsive-mx sm:pb-10 pb-6">
+      <div className="responsive-mx">
+        <Link href="/">
+          <div className="flex items-center gap-2 cursor-pointer">
+            <img
+              src="/assets/logo.webp"
+              alt="Upload"
+              className="object-contain max-w-[20%]"
+            />
+            <h2 className="font-bold lg:text-3xl md:text-2xl text-xl tracking-wide">
+              Kloud Pharma
+            </h2>
+          </div>
+        </Link>
+      </div>
+
+      <div className="grid md:grid-cols-3 grid-cols-1 gap-7 responsive-mx sm:pb-10 pb-6">
         <div className="">
-          <Link href="/">
-            <div className="flex items-center gap-2 cursor-pointer">
-              <img
-                src="/assets/logo.webp"
-                alt="Upload"
-                className="object-contain max-w-[25%]"
-              />
-              <h2 className="font-bold md:text-2xl text-xl tracking-wide">
-                Kloud Pharma
-              </h2>
-            </div>
-          </Link>
           <h1 className="text-[10px] mt-4 font-medium opacity-60 tracking-wide">
             Unit B, Emerald Jade Green Building, 282 Epifanio de los Santos Ave,
             Mandaluyong City, 1550 Metro Manila, Philippines
           </h1>
-          {/* <a
-            href="https://maps.app.goo.gl/QZdyqMRUBCszKHE17"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className="mt-5 underline text-[10px] font-medium opacity-70 tracking-wide">
-              Shop On Map
-            </h2>
-          </a> */}
+
           <div className="w-full mt-4" style={{ height: "200px" }}>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3860.410933793691!2d121.04991531509362!3d14.579738079658887!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397c83f60179b4f%3A0x4146deeab6e6d285!2sEmerald%20Jade%20Green%20Building!5e0!3m2!1sen!2sph!4v1691089012345!5m2!1sen!2sph"
@@ -42,31 +37,11 @@ function Footer() {
               title="Emerald Jade Green Building Location"
             ></iframe>
           </div>
-
-          <div className="flex items-center gap-2 mt-8 cursor-pointer">
-            <a
-              href="https://www.facebook.com/p/Kloud-Pharma-and-Exchange-Inc-61570477360673/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="border border-[#0070BA] rounded-full w-5 h-5 flex justify-center items-center"
-            >
-              <i className="ri-facebook-fill text-color text-xs"></i>
-            </a>
-
-            <a
-              href="https://ph.linkedin.com/in/kloud-house-873542159"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="border border-[#0070BA] rounded-full w-5 h-5 flex justify-center items-center"
-            >
-              <i className="text-xs ri-linkedin-fill text-color"></i>
-            </a>
-          </div>
         </div>
 
         <div className=" tracking-wide flex items-stretch">
           <div className="sm:w-px w-0 bg-gray-100"></div>
-          <div className="sm:px-8 sm:py-6 sm:flex-1">
+          <div className="md:px-8 sm:py-0 sm:flex-1">
             <h1 className="font-semibold text-color text-xs">NeeD Help</h1>
             <a
               href="tel:+639989721498"
@@ -87,8 +62,27 @@ function Footer() {
                 kloudpx@kloudpx.com
               </a>
             </div>
+            <div className="flex items-center gap-2 mt-4 cursor-pointer">
+              <a
+                href="https://www.facebook.com/p/Kloud-Pharma-and-Exchange-Inc-61570477360673/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="border border-[#0070BA] rounded-full w-5 h-5 flex justify-center items-center"
+              >
+                <i className="ri-facebook-fill text-color text-xs"></i>
+              </a>
+
+              <a
+                href="https://ph.linkedin.com/in/kloud-house-873542159"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="border border-[#0070BA] rounded-full w-5 h-5 flex justify-center items-center"
+              >
+                <i className="text-xs ri-linkedin-fill text-color"></i>
+              </a>
+            </div>
           </div>
-          <div className="sm:w-px w-0 bg-gray-100"></div>
+          <div className="md:w-px w-0 bg-gray-00"></div>
         </div>
 
         <div className="tracking-wide flex justify-between items-start">
