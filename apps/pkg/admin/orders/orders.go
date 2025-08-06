@@ -56,7 +56,7 @@ func GetAllOrders(c *gin.Context, db *gorm.DB) {
 			"order_number":     order.OrderNumber,
 			"customer_name":    fmt.Sprintf("%s %s", user.FirstName, user.LastName),
 			"payment_number":   payment.PaymentNumber,
-			"amount_paid":      payment.AmountPaid,
+			"remark":           payment.Remark,
 			"delivery_type":    order.DeliveryType,
 			"delivery_address": order.DeliveryAddress,
 			"status":           order.Status,
