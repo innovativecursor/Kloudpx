@@ -40,14 +40,14 @@ const Cod = () => {
         <button
           type="button"
           onClick={() => router.back()}
-          className="w-1/2 py-2 text-sm rounded-full border border-gray-300 hover:bg-gray-100 transition"
+          className="w-1/2 py-2 text-sm rounded-full cursor-pointer border border-gray-300 hover:bg-gray-100 transition"
         >
           Cancel
         </button>
         <button
           type="button"
           onClick={handleSubmit}
-          className="w-1/2 py-2 text-sm rounded-full bg-[#0070BA] hover:bg-[#005c96] text-white transition"
+          className="w-1/2 py-2 text-sm rounded-full bg-[#0070BA] cursor-pointer hover:bg-[#005c96] text-white transition"
         >
           Confirm Order
         </button>

@@ -54,7 +54,12 @@ const SwiperSlider = ({ data, title }) => {
                 </div>
 
                 {/* Product details */}
-                <div className="md:mt-3 mt-1 px-2">
+                <div
+                  onClick={() =>
+                    goToProductPage(product?.id, product?.genericname)
+                  }
+                  className="md:mt-3 mt-1 px-2 cursor-pointer"
+                >
                   <DetailsCard product={product} />
                 </div>
 
