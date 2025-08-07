@@ -317,6 +317,49 @@ func AddToCartOTC(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, gin.H{"message": "OTC medicine added to cart successfully"})
 }
 
+// select prescription
+func SelectPrescriptionByID(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	userObj, ok := user.(*models.User)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
+		return
+	}
+
+	// Get prescription ID from URL
+	prescriptionID := c.Param("id")
+
+	// Verify that the prescription belongs to the user
+	var prescription models.Prescription
+	if err := db.Where("id = ? AND user_id = ?", prescriptionID, userObj.ID).First(&prescription).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Prescription not found"})
+		return
+	}
+
+	// Unselect all prescriptions for this user
+	if err := db.Model(&models.Prescription{}).
+		Where("user_id = ?", userObj.ID).
+		Update("is_selected", false).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unselect prescriptions"})
+		return
+	}
+
+	// Mark the selected one
+	if err := db.Model(&prescription).Update("is_selected", true).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to select prescription"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":      "Prescription selected successfully",
+		"prescription": prescription,
+	})
+}
+
 func AddToCartMedicine(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -374,6 +417,16 @@ func AddToCartMedicine(c *gin.Context, db *gorm.DB) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart item"})
 			return
 		}
+
+		// Ensure prescription status is marked unsettled if needed
+		if existingCart.PrescriptionID != nil {
+			var prescription models.Prescription
+			if err := db.First(&prescription, *existingCart.PrescriptionID).Error; err == nil {
+				if prescription.Status != "unsettled" {
+					db.Model(&prescription).Update("status", "unsettled")
+				}
+			}
+		}
 		c.JSON(http.StatusOK, gin.H{"message": "Cart item updated with new prescription"})
 		return
 	}
@@ -391,6 +444,16 @@ func AddToCartMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// Ensure prescription status is marked unsettled if needed
+	// Ensure prescription status is marked unsettled if needed
+	if entry.PrescriptionID != nil {
+		var prescription models.Prescription
+		if err := db.First(&prescription, *entry.PrescriptionID).Error; err == nil {
+			if prescription.Status != "unsettled" {
+				db.Model(&prescription).Update("status", "unsettled")
+			}
+		}
+	}
 	c.JSON(http.StatusOK, gin.H{"message": "Medicine added to cart successfully"})
 }
 

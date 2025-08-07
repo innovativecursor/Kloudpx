@@ -113,6 +113,8 @@ type Prescription struct {
 	User          User `gorm:"foreignKey:UserID"`
 	UploadedImage string
 	Status        string // "unsettled", "fulfilled"
+	IsSelected    bool   `gorm:"default:false"`
+	Remarks       string `gorm:"type:text"`
 }
 
 // Many-to-many (cart) between prescription and medicines
@@ -126,7 +128,8 @@ type Cart struct {
 	Quantity          int
 	IsOTC             bool // NEW: explicitly marks whether it’s OTC
 	CheckoutSessionID *uint
-	IsSavedForLater   bool `gorm:"default:false"`
+	IsSavedForLater   bool   `gorm:"default:false"`
+	MedicineStatus    string `gorm:"default:'unsettled'"` // "approved", "rejected", "unsettled"
 }
 
 type CarouselImage struct {
