@@ -34,7 +34,27 @@ const CheckoutContent = ({ setSelectedProduct }) => {
     await toggleSaveForLater(cartId);
   };
 
+  // const handleCheckout = async () => {
+  //   try {
+  //     await doCheckout();
+  //     router.push("/Address");
+  //   } catch (error) {
+  //     toast.error("Checkout failed, please try again.");
+  //   }
+  // };
+
   const handleCheckout = async () => {
+    const allItemsSavedForLater = validItems.every((item) =>
+      savedForLaterIds.includes(item.cart_id)
+    );
+
+    if (validItems.length === 0 || allItemsSavedForLater) {
+      toast.error(
+        "No items available for checkout. Please move items back from 'Save for Later'."
+      );
+      return;
+    }
+
     try {
       await doCheckout();
       router.push("/Address");
@@ -75,54 +95,6 @@ const CheckoutContent = ({ setSelectedProduct }) => {
             const bgClass = "bg-green-50";
 
             return (
-              // <div
-              //   key={item.cart_id}
-              //   className={`w-full py-3 sm:px-6 px-3 rounded-sm cursor-pointer flex justify-between items-center ${bgClass}`}
-              //   onClick={() => setSelectedProduct(item)}
-              // >
-              //   <div className="flex gap-2 items-center">
-              //     <img
-              //       src={imageUrl}
-              //       alt="product"
-              //       className="sm:w-12 sm:h-12 w-8 h-8 object-cover rounded"
-              //     />
-              //     <div className="flex flex-col">
-              //       <h1 className="font-medium sm:text-sm text-[10px]">
-              //         {medicine?.genericname || "N/A"}
-              //       </h1>
-              //       <h1 className="font-light sm:text-[11px] text-[9px]">
-              //         {medicine?.brandname || "N/A"}
-              //       </h1>
-              //     </div>
-              //   </div>
-
-              //   <div className="flex flex-col items-center">
-              //     <h1 className="font-medium sm:text-base text-xs">
-              //       {discountPercent > 0 ? (
-              //         <div className="text-sm font-semibold text-[#333]">
-              //           ₱ {discountedPrice}
-              //           <span className="text-xs line-through text-gray-400 ml-2">
-              //             ₱ {price}
-              //           </span>
-              //         </div>
-              //       ) : (
-              //         <h2 className="text-sm font-semibold text-[#333]">
-              //           ₱ {price}
-              //         </h2>
-              //       )}
-              //     </h1>
-              //     <div className="flex items-center gap-2">
-              //       <input
-              //         type="checkbox"
-              //         checked={savedForLaterIds.includes(item.cart_id)}
-              //         onChange={() => handleSaveForLater(item.cart_id)}
-              //         className="appearance-none bg-transparent border border-[#0070ba] cursor-pointer rounded-full sm:w-4 sm:h-4 w-2 h-2 checked:bg-blue-500"
-              //       />
-              //       <label className="text-[9px]">Save for Later</label>
-              //     </div>
-              //   </div>
-              // </div>
-
               <div
                 key={item.cart_id}
                 className={`w-full py-3 sm:px-6 px-3 rounded-sm cursor-pointer flex justify-between items-center ${bgClass}`}
@@ -187,12 +159,27 @@ const CheckoutContent = ({ setSelectedProduct }) => {
         <div className="w-[60%]">
           <button
             className={`bg-[#0070BA] text-white hover:bg-[#005c96] sm:text-[11px] text-[8px] w-full py-3 rounded-full font-semibold ${
-              itemCount === 0
+              itemCount === 0 ||
+              validItems.every((item) =>
+                savedForLaterIds.includes(item.cart_id)
+              )
                 ? "opacity-50 cursor-not-allowed"
                 : "cursor-pointer"
             }`}
-            onClick={itemCount === 0 ? null : handleCheckout}
-            disabled={itemCount === 0}
+            onClick={
+              itemCount === 0 ||
+              validItems.every((item) =>
+                savedForLaterIds.includes(item.cart_id)
+              )
+                ? null
+                : handleCheckout
+            }
+            disabled={
+              itemCount === 0 ||
+              validItems.every((item) =>
+                savedForLaterIds.includes(item.cart_id)
+              )
+            }
           >
             Proceed to Checkout
           </button>

@@ -15,7 +15,7 @@ const DeliveryCart = () => {
 
   useEffect(() => {}, [deliveryData]);
 
-  // console.log("Delivery Data updated:", deliveryData);
+  console.log("Delivery Data updated:", items);
 
   return (
     <div>
