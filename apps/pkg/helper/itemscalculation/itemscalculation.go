@@ -9,9 +9,12 @@ import (
 )
 
 func CalculateTotalStockByBrandName(db *gorm.DB, brandName, power string) (int, error) {
+	brandName = strings.TrimSpace(strings.ToLower(brandName))
+	power = strings.TrimSpace(strings.ToLower(power))
+
 	var medicines []models.Medicine
 	if err := db.
-		Where("LOWER(brand_name) = ? AND LOWER(power) = ?", strings.ToLower(brandName), strings.ToLower(power)).
+		Where("LOWER(brand_name) = ? AND LOWER(power) = ?", brandName, power).
 		Find(&medicines).Error; err != nil {
 		return 0, err
 	}
@@ -27,7 +30,6 @@ func CalculateTotalStockByBrandName(db *gorm.DB, brandName, power string) (int, 
 	return total, nil
 }
 
-// convert to pieces first
 func getAvailableInPieces(med models.Medicine) int {
 	if med.UnitOfMeasurement == "per box" {
 		return med.MeasurementUnitValue * med.NumberOfPiecesPerBox
@@ -35,10 +37,8 @@ func getAvailableInPieces(med models.Medicine) int {
 	return med.MeasurementUnitValue
 }
 
-// update quantity back
 func updateStockAfterDeduction(med *models.Medicine, newTotalPieces int) {
 	if med.UnitOfMeasurement == "per box" {
-		// Keep full boxes only, truncate remainder
 		med.MeasurementUnitValue = newTotalPieces / med.NumberOfPiecesPerBox
 	} else {
 		med.MeasurementUnitValue = newTotalPieces
@@ -46,9 +46,12 @@ func updateStockAfterDeduction(med *models.Medicine, newTotalPieces int) {
 }
 
 func DeductStockByBrandAndPower(db *gorm.DB, brandName, power string, quantityToDeduct int) error {
+	brandName = strings.TrimSpace(strings.ToLower(brandName))
+	power = strings.TrimSpace(strings.ToLower(power))
+
 	var medicines []models.Medicine
 	if err := db.
-		Where("LOWER(brand_name) = ? AND LOWER(power) = ?", strings.ToLower(brandName), strings.ToLower(power)).
+		Where("LOWER(brand_name) = ? AND LOWER(power) = ?", brandName, power).
 		Order("id asc").
 		Find(&medicines).Error; err != nil {
 		return fmt.Errorf("failed to fetch medicines for deduction: %w", err)
