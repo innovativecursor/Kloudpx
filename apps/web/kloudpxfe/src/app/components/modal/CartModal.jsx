@@ -29,11 +29,6 @@ const CartModal = ({ isOpen, onClose }) => {
     return null;
   }
 
-  // const handleCheckout = async () => {
-  //   router.push("/Checkout");
-  //   onClose();
-  // };
-
   const handleCheckout = async () => {
     setCheckoutLoading(true);
     try {
@@ -156,15 +151,15 @@ const CartModal = ({ isOpen, onClose }) => {
                       "bg-red-100 border border-red-400": isRejected,
                     }
                   )}
+                  onClick={() => {
+                    onClose();
+                    goToProductPage(
+                      item?.medicine?.id,
+                      item?.medicine?.genericname
+                    );
+                  }}
                 >
-                  <div
-                    onClick={() =>
-                      goToProductPage(
-                        item?.medicine?.id,
-                        item?.medicine?.genericname
-                      )
-                    }
-                  >
+                  <div>
                     <img
                       src={imageUrl}
                       alt="product"
@@ -214,7 +209,7 @@ const CartModal = ({ isOpen, onClose }) => {
                     {/* Prescription Status  */}
                     {isUnsettled && (
                       <p className="text-xs text-red-500 mt-1">
-                        Waiting for pharmacist approval before purchase
+                        Waiting for pharmacist approval
                       </p>
                     )}
                     {isRejected && (
