@@ -43,12 +43,12 @@ func Pharmacist(db *gorm.DB) {
 		pharmacistflow.GetPrescriptionCart(c, db)
 	})
 
-	apiV1.POST("/pharmacist/submit-prescriptions/:id", middleware.JWTMiddlewarePharmacist(db), func(c *gin.Context) {
-		pharmacistflow.SubmitPrescription(c, db)
+	apiV1.POST("/pharmacist/submit-prescriptions/:cart_id", middleware.JWTMiddlewarePharmacist(db), func(c *gin.Context) {
+		pharmacistflow.ApproveMedicineInPrescription(c, db)
 	})
 
-	apiV1.PUT("/pharmacist/reject-prescriptions/:id", middleware.JWTMiddlewarePharmacist(db), func(c *gin.Context) {
-		pharmacistflow.RejectPrescription(c, db)
+	apiV1.PUT("/pharmacist/reject-prescriptions/:cart_id", middleware.JWTMiddlewarePharmacist(db), func(c *gin.Context) {
+		pharmacistflow.RejectMedicineInPrescription(c, db)
 	})
 	//pharmacist info
 	apiV1.GET("/pharmacist/info", middleware.JWTMiddlewarePharmacist(db), func(c *gin.Context) {

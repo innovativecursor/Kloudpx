@@ -172,3 +172,28 @@ func UploadPrescription(c *gin.Context, db *gorm.DB) {
 		"prescription_id": prescription.ID,
 	})
 }
+
+func GetPrescriptionsByUser(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+
+	userObj, ok := user.(*models.User)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
+		return
+	}
+
+	var prescriptions []models.Prescription
+	if err := db.Where("user_id = ?", userObj.ID).Order("created_at DESC").Find(&prescriptions).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch prescriptions"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":       "Prescriptions fetched successfully",
+		"prescriptions": prescriptions,
+	})
+}
