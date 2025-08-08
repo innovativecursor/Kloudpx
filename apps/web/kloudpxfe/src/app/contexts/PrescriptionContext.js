@@ -2,7 +2,7 @@
 import { createContext, useContext, useState } from "react";
 import toast from "react-hot-toast";
 import { useAuth } from "@/app/contexts/AuthContext";
-import { postAxiosCall } from "@/app/lib/axios";
+import { getAxiosCall, postAxiosCall, updateAxiosCall } from "@/app/lib/axios";
 import endpoints from "@/app/config/endpoints";
 import useImageCompressor from "@/app/hooks/useImageCompressor";
 import { useCartContext } from "./CartContext";
@@ -18,6 +18,8 @@ export const PrescriptionProvider = ({ children }) => {
   const [uploadedPrescriptionId, setUploadedPrescriptionId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [pendingCartData, setPendingCartData] = useState(null);
+  const [allPrescription, setAllPrescription] = useState([]);
+  const [selectedPrescriptionId, setSelectedPrescriptionId] = useState(null);
   const { getAllCartData } = useCartContext();
 
   // console.log(pendingCartData);
@@ -46,10 +48,10 @@ export const PrescriptionProvider = ({ children }) => {
         payload,
         true
       );
-      const prescriptionId = res?.prescription_id;
-      // console.log(prescriptionId);
 
+      const prescriptionId = res?.prescription_id;
       setUploadedPrescriptionId(prescriptionId);
+      getAllPrescription();
 
       if (res?.url) {
         const img = new Image();
@@ -57,14 +59,8 @@ export const PrescriptionProvider = ({ children }) => {
 
         img.onload = async () => {
           setUploadedImage(res.url);
-          // toast.success("Prescription uploaded successfully");
           setIsOpen(false);
           setLoading(false);
-
-          // console.log("🧾 Debug Prescription Payload:");
-          // console.log("prescriptionId:", prescriptionId);
-          // console.log("medicineId:", medicineid);
-          // console.log("quantity:", quantity);
 
           if (!medicineid || !prescriptionId || !quantity) {
             console.error("❌ Missing data in prescription cart call", {
@@ -76,18 +72,13 @@ export const PrescriptionProvider = ({ children }) => {
             return;
           }
 
-          await postAxiosCall(
-            // "http://localhost:10003/v1/user/add-to-cart-medicine",
-            endpoints.prescriptioncart.add,
-            {
-              medicineid,
-              prescriptionid: prescriptionId,
-              quantity,
-            },
-            true
+          // ✅ Use the new reusable function here
+          await addMedicineToCartWithPrescription(
+            medicineid,
+            prescriptionId,
+            quantity
           );
-          toast.success("Item added to cart with prescription!");
-          getAllCartData();
+          setIsOpen(false);
         };
 
         img.onerror = () => {
@@ -99,7 +90,67 @@ export const PrescriptionProvider = ({ children }) => {
       }
     } catch (err) {
       toast.error("Upload failed. Try again.");
+      console.error("Upload error:", err);
       setLoading(false);
+    }
+  };
+
+  const getAllPrescription = async () => {
+    if (!token) return;
+    try {
+      const res = await getAxiosCall(endpoints.prescription.get, {}, true);
+      setAllPrescription(res?.data?.prescriptions || []);
+    } catch (error) {
+      setAllPrescription([]);
+    }
+  };
+
+  const handleSelectedPrescription = async (id) => {
+    console.log(id);
+    try {
+      const res = await updateAxiosCall(
+        endpoints.selectedprescription.put,
+        id,
+        {},
+        true
+      );
+      // setSelectedPrescriptionId(null);
+    } catch (error) {
+      console.error("Error selecting prescription:", error);
+    }
+  };
+
+  const addMedicineToCartWithPrescription = async (
+    medicineid,
+    prescriptionid,
+    quantity
+  ) => {
+    if (!medicineid || !prescriptionid || !quantity) {
+      toast.error("Missing data for cart.");
+      console.error("Missing params:", {
+        medicineid,
+        prescriptionid,
+        quantity,
+      });
+      throw new Error("Missing data");
+    }
+    try {
+      await postAxiosCall(
+        endpoints.prescriptioncart.add,
+        {
+          medicineid,
+          prescriptionid,
+          quantity,
+        },
+        true
+      );
+      toast.success("Item added to cart with prescription!");
+      setSelectedPrescriptionId(null);
+      getAllCartData();
+    } catch (error) {
+      console.error("Cart error response:", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Failed to add item to cart.");
+      throw error;
     }
   };
 
@@ -115,6 +166,12 @@ export const PrescriptionProvider = ({ children }) => {
         uploadedPrescriptionId,
         pendingCartData,
         setPendingCartData,
+        getAllPrescription,
+        allPrescription,
+        handleSelectedPrescription,
+        selectedPrescriptionId,
+        setSelectedPrescriptionId,
+        addMedicineToCartWithPrescription,
       }}
     >
       {children}

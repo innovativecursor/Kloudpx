@@ -23,7 +23,6 @@ export const CartProvider = ({ children }) => {
 
     try {
       await postAxiosCall(
-        // "/v1/user/add-to-cart"
         endpoints.cart.add,
         { medicineid, quantity },
         true

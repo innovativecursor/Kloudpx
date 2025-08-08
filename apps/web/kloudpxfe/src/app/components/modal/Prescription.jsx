@@ -1,7 +1,14 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { usePrescriptionContext } from "@/app/contexts/PrescriptionContext";
+import { useAuth } from "@/app/contexts/AuthContext";
+import toast from "react-hot-toast";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import "swiper/css";
+// import "swiper/css/pagination";
+import "swiper/css/navigation";
 
 const Prescription = () => {
   const {
@@ -11,17 +18,37 @@ const Prescription = () => {
     uploadPrescription,
     loading,
     pendingCartData,
-    uploadedPrescriptionId,
+    handleSelectedPrescription,
+    selectedPrescriptionId,
+    setSelectedPrescriptionId,
+    addMedicineToCartWithPrescription,
   } = usePrescriptionContext();
+  const { token } = useAuth();
+  const fallbackImage = "/assets/fallback.png";
+  const { getAllPrescription, allPrescription } = usePrescriptionContext();
+  const swiperRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const medicineid = pendingCartData?.medicineid;
+  const quantity = pendingCartData?.quantity;
+
+  useEffect(() => {
+    if (!allPrescription || allPrescription.length === 0) {
+      getAllPrescription();
+    }
+  }, []);
+
+  console.log(allPrescription);
 
   const modalRef = useRef(null);
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) uploadPrescription(file);
+  if (!isOpen) return null;
+
+  const handleSlideChange = (swiper) => {
+    setActiveIndex(swiper.activeIndex);
   };
 
-  if (!isOpen) return null;
+  const totalSlides = allPrescription ? allPrescription.length : 0;
 
   return (
     <>
@@ -31,7 +58,7 @@ const Prescription = () => {
         </div>
       )}
       <div
-        className="fixed inset-0 bg-black/40 z-40"
+        className="fixed inset-0 bg-black/40 cursor-pointer z-40"
         onClick={() => setIsOpen(false)}
       ></div>
 
@@ -40,35 +67,193 @@ const Prescription = () => {
         role="dialog"
         aria-modal="true"
         ref={modalRef}
-        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white shadow-lg z-50 md:h-fit md:overflow-hidden max-h-[80%] overflow-scroll w-[95%] lg:max-w-6xl md:max-w-4xl rounded-2xl "
+        className="fixed top-1/2 left-1/2 -translate-x-1/2 cursor-pointer -translate-y-1/2 bg-white shadow-lg z-50  md:overflow-hidden md:h-fit h-fit md:mx-0  overflow-scroll w-[90%]  md:max-w-4xl rounded-xl "
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="grid md:grid-cols-2 grid-cols-1 gap-6">
-          {/* Left side - Upload */}
-             <div className="flex justify-end mr-5 mt-2 items-end md:hidden">
-              <button
-                onClick={() => setIsOpen(false)}
-                className=" text-gray-500 cursor-pointer hover:text-gray-900 font-bold"
-              >
-                 ✕
-              </button>
+        {/* all prescriptions... */}
+
+        {allPrescription.length > 0 ? (
+          <>
+            <div className="md:mt-6 mt-1 md:py-0 md:px-0 px-4">
+              <div className="flex md:hidden justify-end">
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className=" text-gray-500 cursor-pointer hover:text-gray-900 font-bold"
+                >
+                  ✕
+                </button>
+              </div>
+              <p className="md:text-center text-start tracking-wider text-base mb-5 font-semibold dark-text">
+                Would You Like To Upload A Prescription?
+              </p>
+
+              <div className=" flex items-center justify-center gap-2">
+                <button
+                  onClick={() => swiperRef.current?.slidePrev()}
+                  className={`cursor-pointer py-2 px-4 md:block hidden rounded font-semibold ${
+                    activeIndex > 0
+                      ? " text-[#0070ba]"
+                      : " text-gray-500 cursor-not-allowed"
+                  }`}
+                  disabled={activeIndex === 0}
+                >
+                  <i className="ri-arrow-left-s-fill text-3xl"></i>
+                </button>
+
+                <div className="flex-1 md:max-w-[80%] w-full">
+                  {/* Swiper for md and lg */}
+                  <div className="hidden md:block">
+                    <Swiper
+                      modules={[Navigation]}
+                      onSwiper={(swiper) => (swiperRef.current = swiper)}
+                      spaceBetween={10}
+                      slidesPerView={1}
+                      onSlideChange={handleSlideChange}
+                      breakpoints={{
+                        768: {
+                          slidesPerView: 1,
+                          spaceBetween: 10,
+                        },
+                        1024: {
+                          slidesPerView: 1,
+                          spaceBetween: 10,
+                        },
+                      }}
+                    >
+                      {Array.isArray(allPrescription) &&
+                      allPrescription.length > 0
+                        ? allPrescription.map(({ ID, UploadedImage }) => (
+                            <SwiperSlide key={ID} className="relative">
+                              <img
+                                src={UploadedImage || fallbackImage}
+                                alt="Prescription"
+                                className={`cursor-pointer w-full h-56 object-cover rounded-2xl shadow`}
+                                onClick={() => {
+                                  setSelectedPrescriptionId(ID);
+                                  handleSelectedPrescription(ID);
+                                }}
+                              />
+                              {selectedPrescriptionId === ID && (
+                                <div className="absolute top-2 right-2 bg-green-600 rounded-full w-8 h-8 flex items-center justify-center text-white text-xl font-bold pointer-events-none">
+                                  ✔
+                                </div>
+                              )}
+                            </SwiperSlide>
+                          ))
+                        : null}
+                    </Swiper>
+                  </div>
+
+                  <div className="md:hidden max-h-64 sm:max-h-72 overflow-y-auto flex flex-col sm:gap-6 gap-4">
+                    {Array.isArray(allPrescription) &&
+                    allPrescription.length > 0
+                      ? allPrescription.map(({ ID, UploadedImage }) => (
+                          <div
+                            key={ID}
+                            className="relative  flex-shrink-0 cursor-pointer"
+                          >
+                            <img
+                              src={UploadedImage || fallbackImage}
+                              alt="Prescription"
+                              className={`w-full h-32 sm:h-40 object-cover rounded-lg shadow`}
+                              onClick={() => {
+                                setSelectedPrescriptionId(ID);
+                                handleSelectedPrescription(ID);
+                              }}
+                            />
+                            {selectedPrescriptionId === ID && (
+                              <div className="absolute top-2 right-2 bg-green-600 rounded-full w-8 h-8 flex items-center justify-center text-white text-xl font-bold pointer-events-none">
+                                ✔
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      : null}
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => swiperRef.current?.slideNext()}
+                  className={`cursor-pointer py-2 px-4 rounded  md:block hidden font-semibold ${
+                    activeIndex < totalSlides - 1
+                      ? " text-[#0070ba]"
+                      : " text-gray-500 cursor-not-allowed"
+                  }`}
+                  disabled={activeIndex === totalSlides - 1}
+                >
+                  <i className="ri-arrow-right-s-fill text-3xl"></i>
+                </button>
+              </div>
             </div>
 
-          <div className="flex flex-col justify-center items-center md:p-4">
-         
+            <div className="flex justify-center items-center md:px-0 px-4">
+              <button
+                className="bg-[#0070ba] text-sm cursor-pointer md:w-40 w-full  shadow h-10 font-medium mt-6 text-white rounded-md"
+                onClick={async () => {
+                  if (!selectedPrescriptionId) {
+                    toast.error("Please select a prescription first.");
+                    return;
+                  }
 
-                <h2 className="sm:text-3xl text-xl font-semibold md:mb-2">
+                  if (!token) {
+                    toast.error("User not authenticated.");
+                    return;
+                  }
+
+                  if (!medicineid || !quantity) {
+                    toast.error("Invalid medicine or quantity.");
+                    return;
+                  }
+
+                  try {
+                    await addMedicineToCartWithPrescription(
+                      medicineid,
+                      selectedPrescriptionId,
+                      quantity
+                    );
+
+                    setIsOpen(false);
+                  } catch (error) {
+                    console.error(
+                      "Cart error response:",
+                      error.response?.data || error.message
+                    );
+                    toast.error(
+                      error.response?.data?.message ||
+                        "Failed to add item to cart."
+                    );
+                  }
+                }}
+              >
+                Next
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="text-center text-gray-500 pt-10">
+              Please upload the prescription.
+            </div>
+          </>
+        )}
+
+        <div className="grid md:grid-cols-2 grid-cols-1 md:border-t-4 mt-9 border-[#EDF6FD] gap-6">
+          <div className="flex flex-col justify-center items-center md:p-4">
+            <h2 className="sm:text-base text-xs md:block hidden font-medium dark-text ">
               Upload Prescription
             </h2>
-            <h1 className="text-sm opacity-50 mt-4 font-medium mb-6 text-center">
+            <h1 className="text-[11px] opacity-50 md:block hidden font-medium mb-6 text-center">
               Please upload image of valid prescription from your doctor.
             </h1>
 
-            <label className="flex flex-col items-center justify-center border-2 border-dashed border-[#0070BA]/40 rounded-lg p-4 w-48 h-48 cursor-pointer hover:border-[#0070BA]">
+            <label
+              className="flex flex-col md:mb-0 mb-8 items-center justify-center border md:px-0 px-4 border-dashed border-gray-900  rounded-lg md:p-4
+             md:w-full w-[90%] bg-[#F6F5FA] md:h-48 h-32 cursor-pointer hover:border-[#0070BA]"
+            >
               <img
                 src="https://cdn-icons-png.flaticon.com/512/4147/4147103.png"
                 alt="Upload New"
-                className="w-20 h-20 mb-2"
+                className="md:w-20 md:h-20 w-14 h-14 mb-2"
               />
               <h1 className="text-base font-semibold text-[#0070BA]">
                 Upload New
@@ -88,75 +273,21 @@ const Prescription = () => {
                 }}
               />
             </label>
-
-            <hr className="border opacity-70 border-gray-300 mt-8 mb-6 w-full" />
-
-            <h1 className="text-sm tracking-wide text-center">
-              <span className="font-bold text-[#0070BA]">Note:</span> Always
-              upload a clean version of your prescription for better result.
-            </h1>
-            {/* <div className="flex flex-col justify-center items-center md:p-4">
-            <h2 className="sm:text-3xl text-xl font-semibold md:mb-2">
-              Upload Prescription
-            </h2>
-            <p className="text-sm opacity-50 mt-4 font-medium mb-6 text-center">
-              Please upload image of valid prescription from your doctor.
-            </p>
-
-            <label className="flex flex-col items-center justify-center border-2 border-dashed border-[#0070BA]/40 rounded-lg p-4 w-48 h-48 cursor-pointer hover:border-[#0070BA]">
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/4147/4147103.png"
-                alt="Upload New"
-                className="w-20 h-20 mb-2"
-              />
-              <p className="text-base font-semibold text-[#0070BA]">
-                Upload New
-              </p>
-
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-
-                  if (file && pendingCartData) {
-                    const { medicineid, quantity } = pendingCartData;
-                    uploadPrescription(file, medicineid, quantity);
-                  }
-                }}
-              />
-            </label>
-
-            <hr className="border opacity-70 border-gray-300 mt-8 mb-6 w-full" />
-
-            <p className="text-sm tracking-wide text-center">
-              <span className="font-bold text-[#0070BA]">Note:</span> Always
-              upload a clean version of your prescription for better result.
-            </p>
-            </div> */}
           </div>
 
           {/* Right side - Guide / Preview */}
-          <div className="bg-[#EDF6FD] p-4">
-            <div className="md:flex justify-end hidden">
-              <button
-                onClick={() => setIsOpen(false)}
-                className="mb-4 text-gray-500 cursor-pointer hover:text-gray-900 font-bold"
-              >
-                Close ✕
-              </button>
-            </div>
+          <div className="bg-[#F6F5FA] md:block hidden ">
+            <div className="md:flex justify-end hidden"></div>
             <div className=" rounded-xl py-6 px-6 flex flex-col items-center justify-center">
-              <h3 className="sm:text-2xl text-base font-semibold mb-4">
-                Guide for a valid prescription
+              <h3 className="sm:text-sm dark-text font-semibold mb-4">
+                Guide for Prescription
               </h3>
-              <div className="w-full h-72 overflow-hidden rounded-md border border-gray-300 flex items-center justify-center">
+              <div className="w-full h-40 overflow-hidden rounded-md border border-gray-300 flex items-center justify-center">
                 {uploadedImage ? (
                   <img
                     src={uploadedImage}
                     alt="Prescription Preview"
-                    className="object-contain w-full p-5 h-full rounded-md"
+                    className="object-contain w-full p-5 h-40 rounded-md"
                   />
                 ) : (
                   <h1 className="text-center text-sm opacity-60">
@@ -164,11 +295,11 @@ const Prescription = () => {
                   </h1>
                 )}
               </div>
-              <div className="flex flex-col items-center justify-center tracking-wider mt-5">
-                <h1 className="sm:text-lg text-base font-semibold text-gray-700 mt-2">
+              <div className="flex flex-col items-center justify-center tracking-wider mt-2">
+                <h1 className="sm:text-xs text-[11px] font-semibold text-gray-700 mt-2">
                   Doctor Signature & Stamp:
                 </h1>
-                <h1 className="text-center opacity-60 md:text-sm text-xs mt-2">
+                <h1 className="text-center opacity-60 text-[11px] mt-2">
                   The prescription with signature and stamp of doctor to be
                   considered valid.
                 </h1>
