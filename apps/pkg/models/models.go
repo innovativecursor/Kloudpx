@@ -114,7 +114,6 @@ type Prescription struct {
 	UploadedImage string
 	Status        string // "unsettled", "fulfilled"
 	IsSelected    bool   `gorm:"default:false"`
-	Remarks       string `gorm:"type:text"`
 }
 
 // Many-to-many (cart) between prescription and medicines
@@ -212,6 +211,7 @@ type Address struct {
 	Barangay      string
 	City          string
 	ZipCode       string
+	PhoneNumber   string
 	IsDefault     bool
 }
 

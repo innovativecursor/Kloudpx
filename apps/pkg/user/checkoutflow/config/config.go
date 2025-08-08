@@ -8,6 +8,7 @@ type AddressRequest struct {
 	Barangay      string `json:"barangay"`
 	City          string `json:"city"`
 	ZipCode       string `json:"zipcode"`
+	PhoneNumber   string `json:"phonenumber"`
 	IsDefault     bool   `json:"isdefault"`
 }
 

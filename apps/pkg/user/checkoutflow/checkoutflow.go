@@ -74,31 +74,25 @@ func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 	err := db.Where("user_id = ? AND status = ?", userObj.ID, "pending").First(&existingSession).Error
 	sessionExists := err == nil
 
-	// Fetch all active (not saved) cart items
-	var cartItems []models.Cart
-	if err := db.Preload("Medicine").
+	// Fetch all active (not saved) cart items — prescription status no longer matters
+	var eligibleItems []models.Cart
+	if err := db.Preload("Medicine.Generic").
+		Preload("Medicine.Category").
+		Preload("Medicine.ItemImages").
 		Preload("Prescription").
 		Where("user_id = ? AND is_saved_for_later = false", userObj.ID).
-		Find(&cartItems).Error; err != nil {
+		Find(&eligibleItems).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart items"})
 		return
-	}
-
-	var eligibleItems []models.Cart
-	for _, item := range cartItems {
-		if item.Medicine.Prescription {
-			if item.Prescription != nil && item.Prescription.Status == "fulfilled" {
-				eligibleItems = append(eligibleItems, item)
-			}
-		} else {
-			eligibleItems = append(eligibleItems, item)
-		}
 	}
 
 	if len(eligibleItems) == 0 && sessionExists {
 		// No new items but existing session exists — return session items
 		var linkedItems []models.Cart
-		if err := db.Preload("Medicine").
+		if err := db.Preload("Medicine.Generic").
+			Preload("Medicine.Category").
+			Preload("Medicine.ItemImages").
+			Preload("Prescription").
 			Where("checkout_session_id = ? AND is_saved_for_later = false", existingSession.ID).
 			Find(&linkedItems).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch session items"})
@@ -113,7 +107,7 @@ func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 	}
 
 	if len(eligibleItems) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No eligible items available for checkout"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No items available for checkout"})
 		return
 	}
 
@@ -141,9 +135,12 @@ func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 		}
 	}
 
-	// Fetch all linked items again (some might’ve been linked in past)
+	// Fetch all linked items again
 	var finalItems []models.Cart
-	if err := db.Preload("Medicine").
+	if err := db.Preload("Medicine.Generic").
+		Preload("Medicine.Category").
+		Preload("Medicine.ItemImages").
+		Preload("Prescription").
 		Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
 		Find(&finalItems).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load session cart items"})
@@ -156,6 +153,7 @@ func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 		"items":               buildCartResponse(finalItems, db),
 	})
 }
+
 func buildCartResponse(cartItems []models.Cart, db *gorm.DB) []config.CartResponse {
 	var response []config.CartResponse
 
@@ -220,7 +218,6 @@ func buildCartResponse(cartItems []models.Cart, db *gorm.DB) []config.CartRespon
 
 	return response
 }
-
 func AddOrUpdateAddress(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -252,6 +249,7 @@ func AddOrUpdateAddress(c *gin.Context, db *gorm.DB) {
 		addr.Barangay = req.Barangay
 		addr.City = req.City
 		addr.ZipCode = req.ZipCode
+		addr.PhoneNumber = req.PhoneNumber
 		addr.IsDefault = req.IsDefault
 
 		if req.IsDefault {
@@ -271,10 +269,11 @@ func AddOrUpdateAddress(c *gin.Context, db *gorm.DB) {
 		UserID:        userObj.ID,
 		NameResidency: req.NameResidency,
 		Region:        req.Region,
-		Barangay:      req.Barangay,
 		Province:      req.Province,
+		Barangay:      req.Barangay,
 		City:          req.City,
 		ZipCode:       req.ZipCode,
+		PhoneNumber:   req.PhoneNumber,
 		IsDefault:     req.IsDefault,
 	}
 
@@ -399,10 +398,13 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 		}
 	}
 
+	region := userinfo.GetRegionInfo(address.ZipCode)
+
 	var totalCost float64
 	for _, item := range session.CartItems {
 		medicine := item.Medicine
 		price := medicine.SellingPricePerPiece * float64(item.Quantity)
+
 		if medicine.Discount != "" {
 			discountStr := strings.TrimSuffix(medicine.Discount, "%")
 			discountVal, err := strconv.ParseFloat(discountStr, 64)
@@ -418,12 +420,31 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 
 	switch dataConfig.DeliveryType {
 	case "standard":
-		deliveryCost = CalculateStandardDelivery(address.ZipCode)
+		if totalCost >= region.FreeShippingLimit {
+			// Apply standard rate even if above threshold, no COD fee
+			deliveryCost = region.StandardRate
+			codFee = 0
+		} else {
+			// Apply both standard rate and COD fee
+			deliveryCost = region.StandardRate
+			codFee = totalCost * 0.0275
+		}
+
 	case "priority":
 		deliveryCost = 150
+		codFee = 0 // No COD fee for priority unless you want to apply it
+
 	case "cod":
-		deliveryCost = CalculateStandardDelivery(address.ZipCode)
-		codFee = totalCost * 0.0275
+		if totalCost >= region.FreeShippingLimit {
+			// Fully free if threshold surpassed
+			deliveryCost = 0
+			codFee = 0
+		} else {
+			// Apply delivery rate + COD fee
+			deliveryCost = region.StandardRate
+			codFee = totalCost * 0.0275
+		}
+
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid delivery type"})
 		return
@@ -506,31 +527,13 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 		"delivery_cost":       deliveryCost,
 		"cod_fee":             codFee,
 		"delivery_type":       session.DeliveryType,
+		"delivery_time":       region.DeliveryTime,
 		"checkout_session_id": session.ID,
 		"address":             address,
 		"cart_items":          response,
 		"total_price":         totalCost,
 		"grand_total":         grandTotal,
 	})
-}
-
-func CalculateStandardDelivery(zipCode string) int {
-	zip, err := strconv.Atoi(zipCode)
-	if err != nil {
-		return 100 // default fallback
-	}
-	switch {
-	case zip >= 1000 && zip <= 1749:
-		return 85
-	case zip >= 2000 && zip <= 5200:
-		return 95
-	case zip >= 5000 && zip <= 6700:
-		return 100
-	case zip >= 7000 && zip <= 9800:
-		return 105
-	default:
-		return 100
-	}
 }
 
 func SubmitPayment(c *gin.Context, db *gorm.DB) {
@@ -750,10 +753,9 @@ func SubmitPayment(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	if err := db.Model(&models.Cart{}).
-		Where("checkout_session_id = ?", session.ID).
-		Update("checkout_session_id", nil).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to clear session from cart items"})
+	if err := db.Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
+		Delete(&models.Cart{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to remove ordered cart items"})
 		return
 	}
 
