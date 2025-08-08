@@ -15,7 +15,7 @@ const DeliveryCart = () => {
 
   useEffect(() => {}, [deliveryData]);
 
-  console.log("Delivery Data updated:", items);
+  // console.log("Delivery Data updated:", items);
 
   return (
     <div>
@@ -26,7 +26,12 @@ const DeliveryCart = () => {
 
         {items.map((item, index) => {
           const medicine = item.medicine || {};
-          const image = medicine.images?.[0]?.url || fallbackImage;
+          // const image = medicine.images?.[0]?.url || fallbackImage;
+
+          const image =
+            Array.isArray(medicine?.images) && medicine.images[0]
+              ? medicine.images[0]
+              : fallbackImage;
 
           const price = medicine?.price || 0;
           const discountPercent =

@@ -22,7 +22,21 @@ const NewAddress = ({ setShowAddForm }) => {
             name="nameresidency"
             value={formData.nameresidency}
             onChange={handleChange}
+            required
             placeholder="e.g., Office 1"
+            className="w-full border-2 px-4 py-2 mt-1 rounded-lg text-xs border-gray-300"
+          />
+        </div>
+
+        <div>
+          <label className="font-medium text-xs dark-text">Phone Number</label>
+          <input
+            type="text"
+            name="phonenumber"
+            value={formData.phonenumber || ""}
+            onChange={handleChange}
+            required
+            placeholder="e.g., 09123456789"
             className="w-full border-2 px-4 py-2 mt-1 rounded-lg text-xs border-gray-300"
           />
         </div>
@@ -45,6 +59,7 @@ const NewAddress = ({ setShowAddForm }) => {
           <input
             type="text"
             name="province"
+            required
             value={formData.province}
             onChange={handleChange}
             placeholder="e.g., Metro Province"
@@ -57,6 +72,7 @@ const NewAddress = ({ setShowAddForm }) => {
           <input
             type="text"
             name="barangay"
+            required
             value={formData.barangay}
             onChange={handleChange}
             placeholder="e.g., Office 1"
@@ -83,6 +99,7 @@ const NewAddress = ({ setShowAddForm }) => {
           <input
             type="text"
             name="zipcode"
+            required
             value={formData.zipcode}
             onChange={handleChange}
             placeholder="e.g., 1000"

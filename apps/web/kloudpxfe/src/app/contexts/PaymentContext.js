@@ -1,31 +1,57 @@
 "use client";
 import { createContext, useContext, useState } from "react";
 import { useCheckout } from "./CheckoutContext";
-import { postAxiosCall } from "../lib/axios";
+import { getAxiosCall, postAxiosCall } from "../lib/axios";
 import endpoints from "../config/endpoints";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useCartContext } from "./CartContext";
 
 const PaymentContext = createContext();
 
 export const PaymentProvider = ({ children }) => {
     const [selectedFile, setSelectedFile] = useState(null);
+    const [previewImage, setPreviewImage] = useState(null);
     const [gcashNumber, setGcashNumber] = useState("");
     const [amountPaid, setAmountPaid] = useState("");
     const [orderSuccess, setOrderSuccess] = useState([]);
     const { checkoutData, deliveryData } = useCheckout();
+    const [paymentSlip, setPaymentSlip] = useState([])
+    const { getAllCartData } = useCartContext();
     const router = useRouter();
+
+
+
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setSelectedFile(reader.result);
-            };
-            reader.readAsDataURL(file);
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const fullBase64 = reader.result;
+            const base64String = reader.result.split(",")[1];
+            setSelectedFile(base64String);
+            setPreviewImage(fullBase64);
+            // getPaymentSlip();
+        };
+        reader.readAsDataURL(file);
+    };
+
+
+    const getPaymentSlip = async () => {
+        try {
+            const res = await getAxiosCall(endpoints.paymentslip.get, {}, true);
+            console.log(res);
+
+            setPaymentSlip(res?.data?.screenshot_url
+                || []);
+        } catch (error) {
+            setPaymentSlip([]);
         }
     };
+
+
 
     const handleSubmit = async () => {
         const isCOD = deliveryData?.delivery_type === "cod";
@@ -65,8 +91,11 @@ export const PaymentProvider = ({ children }) => {
                 payload,
                 true
             );
+            console.log(res);
+
             setOrderSuccess(res || []);
             toast.success("Payment submitted successfully!");
+            getAllCartData();
             router.push("/Success");
 
             if (!isCOD) {
@@ -92,6 +121,9 @@ export const PaymentProvider = ({ children }) => {
                 setAmountPaid,
                 handleSubmit,
                 orderSuccess,
+                getPaymentSlip,
+                paymentSlip,
+                previewImage
             }}
         >
             {children}

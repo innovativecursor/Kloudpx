@@ -56,7 +56,7 @@ const ImageSwiper = ({ images }) => {
           >
             {safeImages.map((img, index) => (
               <SwiperSlide key={index}>
-                <div className="flex justify-center items-center w-full sm:h-[80vh] h-[50vh] p-4 bg-white">
+                <div className="flex justify-center items-center w-full sm:h-[70vh] h-[50vh] p-4 bg-white">
                   {isClient ? (
                     <Zoom>
                       <img

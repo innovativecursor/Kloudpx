@@ -29,7 +29,7 @@ export const PrescriptionProvider = ({ children }) => {
 
     if (!token) {
       toast.error("Please login first!");
-      login?.();
+      // login?.();
       return;
     }
 

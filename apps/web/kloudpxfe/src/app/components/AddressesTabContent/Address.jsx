@@ -34,7 +34,7 @@ const Address = () => {
     }
   }, []);
 
-  // console.log(deliveryData, "my add ");
+  // console.log(getAllAddress, "my add ");
 
   return (
     <>
@@ -87,7 +87,8 @@ const Address = () => {
 
                     <div className="w-[70%] ">
                       <div className="text-xs  tracking-wide text-gray-600 text-center">
-                        {address?.City}, {address?.Region}, {address?.Province},{" "}
+                        {address?.PhoneNumber} {address?.City},{" "}
+                        {address?.Region}, {address?.Province},{" "}
                         {address?.ZipCode}
                       </div>
                     </div>

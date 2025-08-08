@@ -19,14 +19,16 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const t = localStorage.getItem("access_token");
-      setToken(t);
+      if (t && t !== "null") {
+        setToken(t);
+      }
       setIsAuthLoaded(true);
     }
   }, []);
 
   useEffect(() => {
+    if (!token) return;
     const fetchUser = async () => {
-      if (!token) return;
       try {
         const res = await getAxiosCall(endpoints.auth.getCurrentUser, {}, true);
         setUser(res?.data);

@@ -75,7 +75,7 @@ const CheckoutProduct = ({ product }) => {
         </div>
 
         {/* Description */}
-        <p className="opacity-60 leading-relaxed text-sm md:text-lg text-justify mt-5">
+        <p className="opacity-60 leading-relaxed text-sm md:text-lg text-start mt-5">
           {medicine?.description || "No description available."}
         </p>
       </div>
