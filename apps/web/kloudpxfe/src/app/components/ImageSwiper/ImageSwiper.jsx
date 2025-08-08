@@ -55,20 +55,8 @@ const ImageSwiper = ({ images }) => {
             className="w-full h-full"
           >
             {safeImages.map((img, index) => (
-              // <SwiperSlide key={index}>
-              //   <div className="flex justify-center items-center w-full sm:h-[80vh] h-[50vh] p-4 overflow-hidden">
-              //     <Zoom>
-              //       <SafeImage
-              //         src={img}
-              //         alt={`product-${index}`}
-              //         className="max-w-full max-h-full"
-              //       />
-              //     </Zoom>
-              //   </div>
-              // </SwiperSlide>
-
               <SwiperSlide key={index}>
-                <div className="flex justify-center items-center w-full sm:h-[80vh] h-[50vh] p-4 bg-white">
+                <div className="flex justify-center items-center w-full sm:h-[70vh] h-[50vh] p-4 bg-white">
                   {isClient ? (
                     <Zoom>
                       <img

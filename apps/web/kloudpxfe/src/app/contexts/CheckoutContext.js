@@ -22,6 +22,7 @@ export const CheckoutProvider = ({ children }) => {
     city: "",
     zipcode: "",
     barangay: "",
+    phonenumber: "",
     isdefault: false,
   });
 
@@ -40,8 +41,6 @@ export const CheckoutProvider = ({ children }) => {
         {},
         true
       );
-      console.log(res);
-
       const isSaved = res.save_for_later;
 
       setSavedForLaterIds((prev) => {
@@ -63,6 +62,8 @@ export const CheckoutProvider = ({ children }) => {
   const doCheckout = async () => {
     try {
       const res = await postAxiosCall(endpoints.checkout.get, {}, true);
+      // console.log(res);
+
       setCheckoutData(res || []);
     } catch (error) {
       setCheckoutData([]);
@@ -78,7 +79,7 @@ export const CheckoutProvider = ({ children }) => {
       city: address.City,
       barangay: address.Barangay,
       zipcode: address.ZipCode,
-
+      phonenumber: address.PhoneNumber || "",
       isdefault: address.IsDefault,
     });
   };
@@ -94,7 +95,7 @@ export const CheckoutProvider = ({ children }) => {
         city: formData.city,
         barangay: formData.barangay,
         zipcode: formData.zipcode,
-
+        phonenumber: formData.phonenumber,
         isdefault: formData.isdefault,
       };
 
@@ -103,7 +104,7 @@ export const CheckoutProvider = ({ children }) => {
       }
 
       const res = await postAxiosCall(endpoints.address.add, payload, true);
-      // console.log(res);
+
 
       toast.success(
         formData.id
@@ -132,6 +133,8 @@ export const CheckoutProvider = ({ children }) => {
   const fetchAddressData = async () => {
     try {
       const res = await getAxiosCall(endpoints.address.get, {}, true);
+
+
       setGetAllAddress(res?.data || []);
     } catch (error) {
       setGetAllAddress([]);
@@ -139,7 +142,7 @@ export const CheckoutProvider = ({ children }) => {
   };
 
   const selectedAddress = async (id) => {
-    console.log(id);
+    // console.log(id);
     try {
       const res = await postAxiosCall(
         endpoints.selectedAddress.add,
@@ -165,7 +168,7 @@ export const CheckoutProvider = ({ children }) => {
         },
         true
       );
-      // console.log("Delivery type:", res);
+      console.log("Delivery type:", res);
       setDeliveryData(res || []);
       toast.success("Delivery type selected successfully!");
     } catch (error) {

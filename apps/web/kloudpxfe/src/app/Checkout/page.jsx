@@ -11,15 +11,8 @@ const page = () => {
   const { getCartData } = useCartContext();
 
   useEffect(() => {
-    const validItems =
-      getCartData?.data?.filter(
-        (item) =>
-          item.prescription_status !== "Unsettled" &&
-          item.prescription_status !== "Rejected"
-      ) || [];
-
-    if (validItems.length > 0) {
-      setSelectedProduct(validItems[0]);
+    if (getCartData?.data?.length > 0) {
+      setSelectedProduct(getCartData.data[0]);
     } else {
       setSelectedProduct(null);
     }
@@ -31,7 +24,10 @@ const page = () => {
         <div className="flex justify-between md:flex-row flex-col md:gap-0 gap-10 items-start">
           <div className="md:w-[45%] w-full flex flex-col">
             <SubTitle paths={["Cart", "Checkout"]} />
-            <CheckoutContent setSelectedProduct={setSelectedProduct} />
+            <CheckoutContent
+              setSelectedProduct={setSelectedProduct}
+              cartItems={getCartData?.data || []}
+            />
           </div>
           <div className="md:w-[40%] w-full">
             <CheckoutProduct product={selectedProduct} />

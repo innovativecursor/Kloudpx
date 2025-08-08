@@ -1,4 +1,5 @@
-"use client";
+// CheckoutContent.jsx
+
 import React, { useEffect } from "react";
 import { useCartContext } from "@/app/contexts/CartContext";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
@@ -6,23 +7,15 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
-const CheckoutContent = ({ setSelectedProduct }) => {
+const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
   const { token } = useAuth();
   const router = useRouter();
-  const { getCartData, getAllCartData } = useCartContext();
+  const { getAllCartData } = useCartContext();
   const { toggleSaveForLater, savedForLaterIds, doCheckout } = useCheckout();
   const fallbackImage = "/assets/fallback.png";
 
-  const data = getCartData?.data || [];
-  const loading = getCartData?.loading || false;
-
-  const validItems = data?.filter(
-    (item) =>
-      item.prescription_status !== "Unsettled" &&
-      item.prescription_status !== "Rejected"
-  );
-
-  const itemCount = validItems?.length || 0;
+  const data = cartItems || [];
+  const loading = false; // Or pass loading as a prop if you want
 
   useEffect(() => {
     if (token) {
@@ -34,21 +27,12 @@ const CheckoutContent = ({ setSelectedProduct }) => {
     await toggleSaveForLater(cartId);
   };
 
-  // const handleCheckout = async () => {
-  //   try {
-  //     await doCheckout();
-  //     router.push("/Address");
-  //   } catch (error) {
-  //     toast.error("Checkout failed, please try again.");
-  //   }
-  // };
-
   const handleCheckout = async () => {
-    const allItemsSavedForLater = validItems.every((item) =>
+    const allItemsSavedForLater = data.every((item) =>
       savedForLaterIds.includes(item.cart_id)
     );
 
-    if (validItems.length === 0 || allItemsSavedForLater) {
+    if (data.length === 0 || allItemsSavedForLater) {
       toast.error(
         "No items available for checkout. Please move items back from 'Save for Later'."
       );
@@ -65,19 +49,17 @@ const CheckoutContent = ({ setSelectedProduct }) => {
 
   return (
     <div>
-      {/* Cart Header */}
       <div className="bg-[#EDF4F6] shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
         <h3 className="font-semibold text-center dark-text tracking-wider sm:text-base text-sm dark-text">
-          {itemCount} item{itemCount !== 1 && "s"} in your cart
+          {data.length} item{data.length !== 1 && "s"} in your cart
         </h3>
       </div>
 
-      {/* Cart Items */}
       {loading ? (
         <p className="text-center text-gray-500">Loading cart...</p>
       ) : (
         <div className="space-y-4">
-          {validItems.map((item) => {
+          {data.map((item) => {
             const medicine = item?.medicine;
             const imageUrl =
               Array.isArray(medicine?.images) && medicine.images[0]
@@ -92,19 +74,17 @@ const CheckoutContent = ({ setSelectedProduct }) => {
               (price * discountPercent) / 100
             ).toFixed(2);
 
-            const bgClass = "bg-green-50";
-
             return (
               <div
                 key={item.cart_id}
-                className={`w-full py-3 sm:px-6 px-3 rounded-sm cursor-pointer flex justify-between items-center ${bgClass}`}
+                className="w-full py-3 sm:px-6 px-3 rounded-sm cursor-pointer flex justify-between items-center bg-green-50"
                 onClick={() => setSelectedProduct(item)}
               >
                 <div className="flex items-center gap-3">
                   <img
                     src={imageUrl}
                     alt="product"
-                    className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-md "
+                    className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-md"
                   />
                   <div className="flex flex-col">
                     <span className="font-semibold text-xs sm:text-sm truncate max-w-[140px]">
@@ -135,7 +115,7 @@ const CheckoutContent = ({ setSelectedProduct }) => {
                       type="checkbox"
                       checked={savedForLaterIds.includes(item.cart_id)}
                       onChange={() => handleSaveForLater(item.cart_id)}
-                      className="w-3 h-3 sm:w-4 sm:h-4 rounded-full border border-blue-600  cursor-pointer checked:bg-blue-500"
+                      className="w-3 h-3 sm:w-4 sm:h-4 rounded-full border border-blue-600 cursor-pointer checked:bg-blue-500"
                     />
                     Save for Later
                   </label>
@@ -146,7 +126,6 @@ const CheckoutContent = ({ setSelectedProduct }) => {
         </div>
       )}
 
-      {/* Action Buttons */}
       <div className="flex justify-between gap-5 sm:mt-10 mt-8 items-center">
         <div className="w-[40%]">
           <button
@@ -159,26 +138,20 @@ const CheckoutContent = ({ setSelectedProduct }) => {
         <div className="w-[60%]">
           <button
             className={`bg-[#0070BA] text-white hover:bg-[#005c96] sm:text-[11px] text-[8px] w-full py-3 rounded-full font-semibold ${
-              itemCount === 0 ||
-              validItems.every((item) =>
-                savedForLaterIds.includes(item.cart_id)
-              )
+              data.length === 0 ||
+              data.every((item) => savedForLaterIds.includes(item.cart_id))
                 ? "opacity-50 cursor-not-allowed"
                 : "cursor-pointer"
             }`}
             onClick={
-              itemCount === 0 ||
-              validItems.every((item) =>
-                savedForLaterIds.includes(item.cart_id)
-              )
+              data.length === 0 ||
+              data.every((item) => savedForLaterIds.includes(item.cart_id))
                 ? null
                 : handleCheckout
             }
             disabled={
-              itemCount === 0 ||
-              validItems.every((item) =>
-                savedForLaterIds.includes(item.cart_id)
-              )
+              data.length === 0 ||
+              data.every((item) => savedForLaterIds.includes(item.cart_id))
             }
           >
             Proceed to Checkout

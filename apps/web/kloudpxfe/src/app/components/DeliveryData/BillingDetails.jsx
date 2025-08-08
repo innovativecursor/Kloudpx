@@ -3,6 +3,7 @@ import { AiFillProduct } from "react-icons/ai";
 import { MdDeliveryDining } from "react-icons/md";
 import { MdLocalOffer } from "react-icons/md";
 import { MdPayment } from "react-icons/md";
+import { CiDeliveryTruck } from "react-icons/ci";
 
 const BillingDetails = ({ deliveryData }) => {
   if (!deliveryData) return null;
@@ -52,6 +53,16 @@ const BillingDetails = ({ deliveryData }) => {
           </div>
           <span className="text-sm font-semibold text-[#333]">
             {deliveryData?.cod_fee?.toFixed(2)}
+          </span>
+        </div>
+
+        <div className="flex justify-between items-center px-6 mt-3">
+          <div className="flex gap-1  items-center">
+            <CiDeliveryTruck className="text-base" />
+            <span className="text-sm font-medium">Delivery Time</span>
+          </div>
+          <span className="text-sm font-semibold text-[#333]">
+            {deliveryData?.delivery_time}
           </span>
         </div>
 

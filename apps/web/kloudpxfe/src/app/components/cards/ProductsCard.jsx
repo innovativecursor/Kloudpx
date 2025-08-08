@@ -42,42 +42,41 @@ const ProductCardItem = ({ item, fallbackImage }) => {
       className="w-full sm:h-[380px]  h-[240px]  bg-white rounded-xl border-2 border-gray-100 
       md:shadow-[0_8px_15px_-6px_rgba(0,0,0,0.5)] shadow-[0_2px_6px_-3px_rgba(0,0,0,0.4)] cursor-pointer transform transition-transform duration-300 hover:scale-105 hover:shadow-xl overflow-hidden"
     >
-      <div
-        onClick={() => goToProductPage(item.id, item.genericname)}
-        className="relative  sm:h-64  flex items-center justify-center h-36 px-4 shadow bg-[#F6F5FA]"
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-      >
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 bg-[#002046] text-white sm:text-[10px] text-[8px] sm:px-5 px-3 py-[2px] lg:py-[5px] sm:py-[4px]  rounded-b-xl  z-10 shadow-lg">
-          {item?.discount}
+      <div onClick={() => goToProductPage(item.id, item.genericname)}>
+        <div
+          className="relative  sm:h-64  flex items-center justify-center h-36 px-4 shadow bg-[#F6F5FA]"
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+        >
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 bg-[#002046] text-white sm:text-[10px] text-[8px] sm:px-5 px-3 py-[2px] lg:py-[5px] sm:py-[4px]  rounded-b-xl  z-10 shadow-lg">
+            {item?.discount}
+          </div>
+
+          <Swiper
+            ref={swiperRef}
+            spaceBetween={10}
+            slidesPerView={1}
+            loop
+            allowTouchMove={true}
+            // style={{ width: "80%", height: "160px" }}
+            className="sm:w-[80%] sm:h-[160px] w-[95%] h-[100px]"
+          >
+            {slides.map((img, index) => (
+              <SwiperSlide key={index}>
+                <div className="relative w-full h-full rounded overflow-hidden">
+                  <Image
+                    src={img.FileName}
+                    alt={item.brandname}
+                    fill
+                    className=" rounded"
+                  />
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
 
-        <Swiper
-          ref={swiperRef}
-          spaceBetween={10}
-          slidesPerView={1}
-          loop
-          allowTouchMove={true}
-          // style={{ width: "80%", height: "160px" }}
-          className="sm:w-[80%] sm:h-[160px] w-[95%] h-[100px]"
-        >
-          {slides.map((img, index) => (
-            <SwiperSlide key={index}>
-              <div className="relative w-full h-full rounded overflow-hidden">
-                <Image
-                  src={img.FileName}
-                  alt={item.brandname}
-                  fill
-                  className=" rounded"
-                />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
-
-      <div className=" mt-3 mx-3.5 mb-2">
-        <div>
+        <div className="mt-3 mx-3.5">
           <h1 className="sm:text-[12px] text-[10px] text-color font-light">
             {(item?.genericname?.slice(0, 22) || "No genericname") +
               (item?.genericname?.length > 22 ? "..." : "")}
@@ -88,11 +87,10 @@ const ProductCardItem = ({ item, fallbackImage }) => {
               (item?.brandname?.length > 25 ? "..." : "")}
           </span>
         </div>
+      </div>
+
+      <div className=" mx-3.5 mb-2">
         <div className="flex justify-between sm:mt-3 mt-2 pb-2 items-center">
-          {/* <p className="font-semibold sm:text-base text-xs">
-            {" "}
-            ₱{item?.price.toFixed(2)}
-          </p> */}
           <span className="font-semibold sm:text-base text-xs">
             ₱
             {(

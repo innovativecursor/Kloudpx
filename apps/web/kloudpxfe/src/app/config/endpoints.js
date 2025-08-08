@@ -74,6 +74,10 @@ const endpoints = {
   },
   prescription: {
     upload: `${baseUrl}/v1/user/upload-prescription`,
+    get: `${baseUrl}/v1/user/get-prescriptions`,
+  },
+  selectedprescription: {
+    put: `${baseUrl}/v1/user/select-prescription`
   },
 
   paymentSubmit: {

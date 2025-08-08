@@ -61,3 +61,6 @@ body {
 .menu-button {
   @apply flex items-center w-full text-sm text-left p-2 rounded transition-all duration-300 hover:bg-[#0070ba] hover:text-white font-normal;
 }
+
+
+

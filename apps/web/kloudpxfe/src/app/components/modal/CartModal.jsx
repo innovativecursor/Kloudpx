@@ -19,6 +19,8 @@ const CartModal = ({ isOpen, onClose }) => {
   const data = getCartData?.data || [];
   const loading = getCartData?.loading || false;
 
+  console.log(data);
+
   useEffect(() => {
     if (token) {
       getAllCartData();

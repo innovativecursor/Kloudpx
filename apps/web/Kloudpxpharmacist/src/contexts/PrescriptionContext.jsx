@@ -16,6 +16,9 @@ const PrescriptionProvider = ({ children }) => {
   const fetchAllPrescriptions = async () => {
     try {
       const res = await getAxiosCall(endpoints.Prescriptions.get, {}, true);
+
+      console.log(res);
+
       setAllPrescriptions(res?.data || res);
     } catch (error) {
       setAllPrescriptions([]);
@@ -29,6 +32,9 @@ const PrescriptionProvider = ({ children }) => {
         {},
         true
       );
+      console.log(res);
+      
+
       setPrescriptionDetails(res?.data || res);
     } catch (error) {
       setPrescriptionDetails(null);
@@ -42,6 +48,8 @@ const PrescriptionProvider = ({ children }) => {
         {},
         true
       );
+      console.log(res);
+
       setPrescriptionCart(res?.data || res);
       return res;
     } catch (error) {
@@ -51,13 +59,15 @@ const PrescriptionProvider = ({ children }) => {
     }
   };
 
-  const approvePrescription = async (prescriptionId) => {
+  const approvePrescription = async (cartid) => {
+    console.log(cartid);
     try {
       const res = await postAxiosCall(
-        `${endpoints.Prescriptions.submitPrescription}/${prescriptionId}`,
+        `${endpoints.Prescriptions.submitPrescription}/${cartid}`,
         {},
         true
       );
+      console.log(res);
       return res;
     } catch (error) {
       console.error("Error approving prescription:", error);
@@ -65,11 +75,11 @@ const PrescriptionProvider = ({ children }) => {
     }
   };
 
-  const rejectPrescription = async (prescriptionId) => {
+  const rejectPrescription = async (cartid) => {
     try {
       const res = await updateAxiosCall(
         endpoints.Prescriptions.rejectPrescription,
-        prescriptionId,
+        cartid,
         {},
         true
       );

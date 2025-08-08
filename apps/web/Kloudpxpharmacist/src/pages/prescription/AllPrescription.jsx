@@ -51,18 +51,6 @@ const Home = () => {
         </Tag>
       ),
     },
-    // {
-    //   title: "Status",
-    //   dataIndex: "prescriptionstatus",
-    //   render: (status) => (
-    //     <Tag
-    //       color={status === "unsettled" ? "red" : "green"}
-    //       className="capitalize font-medium px-3"
-    //     >
-    //       {status}
-    //     </Tag>
-    //   ),
-    // },
   ];
 
   return (

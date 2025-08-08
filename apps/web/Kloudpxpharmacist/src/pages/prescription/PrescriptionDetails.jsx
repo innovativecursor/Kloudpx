@@ -95,9 +95,9 @@ const PrescriptionDetails = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex mt-12 gap-12 mb-4 flex-wrap">
+      <div className="flex mt-12 sm:gap-12 mb-4 gap-5 sm:flex-wrap">
         <button
-          className={`px-12 py-3 rounded-full ${
+          className={`sm:px-12 px-7 sm:py-3 py-2 rounded-full ${
             activeTab === "past"
               ? "bg-[#0070ba] text-white"
               : "bg-gray-300 text-gray-900"
@@ -107,7 +107,7 @@ const PrescriptionDetails = () => {
           Past ({past?.length})
         </button>
         <button
-          className={`px-12 py-3 rounded-full ${
+          className={`sm:px-12 px-7 sm:py-3 py-2 rounded-full ${
             activeTab === "unsettled"
               ? "bg-[#0070ba] text-white"
               : "bg-gray-300 text-gray-900"
@@ -127,6 +127,7 @@ const PrescriptionDetails = () => {
         isOpen={isModalOpen}
         onClose={closeModal}
         selectedPrescription={selectedPrescription}
+        activeTab={activeTab}
       />
     </div>
   );

@@ -122,7 +122,7 @@ function Footer() {
       </div>
 
       <hr className="border-b border-gray-200" />
-      <div className="flex-between-center items-center responsive-mx md:pb-0 pb-2 sm:my-6 my-3">
+      <div className="flex-between-center items-center responsive-mx md:pb-0 pb-2 sm:my-5 my-3">
         <h1 className="sm:text-[10px] text-[8px] cursor-pointer font-medium tracking-wider opacity-60">
           Copyright © 2025 KLOUD P&X - All Rights Reserved.{" "}
         </h1>
@@ -144,6 +144,9 @@ function Footer() {
             alt="Upload"
             className="object-contain cursor-pointer sm:max-w-[70%] max-w-[50%]"
           />
+
+          <p className="sm:text-[4px] text-[3px] opacity-30">V1.3.8</p>
+
           <div className="md:hidden block">
             <a
               href="https://www.innovativecursor.com/"
