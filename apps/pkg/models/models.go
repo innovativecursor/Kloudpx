@@ -131,6 +131,21 @@ type Cart struct {
 	MedicineStatus    string `gorm:"default:'unsettled'"` // "approved", "rejected", "unsettled"
 }
 
+type CartHistory struct {
+	gorm.Model
+	UserID            uint
+	PrescriptionID    *uint
+	Prescription      *Prescription
+	MedicineID        uint
+	Medicine          Medicine
+	Quantity          int
+	IsOTC             bool
+	CheckoutSessionID uint
+	IsSavedForLater   bool
+	MedicineStatus    string
+	OrderNumber       string
+}
+
 type CarouselImage struct {
 	gorm.Model
 	ImageURL string
@@ -221,6 +236,8 @@ type CheckoutSession struct {
 	AddressID    *uint
 	DeliveryType string
 	DeliveryCost int
+	TotalCost    float64
+	GrandTotal   float64
 	Status       string // pending, completed
 	CartItems    []Cart `gorm:"foreignKey:CheckoutSessionID"`
 }
@@ -245,6 +262,8 @@ type Order struct {
 	OrderNumber       string
 	TotalAmount       float64
 	DeliveryAddress   string
+	PaidAmount        float64
+	ShippingNumber    string
 	DeliveryType      string
 	Status            string          // e.g., "processing", "queued", "completed"
 	User              User            `gorm:"foreignKey:UserID"`

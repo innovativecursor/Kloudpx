@@ -203,6 +203,14 @@ func Admin(db *gorm.DB) {
 	apiV1.GET("/admin/order-history", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		orders.GetAllOrders(c, db)
 	})
+
+	apiV1.GET("/admin/order-details/:order_number", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		orders.GetOrderDetails(c, db)
+	})
+
+	apiV1.PUT("/admin/update-order-details/:order_number", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		orders.UpdateOrderDetails(c, db)
+	})
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
 	router.Run(":" + port)
