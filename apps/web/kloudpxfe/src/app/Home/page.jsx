@@ -1,6 +1,6 @@
 "use client";
 import Hero from "@/app/components/Hero/Hero";
-import Products from "@/app/components/Products/Products";
+// import Products from "@/app/components/Products/Products";
 import HomeFloatingBtn from "@/app/components/HomeFloatingBtn/HomeFloatingBtn";
 import Banners from "../components/Banners/Banners";
 import Video from "../components/Videos/Video";
