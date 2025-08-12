@@ -10,7 +10,7 @@ import image from "@/assets/imagw.png";
 const Instructions = () => {
   return (
     <>
-      <div className="responsive-mx  md:py-8 py-5 bg-[#F9FCFF] sm:px-0 px-2  border border-gray-200 rounded-2xl sm:shadow-lg shadow lg:mt-20 sm:mt-16 mt-11">
+      <div className="responsive-mx  md:py-8 py-5 bg-[#F9FCFF] sm:px-0 px-2  border border-gray-200 rounded-2xl sm:shadow-lg shadow lg:mt-20 sm:mt-16 mt-12">
         <h2 className="text-center font-semibold sm:text-lg text-base md:text-2xl mt-4 mb-8">
           Instructions on how to order
         </h2>
@@ -63,7 +63,7 @@ const Instructions = () => {
         </div>
       </div>
 
-      <div className="lg:mt-20 md:mt-14 sm:mt-14 mt-9">
+      <div className="lg:mt-20 md:mt-14 sm:mt-14 mt-11">
         <Image src={image} alt="image" className="w-full h-auto" priority />
       </div>
     </>
