@@ -80,6 +80,73 @@ func GetMedicinesForUser(c *gin.Context, db *gorm.DB) {
 	})
 }
 
+func GetOTCMedicinesForUser(c *gin.Context, db *gorm.DB) {
+	var uniqueMedicineIDs []uint
+
+	if err := db.
+		Model(&models.Medicine{}).
+		Select("MIN(id)").
+		Where("prescription = ?", false).
+		Group("brand_name, power").
+		Scan(&uniqueMedicineIDs).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch distinct OTC medicine IDs by brand name and power")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch OTC medicines"})
+		return
+	}
+
+	var medicines []models.Medicine
+	if err := db.Preload("Generic").
+		Preload("ItemImages").
+		Preload("Category").
+		Where("id IN ?", uniqueMedicineIDs).
+		Find(&medicines).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch OTC medicines by ID list")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch OTC medicines"})
+		return
+	}
+
+	var response []config.UserFacingMedicine
+	for _, med := range medicines {
+		var imageFilenames []string
+		for _, img := range med.ItemImages {
+			imageFilenames = append(imageFilenames, img.FileName)
+		}
+
+		price := med.SellingPricePerBox
+		if med.UnitOfMeasurement == "per piece" {
+			price = med.SellingPricePerPiece
+		}
+
+		response = append(response, config.UserFacingMedicine{
+			ID:                        med.ID,
+			BrandName:                 med.BrandName,
+			Power:                     med.Power,
+			Discount:                  med.Discount,
+			GenericName:               med.Generic.GenericName,
+			Category:                  med.Category.CategoryName,
+			Description:               med.Description,
+			Unit:                      med.UnitOfMeasurement,
+			MeasurementUnitValue:      med.MeasurementUnitValue,
+			NumberOfPiecesPerBox:      med.NumberOfPiecesPerBox,
+			Price:                     price,
+			TaxType:                   med.TaxType,
+			Prescription:              med.Prescription,
+			Benefits:                  med.Benefits,
+			KeyIngredients:            med.KeyIngredients,
+			RecommendedDailyAllowance: med.RecommendedDailyAllowance,
+			DirectionsForUse:          med.DirectionsForUse,
+			SafetyInformation:         med.SafetyInformation,
+			Storage:                   med.Storage,
+			Images:                    imageFilenames,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "OTC medicines fetched successfully",
+		"medicines": response,
+	})
+}
+
 func GetAllBrandNames(c *gin.Context, db *gorm.DB) {
 	var uniqueMedicineIDs []uint
 	var brandNames []string

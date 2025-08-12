@@ -57,3 +57,8 @@ type CartResponse struct {
 	Medicine           UserFacingMedicine `json:"medicine"`
 	PrescriptionStatus string             `json:"prescription_status"`
 }
+
+type ReqPaymentType struct {
+	CheckoutSessionID uint   `json:"checkout_session_id"`
+	PaymentType       string `json:"payment_type"` // GCOD or COD
+}
