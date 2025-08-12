@@ -147,11 +147,11 @@ const CartModal = ({ isOpen, onClose }) => {
                 <div
                   key={item.cart_id}
                   className={classNames(
-                    "flex items-center gap-4 md:p-3 md:shadow-sm rounded-md transition",
-                    {
-                      "bg-gray-200 opacity-60 pointer-events-none": isUnsettled,
-                      "bg-red-100 border border-red-400": isRejected,
-                    }
+                    "flex items-center gap-4 md:p-3 md:shadow-sm rounded-md transition"
+                    // {
+                    //   "bg-gray-200 opacity-60 pointer-events-none": isUnsettled,
+                    //   "bg-red-100 border border-red-400": isRejected,
+                    // }
                   )}
                   onClick={() => {
                     onClose();
@@ -209,7 +209,7 @@ const CartModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Prescription Status  */}
-                    {isUnsettled && (
+                    {/* {isUnsettled && (
                       <p className="text-xs text-red-500 mt-1">
                         Waiting for pharmacist approval
                       </p>
@@ -218,7 +218,7 @@ const CartModal = ({ isOpen, onClose }) => {
                       <p className="text-xs text-red-500 mt-1">
                         This item was rejected by the pharmacist.
                       </p>
-                    )}
+                    )} */}
                   </div>
                 </div>
               );
