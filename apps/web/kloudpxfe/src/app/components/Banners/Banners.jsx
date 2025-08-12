@@ -1,16 +1,19 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
-
-import banner1 from "@/assets/banner1.png";
-import banner2 from "@/assets/banner2.png";
+import PrimaryButton from "../button/PrimaryButton";
+// import banner1 from "@/assets/banner1.png";
+// import banner2 from "@/assets/banner2.png";
 import container from "@/assets/Container.png";
 import container1 from "@/assets/Container (1).png";
 import container2 from "@/assets/Container (2).png";
+import { useImageContext } from "@/app/contexts/ImagesContext";
 
 const Banners = () => {
+  const { galleryImages, getGalleryImages } = useImageContext();
+
   const cards = [
     {
       bg: "#EFF6FF",
@@ -28,14 +31,22 @@ const Banners = () => {
       bg: "#F0FDFA",
       img: container2,
       title: "Free Delivery",
-      desc: "On orders over ₱400",
+      desc: "Enjoy Free Shipping on Selected Medications!",
     },
   ];
+
+  useEffect(() => {
+    getGalleryImages();
+  }, []);
+
+  const allImages = Array.isArray(galleryImages?.data)
+    ? galleryImages.data
+    : [];
 
   return (
     <div className="responsive-mx lg:mt-14 md:mt-12 mt-9">
       <h1 className="font-semibold sm:text-2xl text-lg tracking-wide lg:mb-7 md:mb-5 mb-3">
-        Banners
+        Featured Products
       </h1>
 
       <Swiper
@@ -47,14 +58,28 @@ const Banners = () => {
           0: { slidesPerView: 1.2, spaceBetween: 12 },
         }}
       >
-        {[banner1, banner2].map((banner, index) => (
-          <SwiperSlide key={index}>
-            <Image
-              src={banner}
-              alt={`Banner ${index + 1}`}
-              className="w-full h-auto rounded-xl"
-              priority
-            />
+        {allImages.map((image, index) => (
+          <SwiperSlide key={image.ID || index}>
+            <div className="relative group cursor-pointer overflow-hidden rounded-xl">
+              <img
+                src={image.ImageURL}
+                alt={image.ButtonText || `Banner ${index + 1}`}
+                className="w-full h-auto object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
+              />
+
+              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-60 transition-opacity duration-300 rounded-xl"></div>
+              {(image.ButtonText || image.Link) && (
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  {image.Link ? (
+                    <a href={image.Link} target="_blank" rel="noreferrer">
+                      <PrimaryButton title={image.ButtonText || "View"} />
+                    </a>
+                  ) : (
+                    <PrimaryButton title={image.ButtonText || "View"} />
+                  )}
+                </div>
+              )}
+            </div>
           </SwiperSlide>
         ))}
       </Swiper>
@@ -73,7 +98,7 @@ const Banners = () => {
           {cards.map((card, index) => (
             <SwiperSlide key={index}>
               <div
-                className="flex sm:h-28 cursor-pointer h-24 items-center gap-3 sm:gap-4 border rounded-xl border-gray-100 shadow px-5 md:px-8"
+                className="flex sm:h-28 mb-2 cursor-pointer h-24 items-center gap-3 sm:gap-4 border rounded-xl border-gray-100 shadow px-5 md:px-6"
                 style={{ backgroundColor: card.bg }}
               >
                 <Image
@@ -100,4 +125,3 @@ const Banners = () => {
 };
 
 export default Banners;
-

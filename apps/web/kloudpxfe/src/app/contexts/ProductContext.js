@@ -25,6 +25,7 @@ export const ProductProvider = ({ children }) => {
   const [popular, setPopular] = useState([]);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [branded, setBranded] = useState([]);
+  const [allOtc, setAllOtc] = useState([]);
 
   // Filters
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -49,19 +50,30 @@ export const ProductProvider = ({ children }) => {
   const getAllMedicine = async () => {
     try {
       const res = await getAxiosCall(endpoints.medicine.get, {}, false);
-      // setAllMedicine(res?.data?.medicines || []);
       setSelectedCategoryItems(res?.data?.medicines || []);
     } catch (error) {
-      // setAllMedicine([]);
       console.error("Error fetching all medicines", err);
     }
   };
+
+
+  const getAllOtc = async () => {
+    try {
+      const res = await getAxiosCall(endpoints.otc.get, {}, false);
+      setAllOtc(res?.data?.medicines || []);
+    } catch (error) {
+      setAllOtc([]);
+    }
+  };
+
+
+
+
 
   const getAllBrand = async () => {
     try {
       const res = await getAxiosCall(endpoints.branded.get, {}, false);
       // console.log(res, "");
-
       setBranded(res?.data?.brand_names || []);
     } catch (error) {
       setBranded([]);
@@ -260,6 +272,8 @@ export const ProductProvider = ({ children }) => {
         fetchFilteredMedicines,
         activeSort,
         setActiveSort,
+        getAllOtc,
+        allOtc
       }}
     >
       {children}
