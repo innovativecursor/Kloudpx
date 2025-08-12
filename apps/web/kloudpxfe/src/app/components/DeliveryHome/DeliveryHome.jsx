@@ -1,38 +1,44 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 import { FaUserTie, FaTruck } from "react-icons/fa";
 import { MdOutlineSecurity } from "react-icons/md";
+import delivery1 from "@/assets/delivery1.png";
+import delivery2 from "@/assets/delivery2.png";
 
 const DeliveryHome = () => {
   return (
-    <div className="bg-gray-50 py-12 px-4 md:px-12 lg:px-20">
+    <div className="responsive-mx lg:mt-28 md:mt-24 sm:mt-16 mt-14">
       {/* Top Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:gap-32 gap-10 lg:items-center md:items-start items-center">
         {/* Image */}
-        <div>
-          <img
-            src="/delivery-img1.png"
+        <div className="">
+          <Image
+            src={delivery1}
             alt="Delivery Service"
-            className="w-full h-auto"
+            className="w-full md:h-96 h-auto rounded-xl"
+            priority
           />
         </div>
 
         {/* Text */}
         <div>
-          <h2 className="text-2xl font-bold mb-4">100% Authentic Medicines</h2>
-          <p className="text-gray-600 mb-6">
-            Our licensed pharmacists are available to provide personalized advice
-            and answer your questions about medications, potential interactions,
-            and side effects. We ensure you have all the information you need
-            for safe and effective treatment.
+          <h2 className="sm:text-2xl text-xl font-bold mb-4">
+            100% Authentic Medicines
+          </h2>
+          <p className="text-gray-600 text-justify md:text-start tracking-wide mb-6">
+            Our licensed pharmacists are available to provide personalized
+            advice and answer your questions about medications, potential
+            interactions, and side effects. We ensure you have all the
+            information you need for safe and effective treatment.
           </p>
 
-          <div className="flex items-start space-x-3">
-            <div className="text-blue-500 text-xl">
+          <div className="flex items-start space-x-6">
+            <div className="text-[#0070ba] bg-blue-100 rounded-full p-4 flex items-center text-2xl">
               <FaUserTie />
             </div>
             <div>
-              <p className="font-semibold">Professional Staff</p>
+              <p className="font-bold tex-base">Professional Staff</p>
               <p className="text-gray-500 text-sm">
                 Trained and certified pharmacists
               </p>
@@ -42,13 +48,13 @@ const DeliveryHome = () => {
       </div>
 
       {/* Bottom Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center mt-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:gap-32 gap-10  md:items-start items-center lg:mt-28 md:mt-20 sm:mt-16 mt-11">
         {/* Text */}
         <div>
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className="sm:text-2xl text-xl font-bold mb-6">
             Fast &amp; Secure Delivery Service
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 text-justify md:text-start tracking-wide mb-8">
             Get your medications and health products delivered right to your
             doorstep with our reliable delivery service. We ensure your privacy
             and the integrity of your medications with temperature-controlled
@@ -56,12 +62,13 @@ const DeliveryHome = () => {
           </p>
 
           {/* Same-Day Delivery */}
-          <div className="flex items-start space-x-3 mb-4">
-            <div className="text-blue-500 text-xl">
+
+          <div className="flex items-start space-x-6">
+            <div className="text-[#0070ba] bg-blue-100 rounded-full p-4 flex items-center text-2xl">
               <FaTruck />
             </div>
             <div>
-              <p className="font-semibold">Same-Day Delivery</p>
+              <p className="font-bold tex-base">Same-Day Delivery</p>
               <p className="text-gray-500 text-sm">
                 For orders placed before 2 PM
               </p>
@@ -69,12 +76,13 @@ const DeliveryHome = () => {
           </div>
 
           {/* Secure Packaging */}
-          <div className="flex items-start space-x-3">
-            <div className="text-blue-500 text-xl">
+
+          <div className="flex items-start space-x-6 mt-6">
+            <div className="text-[#0070ba] bg-blue-100 rounded-full p-4 flex items-center text-2xl">
               <MdOutlineSecurity />
             </div>
             <div>
-              <p className="font-semibold">Secure Packaging</p>
+              <p className="font-bold tex-base">Secure Packaging</p>
               <p className="text-gray-500 text-sm">
                 Temperature-controlled and tamper-evident
               </p>
@@ -84,10 +92,10 @@ const DeliveryHome = () => {
 
         {/* Image */}
         <div>
-          <img
-            src="/delivery-img2.png"
-            alt="Pharmacy Store"
-            className="w-full h-auto"
+          <Image
+            src={delivery2}
+            alt="Delivery Service"
+            className="w-full md:h-96 h-auto rounded-xl"
           />
         </div>
       </div>

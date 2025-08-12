@@ -58,28 +58,15 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// components/HealthArticles.jsx
 "use client";
 import { FaArrowRight, FaRegCalendarAlt } from "react-icons/fa";
+import health from "@/assets/health.png";
+import health1 from "@/assets/health1.png";
+import Image from "next/image";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
 
 const articles = [
   {
@@ -88,8 +75,8 @@ const articles = [
     title: "Understanding Antibiotic Resistance",
     description:
       "Learn about the growing concern of antibiotic resistance and how to use antibiotics responsibly.",
-    image: "/antibiotic.jpg", // replace with actual image
-    categoryColor: "bg-blue-100 text-blue-600",
+    image: health,
+    categoryColor: "bg-[#CFEBFF] text-[#0070ba]",
   },
   {
     category: "Wellness",
@@ -97,67 +84,85 @@ const articles = [
     title: "Managing Seasonal Allergies",
     description:
       "Effective strategies and medications to help you cope with seasonal allergies and enjoy the outdoors.",
-    image: "/allergies.jpg", // replace with actual image
-    categoryColor: "bg-blue-100 text-blue-600",
+    image: health1,
+    categoryColor: "bg-[#CFEBFF] text-[#0070ba]",
+  },
+  {
+    category: "Health Education",
+    date: "May 15, 2023",
+    title: "Understanding Antibiotic Resistance",
+    description:
+      "Learn about the growing concern of antibiotic resistance and how to use antibiotics responsibly.",
+    image: health,
+    categoryColor: "bg-[#CFEBFF] text-[#0070ba]",
   },
 ];
 
 export default function HealthArticles() {
   return (
-    <section className="px-6 py-10 max-w-7xl mx-auto">
+    <section className="responsive-mx lg:mt-24 md:mt-20 sm:mt-16 mt-11">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Health Articles</h2>
-        <a
-          href="#"
-          className="flex items-center text-blue-600 hover:underline gap-1"
-        >
+        <h2 className="sm:text-2xl text-xl font-bold">Health Articles</h2>
+        <div className="flex items-center text-[#0070ba] sm:text-base text-xs cursor-pointer hover:underline gap-1">
           View all <FaArrowRight size={14} />
-        </a>
+        </div>
       </div>
 
-      {/* Articles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Swiper Slider with Pagination */}
+      <Swiper
+        spaceBetween={20}
+        modules={[Pagination]}
+        pagination={{
+          clickable: true,
+          el: ".custom-pagination",
+          bulletClass: "custom-bullet",
+          bulletActiveClass: "custom-bullet-active",
+        }}
+        breakpoints={{
+          320: { slidesPerView: 1, spaceBetween: 15 },
+          640: { slidesPerView: 1, spaceBetween: 20 },
+          768: { slidesPerView: 2, spaceBetween: 20 },
+          1024: { slidesPerView: 2, spaceBetween: 20 },
+        }}
+        className="pb-12"
+      >
         {articles.map((article, idx) => (
-          <div
-            key={idx}
-            className="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col"
-          >
-            <img
-              src={article.image}
-              alt={article.title}
-              className="h-48 w-full object-cover"
-            />
-            <div className="p-5 flex flex-col flex-grow">
-              <div className="flex items-center gap-3 mb-2">
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${article.categoryColor}`}
-                >
-                  {article.category}
-                </span>
-                <span className="flex items-center gap-1 text-gray-500 text-sm">
-                  <FaRegCalendarAlt /> {article.date}
-                </span>
+          <SwiperSlide key={idx}>
+            <div className="bg-white mb-2 rounded-xl shadow-sm overflow-hidden flex flex-col">
+              <Image
+                src={article.image}
+                alt={article.title}
+                className="h-full w-full object-cover"
+                priority
+              />
+              <div className="p-5 flex flex-col flex-grow">
+                <div className="flex items-center gap-3 mb-2">
+                  <span
+                    className={`px-3 py-1 rounded-full sm:text-xs text-[10px] font-medium ${article.categoryColor}`}
+                  >
+                    {article.category}
+                  </span>
+                  <span className="flex items-center gap-1 text-gray-500 text-xs">
+                    <FaRegCalendarAlt /> {article.date}
+                  </span>
+                </div>
+                <h3 className="sm:text-lg text-sm font-bold mt-2 mb-2">
+                  {article.title}
+                </h3>
+                <p className="text-gray-600 mt-2 sm:text-sm text-xs flex-grow">
+                  {article.description}
+                </p>
+                <div className="mt-7 mb-4 inline-flex items-center text-[#0070ba] text-sm font-medium hover:underline">
+                  Read more <FaArrowRight className="ml-1" size={14} />
+                </div>
               </div>
-              <h3 className="text-lg font-bold mb-2">{article.title}</h3>
-              <p className="text-gray-600 flex-grow">{article.description}</p>
-              <a
-                href="#"
-                className="mt-3 inline-flex items-center text-blue-600 font-medium hover:underline"
-              >
-                Read more <FaArrowRight className="ml-1" size={14} />
-              </a>
             </div>
-          </div>
+          </SwiperSlide>
         ))}
-      </div>
 
-      {/* Pagination dots */}
-      <div className="flex justify-center mt-6 gap-2">
-        <span className="w-3 h-3 rounded-full bg-blue-600"></span>
-        <span className="w-3 h-3 rounded-full bg-gray-300"></span>
-        <span className="w-3 h-3 rounded-full bg-gray-300"></span>
-      </div>
+        <div className="custom-pagination"></div>
+      </Swiper>
     </section>
   );
 }
