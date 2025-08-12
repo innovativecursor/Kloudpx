@@ -12,6 +12,8 @@ import { FiShoppingCart } from "react-icons/fi";
 import CartModal from "@/app/components/modal/CartModal";
 import useModal from "@/app/hooks/useModal";
 import { RiAccountCircleLine } from "react-icons/ri";
+import { VscAccount } from "react-icons/vsc";
+import { PiShoppingCartSimple } from "react-icons/pi";
 // import Signup from "../Auth/Signup";
 // import Login from "../Auth/Login";
 
@@ -22,6 +24,9 @@ const Header = () => {
   const { isOpen, setIsOpen, modalRef } = useModal();
   // const [showSignup, setShowSignup] = useState(false);
   // const [isLoginOpen, setIsLoginOpen] = useState(false);
+
+  console.log(user?.first_name);
+
   return (
     <>
       <div className="fixed top-0 left-0 right-0 z-40 bg-white shadow-sm">
@@ -48,19 +53,36 @@ const Header = () => {
             <button onClick={() => setIsLoginOpen(true)}>Open Login</button> */}
 
             {/* Right: User & Cart */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center sm:gap-6 gap-4 ">
+              <p className="sm:text-xs text-[9px] mt-1 tracking-wide opacity-70 cursor-pointer">
+                {user?.first_name} {user?.last_name}
+              </p>
               <div>
                 {!isAuthLoaded ? null : !loading && user ? (
-                  <RiAccountCircleLine
-                    className="text-4xl cursor-pointer"
-                    onClick={() => router.push("/Profile")}
-                  />
+                  <div className="flex items-center flex-col">
+                    <VscAccount
+                      className="md:text-2xl text-xl cursor-pointer"
+                      onClick={() => router.push("/Profile")}
+                    />
+                    <span className="md:text-sm sm:text-xs text-[9px] mt-1 tracking-wide opacity-70 cursor-pointer">
+                      Account
+                    </span>
+                  </div>
                 ) : (
                   <div
                     onClick={!loading ? login : undefined}
-                    className="font-semibold sm:text-xs text-xs cursor-pointer"
+                    className="cursor-pointer"
                   >
-                    {loading ? "Signing In..." : "Login/Signup"}
+                    {loading ? (
+                      "Signing In..."
+                    ) : (
+                      <div className="flex items-center flex-col">
+                        <VscAccount className="md:text-2xl text-xl cursor-pointer" />
+                        <span className="md:text-sm sm:text-xs text-[9px] mt-1 tracking-wide opacity-70 cursor-pointer">
+                          Login
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -70,8 +92,14 @@ const Header = () => {
                 className="relative cursor-pointer"
                 onClick={() => setIsOpen(true)}
               >
-                <FiShoppingCart className="md:text-3xl text-2xl font-light" />
-                <span className="absolute -top-1 -right-1 text-[10px] bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center">
+                <PiShoppingCartSimple className="md:text-2xl text-xl cursor-pointer" />
+                <span className="md:text-sm sm:text-xs text-[9px] mt-1 tracking-wide opacity-70 cursor-pointer">
+                  Cart
+                </span>
+                <span
+                  className="absolute sm:-top-1 top-0 sm:right-1 -right-1 sm:text-[10px] text-[9px] bg-red-600 text-white rounded-full
+                 sm:w-4 sm:h-4 h-3 w-3 flex items-center justify-center"
+                >
                   {isAuthLoaded ? cartLength : 0}
                 </span>
 

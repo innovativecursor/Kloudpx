@@ -2,7 +2,7 @@
 import Cards from "@/app/components/cards/Cards";
 import Category7 from "@/app/components/category7/Category7";
 import TrendingProducts from "@/app/components/trendingproducts/TrendingProducts";
-import HealthArticles from "@/app/components/healtharticles/HealthArticles";
+// import HealthArticles from "@/app/components/healtharticles/HealthArticles";
 import Testimonial from "@/app/components/testimonial/Testimonial";
 import FeaturedBrand from "@/app/components/featuredbrand/FeaturedBrand";
 // import Faq from "@/app/components/FaqData/Faq";
@@ -146,7 +146,7 @@ function Products() {
         <Cards data={secondCategory} title={secondCategoryName} />
       </div>
       <TrendingProducts />
-      <HealthArticles articles={articles} />
+      {/* <HealthArticles articles={articles} /> */}
       <Testimonial testimonials={testimonials} />
       <Faq data={faqData} showAll={false} />
       <div className="mt-10 sm:mt-16 md:mt-20">
