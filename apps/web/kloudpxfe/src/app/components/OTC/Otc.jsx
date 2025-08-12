@@ -1,53 +1,102 @@
 "use client";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
-import otc1 from "@/assets/otc1.png";
-import otc2 from "@/assets/otc2.png";
-import otc3 from "@/assets/otc3.png";
-
-const products = [
-  {
-    id: 1,
-    category: "Supplements",
-    title: "Vitamin C Supplement",
-    price: 12.99,
-    image: otc1,
-  },
-  {
-    id: 2,
-    category: "Medical Devices",
-    title: "Digital Thermometer",
-    price: 24.99,
-    image: otc2,
-  },
-  {
-    id: 3,
-    category: "First Aid",
-    title: "First Aid Kit",
-    price: 19.99,
-    image: otc3,
-  },
-  {
-    id: 4,
-    category: "Supplements",
-    title: "Zinc Supplement",
-    price: 14.5,
-    image: otc2,
-  },
-];
+import { useRouter } from "next/navigation";
+import { useProductContext } from "@/app/contexts/ProductContext";
+import AddToCart from "../button/AddToCart";
+import useProductNavigation from "@/app/hooks/useProductNavigation";
 
 const Otc = () => {
+  const { getAllOtc, allOtc } = useProductContext();
+  const fallbackImage = "/assets/fallback.png";
+  const router = useRouter();
+  const { goToProductPage } = useProductNavigation();
+  useEffect(() => {
+    getAllOtc();
+  }, []);
+
+  console.log(allOtc);
+
+  const otcSlides = allOtc.map((product) => {
+    const price = product.price || 0;
+    const discountPercent = product.discount
+      ? parseFloat(product.discount.replace("%", "")) || 0
+      : 0;
+    const discountedPrice = (price - (price * discountPercent) / 100).toFixed(
+      2
+    );
+
+    return (
+      <SwiperSlide key={product.id}>
+        <div className="bg-white h-96 mb-5 cursor-pointer rounded-xl shadow-md overflow-hidden hover:shadow-md transition">
+          {/* Image */}
+          <div
+            onClick={() => goToProductPage(product?.id, product?.genericname)}
+            className="relative w-full cursor-pointer h-56"
+          >
+            <Image
+              src={
+                product.images?.[0]?.trim() ? product.images[0] : fallbackImage
+              }
+              alt={product.title || product.genericname}
+              fill
+              className="object-cover"
+            />
+          </div>
+
+          {/* Content */}
+          <div className="p-4">
+            <div
+              onClick={() => goToProductPage(product?.id, product?.genericname)}
+            >
+              <p className="text-xs text-[#0070ba] font-medium">
+                {product.brandname}
+              </p>
+              <h3 className="text-base mt-1 font-semibold text-gray-900">
+                {product.genericname}
+              </h3>
+            </div>
+
+            <div className="flex justify-between items-center mt-4 mb-2">
+              {discountPercent > 0 ? (
+                <div>
+                  <span className="text-gray-900 font-bold">
+                    ₱{discountedPrice}
+                  </span>
+                  <span className="text-sm line-through text-gray-400 ml-2">
+                    ₱{price.toFixed(2)}
+                  </span>
+                </div>
+              ) : (
+                <p className="text-gray-900 font-bold"> ₱{price.toFixed(2)}</p>
+              )}
+
+              <AddToCart
+                title="Add To Cart"
+                productDetails={product}
+                className="cursor-pointer sm:text-xs text-[10px] px-6 bg-[#0070ba] text-white font-medium sm:py-3 py-2 rounded-full transition"
+              />
+            </div>
+          </div>
+        </div>
+      </SwiperSlide>
+    );
+  });
+
   return (
-    <section className=" responsive-mx md:mt-20 sm:mt-16 mt-12">
-      <div className="">
+    <section className="responsive-mx lg:mt-32 md:mt-24 sm:mt-20 mt-16">
+      <div>
         {/* Header */}
-        <div className="flex sm:justify-between justify-center items-center sm:mb-6 mb-4">
-          <h2 className="sm:text-2xl  text-lg font-bold text-gray-900">
+        <div className="flex sm:justify-between justify-center items-center sm:mb-8 mb-4">
+          <h2 className="sm:text-2xl text-lg font-bold text-gray-900">
             OTC Medications & Supplements
           </h2>
-          <div className="text-[#0070ba]  font-medium sm:flex hidden items-center gap-1 hover:underline">
+          <div
+            onClick={() => router.push("/Products")}
+            className="text-[#0070ba] font-medium sm:flex hidden items-center gap-1 hover:underline"
+          >
             View all <span>→</span>
           </div>
         </div>
@@ -62,43 +111,15 @@ const Otc = () => {
             1024: { slidesPerView: 3 },
           }}
         >
-          {products.map((product) => (
-            <SwiperSlide key={product.id}>
-              <div className="bg-white mb-5 rounded-xl shadow-md  overflow-hidden hover:shadow-md transition">
-                {/* Image */}
-                <div className="relative w-full h-56">
-                  <Image
-                    src={product.image}
-                    alt={product.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="p-4">
-                  <p className="text-xs text-[#0070ba] font-medium">
-                    {product.category}
-                  </p>
-                  <h3 className="text-base mt-1 font-semibold text-gray-900">
-                    {product.title}
-                  </h3>
-                  <div className="flex justify-between items-center mt-4 mb-2">
-                    <p className="text-gray-900 font-bold ">
-                      ${product.price.toFixed(2)}
-                    </p>
-                    <button className=" cursor-pointer sm:text-xs text-[10px] px-6 bg-[#0070ba] text-white font-medium sm:py-3.5 py-2.5 rounded-full transition">
-                      Add to Cart
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
+          {otcSlides}
         </Swiper>
 
+        {/* Mobile View All Button */}
         <div className="sm:hidden flex justify-center items-center mt-4">
-          <button className=" cursor-pointer text-xs px-10 bg-[#0070ba] text-white font-medium py-3 rounded-full transition">
+          <button
+            onClick={() => router.push("/Products")}
+            className="cursor-pointer text-xs px-10 bg-[#0070ba] text-white font-medium py-3 rounded-full transition"
+          >
             View All
           </button>
         </div>

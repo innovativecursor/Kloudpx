@@ -85,11 +85,46 @@ const Address = () => {
                       </span>
                     </div>
 
-                    <div className="w-[70%] ">
+                    {/* <div className="w-[70%] ">
                       <div className="text-xs  tracking-wide text-gray-600 text-center">
                         {address?.PhoneNumber} {address?.City},{" "}
                         {address?.Region}, {address?.Province},{" "}
                         {address?.ZipCode}
+                      </div>
+                    </div> */}
+
+                    <div className="w-[70%]">
+                      <div className="text-xs tracking-wide text-gray-700 flex flex-wrap justify-center gap-x-3 gap-y-1">
+                        <div>
+                          <span className="font-semibold text-gray-500">
+                            Phone:{" "}
+                          </span>
+                          <span>{address?.PhoneNumber || "N/A"}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-gray-500">
+                            City:{" "}
+                          </span>
+                          <span>{address?.City || "N/A"}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-gray-500">
+                            Region:{" "}
+                          </span>
+                          <span>{address?.Region || "N/A"}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-gray-500">
+                            Province:{" "}
+                          </span>
+                          <span>{address?.Province || "N/A"}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-gray-500">
+                            Zip:{" "}
+                          </span>
+                          <span>{address?.ZipCode || "N/A"}</span>
+                        </div>
                       </div>
                     </div>
 
@@ -149,14 +184,17 @@ const Address = () => {
           </>
         )}
 
-        {deliveryType && !deliverySuccess && (
+        {/* {deliveryType && !deliverySuccess && (
           <DeliveryType setDeliverySuccess={setDeliverySuccess} />
-        )}
-        {deliverySuccess && deliveryData?.delivery_type === "cod" ? (
+        )} */}
+
+        {deliveryType && !deliverySuccess && <DeliveryType />}
+
+        {/* {deliverySuccess && deliveryData?.delivery_type === "cod" ? (
           <Cod />
         ) : (
           deliverySuccess && <Screener />
-        )}
+        )} */}
       </div>
     </>
   );

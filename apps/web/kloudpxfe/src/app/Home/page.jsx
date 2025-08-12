@@ -59,7 +59,7 @@ function Home() {
   ];
 
   return (
-    <div className="homepage">
+    <div className=" bg-[#F9FAFB]">
       <div className="mt-40 md:mt-64 sm:mt-48">
         <Hero />
       </div>

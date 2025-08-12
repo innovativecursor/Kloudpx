@@ -25,7 +25,7 @@ const Header = () => {
   // const [showSignup, setShowSignup] = useState(false);
   // const [isLoginOpen, setIsLoginOpen] = useState(false);
 
-  console.log(user?.first_name);
+  // console.log(user?.first_name);
 
   return (
     <>
@@ -53,10 +53,7 @@ const Header = () => {
             <button onClick={() => setIsLoginOpen(true)}>Open Login</button> */}
 
             {/* Right: User & Cart */}
-            <div className="flex items-center justify-center sm:gap-6 gap-4 ">
-              <p className="sm:text-xs text-[9px] mt-1 tracking-wide opacity-70 cursor-pointer">
-                {user?.first_name} {user?.last_name}
-              </p>
+            <div className="flex items-center justify-center gap-6 ">
               <div>
                 {!isAuthLoaded ? null : !loading && user ? (
                   <div className="flex items-center flex-col">
@@ -65,7 +62,7 @@ const Header = () => {
                       onClick={() => router.push("/Profile")}
                     />
                     <span className="md:text-sm sm:text-xs text-[9px] mt-1 tracking-wide opacity-70 cursor-pointer">
-                      Account
+                      {user?.first_name} {user?.last_name}
                     </span>
                   </div>
                 ) : (

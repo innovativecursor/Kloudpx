@@ -10,7 +10,7 @@ const DeliveryHome = () => {
   return (
     <div className="responsive-mx lg:mt-28 md:mt-24 sm:mt-16 mt-14">
       {/* Top Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:gap-32 gap-10 lg:items-center md:items-start items-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:gap-28 gap-10 lg:items-center md:items-start items-center">
         {/* Image */}
         <div className="">
           <Image

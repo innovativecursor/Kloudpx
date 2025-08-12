@@ -5,6 +5,8 @@ import { updateAxiosCall, postAxiosCall, getAxiosCall } from "../lib/axios";
 import endpoints from "../config/endpoints";
 import toast from "react-hot-toast";
 
+
+
 const CheckoutContext = createContext();
 
 export const CheckoutProvider = ({ children }) => {
@@ -14,6 +16,9 @@ export const CheckoutProvider = ({ children }) => {
   const [selected, setSelected] = useState("standard");
   const [deliveryData, setDeliveryData] = useState([]);
   const [getAllAddress, setGetAllAddress] = useState([]);
+  const [paymentMethod, setPaymentMethod] = useState("GCOD");
+  // const [OrderSubmit, setOrderSubmit] = useState([])
+
   const [formData, setFormData] = useState({
     id: null,
     nameresidency: "",
@@ -25,6 +30,9 @@ export const CheckoutProvider = ({ children }) => {
     phonenumber: "",
     isdefault: false,
   });
+
+  // console.log(paymentMethod);
+
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -63,7 +71,6 @@ export const CheckoutProvider = ({ children }) => {
     try {
       const res = await postAxiosCall(endpoints.checkout.get, {}, true);
       // console.log(res);
-
       setCheckoutData(res || []);
     } catch (error) {
       setCheckoutData([]);
@@ -168,15 +175,43 @@ export const CheckoutProvider = ({ children }) => {
         },
         true
       );
-      console.log("Delivery type:", res);
+      // console.log("Delivery type:", res);
       setDeliveryData(res || []);
-      toast.success("Delivery type selected successfully!");
+      // toast.success("Delivery type selected successfully!");
     } catch (error) {
       console.error("Error selecting address:", error.message);
       toast.error("Something went wrong!");
       setDeliveryData([]);
     }
   };
+
+
+  // const handleOrderSubmit = async () => {
+  //   if (!paymentMethod) {
+  //     toast.error("Checkout session ID is missing.");
+  //     return;
+  //   }
+
+  //   try {
+  //     const res = await postAxiosCall(
+  //       endpoints.OrderSubmit.add,
+  //       {
+  //         checkout_session_id: checkoutData?.checkout_session_id,
+  //         payment_type: paymentMethod,
+  //       },
+  //       true
+  //     );
+  //     console.log("Delivery type:", res);
+  //     setOrderSubmit(res || []);
+  //     toast.success("Payment submitted successfully!");
+  //     getAllCartData();
+  //     router.push("/Success");
+  //   } catch (error) {
+  //     console.error("Error selecting address:", error.message);
+  //     toast.error("Something went wrong!");
+  //     setOrderSubmit([]);
+  //   }
+  // };
 
   return (
     <CheckoutContext.Provider
@@ -198,6 +233,9 @@ export const CheckoutProvider = ({ children }) => {
         setSelected,
         addDeliveryData,
         deliveryData,
+        paymentMethod,
+        setPaymentMethod,
+        // handleOrderSubmit,
       }}
     >
       {children}
