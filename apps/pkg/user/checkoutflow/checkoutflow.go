@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	cfg "github.com/innovativecursor/Kloudpx/apps/pkg/config"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/itemscalculation"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/getfileextension"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/s3helper"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/userinfo"
@@ -421,13 +422,13 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 	switch dataConfig.DeliveryType {
 	case "standard":
 		if totalCost >= region.FreeShippingLimit {
-			// Apply standard rate even if above threshold, no COD fee
-			deliveryCost = region.StandardRate
+			// Free delivery
+			deliveryCost = 0
 			codFee = 0
 		} else {
-			// Apply both standard rate and COD fee
+			// Apply standard rate only
 			deliveryCost = region.StandardRate
-			codFee = totalCost * 0.0275
+			codFee = 0
 		}
 
 	case "priority":
@@ -564,36 +565,18 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 // 		return
 // 	}
 
-// 	// Handle Cash on Delivery
+// 	// Use stored totals — no recalculation
+// 	grandTotal := session.GrandTotal
+
+// 	// Handle COD
 // 	if session.DeliveryType == "cod" {
 // 		var address models.Address
 // 		if err := db.First(&address, session.AddressID).Error; err != nil {
 // 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch delivery address"})
 // 			return
 // 		}
-// 		fullAddress := fmt.Sprintf("%s, %s, %s, %s, %s", address.NameResidency, address.Barangay, address.City, address.Province, address.ZipCode)
-
-// 		var cartItems []models.Cart
-// 		if err := db.Preload("Medicine").
-// 			Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
-// 			Find(&cartItems).Error; err != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart items"})
-// 			return
-// 		}
-
-// 		var totalCost float64
-// 		for _, item := range cartItems {
-// 			price := item.Medicine.SellingPricePerPiece * float64(item.Quantity)
-// 			if item.Medicine.Discount != "" {
-// 				discountStr := strings.TrimSuffix(item.Medicine.Discount, "%")
-// 				discountVal, err := strconv.ParseFloat(discountStr, 64)
-// 				if err == nil {
-// 					price -= price * discountVal / 100
-// 				}
-// 			}
-// 			totalCost += price
-// 		}
-// 		grandTotal := totalCost + float64(session.DeliveryCost)
+// 		fullAddress := fmt.Sprintf("%s, %s, %s, %s, %s",
+// 			address.NameResidency, address.Barangay, address.City, address.Province, address.ZipCode)
 
 // 		orderNumber := userinfo.GenerateOrderNumber()
 // 		order := models.Order{
@@ -613,44 +596,28 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 
 // 		session.Status = "completed"
 // 		db.Save(&session)
+
+// 		// Move items to history & clear cart
 // 		var orderedItems []models.Cart
 // 		if err := db.Preload("Medicine").
 // 			Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
-// 			Find(&orderedItems).Error; err != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart items"})
-// 			return
-// 		}
-
-// 		// Save a copy into CartHistory
-// 		for _, item := range orderedItems {
-// 			historyItem := models.CartHistory{
-// 				UserID:            item.UserID,
-// 				PrescriptionID:    item.PrescriptionID,
-// 				MedicineID:        item.MedicineID,
-// 				Quantity:          item.Quantity,
-// 				IsOTC:             item.IsOTC,
-// 				CheckoutSessionID: session.ID,
-// 				IsSavedForLater:   item.IsSavedForLater,
-// 				MedicineStatus:    item.MedicineStatus,
-// 				OrderNumber:       orderNumber,
+// 			Find(&orderedItems).Error; err == nil {
+// 			for _, item := range orderedItems {
+// 				historyItem := models.CartHistory{
+// 					UserID:            item.UserID,
+// 					PrescriptionID:    item.PrescriptionID,
+// 					MedicineID:        item.MedicineID,
+// 					Quantity:          item.Quantity,
+// 					IsOTC:             item.IsOTC,
+// 					CheckoutSessionID: session.ID,
+// 					IsSavedForLater:   item.IsSavedForLater,
+// 					MedicineStatus:    item.MedicineStatus,
+// 					OrderNumber:       orderNumber,
+// 				}
+// 				db.Create(&historyItem)
 // 			}
-// 			if err := db.Create(&historyItem).Error; err != nil {
-// 				logrus.Errorf("Failed to store cart history: %v", err)
-// 			}
-// 		}
-
-// 		// Remove ordered items from cart
-// 		if err := db.Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
-// 			Delete(&models.Cart{}).Error; err != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to remove ordered cart items"})
-// 			return
-// 		}
-
-// 		if err := db.Model(&models.Cart{}).
-// 			Where("checkout_session_id = ?", session.ID).
-// 			Update("checkout_session_id", nil).Error; err != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to clear session from cart items"})
-// 			return
+// 			db.Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
+// 				Delete(&models.Cart{})
 // 		}
 
 // 		c.JSON(http.StatusOK, gin.H{
@@ -661,7 +628,7 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 // 		return
 // 	}
 
-// 	// Online payments
+// 	// Handle Online Payments
 // 	if req.PaymentNumber == "" && req.ScreenshotBase64 == "" {
 // 		c.JSON(http.StatusBadRequest, gin.H{"error": "Either payment_number or screenshot_base64 must be provided"})
 // 		return
@@ -681,29 +648,19 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 // 			return
 // 		}
 
-// 		cfg, err := cfg.Env()
-// 		if err != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Configuration error"})
-// 			return
-// 		}
-
+// 		cfg, _ := cfg.Env()
 // 		profileType := "payment"
 // 		userType := "user"
 // 		uniqueID := s3helper.GenerateUniqueID().String()
 // 		userID := fmt.Sprintf("%d", userObj.ID)
 // 		imageName := "payment_screenshot"
 
-// 		err = s3helper.UploadToS3(
+// 		if err := s3helper.UploadToS3(
 // 			c.Request.Context(),
-// 			profileType,
-// 			userType,
-// 			cfg.S3.BucketName,
-// 			uniqueID,
-// 			userID,
-// 			imageName,
-// 			decodedImage,
-// 		)
-// 		if err != nil {
+// 			profileType, userType,
+// 			cfg.S3.BucketName, uniqueID, userID,
+// 			imageName, decodedImage,
+// 		); err != nil {
 // 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload image"})
 // 			return
 // 		}
@@ -732,46 +689,21 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 // 		Remark:            remark,
 // 		Status:            "Pending",
 // 	}
-
 // 	if err := db.Create(&payment).Error; err != nil {
 // 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save payment"})
 // 		return
 // 	}
 
 // 	session.Status = "completed"
-// 	if err := db.Save(&session).Error; err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update session status"})
-// 		return
-// 	}
+// 	db.Save(&session)
 
 // 	var address models.Address
 // 	if err := db.First(&address, session.AddressID).Error; err != nil {
 // 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch delivery address"})
 // 		return
 // 	}
-// 	fullAddress := fmt.Sprintf("%s, %s, %s, %s, %s", address.NameResidency, address.Barangay, address.City, address.Province, address.ZipCode)
-
-// 	var cartItems []models.Cart
-// 	if err := db.Preload("Medicine").
-// 		Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
-// 		Find(&cartItems).Error; err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart items"})
-// 		return
-// 	}
-
-// 	var totalCost float64
-// 	for _, item := range cartItems {
-// 		price := item.Medicine.SellingPricePerPiece * float64(item.Quantity)
-// 		if item.Medicine.Discount != "" {
-// 			discountStr := strings.TrimSuffix(item.Medicine.Discount, "%")
-// 			discountVal, err := strconv.ParseFloat(discountStr, 64)
-// 			if err == nil {
-// 				price -= price * discountVal / 100
-// 			}
-// 		}
-// 		totalCost += price
-// 	}
-// 	grandTotal := totalCost + float64(session.DeliveryCost)
+// 	fullAddress := fmt.Sprintf("%s, %s, %s, %s, %s",
+// 		address.NameResidency, address.Barangay, address.City, address.Province, address.ZipCode)
 
 // 	order := models.Order{
 // 		UserID:            userObj.ID,
@@ -782,43 +714,32 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 // 		DeliveryType:      session.DeliveryType,
 // 		Status:            "processing",
 // 	}
-
 // 	if err := db.Create(&order).Error; err != nil {
 // 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create order summary"})
 // 		return
 // 	}
 
-// 	// Fetch cart items for this checkout
+// 	// Move items to history & clear cart
 // 	var orderedItems []models.Cart
 // 	if err := db.Preload("Medicine").
 // 		Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
-// 		Find(&orderedItems).Error; err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart items"})
-// 		return
-// 	}
-
-// 	// Save a copy into CartHistory
-// 	for _, item := range orderedItems {
-// 		historyItem := models.CartHistory{
-// 			UserID:            item.UserID,
-// 			PrescriptionID:    item.PrescriptionID,
-// 			MedicineID:        item.MedicineID,
-// 			Quantity:          item.Quantity,
-// 			IsOTC:             item.IsOTC,
-// 			CheckoutSessionID: session.ID,
-// 			IsSavedForLater:   item.IsSavedForLater,
-// 			MedicineStatus:    item.MedicineStatus,
-// 			OrderNumber:       orderNumber, // from your order generation
+// 		Find(&orderedItems).Error; err == nil {
+// 		for _, item := range orderedItems {
+// 			historyItem := models.CartHistory{
+// 				UserID:            item.UserID,
+// 				PrescriptionID:    item.PrescriptionID,
+// 				MedicineID:        item.MedicineID,
+// 				Quantity:          item.Quantity,
+// 				IsOTC:             item.IsOTC,
+// 				CheckoutSessionID: session.ID,
+// 				IsSavedForLater:   item.IsSavedForLater,
+// 				MedicineStatus:    item.MedicineStatus,
+// 				OrderNumber:       orderNumber,
+// 			}
+// 			db.Create(&historyItem)
 // 		}
-// 		if err := db.Create(&historyItem).Error; err != nil {
-// 			logrus.Errorf("Failed to store cart history: %v", err)
-// 		}
-// 	}
-
-// 	if err := db.Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
-// 		Delete(&models.Cart{}).Error; err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to remove ordered cart items"})
-// 		return
+// 		db.Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
+// 			Delete(&models.Cart{})
 // 	}
 
 // 	c.JSON(http.StatusOK, gin.H{
@@ -857,7 +778,16 @@ func SubmitPayment(c *gin.Context, db *gorm.DB) {
 	// Use stored totals — no recalculation
 	grandTotal := session.GrandTotal
 
-	// Handle COD
+	// Fetch ordered items first
+	var orderedItems []models.Cart
+	if err := db.Preload("Medicine").
+		Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
+		Find(&orderedItems).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart items"})
+		return
+	}
+
+	// COD payment
 	if session.DeliveryType == "cod" {
 		var address models.Address
 		if err := db.First(&address, session.AddressID).Error; err != nil {
@@ -868,6 +798,13 @@ func SubmitPayment(c *gin.Context, db *gorm.DB) {
 			address.NameResidency, address.Barangay, address.City, address.Province, address.ZipCode)
 
 		orderNumber := userinfo.GenerateOrderNumber()
+
+		// Deduct stock before creating order
+		if err := itemscalculation.DeductMedicineStock(db, orderedItems); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to deduct stock: " + err.Error()})
+			return
+		}
+
 		order := models.Order{
 			UserID:            userObj.ID,
 			CheckoutSessionID: session.ID,
@@ -877,7 +814,6 @@ func SubmitPayment(c *gin.Context, db *gorm.DB) {
 			DeliveryType:      session.DeliveryType,
 			Status:            "processing",
 		}
-
 		if err := db.Create(&order).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create order summary"})
 			return
@@ -886,28 +822,25 @@ func SubmitPayment(c *gin.Context, db *gorm.DB) {
 		session.Status = "completed"
 		db.Save(&session)
 
-		// Move items to history & clear cart
-		var orderedItems []models.Cart
-		if err := db.Preload("Medicine").
-			Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
-			Find(&orderedItems).Error; err == nil {
-			for _, item := range orderedItems {
-				historyItem := models.CartHistory{
-					UserID:            item.UserID,
-					PrescriptionID:    item.PrescriptionID,
-					MedicineID:        item.MedicineID,
-					Quantity:          item.Quantity,
-					IsOTC:             item.IsOTC,
-					CheckoutSessionID: session.ID,
-					IsSavedForLater:   item.IsSavedForLater,
-					MedicineStatus:    item.MedicineStatus,
-					OrderNumber:       orderNumber,
-				}
-				db.Create(&historyItem)
+		// Move cart items to history
+		for _, item := range orderedItems {
+			historyItem := models.CartHistory{
+				UserID:            item.UserID,
+				PrescriptionID:    item.PrescriptionID,
+				MedicineID:        item.MedicineID,
+				Quantity:          item.Quantity,
+				IsOTC:             item.IsOTC,
+				CheckoutSessionID: session.ID,
+				IsSavedForLater:   item.IsSavedForLater,
+				MedicineStatus:    item.MedicineStatus,
+				OrderNumber:       orderNumber,
 			}
-			db.Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
-				Delete(&models.Cart{})
+			db.Create(&historyItem)
 		}
+
+		// Clear cart
+		db.Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
+			Delete(&models.Cart{})
 
 		c.JSON(http.StatusOK, gin.H{
 			"message":      "COD order placed successfully",
@@ -917,7 +850,7 @@ func SubmitPayment(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Handle Online Payments
+	// Online Payment
 	if req.PaymentNumber == "" && req.ScreenshotBase64 == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Either payment_number or screenshot_base64 must be provided"})
 		return
@@ -969,6 +902,13 @@ func SubmitPayment(c *gin.Context, db *gorm.DB) {
 	}
 
 	orderNumber := userinfo.GenerateOrderNumber()
+
+	// Deduct stock before creating payment/order
+	if err := itemscalculation.DeductMedicineStock(db, orderedItems); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to deduct stock: " + err.Error()})
+		return
+	}
+
 	payment := models.Payment{
 		UserID:            userObj.ID,
 		CheckoutSessionID: uint(sessionID),
@@ -1008,28 +948,25 @@ func SubmitPayment(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Move items to history & clear cart
-	var orderedItems []models.Cart
-	if err := db.Preload("Medicine").
-		Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
-		Find(&orderedItems).Error; err == nil {
-		for _, item := range orderedItems {
-			historyItem := models.CartHistory{
-				UserID:            item.UserID,
-				PrescriptionID:    item.PrescriptionID,
-				MedicineID:        item.MedicineID,
-				Quantity:          item.Quantity,
-				IsOTC:             item.IsOTC,
-				CheckoutSessionID: session.ID,
-				IsSavedForLater:   item.IsSavedForLater,
-				MedicineStatus:    item.MedicineStatus,
-				OrderNumber:       orderNumber,
-			}
-			db.Create(&historyItem)
+	// Move cart items to history
+	for _, item := range orderedItems {
+		historyItem := models.CartHistory{
+			UserID:            item.UserID,
+			PrescriptionID:    item.PrescriptionID,
+			MedicineID:        item.MedicineID,
+			Quantity:          item.Quantity,
+			IsOTC:             item.IsOTC,
+			CheckoutSessionID: session.ID,
+			IsSavedForLater:   item.IsSavedForLater,
+			MedicineStatus:    item.MedicineStatus,
+			OrderNumber:       orderNumber,
 		}
-		db.Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
-			Delete(&models.Cart{})
+		db.Create(&historyItem)
 	}
+
+	// Clear cart
+	db.Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
+		Delete(&models.Cart{})
 
 	c.JSON(http.StatusOK, gin.H{
 		"message":       "Payment submitted successfully",
