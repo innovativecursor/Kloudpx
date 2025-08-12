@@ -45,7 +45,7 @@ func GetUsersWithPrescriptionSummary(c *gin.Context, db *gorm.DB) {
 			SUM(CASE 
 					WHEN p.status = 'unsettled'
 					  AND EXISTS (
-						  SELECT 1 FROM carts c 
+						  SELECT 1 FROM cart_histories c 
 						  WHERE c.prescription_id = p.id 
 						    AND c.medicine_status = 'unsettled'
 					  )
@@ -81,8 +81,8 @@ func GetUserPrescriptionHistory(c *gin.Context, db *gorm.DB) {
 
 	var unsettled []models.Prescription
 	db.Preload("User").
-		Joins("JOIN carts ON carts.prescription_id = prescriptions.id").
-		Where("prescriptions.user_id = ? AND carts.medicine_status = ?", userID, "unsettled").
+		Joins("JOIN cart_histories ch ON ch.prescription_id = prescriptions.id").
+		Where("prescriptions.user_id = ? AND ch.medicine_status = ?", userID, "unsettled").
 		Group("prescriptions.id").
 		Find(&unsettled)
 
@@ -106,7 +106,7 @@ func GetPrescriptionCart(c *gin.Context, db *gorm.DB) {
 
 	prescriptionID := c.Param("id")
 
-	var cartItems []models.Cart
+	var cartItems []models.CartHistory
 	if err := db.
 		Preload("Medicine").
 		Preload("Medicine.ItemImages").
@@ -138,7 +138,7 @@ func ApproveMedicineInPrescription(c *gin.Context, db *gorm.DB) {
 
 	cartID := c.Param("cart_id")
 
-	var cart models.Cart
+	var cart models.CartHistory
 	if err := db.First(&cart, cartID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Cart item not found"})
 		return
@@ -176,7 +176,7 @@ func RejectMedicineInPrescription(c *gin.Context, db *gorm.DB) {
 
 	cartID := c.Param("cart_id")
 
-	var cart models.Cart
+	var cart models.CartHistory
 	if err := db.First(&cart, cartID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Cart item not found"})
 		return
@@ -201,7 +201,7 @@ func RejectMedicineInPrescription(c *gin.Context, db *gorm.DB) {
 
 func checkAndUpdatePrescriptionStatus(db *gorm.DB, prescriptionID uint) {
 	var unsettledCount int64
-	db.Model(&models.Cart{}).
+	db.Model(&models.CartHistory{}).
 		Where("prescription_id = ? AND medicine_status = ?", prescriptionID, "unsettled").
 		Count(&unsettledCount)
 
