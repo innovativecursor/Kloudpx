@@ -8,7 +8,7 @@ import "swiper/css";
 
 const Upload = () => {
   return (
-    <div className="responsive-mx md:mt-20 sm:mt-16 mt-9">
+    <div className="responsive-mx md:mt-20 sm:mt-16 mt-11">
       <Swiper
         spaceBetween={20}
         slidesPerView={1.2}

@@ -33,7 +33,7 @@ const Banners = () => {
   ];
 
   return (
-    <div className="responsive-mx lg:mt-14 md:mt-12 sm:mt-9 mt-6">
+    <div className="responsive-mx lg:mt-14 md:mt-12 mt-9">
       <h1 className="font-semibold sm:text-2xl text-lg tracking-wide lg:mb-7 md:mb-5 mb-3">
         Banners
       </h1>
@@ -60,7 +60,7 @@ const Banners = () => {
       </Swiper>
 
       {/* Cards Section with Swiper */}
-      <div className="lg:mt-24 md:mt-20 sm:mt-16 mt-9">
+      <div className="lg:mt-24 md:mt-20 sm:mt-16 mt-11">
         <Swiper
           spaceBetween={15}
           breakpoints={{

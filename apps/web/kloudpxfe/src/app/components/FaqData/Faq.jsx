@@ -72,7 +72,7 @@ const Faq = ({ data = [], showAll = false }) => {
         <div className="flex justify-center md:mt-6 mt-2">
           <button
             onClick={handleViewMore}
-            className="text-[10px] font-normal bg-[#0070BA] rounded-full text-white cursor-pointer sm:py-2 py-1.5 px-6 sm:px-5"
+            className="text-xs font-normal bg-[#0070BA] rounded-full text-white cursor-pointer sm:py-3 py-1.5 px-6 sm:px-5"
           >
             View More
             <i className="ri-arrow-right-s-line"></i>

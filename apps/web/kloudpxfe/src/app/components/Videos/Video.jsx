@@ -5,7 +5,7 @@ import video from "@/assets/video.png";
 
 const Video = () => {
   return (
-    <div className="responsive-mx lg:mt-28 lg:py-14 sm:py-8 py-6  md:mt-20 sm:mt-16 mt-9 bg-[#EBF7FF] border border-gray-100 flex flex-col justify-center items-center rounded-xl">
+    <div className="responsive-mx lg:mt-28 lg:py-14 sm:py-8 py-6  md:mt-20 sm:mt-16 mt-11 bg-[#EBF7FF] border border-gray-100 flex flex-col justify-center items-center rounded-xl">
       <h1 className="font-bold sm:text-2xl text-lg tracking-wide lg:pt-8 md:pt-5 ">
         How KloudPharma Works
       </h1>
