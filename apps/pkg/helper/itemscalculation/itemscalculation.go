@@ -6,6 +6,7 @@ import (
 
 	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func CalculateTotalStockByBrandName(db *gorm.DB, brandName, power string) (int, error) {
@@ -51,6 +52,7 @@ func DeductStockByBrandAndPower(db *gorm.DB, brandName, power string, quantityTo
 
 	var medicines []models.Medicine
 	if err := db.
+		Clauses(clause.Locking{Strength: "UPDATE"}). // <-- row lock here
 		Where("LOWER(brand_name) = ? AND LOWER(power) = ?", brandName, power).
 		Order("id asc").
 		Find(&medicines).Error; err != nil {

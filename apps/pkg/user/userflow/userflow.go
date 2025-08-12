@@ -80,6 +80,73 @@ func GetMedicinesForUser(c *gin.Context, db *gorm.DB) {
 	})
 }
 
+func GetOTCMedicinesForUser(c *gin.Context, db *gorm.DB) {
+	var uniqueMedicineIDs []uint
+
+	if err := db.
+		Model(&models.Medicine{}).
+		Select("MIN(id)").
+		Where("prescription = ?", false).
+		Group("brand_name, power").
+		Scan(&uniqueMedicineIDs).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch distinct OTC medicine IDs by brand name and power")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch OTC medicines"})
+		return
+	}
+
+	var medicines []models.Medicine
+	if err := db.Preload("Generic").
+		Preload("ItemImages").
+		Preload("Category").
+		Where("id IN ?", uniqueMedicineIDs).
+		Find(&medicines).Error; err != nil {
+		logrus.WithError(err).Error("Failed to fetch OTC medicines by ID list")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch OTC medicines"})
+		return
+	}
+
+	var response []config.UserFacingMedicine
+	for _, med := range medicines {
+		var imageFilenames []string
+		for _, img := range med.ItemImages {
+			imageFilenames = append(imageFilenames, img.FileName)
+		}
+
+		price := med.SellingPricePerBox
+		if med.UnitOfMeasurement == "per piece" {
+			price = med.SellingPricePerPiece
+		}
+
+		response = append(response, config.UserFacingMedicine{
+			ID:                        med.ID,
+			BrandName:                 med.BrandName,
+			Power:                     med.Power,
+			Discount:                  med.Discount,
+			GenericName:               med.Generic.GenericName,
+			Category:                  med.Category.CategoryName,
+			Description:               med.Description,
+			Unit:                      med.UnitOfMeasurement,
+			MeasurementUnitValue:      med.MeasurementUnitValue,
+			NumberOfPiecesPerBox:      med.NumberOfPiecesPerBox,
+			Price:                     price,
+			TaxType:                   med.TaxType,
+			Prescription:              med.Prescription,
+			Benefits:                  med.Benefits,
+			KeyIngredients:            med.KeyIngredients,
+			RecommendedDailyAllowance: med.RecommendedDailyAllowance,
+			DirectionsForUse:          med.DirectionsForUse,
+			SafetyInformation:         med.SafetyInformation,
+			Storage:                   med.Storage,
+			Images:                    imageFilenames,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "OTC medicines fetched successfully",
+		"medicines": response,
+	})
+}
+
 func GetAllBrandNames(c *gin.Context, db *gorm.DB) {
 	var uniqueMedicineIDs []uint
 	var brandNames []string
@@ -403,31 +470,19 @@ func AddToCartMedicine(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Check for existing unsettled cart item for same medicine
+	// Check for existing cart item for same medicine & prescription
 	var existingCart models.Cart
-	err = db.
-		Where("user_id = ? AND medicine_id = ? AND is_otc = ? AND prescription_id IS NOT NULL", userObj.ID, req.MedicineID, false).
-		Preload("Prescription").
+	err = db.Where("user_id = ? AND medicine_id = ? AND prescription_id = ?", userObj.ID, req.MedicineID, req.PrescriptionId).
 		First(&existingCart).Error
 
-	if err == nil && existingCart.Prescription != nil && existingCart.Prescription.Status == "unsettled" {
+	if err == nil {
+		// Found existing cart entry — update quantity
 		existingCart.Quantity += req.Quantity
-		existingCart.PrescriptionID = &req.PrescriptionId
 		if err := db.Save(&existingCart).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart item"})
 			return
 		}
-
-		// Ensure prescription status is marked unsettled if needed
-		if existingCart.PrescriptionID != nil {
-			var prescription models.Prescription
-			if err := db.First(&prescription, *existingCart.PrescriptionID).Error; err == nil {
-				if prescription.Status != "unsettled" {
-					db.Model(&prescription).Update("status", "unsettled")
-				}
-			}
-		}
-		c.JSON(http.StatusOK, gin.H{"message": "Cart item updated with new prescription"})
+		c.JSON(http.StatusOK, gin.H{"message": "Medicine quantity updated in cart"})
 		return
 	}
 
@@ -933,12 +988,12 @@ func SearchMedicinesForUser(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	var medicines []models.Medicine
 	searchTerm := "%" + query + "%"
 
-	if err := db.Preload("Generic").
-		Preload("Category").
-		Preload("ItemImages").
+	var uniqueMedicineIDs []uint
+	if err := db.
+		Model(&models.Medicine{}).
+		Select("MIN(medicines.id)").
 		Joins("LEFT JOIN categories ON categories.id = medicines.category_id").
 		Joins("LEFT JOIN generics ON generics.id = medicines.generic_id").
 		Where(`
@@ -946,6 +1001,19 @@ func SearchMedicinesForUser(c *gin.Context, db *gorm.DB) {
 			OR medicines.brand_name LIKE ? 
 			OR categories.category_name LIKE ?
 		`, searchTerm, searchTerm, searchTerm).
+		Group("medicines.brand_name, medicines.power").
+		Scan(&uniqueMedicineIDs).Error; err != nil {
+
+		logrus.WithError(err).Error("Failed to fetch distinct medicine IDs by search")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search medicines"})
+		return
+	}
+
+	var medicines []models.Medicine
+	if err := db.Preload("Generic").
+		Preload("Category").
+		Preload("ItemImages").
+		Where("medicines.id IN ?", uniqueMedicineIDs).
 		Order(gorm.Expr(`
 			CASE
 				WHEN generics.generic_name LIKE ? THEN 1
@@ -956,8 +1024,8 @@ func SearchMedicinesForUser(c *gin.Context, db *gorm.DB) {
 		`, searchTerm, searchTerm, searchTerm)).
 		Find(&medicines).Error; err != nil {
 
-		logrus.WithError(err).Error("Failed to search medicines")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search medicines"})
+		logrus.WithError(err).Error("Failed to fetch medicines for search")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch medicines"})
 		return
 	}
 

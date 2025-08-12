@@ -162,6 +162,7 @@ type GalleryImage struct {
 
 type Midwives struct {
 	gorm.Model
+	MidwifeCode  string `gorm:"uniqueIndex;default:null"`
 	FirstName    string `gorm:"not null"`
 	LastName     string `gorm:"not null"`
 	MiddleName   string
@@ -171,6 +172,7 @@ type Midwives struct {
 
 type Hospital struct {
 	gorm.Model
+	HospitalCode string `gorm:"uniqueIndex;default:null"`
 	Region       string `gorm:"not null"`
 	Province     string `gorm:"not null"`
 	Name         string `gorm:"not null"`
@@ -186,16 +188,18 @@ type Hospital struct {
 
 type Physician struct {
 	gorm.Model
-	FirstName    string `gorm:"not null"`
-	LastName     string `gorm:"not null"`
-	MiddleName   string
-	Specialty    string `gorm:"not null"`
-	Municipality string `gorm:"not null"`
-	Province     string `gorm:"not null"`
+	PhysicianCode string `gorm:"uniqueIndex;default:null"`
+	FirstName     string `gorm:"not null"`
+	LastName      string `gorm:"not null"`
+	MiddleName    string
+	Specialty     string `gorm:"not null"`
+	Municipality  string `gorm:"not null"`
+	Province      string `gorm:"not null"`
 }
 
 type KonsultaProvider struct {
 	gorm.Model
+	ProviderCode string `gorm:"uniqueIndex;default:null"`
 	Region       string `gorm:"not null"`
 	Province     string `gorm:"not null"`
 	FacilityName string `gorm:"not null"`
@@ -209,6 +213,7 @@ type KonsultaProvider struct {
 
 type Dentist struct {
 	gorm.Model
+	DentistCode  string `gorm:"uniqueIndex;default:null"`
 	LastName     string `gorm:"not null" json:"last_name"`
 	FirstName    string `gorm:"not null" json:"first_name"`
 	MiddleName   string `json:"middle_name"`

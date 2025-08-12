@@ -45,6 +45,10 @@ func User(db *gorm.DB) {
 		userflow.GetMedicinesForUser(c, db)
 	})
 
+	apiV1.GET("/user/get-otc-medicines", func(c *gin.Context) {
+		userflow.GetOTCMedicinesForUser(c, db)
+	})
+
 	apiV1.GET("/user/get-all-brands", func(c *gin.Context) {
 		userflow.GetAllBrandNames(c, db)
 	})
@@ -149,13 +153,17 @@ func User(db *gorm.DB) {
 		checkoutflow.SelectDeliveryType(c, db)
 	})
 
-	apiV1.POST("/user/submit-payment", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
-		checkoutflow.SubmitPayment(c, db)
+	apiV1.POST("/user/select-payment-type", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		checkoutflow.SelectPaymentType(c, db)
 	})
 
-	apiV1.GET("/user/get-payment-slip", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
-		checkoutflow.PreviewPaymentScreenshot(c, db)
-	})
+	// apiV1.POST("/user/submit-payment", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+	// 	checkoutflow.SubmitPayment(c, db)
+	// })
+
+	// apiV1.GET("/user/get-payment-slip", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+	// 	checkoutflow.PreviewPaymentScreenshot(c, db)
+	// })
 
 	//user account
 	apiV1.GET("/user/prescription history", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
