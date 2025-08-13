@@ -12,6 +12,8 @@ import (
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/uploadprescription"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/useraccount"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/userflow"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/user/userlogin"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/user/usersignup"
 	"github.com/innovativecursor/Kloudpx/apps/routes/getapiroutes"
 	"gorm.io/gorm"
 )
@@ -32,6 +34,14 @@ func User(db *gorm.DB) {
 
 	apiV1.GET("/auth/google/callback/user", func(c *gin.Context) {
 		oauthuser.GoogleUserCallbackHandler(c, db)
+	})
+
+	apiV1.POST("/user/signup", func(c *gin.Context) {
+		usersignup.UserSignUp(c, db)
+	})
+
+	apiV1.POST("/user/login", func(c *gin.Context) {
+		userlogin.UserLogin(c, db)
 	})
 
 	apiV1.POST("/user/upload-prescription", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {

@@ -102,6 +102,8 @@ type User struct {
 	FirstName       string
 	LastName        string
 	Email           string `gorm:"unique"`
+	Password        string // store hashed password
+	Phone           string `gorm:"unique"`
 	EmailVerified   bool
 	ApplicationRole string
 }
