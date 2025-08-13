@@ -67,6 +67,12 @@ const endpoints = {
   allorders: {
     get: `${baseUrl}/v1/admin/order-history`,
   },
+  orderdetails: {
+    get: (id) => `${baseUrl}/v1/admin/order-details/${id}`,
+  },
+  updateOrder: {
+    put: (id) => `${baseUrl}/v1/admin/update-order-details/${id}`,
+  },
   protected: {
     basic: `${baseUrl}/api/v1/protected`,
     admin: `${baseUrl}/api/v1/admin`,

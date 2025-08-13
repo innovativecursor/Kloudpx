@@ -4,8 +4,8 @@ export const MeasurementContext = createContext();
 
 export const MeasurementProvider = ({ children }) => {
   const [measurementTypeOptions] = useState([
-    { label: "Per Box", value: "perBox" },
-    { label: "Per Piece", value: "perPiece" },
+    { label: "Per Box", value: "per box" },
+    { label: "Per Piece", value: "per piece" },
   ]);
   const [measurementType, setMeasurementType] = useState(null);
   const [measurementValue, setMeasurementValue] = useState("");
@@ -22,7 +22,7 @@ export const MeasurementProvider = ({ children }) => {
     const sellPiece = parseFloat(sellingPricePerPiece);
     const costPiece = parseFloat(costPricePerPiece);
 
-    if (measurementType?.value === "perBox" && pieces > 0) {
+    if (measurementType?.value === "per box" && pieces > 0) {
       if (!isNaN(sellBox))
         setSellingPricePerPiece((sellBox / pieces).toFixed(2));
       else setSellingPricePerPiece("");
@@ -30,7 +30,7 @@ export const MeasurementProvider = ({ children }) => {
       else setCostPricePerPiece("");
     }
 
-    if (measurementType?.value === "perPiece" && pieces > 0) {
+    if (measurementType?.value === "per piece" && pieces > 0) {
       if (!isNaN(sellPiece))
         setSellingPricePerBox((sellPiece * pieces).toFixed(2));
       else setSellingPricePerBox("");
