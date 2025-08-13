@@ -12,17 +12,17 @@ import icon3 from "@/assets/icon3.svg";
 const Instructions = () => {
   const stats = [
     {
-      icon: icon3,
+      icon: icon2,
       number: "1000+",
       label: "Total Orders Delivered",
     },
     {
-      icon: icon2,
+      icon: icon1,
       number: "20000+",
       label: "Pincodes Served",
     },
     {
-      icon: icon1,
+      icon: icon3,
       number: "9M+",
       label: "Happy Customers",
     },
@@ -97,7 +97,7 @@ const Instructions = () => {
                   <Image
                     src={stat.icon}
                     alt={stat.label}
-                    className="mb-3 w-12 h-12 sm:w-14 sm:h-14 md:w-20 md:h-20 lg:w-24 lg:h-24"
+                    className="mb-3 w-12 h-12 sm:w-14 sm:h-14 md:w-20 md:h-20 lg:w-20 lg:h-20"
                   />
                 </div>
                 <h2 className="text-sm sm:text-xl md:text-2xl font-bold text-black">
