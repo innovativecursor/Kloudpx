@@ -16,9 +16,18 @@ const Screener = () => {
     amountPaid,
     setAmountPaid,
     handleSubmit,
+    getPaymentSlip,
+    paymentSlip,
+    previewImage,
   } = usePayment();
 
   useEffect(() => {}, [deliveryData]);
+
+  // useEffect(() => {
+  //   getPaymentSlip();
+  // }, []);
+
+  // console.log(paymentSlip);
 
   return (
     <div className="w-full mt-10 py-8 px-6 bg-[#EDF4F6] rounded-lg ">
@@ -62,9 +71,9 @@ const Screener = () => {
                 Preview
               </h1>
               <div className="rounded-md overflow-hidden shadow">
-                {selectedFile ? (
+                {previewImage ? (
                   <img
-                    src={selectedFile}
+                    src={previewImage}
                     alt="Preview"
                     className="w-full h-32 object-cover"
                   />
@@ -102,11 +111,3 @@ const Screener = () => {
 };
 
 export default Screener;
-
-
-
-
-
-
-
-

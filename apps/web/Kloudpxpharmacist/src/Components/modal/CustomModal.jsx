@@ -1,16 +1,26 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { usePrescriptionContext } from "../../contexts/PrescriptionContext";
 import Swal from "sweetalert2";
+import Zoom from "react-medium-image-zoom";
+import "react-medium-image-zoom/dist/styles.css";
 
-const CustomModal = ({ isOpen, onClose, selectedPrescription }) => {
+const CustomModal = ({ isOpen, onClose, selectedPrescription, activeTab }) => {
   const {
     fetchPrescriptionCartById,
     prescriptionCart,
     approvePrescription,
     fetchPrescriptionsDetails,
     fetchAllPrescriptions,
-    rejectPrescription
+    rejectPrescription,
   } = usePrescriptionContext();
+
+  const modalRef = useRef();
+
+  const handleOverlayClick = (e) => {
+    if (modalRef.current && !modalRef.current.contains(e.target)) {
+      onClose();
+    }
+  };
 
   useEffect(() => {
     if (isOpen && selectedPrescription?.ID) {
@@ -20,10 +30,10 @@ const CustomModal = ({ isOpen, onClose, selectedPrescription }) => {
 
   if (!isOpen) return null;
 
-  const handleApprove = async () => {
-    if (!selectedPrescription?.ID) return;
+  const handleApprove = async (cartid) => {
+    if (!cartid) return;
 
-    const res = await approvePrescription(selectedPrescription.ID);
+    const res = await approvePrescription(cartid);
 
     if (res) {
       await fetchPrescriptionsDetails(selectedPrescription.UserID);
@@ -48,15 +58,10 @@ const CustomModal = ({ isOpen, onClose, selectedPrescription }) => {
     }
   };
 
+  const handleReject = async (cartid) => {
+    if (!cartid) return;
 
-
-  const handleReject = async () => {
-    if (!selectedPrescription?.ID) return;
-
-    console.log(selectedPrescription?.ID);
-
-
-    const res = await rejectPrescription(selectedPrescription.ID);
+    const res = await rejectPrescription(cartid);
 
     if (res) {
       await fetchPrescriptionsDetails(selectedPrescription.UserID);
@@ -81,10 +86,15 @@ const CustomModal = ({ isOpen, onClose, selectedPrescription }) => {
     }
   };
 
-
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center px-4">
-      <div className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-6 relative overflow-y-auto max-h-[90vh]">
+    <div
+      onClick={handleOverlayClick}
+      className="fixed inset-0 z-50 cursor-pointer bg-black bg-opacity-50 flex justify-center items-center px-4"
+    >
+      <div
+        ref={modalRef}
+        className="bg-white w-full max-w-4xl rounded-lg shadow-lg p-6 relative overflow-y-auto max-h-[90vh]"
+      >
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -101,11 +111,13 @@ const CustomModal = ({ isOpen, onClose, selectedPrescription }) => {
             </h2>
 
             {selectedPrescription.UploadedImage ? (
-              <img
-                src={selectedPrescription.UploadedImage}
-                alt="Prescription"
-                className="w-full h-64 object-contain rounded-lg border"
-              />
+              <Zoom>
+                <img
+                  src={selectedPrescription.UploadedImage}
+                  alt="Prescription"
+                  className="w-full h-64 object-contain rounded-lg border cursor-pointer"
+                />
+              </Zoom>
             ) : (
               <div className="w-full h-64 bg-gray-100 flex items-center justify-center text-gray-500">
                 No Image Available
@@ -119,54 +131,78 @@ const CustomModal = ({ isOpen, onClose, selectedPrescription }) => {
               </h3>
 
               {Array.isArray(prescriptionCart) &&
-                prescriptionCart?.length > 0 ? (
+              prescriptionCart?.length > 0 ? (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full text-sm text-left border">
-                    <thead className="bg-gray-200 text-gray-700 font-semibold">
+                  <table className="min-w-full text-sm text-center cursor-pointer border">
+                    <thead className="bg-[#0070ba] text-white   font-semibold">
                       <tr>
-                        <th className="px-4 py-2 border">Category</th>
-                        <th className="px-4 py-2 border">Brand</th>
-                        <th className="px-4 py-2 border">Generic</th>
-                        <th className="px-4 py-2 border">Power</th>
-                        <th className="px-4 py-2 border">Quantity</th>
-                        <th className="px-4 py-2 border">Action</th>
+                        <th className="px-4 py-3 border">Category</th>
+                        <th className="px-4 py-3 border">Brand</th>
+                        <th className="px-4 py-3 border">Generic</th>
+                        <th className="px-4 py-3 border">Power</th>
+                        <th className="px-4 py-3 border">Quantity</th>
+                        <th className="px-4 py-3 border">Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {prescriptionCart.map((item, index) => (
                         <tr key={index} className="hover:bg-gray-50">
-                          <td className="px-4 py-2 border">
+                          <td className="px-4 py-3 border">
                             {item.Medicine?.Category?.CategoryName || "N/A"}
                           </td>
-                          <td className="px-4 py-2 border">
+                          <td className="px-4 py-3 border">
                             {item.Medicine?.BrandName || "N/A"}
                           </td>
-                          <td className="px-4 py-2 border">
+                          <td className="px-4 py-3 border">
                             {item.Medicine?.Generic?.GenericName || "N/A"}
                           </td>
-                          <td className="px-4 py-2 border">
+                          <td className="px-4 py-3 border">
                             {item.Medicine?.Power || "N/A"}
                           </td>
-                          <td className="px-4 py-2 border">{item.Quantity}</td>
-                          <td className="px-4 py-2 border">
-                            {selectedPrescription?.Status === "unsettled" ? (
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={handleApprove}
-                                  className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                          <td className="px-4 py-3 border">{item.Quantity}</td>
+                          <td className="px-4 py-3 border">
+                            {activeTab === "unsettled" ? (
+                              item.MedicineStatus === "unsettled" ? (
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => handleApprove(item.ID)}
+                                    className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                                  >
+                                    Approve
+                                  </button>
+                                  <button
+                                    onClick={() => handleReject(item.ID)}
+                                    className="bg-red-400 text-white px-3 py-1 rounded hover:bg-red-700"
+                                  >
+                                    Reject
+                                  </button>
+                                </div>
+                              ) : (
+                                <span
+                                  className={
+                                    item.MedicineStatus === "approved"
+                                      ? "text-green-600 font-semibold"
+                                      : "text-red-500 font-semibold"
+                                  }
                                 >
-                                  Approve
-                                </button>
-                                <button
-                                  onClick={handleReject}
-                                  className="bg-red-400 text-white px-3 py-1 rounded hover:bg-red-700"
-                                >
-                                  Reject
-                                </button>
-                              </div>
+                                  {`Already ${
+                                    item.MedicineStatus.charAt(
+                                      0
+                                    ).toUpperCase() +
+                                    item.MedicineStatus.slice(1)
+                                  }`}
+                                </span>
+                              )
                             ) : (
-                              <span className="text-gray-500 text-sm italic">
-                                Already Approved
+                              <span
+                                className={`text-xs font-medium px-5 py-1 rounded-full ${
+                                  item?.MedicineStatus?.toLowerCase() ===
+                                  "approved"
+                                    ? "bg-green-100 text-green-600 border border-green-300"
+                                    : "bg-red-100 text-red-600 border border-red-300"
+                                }`}
+                              >
+                                {item?.MedicineStatus}
                               </span>
                             )}
                           </td>

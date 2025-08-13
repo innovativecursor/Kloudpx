@@ -10,6 +10,9 @@ const endpoints = {
   medicine: {
     get: `${baseUrl}/v1/user/get-medicines`,
   },
+  otc: {
+    get: `${baseUrl}/v1/user/get-otc-medicines`,
+  },
   category: {
     getAll: `${baseUrl}/v1/user/get-categories-for-user`,
     getItemsByCategory: (id) =>
@@ -74,10 +77,17 @@ const endpoints = {
   },
   prescription: {
     upload: `${baseUrl}/v1/user/upload-prescription`,
+    get: `${baseUrl}/v1/user/get-prescriptions`,
+  },
+  selectedprescription: {
+    put: `${baseUrl}/v1/user/select-prescription`
   },
 
   paymentSubmit: {
     add: `${baseUrl}/v1/user/submit-payment`,
+  },
+  OrderSubmit: {
+    add: `${baseUrl}/v1/user/select-payment-type`,
   },
   paymentslip: {
     get: `${baseUrl}/v1/user/get-payment-slip`,

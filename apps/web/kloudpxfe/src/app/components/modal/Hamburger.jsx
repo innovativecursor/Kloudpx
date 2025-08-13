@@ -17,7 +17,7 @@ const Hamburger = () => {
       <div className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="text-2xl cursor-pointer p-2 focus:outline-none"
+          className="text-xl cursor-pointer p-2 focus:outline-none"
         >
           <i className="ri-menu-2-fill"></i>
         </button>

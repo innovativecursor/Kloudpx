@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -14,183 +15,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// func UploadMedicineExcel(c *gin.Context, db *gorm.DB) {
-// 	user, exists := c.Get("user")
-// 	if !exists {
-// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
-// 		return
-// 	}
-// 	userObj, ok := user.(*models.Admin)
-// 	if !ok {
-// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
-// 		return
-// 	}
-// 	if userObj.ApplicationRole != "admin" {
-// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Only admins can upload medicines"})
-// 		return
-// 	}
-
-// 	file, err := c.FormFile("file")
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Excel file is required"})
-// 		return
-// 	}
-
-// 	src, err := file.Open()
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open uploaded file"})
-// 		return
-// 	}
-// 	defer src.Close()
-
-// 	xlFile, err := excelize.OpenReader(src)
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read Excel file"})
-// 		return
-// 	}
-
-// 	sheet := xlFile.GetSheetName(0)
-// 	rows, err := xlFile.GetRows(sheet)
-// 	if err != nil || len(rows) < 2 {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Excel file is empty or malformed"})
-// 		return
-// 	}
-
-// 	for i, row := range rows[1:] {
-// 		getCell := func(index int) string {
-// 			if index < len(row) {
-// 				return strings.TrimSpace(row[index])
-// 			}
-// 			return ""
-// 		}
-
-// 		// Skip completely empty rows
-// 		isEmptyRow := true
-// 		for _, cell := range row {
-// 			if strings.TrimSpace(cell) != "" {
-// 				isEmptyRow = false
-// 				break
-// 			}
-// 		}
-// 		if isEmptyRow {
-// 			continue
-// 		}
-
-// 		unitOfMeasurement := getCell(8)
-// 		numberOfPiecesStr := getCell(17)
-// 		var numberOfPieces int
-// 		fmt.Sscanf(numberOfPiecesStr, "%d", &numberOfPieces)
-
-// 		if unitOfMeasurement == "per piece" && numberOfPieces != 0 {
-// 			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Row %d: NumberOfPiecesPerBox must be 0 when unit is 'per piece'", i+2)})
-// 			return
-// 		}
-
-// 		var measurementUnitValue int
-// 		fmt.Sscanf(getCell(11), "%d", &measurementUnitValue)
-
-// 		// Required fields check
-// 		brandName := getCell(0)
-// 		if brandName == "" {
-// 			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Row %d: BrandName is required", i+2)})
-// 			return
-// 		}
-// 		var prescription bool
-// 		fmt.Sscanf(getCell(21), "%t", &prescription)
-
-// 		medicine := models.Medicine{
-// 			BrandName:                 brandName,
-// 			Power:                     getCell(1),
-// 			Description:               getCell(2),
-// 			Packaging:                 getCell(3),
-// 			DosageForm:                getCell(4),
-// 			Marketer:                  getCell(5),
-// 			TaxType:                   getCell(6),
-// 			CategorySubClass:          getCell(7),
-// 			UnitOfMeasurement:         unitOfMeasurement,
-// 			Discount:                  getCell(22),
-// 			SupplierDiscount:          getCell(23),
-// 			IsBrand:                   strings.ToLower(getCell(24)) == "true",
-// 			InhouseBrand:              strings.ToLower(getCell(25)) == "true",
-// 			IsFeature:                 strings.ToLower(getCell(26)) == "true",
-// 			NumberOfPiecesPerBox:      0,
-// 			MeasurementUnitValue:      measurementUnitValue,
-// 			Benefits:                  getCell(27),
-// 			KeyIngredients:            getCell(28),
-// 			RecommendedDailyAllowance: getCell(29),
-// 			DirectionsForUse:          getCell(30),
-// 			SafetyInformation:         getCell(31),
-// 			Storage:                   getCell(32),
-// 			UpdatedBy:                 userObj.ID,
-// 			Prescription:              prescription,
-// 		}
-
-// 		if unitOfMeasurement == "per box" {
-// 			medicine.NumberOfPiecesPerBox = numberOfPieces
-// 		}
-
-// 		// Generic
-// 		genericName := getCell(9)
-// 		var generic models.Generic
-// 		db.FirstOrCreate(&generic, models.Generic{GenericName: genericName})
-// 		medicine.GenericID = generic.ID
-
-// 		// Supplier
-// 		supplierName := getCell(10)
-// 		var supplier models.Supplier
-// 		db.FirstOrCreate(&supplier, models.Supplier{SupplierName: supplierName})
-// 		medicine.SupplierID = supplier.ID
-
-// 		// Category
-// 		categoryName := getCell(12)
-// 		var category models.Category
-// 		db.Where("category_name = ?", categoryName).First(&category)
-// 		if category.ID == 0 {
-// 			category = models.Category{CategoryName: categoryName}
-// 			db.Create(&category)
-// 		}
-// 		medicine.CategoryID = category.ID
-
-// 		// Prices and thresholds
-// 		fmt.Sscanf(getCell(13), "%f", &medicine.SellingPricePerBox)
-// 		fmt.Sscanf(getCell(14), "%f", &medicine.SellingPricePerPiece)
-// 		fmt.Sscanf(getCell(15), "%f", &medicine.CostPricePerBox)
-// 		fmt.Sscanf(getCell(16), "%f", &medicine.CostPricePerPiece)
-// 		fmt.Sscanf(getCell(18), "%d", &medicine.MinimumThreshold)
-// 		fmt.Sscanf(getCell(19), "%d", &medicine.MaximumThreshold)
-// 		fmt.Sscanf(getCell(20), "%d", &medicine.EstimatedLeadTimeDays)
-
-// 		var existingMedicines []models.Medicine
-// 		err := db.Where(
-// 			"brand_name = ? AND generic_id = ? AND supplier_id = ? AND power = ? AND unit_of_measurement = ? AND measurement_unit_value = ?",
-// 			medicine.BrandName, medicine.GenericID, medicine.SupplierID,
-// 			medicine.Power, medicine.UnitOfMeasurement, medicine.MeasurementUnitValue,
-// 		).Find(&existingMedicines).Error
-
-// 		if err != nil {
-// 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: DB error: %v", i+2, err)})
-// 			return
-// 		}
-
-// 		exactMatchFound := false
-// 		for _, m := range existingMedicines {
-// 			if reflect.DeepEqual(stripAutoFields(m), stripAutoFields(medicine)) {
-// 				exactMatchFound = true
-// 				break
-// 			}
-// 		}
-
-// 		if !exactMatchFound {
-// 			if err := db.Create(&medicine).Error; err != nil {
-// 				c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to create medicine", i+2)})
-// 				return
-// 			}
-// 		}
-
-// 	}
-
-//		c.JSON(http.StatusOK, gin.H{"message": "Excel data uploaded successfully"})
-//	}
 func UploadMedicineExcel(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -439,6 +263,7 @@ func DownloadMedicineExcel(c *gin.Context, db *gorm.DB) {
 }
 
 func UploadMidwivesExcel(c *gin.Context, db *gorm.DB) {
+	// Auth check
 	user, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
@@ -450,6 +275,7 @@ func UploadMidwivesExcel(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// File check
 	file, err := c.FormFile("file")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Excel file is required"})
@@ -477,20 +303,59 @@ func UploadMidwivesExcel(c *gin.Context, db *gorm.DB) {
 	}
 
 	for i, row := range rows[1:] {
-		if len(row) < 6 {
+		getCell := func(index int) string {
+			if index < len(row) {
+				return strings.TrimSpace(row[index])
+			}
+			return ""
+		}
+
+		// Skip empty rows
+		isEmpty := true
+		for _, cell := range row {
+			if strings.TrimSpace(cell) != "" {
+				isEmpty = false
+				break
+			}
+		}
+		if isEmpty {
 			continue
 		}
 
-		midwife := models.Midwives{
-			LastName:     strings.TrimSpace(row[1]),
-			FirstName:    strings.TrimSpace(row[2]),
-			MiddleName:   strings.TrimSpace(row[3]),
-			Municipality: strings.TrimSpace(row[4]),
-			Province:     strings.TrimSpace(row[5]),
+		// Generate unique code if missing
+		midwifeCode := getCell(0)
+		if midwifeCode == "" {
+			midwifeCode = generateMidwifeCode()
 		}
 
-		if err := db.Create(&midwife).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to save midwife", i+2)})
+		midwife := models.Midwives{
+			MidwifeCode:  midwifeCode,
+			LastName:     getCell(1),
+			FirstName:    getCell(2),
+			MiddleName:   getCell(3),
+			Municipality: getCell(4),
+			Province:     getCell(5),
+		}
+
+		// Check existing record by code
+		var existing models.Midwives
+		err := db.Where("midwife_code = ?", midwifeCode).First(&existing).Error
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// Create new
+			if err := db.Create(&midwife).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to create midwife", i+2)})
+				return
+			}
+		} else if err == nil {
+			// Update existing
+			midwife.ID = existing.ID
+			if err := db.Model(&existing).Updates(midwife).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to update midwife", i+2)})
+				return
+			}
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: DB error: %v", i+2, err)})
 			return
 		}
 	}
@@ -498,8 +363,14 @@ func UploadMidwivesExcel(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, gin.H{"message": "Midwives uploaded successfully"})
 }
 
-// hospital list
+func generateMidwifeCode() string {
+	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
+	random := rand.Intn(1000)
+	return fmt.Sprintf("MWF-%d-%03d", timestamp, random)
+}
+
 func UploadHospitalsExcel(c *gin.Context, db *gorm.DB) {
+	// Auth check
 	user, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
@@ -511,6 +382,7 @@ func UploadHospitalsExcel(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// File check
 	file, err := c.FormFile("file")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Excel file is required"})
@@ -537,29 +409,72 @@ func UploadHospitalsExcel(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	for i, row := range rows[2:] { // Skip header + 1 blank
-		if len(row) < 12 {
+	for i, row := range rows[1:] { // Skip header
+		getCell := func(index int) string {
+			if index < len(row) {
+				return strings.TrimSpace(row[index])
+			}
+			return ""
+		}
+
+		// Skip empty rows
+		isEmpty := true
+		for _, cell := range row {
+			if strings.TrimSpace(cell) != "" {
+				isEmpty = false
+				break
+			}
+		}
+		if isEmpty {
 			continue
 		}
 
-		hospital := models.Hospital{
-			Region:   strings.TrimSpace(row[0]),
-			Province: strings.TrimSpace(row[1]),
-			Name:     strings.TrimSpace(row[3]),
+		// Parse BedCount safely
+		beds := 0
+		if val := getCell(4); val != "" {
+			if n, err := strconv.Atoi(val); err == nil {
+				beds = n
+			}
 		}
 
-		// Optional and parsed fields
-		fmt.Sscanf(strings.TrimSpace(row[4]), "%d", &hospital.BedCount)
-		hospital.Category = strings.TrimSpace(row[5])
-		hospital.Telephone = strings.TrimSpace(row[6])
-		hospital.Email = strings.TrimSpace(row[7])
-		hospital.Street = strings.TrimSpace(row[8])
-		hospital.Municipality = strings.TrimSpace(row[9])
-		hospital.Sector = strings.TrimSpace(row[10])
-		hospital.Head = strings.TrimSpace(row[11])
+		// Unique Hospital Code from column 2 (index 2)
+		hospitalCode := getCell(2)
+		if hospitalCode == "" {
+			hospitalCode = generateHospitalCode()
+		}
 
-		if err := db.Create(&hospital).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to save hospital", i+3)})
+		hospital := models.Hospital{
+			Region:       getCell(0),
+			Province:     getCell(1),
+			HospitalCode: hospitalCode,
+			Name:         getCell(3),
+			BedCount:     beds,
+			Category:     getCell(5),
+			Telephone:    getCell(6),
+			Email:        getCell(7),
+			Street:       getCell(8),
+			Municipality: getCell(9),
+			Sector:       getCell(10),
+			Head:         getCell(11),
+		}
+
+		// Check if hospital exists
+		var existing models.Hospital
+		err := db.Where("hospital_code = ?", hospitalCode).First(&existing).Error
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			if err := db.Create(&hospital).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to create hospital", i+2)})
+				return
+			}
+		} else if err == nil {
+			hospital.ID = existing.ID
+			if err := db.Model(&existing).Updates(hospital).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to update hospital", i+2)})
+				return
+			}
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: DB error: %v", i+2, err)})
 			return
 		}
 	}
@@ -567,8 +482,15 @@ func UploadHospitalsExcel(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, gin.H{"message": "Hospitals uploaded successfully"})
 }
 
+func generateHospitalCode() string {
+	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
+	random := rand.Intn(1000)
+	return fmt.Sprintf("HSP-%d-%03d", timestamp, random)
+}
+
 // physician
 func UploadPhysiciansExcel(c *gin.Context, db *gorm.DB) {
+	// Auth check
 	user, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
@@ -580,6 +502,7 @@ func UploadPhysiciansExcel(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// File check
 	file, err := c.FormFile("file")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Excel file is required"})
@@ -607,21 +530,58 @@ func UploadPhysiciansExcel(c *gin.Context, db *gorm.DB) {
 	}
 
 	for i, row := range rows[1:] {
-		if len(row) < 7 {
+		getCell := func(index int) string {
+			if index < len(row) {
+				return strings.TrimSpace(row[index])
+			}
+			return ""
+		}
+
+		// Skip empty rows
+		isEmpty := true
+		for _, cell := range row {
+			if strings.TrimSpace(cell) != "" {
+				isEmpty = false
+				break
+			}
+		}
+		if isEmpty {
 			continue
 		}
 
-		physician := models.Physician{
-			LastName:     strings.TrimSpace(row[1]),
-			FirstName:    strings.TrimSpace(row[2]),
-			MiddleName:   strings.TrimSpace(row[3]),
-			Specialty:    strings.TrimSpace(row[4]),
-			Municipality: strings.TrimSpace(row[5]),
-			Province:     strings.TrimSpace(row[6]),
+		// Unique Physician Code
+		physicianCode := getCell(0)
+		if physicianCode == "" {
+			physicianCode = generatePhysicianCode()
 		}
 
-		if err := db.Create(&physician).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to save physician", i+2)})
+		physician := models.Physician{
+			PhysicianCode: physicianCode,
+			LastName:      getCell(1),
+			FirstName:     getCell(2),
+			MiddleName:    getCell(3),
+			Specialty:     getCell(4),
+			Municipality:  getCell(5),
+			Province:      getCell(6),
+		}
+
+		// Check if exists
+		var existing models.Physician
+		err := db.Where("physician_code = ?", physicianCode).First(&existing).Error
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			if err := db.Create(&physician).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to create physician", i+2)})
+				return
+			}
+		} else if err == nil {
+			physician.ID = existing.ID
+			if err := db.Model(&existing).Updates(physician).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to update physician", i+2)})
+				return
+			}
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: DB error: %v", i+2, err)})
 			return
 		}
 	}
@@ -629,7 +589,14 @@ func UploadPhysiciansExcel(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, gin.H{"message": "Physicians uploaded successfully"})
 }
 
+func generatePhysicianCode() string {
+	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
+	random := rand.Intn(1000)
+	return fmt.Sprintf("PHY-%d-%03d", timestamp, random)
+}
+
 func UploadKonsultaProvidersExcel(c *gin.Context, db *gorm.DB) {
+	// Auth check
 	user, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
@@ -641,6 +608,7 @@ func UploadKonsultaProvidersExcel(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// File check
 	file, err := c.FormFile("file")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Excel file is required"})
@@ -656,7 +624,7 @@ func UploadKonsultaProvidersExcel(c *gin.Context, db *gorm.DB) {
 
 	xlFile, err := excelize.OpenReader(src)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse Excel"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read Excel file"})
 		return
 	}
 
@@ -667,25 +635,62 @@ func UploadKonsultaProvidersExcel(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	for i, row := range rows[1:] {
-		if len(row) < 10 {
+	for i, row := range rows[1:] { // Skip header row
+		getCell := func(index int) string {
+			if index < len(row) {
+				return strings.TrimSpace(row[index])
+			}
+			return ""
+		}
+
+		// Skip completely empty rows
+		isEmpty := true
+		for _, cell := range row {
+			if strings.TrimSpace(cell) != "" {
+				isEmpty = false
+				break
+			}
+		}
+		if isEmpty {
 			continue
 		}
 
-		provider := models.KonsultaProvider{
-			Region:       strings.TrimSpace(row[0]),
-			Province:     strings.TrimSpace(row[1]),
-			FacilityName: strings.TrimSpace(row[3]),
-			Telephone:    strings.TrimSpace(row[4]),
-			Email:        strings.TrimSpace(row[5]),
-			Street:       strings.TrimSpace(row[6]),
-			Municipality: strings.TrimSpace(row[7]),
-			Sector:       strings.TrimSpace(row[8]),
-			Head:         strings.TrimSpace(row[9]),
+		// Unique provider code
+		providerCode := getCell(2)
+		if providerCode == "" {
+			providerCode = generateProviderCode()
 		}
 
-		if err := db.Create(&provider).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to save provider", i+2)})
+		provider := models.KonsultaProvider{
+			Region:       getCell(0),
+			Province:     getCell(1),
+			ProviderCode: providerCode,
+			FacilityName: getCell(3),
+			Telephone:    getCell(4),
+			Email:        getCell(5),
+			Street:       getCell(6),
+			Municipality: getCell(7),
+			Sector:       getCell(8),
+			Head:         getCell(9),
+		}
+
+		// Check if exists → update, else create
+		var existing models.KonsultaProvider
+		err := db.Where("provider_code = ?", providerCode).First(&existing).Error
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			if err := db.Create(&provider).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to create provider", i+2)})
+				return
+			}
+		} else if err == nil {
+			provider.ID = existing.ID
+			if err := db.Model(&existing).Updates(provider).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to update provider", i+2)})
+				return
+			}
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: DB error: %v", i+2, err)})
 			return
 		}
 	}
@@ -693,47 +698,115 @@ func UploadKonsultaProvidersExcel(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, gin.H{"message": "Konsulta providers uploaded successfully"})
 }
 
+// Generates a unique provider code
+func generateProviderCode() string {
+	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
+	random := rand.Intn(1000)
+	return fmt.Sprintf("PRV-%d-%03d", timestamp, random)
+}
+
 func UploadDentists(c *gin.Context, db *gorm.DB) {
+	// Auth check
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+	userObj, ok := user.(*models.Admin)
+	if !ok || userObj.ApplicationRole != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Only admins can upload Dentists"})
+		return
+	}
+
+	// File check
 	file, err := c.FormFile("file")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "File upload failed"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Excel file is required"})
 		return
 	}
 
-	f, err := file.Open()
+	src, err := file.Open()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot open file"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open file"})
 		return
 	}
-	defer f.Close()
+	defer src.Close()
 
-	xlFile, err := excelize.OpenReader(f)
+	xlFile, err := excelize.OpenReader(src)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read Excel"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read Excel file"})
 		return
 	}
 
-	rows, err := xlFile.GetRows(xlFile.GetSheetName(0))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot get Excel rows"})
+	sheet := xlFile.GetSheetName(0)
+	rows, err := xlFile.GetRows(sheet)
+	if err != nil || len(rows) < 2 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or empty Excel"})
 		return
 	}
 
-	for i, row := range rows {
-		if i == 0 || len(row) < 6 {
+	for i, row := range rows[1:] { // Skip header row
+		getCell := func(index int) string {
+			if index < len(row) {
+				return strings.TrimSpace(row[index])
+			}
+			return ""
+		}
+
+		// Skip empty rows
+		isEmpty := true
+		for _, cell := range row {
+			if strings.TrimSpace(cell) != "" {
+				isEmpty = false
+				break
+			}
+		}
+		if isEmpty {
 			continue
 		}
 
-		dentist := models.Dentist{
-			LastName:     strings.TrimSpace(row[1]),
-			FirstName:    strings.TrimSpace(row[2]),
-			MiddleName:   strings.TrimSpace(row[3]),
-			Municipality: strings.TrimSpace(row[4]),
-			Province:     strings.TrimSpace(row[5]),
+		// Unique dentist code
+		dentistCode := getCell(0)
+		if dentistCode == "" {
+			dentistCode = generateDentistCode()
 		}
 
-		db.Create(&dentist)
+		dentist := models.Dentist{
+			DentistCode:  dentistCode,
+			LastName:     getCell(1),
+			FirstName:    getCell(2),
+			MiddleName:   getCell(3),
+			Municipality: getCell(4),
+			Province:     getCell(5),
+		}
+
+		// Check if exists → update, else create
+		var existing models.Dentist
+		err := db.Where("dentist_code = ?", dentistCode).First(&existing).Error
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			if err := db.Create(&dentist).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to create dentist", i+2)})
+				return
+			}
+		} else if err == nil {
+			dentist.ID = existing.ID
+			if err := db.Model(&existing).Updates(dentist).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: Failed to update dentist", i+2)})
+				return
+			}
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Row %d: DB error: %v", i+2, err)})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Dentist data uploaded successfully"})
+}
+
+// Generates a unique dentist code
+func generateDentistCode() string {
+	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
+	random := rand.Intn(1000)
+	return fmt.Sprintf("DNT-%d-%03d", timestamp, random)
 }

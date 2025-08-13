@@ -19,6 +19,8 @@ const CartModal = ({ isOpen, onClose }) => {
   const data = getCartData?.data || [];
   const loading = getCartData?.loading || false;
 
+  // console.log(data);
+
   useEffect(() => {
     if (token) {
       getAllCartData();
@@ -28,11 +30,6 @@ const CartModal = ({ isOpen, onClose }) => {
   if (!isAuthLoaded) {
     return null;
   }
-
-  // const handleCheckout = async () => {
-  //   router.push("/Checkout");
-  //   onClose();
-  // };
 
   const handleCheckout = async () => {
     setCheckoutLoading(true);
@@ -150,21 +147,21 @@ const CartModal = ({ isOpen, onClose }) => {
                 <div
                   key={item.cart_id}
                   className={classNames(
-                    "flex items-center gap-4 md:p-3 md:shadow-sm rounded-md transition",
-                    {
-                      "bg-gray-200 opacity-60 pointer-events-none": isUnsettled,
-                      "bg-red-100 border border-red-400": isRejected,
-                    }
+                    "flex items-center gap-4 md:p-3 md:shadow-sm rounded-md transition"
+                    // {
+                    //   "bg-gray-200 opacity-60 pointer-events-none": isUnsettled,
+                    //   "bg-red-100 border border-red-400": isRejected,
+                    // }
                   )}
+                  onClick={() => {
+                    onClose();
+                    goToProductPage(
+                      item?.medicine?.id,
+                      item?.medicine?.genericname
+                    );
+                  }}
                 >
-                  <div
-                    onClick={() =>
-                      goToProductPage(
-                        item?.medicine?.id,
-                        item?.medicine?.genericname
-                      )
-                    }
-                  >
+                  <div>
                     <img
                       src={imageUrl}
                       alt="product"
@@ -212,16 +209,16 @@ const CartModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Prescription Status  */}
-                    {isUnsettled && (
+                    {/* {isUnsettled && (
                       <p className="text-xs text-red-500 mt-1">
-                        Waiting for pharmacist approval before purchase
+                        Waiting for pharmacist approval
                       </p>
                     )}
                     {isRejected && (
                       <p className="text-xs text-red-500 mt-1">
                         This item was rejected by the pharmacist.
                       </p>
-                    )}
+                    )} */}
                   </div>
                 </div>
               );

@@ -15,6 +15,7 @@ func GetUsersWithPrescriptionSummary(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
 		return
 	}
+
 	userObj, ok := user.(*models.Pharmacist)
 	if !ok || userObj.ApplicationRole != "Pharmacist" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Access denied: Pharmacist only"})
@@ -25,7 +26,6 @@ func GetUsersWithPrescriptionSummary(c *gin.Context, db *gorm.DB) {
 		UserID              uint   `json:"userid"`
 		Name                string `json:"name"`
 		Email               string `json:"email"`
-		PrescriptionStatus  string `json:"prescriptionstatus"`
 		PastPrescription    int64  `json:"pastprescription"`
 		PendingPrescription int64  `json:"pendingprescription"`
 	}
@@ -33,12 +33,25 @@ func GetUsersWithPrescriptionSummary(c *gin.Context, db *gorm.DB) {
 	var result []Response
 
 	db.Raw(`
-		SELECT u.id as user_id, 
-			   CONCAT(u.first_name, ' ', u.last_name) as name,
-			   u.email,
-			   MAX(p.status) as prescription_status,
-			   SUM(CASE WHEN p.status IN ('fulfilled', 'rejected') THEN 1 ELSE 0 END) AS past_prescription,
-			   SUM(CASE WHEN p.status = 'unsettled' THEN 1 ELSE 0 END) as pending_prescription
+		SELECT 
+			u.id AS user_id, 
+			CONCAT(u.first_name, ' ', u.last_name) AS name,
+			u.email,
+			SUM(CASE 
+					WHEN p.status IN ('fulfilled', 'rejected') 
+					THEN 1 
+					ELSE 0 
+				END) AS past_prescription,
+			SUM(CASE 
+					WHEN p.status = 'unsettled'
+					  AND EXISTS (
+						  SELECT 1 FROM cart_histories c 
+						  WHERE c.prescription_id = p.id 
+						    AND c.medicine_status = 'unsettled'
+					  )
+					THEN 1 
+					ELSE 0 
+				END) AS pending_prescription
 		FROM prescriptions p
 		JOIN users u ON p.user_id = u.id
 		GROUP BY u.id, u.first_name, u.last_name, u.email
@@ -68,7 +81,9 @@ func GetUserPrescriptionHistory(c *gin.Context, db *gorm.DB) {
 
 	var unsettled []models.Prescription
 	db.Preload("User").
-		Where("user_id = ? AND status = ?", userID, "unsettled").
+		Joins("JOIN cart_histories ch ON ch.prescription_id = prescriptions.id").
+		Where("prescriptions.user_id = ? AND ch.medicine_status = ?", userID, "unsettled").
+		Group("prescriptions.id").
 		Find(&unsettled)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -91,7 +106,7 @@ func GetPrescriptionCart(c *gin.Context, db *gorm.DB) {
 
 	prescriptionID := c.Param("id")
 
-	var cartItems []models.Cart
+	var cartItems []models.CartHistory
 	if err := db.
 		Preload("Medicine").
 		Preload("Medicine.ItemImages").
@@ -109,59 +124,93 @@ func GetPrescriptionCart(c *gin.Context, db *gorm.DB) {
 }
 
 // approve
-func SubmitPrescription(c *gin.Context, db *gorm.DB) {
+func ApproveMedicineInPrescription(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
-	userObj, ok := user.(*models.Pharmacist)
-	if !ok || userObj.ApplicationRole != "Pharmacist" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Access denied: Pharmacist only"})
-		return
-	}
-
-	id := c.Param("id")
-
-	if err := db.Model(&models.Prescription{}).
-		Where("id = ?", id).
-		Update("status", "fulfilled").Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Prescription submission failed"})
+	pharmacist, ok := user.(*models.Pharmacist)
+	if !ok || pharmacist.ApplicationRole != "Pharmacist" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Access denied"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Prescription submitted successfully"})
+	cartID := c.Param("cart_id")
+
+	var cart models.CartHistory
+	if err := db.First(&cart, cartID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Cart item not found"})
+		return
+	}
+
+	if cart.MedicineStatus != "unsettled" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Already processed"})
+		return
+	}
+
+	// Approve medicine
+	if err := db.Model(&cart).Update("medicine_status", "approved").Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to approve medicine"})
+		return
+	}
+
+	// Check if all cart items under this prescription are settled
+	checkAndUpdatePrescriptionStatus(db, *cart.PrescriptionID)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Medicine approved"})
 }
 
 // reject
-func RejectPrescription(c *gin.Context, db *gorm.DB) {
+func RejectMedicineInPrescription(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
-	userObj, ok := user.(*models.Pharmacist)
-	if !ok || userObj.ApplicationRole != "Pharmacist" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Access denied: Pharmacist only"})
-		return
-	}
-
-	id := c.Param("id")
-
-	var prescription models.Prescription
-	if err := db.First(&prescription, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Prescription not found"})
+	pharmacist, ok := user.(*models.Pharmacist)
+	if !ok || pharmacist.ApplicationRole != "Pharmacist" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Access denied"})
 		return
 	}
 
-	if err := db.Model(&models.Prescription{}).
-		Where("id = ?", id).
-		Update("status", "rejected").Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to reject prescription"})
+	cartID := c.Param("cart_id")
+
+	var cart models.CartHistory
+	if err := db.First(&cart, cartID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Cart item not found"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Prescription rejected successfully"})
+	if cart.MedicineStatus != "unsettled" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Already processed"})
+		return
+	}
+
+	// Reject medicine
+	if err := db.Model(&cart).Update("medicine_status", "rejected").Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to reject medicine"})
+		return
+	}
+
+	// Check if all cart items under this prescription are settled
+	checkAndUpdatePrescriptionStatus(db, *cart.PrescriptionID)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Medicine rejected"})
+}
+
+func checkAndUpdatePrescriptionStatus(db *gorm.DB, prescriptionID uint) {
+	var unsettledCount int64
+	db.Model(&models.CartHistory{}).
+		Where("prescription_id = ? AND medicine_status = ?", prescriptionID, "unsettled").
+		Count(&unsettledCount)
+
+	if unsettledCount == 0 {
+		// All medicines settled, so mark prescription as fulfilled (or you can do custom logic here)
+		db.Model(&models.Prescription{}).
+			Where("id = ?", prescriptionID).
+			Update("status", "fulfilled")
+	}
 }
 
 // pharmacist info

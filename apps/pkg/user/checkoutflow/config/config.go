@@ -8,6 +8,7 @@ type AddressRequest struct {
 	Barangay      string `json:"barangay"`
 	City          string `json:"city"`
 	ZipCode       string `json:"zipcode"`
+	PhoneNumber   string `json:"phonenumber"`
 	IsDefault     bool   `json:"isdefault"`
 }
 
@@ -55,4 +56,9 @@ type CartResponse struct {
 	Quantity           int                `json:"quantity"`
 	Medicine           UserFacingMedicine `json:"medicine"`
 	PrescriptionStatus string             `json:"prescription_status"`
+}
+
+type ReqPaymentType struct {
+	CheckoutSessionID uint   `json:"checkout_session_id"`
+	PaymentType       string `json:"payment_type"` // GCOD or COD
 }

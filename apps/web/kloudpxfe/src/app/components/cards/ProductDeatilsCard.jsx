@@ -70,8 +70,8 @@ const ProductDeatilsCard = ({ details }) => {
         </div>
       </div>
 
-      <div className="w-full mx-auto rounded-lg bg-[#EDF4F6]   sm:mt-12 mt-7">
-        {/* Delivery row */}
+      {/* <div className="w-full mx-auto rounded-lg bg-[#EDF4F6]   sm:mt-12 mt-7">
+
         <div className="flex tracking-wide items-start sm:gap-4 gap-2 sm:p-4 p-3 border-b border-blue-100">
           <RiTruckLine className="w-8 h-8 mt-0.5 text-blue-900" />
           <div>
@@ -83,7 +83,7 @@ const ProductDeatilsCard = ({ details }) => {
             </h1>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

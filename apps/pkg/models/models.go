@@ -115,6 +115,7 @@ type Prescription struct {
 	User          User `gorm:"foreignKey:UserID"`
 	UploadedImage string
 	Status        string // "unsettled", "fulfilled"
+	IsSelected    bool   `gorm:"default:false"`
 }
 
 // Many-to-many (cart) between prescription and medicines
@@ -128,7 +129,23 @@ type Cart struct {
 	Quantity          int
 	IsOTC             bool // NEW: explicitly marks whether it’s OTC
 	CheckoutSessionID *uint
-	IsSavedForLater   bool `gorm:"default:false"`
+	IsSavedForLater   bool   `gorm:"default:false"`
+	MedicineStatus    string `gorm:"default:'unsettled'"` // "approved", "rejected", "unsettled"
+}
+
+type CartHistory struct {
+	gorm.Model
+	UserID            uint
+	PrescriptionID    *uint
+	Prescription      *Prescription
+	MedicineID        uint
+	Medicine          Medicine
+	Quantity          int
+	IsOTC             bool
+	CheckoutSessionID uint
+	IsSavedForLater   bool
+	MedicineStatus    string
+	OrderNumber       string
 }
 
 type CarouselImage struct {
@@ -147,6 +164,7 @@ type GalleryImage struct {
 
 type Midwives struct {
 	gorm.Model
+	MidwifeCode  string `gorm:"uniqueIndex;default:null"`
 	FirstName    string `gorm:"not null"`
 	LastName     string `gorm:"not null"`
 	MiddleName   string
@@ -156,6 +174,7 @@ type Midwives struct {
 
 type Hospital struct {
 	gorm.Model
+	HospitalCode string `gorm:"uniqueIndex;default:null"`
 	Region       string `gorm:"not null"`
 	Province     string `gorm:"not null"`
 	Name         string `gorm:"not null"`
@@ -171,16 +190,18 @@ type Hospital struct {
 
 type Physician struct {
 	gorm.Model
-	FirstName    string `gorm:"not null"`
-	LastName     string `gorm:"not null"`
-	MiddleName   string
-	Specialty    string `gorm:"not null"`
-	Municipality string `gorm:"not null"`
-	Province     string `gorm:"not null"`
+	PhysicianCode string `gorm:"uniqueIndex;default:null"`
+	FirstName     string `gorm:"not null"`
+	LastName      string `gorm:"not null"`
+	MiddleName    string
+	Specialty     string `gorm:"not null"`
+	Municipality  string `gorm:"not null"`
+	Province      string `gorm:"not null"`
 }
 
 type KonsultaProvider struct {
 	gorm.Model
+	ProviderCode string `gorm:"uniqueIndex;default:null"`
 	Region       string `gorm:"not null"`
 	Province     string `gorm:"not null"`
 	FacilityName string `gorm:"not null"`
@@ -194,6 +215,7 @@ type KonsultaProvider struct {
 
 type Dentist struct {
 	gorm.Model
+	DentistCode  string `gorm:"uniqueIndex;default:null"`
 	LastName     string `gorm:"not null" json:"last_name"`
 	FirstName    string `gorm:"not null" json:"first_name"`
 	MiddleName   string `json:"middle_name"`
@@ -211,6 +233,7 @@ type Address struct {
 	Barangay      string
 	City          string
 	ZipCode       string
+	PhoneNumber   string
 	IsDefault     bool
 }
 
@@ -220,6 +243,8 @@ type CheckoutSession struct {
 	AddressID    *uint
 	DeliveryType string
 	DeliveryCost int
+	TotalCost    float64
+	GrandTotal   float64
 	Status       string // pending, completed
 	CartItems    []Cart `gorm:"foreignKey:CheckoutSessionID"`
 }
@@ -244,6 +269,8 @@ type Order struct {
 	OrderNumber       string
 	TotalAmount       float64
 	DeliveryAddress   string
+	PaidAmount        float64
+	ShippingNumber    string
 	DeliveryType      string
 	Status            string          // e.g., "processing", "queued", "completed"
 	User              User            `gorm:"foreignKey:UserID"`

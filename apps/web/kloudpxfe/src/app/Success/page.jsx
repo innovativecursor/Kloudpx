@@ -6,13 +6,13 @@ import { usePayment } from "../contexts/PaymentContext";
 
 const SuccessPage = () => {
   const router = useRouter();
-  const { orderSuccess } = usePayment();
+  const { OrderSubmit } = usePayment();
 
   const handleBackToShopping = () => {
     router.push("/");
   };
 
-  const orderNumber = orderSuccess?.order_number;
+  const orderNumber = OrderSubmit?.order_number;
 
   return (
     <div className="min-h-[80vh] flex flex-col justify-center items-center text-center px-4 md:mt-52 sm:mt-48 mt-32">

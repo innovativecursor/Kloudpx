@@ -1,16 +1,13 @@
 package checkoutflow
 
 import (
-	"encoding/base64"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	cfg "github.com/innovativecursor/Kloudpx/apps/pkg/config"
-	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/getfileextension"
-	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/s3helper"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/itemscalculation"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/userinfo"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/checkoutflow/config"
@@ -74,31 +71,25 @@ func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 	err := db.Where("user_id = ? AND status = ?", userObj.ID, "pending").First(&existingSession).Error
 	sessionExists := err == nil
 
-	// Fetch all active (not saved) cart items
-	var cartItems []models.Cart
-	if err := db.Preload("Medicine").
+	// Fetch all active (not saved) cart items — prescription status no longer matters
+	var eligibleItems []models.Cart
+	if err := db.Preload("Medicine.Generic").
+		Preload("Medicine.Category").
+		Preload("Medicine.ItemImages").
 		Preload("Prescription").
 		Where("user_id = ? AND is_saved_for_later = false", userObj.ID).
-		Find(&cartItems).Error; err != nil {
+		Find(&eligibleItems).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart items"})
 		return
-	}
-
-	var eligibleItems []models.Cart
-	for _, item := range cartItems {
-		if item.Medicine.Prescription {
-			if item.Prescription != nil && item.Prescription.Status == "fulfilled" {
-				eligibleItems = append(eligibleItems, item)
-			}
-		} else {
-			eligibleItems = append(eligibleItems, item)
-		}
 	}
 
 	if len(eligibleItems) == 0 && sessionExists {
 		// No new items but existing session exists — return session items
 		var linkedItems []models.Cart
-		if err := db.Preload("Medicine").
+		if err := db.Preload("Medicine.Generic").
+			Preload("Medicine.Category").
+			Preload("Medicine.ItemImages").
+			Preload("Prescription").
 			Where("checkout_session_id = ? AND is_saved_for_later = false", existingSession.ID).
 			Find(&linkedItems).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch session items"})
@@ -113,7 +104,7 @@ func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 	}
 
 	if len(eligibleItems) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No eligible items available for checkout"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No items available for checkout"})
 		return
 	}
 
@@ -141,9 +132,12 @@ func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 		}
 	}
 
-	// Fetch all linked items again (some might’ve been linked in past)
+	// Fetch all linked items again
 	var finalItems []models.Cart
-	if err := db.Preload("Medicine").
+	if err := db.Preload("Medicine.Generic").
+		Preload("Medicine.Category").
+		Preload("Medicine.ItemImages").
+		Preload("Prescription").
 		Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
 		Find(&finalItems).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load session cart items"})
@@ -156,6 +150,7 @@ func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 		"items":               buildCartResponse(finalItems, db),
 	})
 }
+
 func buildCartResponse(cartItems []models.Cart, db *gorm.DB) []config.CartResponse {
 	var response []config.CartResponse
 
@@ -220,7 +215,6 @@ func buildCartResponse(cartItems []models.Cart, db *gorm.DB) []config.CartRespon
 
 	return response
 }
-
 func AddOrUpdateAddress(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -252,6 +246,7 @@ func AddOrUpdateAddress(c *gin.Context, db *gorm.DB) {
 		addr.Barangay = req.Barangay
 		addr.City = req.City
 		addr.ZipCode = req.ZipCode
+		addr.PhoneNumber = req.PhoneNumber
 		addr.IsDefault = req.IsDefault
 
 		if req.IsDefault {
@@ -271,10 +266,11 @@ func AddOrUpdateAddress(c *gin.Context, db *gorm.DB) {
 		UserID:        userObj.ID,
 		NameResidency: req.NameResidency,
 		Region:        req.Region,
-		Barangay:      req.Barangay,
 		Province:      req.Province,
+		Barangay:      req.Barangay,
 		City:          req.City,
 		ZipCode:       req.ZipCode,
+		PhoneNumber:   req.PhoneNumber,
 		IsDefault:     req.IsDefault,
 	}
 
@@ -399,10 +395,13 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 		}
 	}
 
+	region := userinfo.GetRegionInfo(address.ZipCode)
+
 	var totalCost float64
 	for _, item := range session.CartItems {
 		medicine := item.Medicine
 		price := medicine.SellingPricePerPiece * float64(item.Quantity)
+
 		if medicine.Discount != "" {
 			discountStr := strings.TrimSuffix(medicine.Discount, "%")
 			discountVal, err := strconv.ParseFloat(discountStr, 64)
@@ -418,12 +417,31 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 
 	switch dataConfig.DeliveryType {
 	case "standard":
-		deliveryCost = CalculateStandardDelivery(address.ZipCode)
+		if totalCost >= region.FreeShippingLimit {
+			// Free delivery
+			deliveryCost = 0
+			codFee = 0
+		} else {
+			// Apply standard rate only
+			deliveryCost = region.StandardRate
+			codFee = 0
+		}
+
 	case "priority":
 		deliveryCost = 150
+		codFee = 0 // No COD fee for priority unless you want to apply it
+
 	case "cod":
-		deliveryCost = CalculateStandardDelivery(address.ZipCode)
-		codFee = totalCost * 0.0275
+		if totalCost >= region.FreeShippingLimit {
+			// Fully free if threshold surpassed
+			deliveryCost = 0
+			codFee = 0
+		} else {
+			// Apply delivery rate + COD fee
+			deliveryCost = region.StandardRate
+			codFee = totalCost * 0.0275
+		}
+
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid delivery type"})
 		return
@@ -432,6 +450,9 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 	session.AddressID = &address.ID
 	session.DeliveryType = dataConfig.DeliveryType
 	session.DeliveryCost = deliveryCost + int(codFee)
+
+	session.TotalCost = totalCost
+	session.GrandTotal = totalCost + float64(deliveryCost) + codFee
 
 	if err := db.Save(&session).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update delivery info"})
@@ -506,6 +527,7 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 		"delivery_cost":       deliveryCost,
 		"cod_fee":             codFee,
 		"delivery_type":       session.DeliveryType,
+		"delivery_time":       region.DeliveryTime,
 		"checkout_session_id": session.ID,
 		"address":             address,
 		"cart_items":          response,
@@ -514,26 +536,7 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 	})
 }
 
-func CalculateStandardDelivery(zipCode string) int {
-	zip, err := strconv.Atoi(zipCode)
-	if err != nil {
-		return 100 // default fallback
-	}
-	switch {
-	case zip >= 1000 && zip <= 1749:
-		return 85
-	case zip >= 2000 && zip <= 5200:
-		return 95
-	case zip >= 5000 && zip <= 6700:
-		return 100
-	case zip >= 7000 && zip <= 9800:
-		return 105
-	default:
-		return 100
-	}
-}
-
-func SubmitPayment(c *gin.Context, db *gorm.DB) {
+func SelectPaymentType(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -545,196 +548,52 @@ func SubmitPayment(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	var req config.SubmitPaymentRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
+	var req config.ReqPaymentType
+	if err := c.ShouldBindJSON(&req); err != nil || req.CheckoutSessionID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
 		return
 	}
 
-	sessionID, _ := strconv.Atoi(req.CheckoutSessionID)
+	// Fetch checkout session
 	var session models.CheckoutSession
-	if err := db.First(&session, sessionID).Error; err != nil {
+	if err := db.
+		Preload("CartItems.Medicine").
+		Where("id = ? AND user_id = ?", req.CheckoutSessionID, userObj.ID).
+		First(&session).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Checkout session not found"})
 		return
 	}
 
-	// Handle Cash on Delivery
-	if session.DeliveryType == "cod" {
-		var address models.Address
-		if err := db.First(&address, session.AddressID).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch delivery address"})
-			return
-		}
-		fullAddress := fmt.Sprintf("%s, %s, %s, %s, %s", address.NameResidency, address.Barangay, address.City, address.Province, address.ZipCode)
-
-		var cartItems []models.Cart
-		if err := db.Preload("Medicine").
-			Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
-			Find(&cartItems).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart items"})
-			return
-		}
-
-		var totalCost float64
-		for _, item := range cartItems {
-			price := item.Medicine.SellingPricePerPiece * float64(item.Quantity)
-			if item.Medicine.Discount != "" {
-				discountStr := strings.TrimSuffix(item.Medicine.Discount, "%")
-				discountVal, err := strconv.ParseFloat(discountStr, 64)
-				if err == nil {
-					price -= price * discountVal / 100
-				}
-			}
-			totalCost += price
-		}
-		grandTotal := totalCost + float64(session.DeliveryCost)
-
-		orderNumber := userinfo.GenerateOrderNumber()
-		order := models.Order{
-			UserID:            userObj.ID,
-			CheckoutSessionID: session.ID,
-			OrderNumber:       orderNumber,
-			TotalAmount:       grandTotal,
-			DeliveryAddress:   fullAddress,
-			DeliveryType:      session.DeliveryType,
-			Status:            "processing",
-		}
-
-		if err := db.Create(&order).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create order summary"})
-			return
-		}
-
-		session.Status = "completed"
-		db.Save(&session)
-
-		if err := db.Model(&models.Cart{}).
-			Where("checkout_session_id = ?", session.ID).
-			Update("checkout_session_id", nil).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to clear session from cart items"})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"message":      "COD order placed successfully",
-			"order_number": orderNumber,
-			"order":        order,
-		})
-		return
-	}
-
-	// Online payments
-	if req.PaymentNumber == "" && req.ScreenshotBase64 == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Either payment_number or screenshot_base64 must be provided"})
-		return
-	}
-
-	remark, err := strconv.ParseFloat(req.Remark, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid remark amount"})
-		return
-	}
-
-	var screenshotURL string
-	if req.ScreenshotBase64 != "" {
-		decodedImage, err := base64.StdEncoding.DecodeString(req.ScreenshotBase64)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid base64 image"})
-			return
-		}
-
-		cfg, err := cfg.Env()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Configuration error"})
-			return
-		}
-
-		profileType := "payment"
-		userType := "user"
-		uniqueID := s3helper.GenerateUniqueID().String()
-		userID := fmt.Sprintf("%d", userObj.ID)
-		imageName := "payment_screenshot"
-
-		err = s3helper.UploadToS3(
-			c.Request.Context(),
-			profileType,
-			userType,
-			cfg.S3.BucketName,
-			uniqueID,
-			userID,
-			imageName,
-			decodedImage,
-		)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload image"})
-			return
-		}
-
-		extension, _ := getfileextension.GetFileExtension(decodedImage)
-		screenshotURL = fmt.Sprintf(
-			"https://%s.s3.%s.amazonaws.com/%s/%s/%s/%s/%s.%s",
-			cfg.S3.BucketName,
-			cfg.S3.Region,
-			profileType,
-			userType,
-			uniqueID,
-			userID,
-			imageName,
-			extension,
-		)
-	}
-
-	orderNumber := userinfo.GenerateOrderNumber()
-	payment := models.Payment{
-		UserID:            userObj.ID,
-		CheckoutSessionID: uint(sessionID),
-		OrderNumber:       orderNumber,
-		PaymentNumber:     req.PaymentNumber,
-		ScreenshotURL:     screenshotURL,
-		Remark:            remark,
-		Status:            "Pending",
-	}
-
-	if err := db.Create(&payment).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save payment"})
-		return
-	}
-
-	session.Status = "completed"
-	if err := db.Save(&session).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update session status"})
-		return
-	}
-
+	// Fetch delivery address
 	var address models.Address
 	if err := db.First(&address, session.AddressID).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch delivery address"})
 		return
 	}
-	fullAddress := fmt.Sprintf("%s, %s, %s, %s, %s", address.NameResidency, address.Barangay, address.City, address.Province, address.ZipCode)
+	fullAddress := fmt.Sprintf("%s, %s, %s, %s, %s",
+		address.NameResidency, address.Barangay, address.City, address.Province, address.ZipCode)
 
-	var cartItems []models.Cart
+	grandTotal := session.TotalCost + float64(session.DeliveryCost)
+
+	// Fetch cart items
+	var orderedItems []models.Cart
 	if err := db.Preload("Medicine").
 		Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
-		Find(&cartItems).Error; err != nil {
+		Find(&orderedItems).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart items"})
 		return
 	}
 
-	var totalCost float64
-	for _, item := range cartItems {
-		price := item.Medicine.SellingPricePerPiece * float64(item.Quantity)
-		if item.Medicine.Discount != "" {
-			discountStr := strings.TrimSuffix(item.Medicine.Discount, "%")
-			discountVal, err := strconv.ParseFloat(discountStr, 64)
-			if err == nil {
-				price -= price * discountVal / 100
-			}
-		}
-		totalCost += price
+	// Deduct stock
+	if err := itemscalculation.DeductMedicineStock(db, orderedItems); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to deduct stock: " + err.Error()})
+		return
 	}
-	grandTotal := totalCost + float64(session.DeliveryCost)
 
+	// Generate order number
+	orderNumber := userinfo.GenerateOrderNumber()
+
+	// Create order
 	order := models.Order{
 		UserID:            userObj.ID,
 		CheckoutSessionID: session.ID,
@@ -744,47 +603,290 @@ func SubmitPayment(c *gin.Context, db *gorm.DB) {
 		DeliveryType:      session.DeliveryType,
 		Status:            "processing",
 	}
-
 	if err := db.Create(&order).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create order summary"})
 		return
 	}
 
-	if err := db.Model(&models.Cart{}).
-		Where("checkout_session_id = ?", session.ID).
-		Update("checkout_session_id", nil).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to clear session from cart items"})
-		return
+	// Update session
+	session.Status = "completed"
+	db.Save(&session)
+
+	// Move cart items to history
+	for _, item := range orderedItems {
+		historyItem := models.CartHistory{
+			UserID:            item.UserID,
+			PrescriptionID:    item.PrescriptionID,
+			MedicineID:        item.MedicineID,
+			Quantity:          item.Quantity,
+			IsOTC:             item.IsOTC,
+			CheckoutSessionID: session.ID,
+			IsSavedForLater:   item.IsSavedForLater,
+			MedicineStatus:    item.MedicineStatus,
+			OrderNumber:       orderNumber,
+		}
+		db.Create(&historyItem)
 	}
 
+	// Clear cart
+	db.Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
+		Delete(&models.Cart{})
+
 	c.JSON(http.StatusOK, gin.H{
-		"message":       "Payment submitted successfully",
-		"payment":       payment,
+		"message":       "Order placed successfully",
 		"order_number":  orderNumber,
+		"payment_type":  req.PaymentType,
+		"grand_total":   grandTotal,
 		"order_summary": order,
 	})
 }
 
-func PreviewPaymentScreenshot(c *gin.Context, db *gorm.DB) {
-	user, exists := c.Get("user")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
-	}
-	_, ok := user.(*models.User)
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
-		return
-	}
-	paymentID := c.Param("id")
+// func SubmitPayment(c *gin.Context, db *gorm.DB) {
+// 	user, exists := c.Get("user")
+// 	if !exists {
+// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+// 		return
+// 	}
+// 	userObj, ok := user.(*models.User)
+// 	if !ok {
+// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
+// 		return
+// 	}
 
-	var payment models.Payment
-	if err := db.First(&payment, paymentID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Payment not found"})
-		return
-	}
+// 	var req config.SubmitPaymentRequest
+// 	if err := c.ShouldBindJSON(&req); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
+// 		return
+// 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"screenshot_url": payment.ScreenshotURL,
-	})
-}
+// 	sessionID, _ := strconv.Atoi(req.CheckoutSessionID)
+// 	var session models.CheckoutSession
+// 	if err := db.First(&session, sessionID).Error; err != nil {
+// 		c.JSON(http.StatusNotFound, gin.H{"error": "Checkout session not found"})
+// 		return
+// 	}
+
+// 	// Use stored totals — no recalculation
+// 	grandTotal := session.GrandTotal
+
+// 	// Fetch ordered items first
+// 	var orderedItems []models.Cart
+// 	if err := db.Preload("Medicine").
+// 		Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
+// 		Find(&orderedItems).Error; err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart items"})
+// 		return
+// 	}
+
+// 	// COD payment
+// 	if session.DeliveryType == "cod" {
+// 		var address models.Address
+// 		if err := db.First(&address, session.AddressID).Error; err != nil {
+// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch delivery address"})
+// 			return
+// 		}
+// 		fullAddress := fmt.Sprintf("%s, %s, %s, %s, %s",
+// 			address.NameResidency, address.Barangay, address.City, address.Province, address.ZipCode)
+
+// 		orderNumber := userinfo.GenerateOrderNumber()
+
+// 		// Deduct stock before creating order
+// 		if err := itemscalculation.DeductMedicineStock(db, orderedItems); err != nil {
+// 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to deduct stock: " + err.Error()})
+// 			return
+// 		}
+
+// 		order := models.Order{
+// 			UserID:            userObj.ID,
+// 			CheckoutSessionID: session.ID,
+// 			OrderNumber:       orderNumber,
+// 			TotalAmount:       grandTotal,
+// 			DeliveryAddress:   fullAddress,
+// 			DeliveryType:      session.DeliveryType,
+// 			Status:            "processing",
+// 		}
+// 		if err := db.Create(&order).Error; err != nil {
+// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create order summary"})
+// 			return
+// 		}
+
+// 		session.Status = "completed"
+// 		db.Save(&session)
+
+// 		// Move cart items to history
+// 		for _, item := range orderedItems {
+// 			historyItem := models.CartHistory{
+// 				UserID:            item.UserID,
+// 				PrescriptionID:    item.PrescriptionID,
+// 				MedicineID:        item.MedicineID,
+// 				Quantity:          item.Quantity,
+// 				IsOTC:             item.IsOTC,
+// 				CheckoutSessionID: session.ID,
+// 				IsSavedForLater:   item.IsSavedForLater,
+// 				MedicineStatus:    item.MedicineStatus,
+// 				OrderNumber:       orderNumber,
+// 			}
+// 			db.Create(&historyItem)
+// 		}
+
+// 		// Clear cart
+// 		db.Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
+// 			Delete(&models.Cart{})
+
+// 		c.JSON(http.StatusOK, gin.H{
+// 			"message":      "COD order placed successfully",
+// 			"order_number": orderNumber,
+// 			"order":        order,
+// 		})
+// 		return
+// 	}
+
+// 	// Online Payment
+// 	if req.PaymentNumber == "" && req.ScreenshotBase64 == "" {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Either payment_number or screenshot_base64 must be provided"})
+// 		return
+// 	}
+
+// 	remark, err := strconv.ParseFloat(req.Remark, 64)
+// 	if err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid remark amount"})
+// 		return
+// 	}
+
+// 	var screenshotURL string
+// 	if req.ScreenshotBase64 != "" {
+// 		decodedImage, err := base64.StdEncoding.DecodeString(req.ScreenshotBase64)
+// 		if err != nil {
+// 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid base64 image"})
+// 			return
+// 		}
+
+// 		cfg, _ := cfg.Env()
+// 		profileType := "payment"
+// 		userType := "user"
+// 		uniqueID := s3helper.GenerateUniqueID().String()
+// 		userID := fmt.Sprintf("%d", userObj.ID)
+// 		imageName := "payment_screenshot"
+
+// 		if err := s3helper.UploadToS3(
+// 			c.Request.Context(),
+// 			profileType, userType,
+// 			cfg.S3.BucketName, uniqueID, userID,
+// 			imageName, decodedImage,
+// 		); err != nil {
+// 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload image"})
+// 			return
+// 		}
+
+// 		extension, _ := getfileextension.GetFileExtension(decodedImage)
+// 		screenshotURL = fmt.Sprintf(
+// 			"https://%s.s3.%s.amazonaws.com/%s/%s/%s/%s/%s.%s",
+// 			cfg.S3.BucketName,
+// 			cfg.S3.Region,
+// 			profileType,
+// 			userType,
+// 			uniqueID,
+// 			userID,
+// 			imageName,
+// 			extension,
+// 		)
+// 	}
+
+// 	orderNumber := userinfo.GenerateOrderNumber()
+
+// 	// Deduct stock before creating payment/order
+// 	if err := itemscalculation.DeductMedicineStock(db, orderedItems); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to deduct stock: " + err.Error()})
+// 		return
+// 	}
+
+// 	payment := models.Payment{
+// 		UserID:            userObj.ID,
+// 		CheckoutSessionID: uint(sessionID),
+// 		OrderNumber:       orderNumber,
+// 		PaymentNumber:     req.PaymentNumber,
+// 		ScreenshotURL:     screenshotURL,
+// 		Remark:            remark,
+// 		Status:            "Pending",
+// 	}
+// 	if err := db.Create(&payment).Error; err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save payment"})
+// 		return
+// 	}
+
+// 	session.Status = "completed"
+// 	db.Save(&session)
+
+// 	var address models.Address
+// 	if err := db.First(&address, session.AddressID).Error; err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch delivery address"})
+// 		return
+// 	}
+// 	fullAddress := fmt.Sprintf("%s, %s, %s, %s, %s",
+// 		address.NameResidency, address.Barangay, address.City, address.Province, address.ZipCode)
+
+// 	order := models.Order{
+// 		UserID:            userObj.ID,
+// 		CheckoutSessionID: session.ID,
+// 		OrderNumber:       orderNumber,
+// 		TotalAmount:       grandTotal,
+// 		DeliveryAddress:   fullAddress,
+// 		DeliveryType:      session.DeliveryType,
+// 		Status:            "processing",
+// 	}
+// 	if err := db.Create(&order).Error; err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create order summary"})
+// 		return
+// 	}
+
+// 	// Move cart items to history
+// 	for _, item := range orderedItems {
+// 		historyItem := models.CartHistory{
+// 			UserID:            item.UserID,
+// 			PrescriptionID:    item.PrescriptionID,
+// 			MedicineID:        item.MedicineID,
+// 			Quantity:          item.Quantity,
+// 			IsOTC:             item.IsOTC,
+// 			CheckoutSessionID: session.ID,
+// 			IsSavedForLater:   item.IsSavedForLater,
+// 			MedicineStatus:    item.MedicineStatus,
+// 			OrderNumber:       orderNumber,
+// 		}
+// 		db.Create(&historyItem)
+// 	}
+
+// 	// Clear cart
+// 	db.Where("checkout_session_id = ? AND is_saved_for_later = false", session.ID).
+// 		Delete(&models.Cart{})
+
+// 	c.JSON(http.StatusOK, gin.H{
+// 		"message":       "Payment submitted successfully",
+// 		"payment":       payment,
+// 		"order_number":  orderNumber,
+// 		"order_summary": order,
+// 	})
+// }
+
+// func PreviewPaymentScreenshot(c *gin.Context, db *gorm.DB) {
+// 	user, exists := c.Get("user")
+// 	if !exists {
+// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+// 		return
+// 	}
+// 	_, ok := user.(*models.User)
+// 	if !ok {
+// 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
+// 		return
+// 	}
+// 	paymentID := c.Param("id")
+
+// 	var payment models.Payment
+// 	if err := db.First(&payment, paymentID).Error; err != nil {
+// 		c.JSON(http.StatusNotFound, gin.H{"error": "Payment not found"})
+// 		return
+// 	}
+
+// 	c.JSON(http.StatusOK, gin.H{
+// 		"screenshot_url": payment.ScreenshotURL,
+// 	})
+// }
