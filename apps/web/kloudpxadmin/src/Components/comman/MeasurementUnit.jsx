@@ -58,7 +58,7 @@ const MeasurementUnit = () => {
         placeholder="Select or create type"
       />
 
-      {measurementType?.value === "perBox" && (
+      {measurementType?.value === "per box" && (
         <>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -89,7 +89,7 @@ const MeasurementUnit = () => {
       )}
 
       <div className="my-10">
-        {measurementType?.value === "perPiece" && (
+        {measurementType?.value === "per piece" && (
           <div className="">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Measurement Unit Value (Piece)

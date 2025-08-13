@@ -22,12 +22,12 @@ const PriceDetails = () => {
   const cpPiece = parseFloat(costPricePerPiece);
 
   useEffect(() => {
-    if (measurementType?.value === "perBox" && pieces > 0) {
+    if (measurementType?.value === "per box" && pieces > 0) {
       if (!isNaN(spBox)) setSellingPricePerPiece((spBox / pieces).toFixed(2));
       if (!isNaN(cpBox)) setCostPricePerPiece((cpBox / pieces).toFixed(2));
     }
 
-    if (measurementType?.value === "perPiece" && pieces > 0) {
+    if (measurementType?.value === "per piece" && pieces > 0) {
       if (!isNaN(spPiece)) setSellingPricePerBox((spPiece * pieces).toFixed(2));
       if (!isNaN(cpPiece)) setCostPricePerBox((cpPiece * pieces).toFixed(2));
     }
