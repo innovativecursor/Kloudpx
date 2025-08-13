@@ -33,7 +33,7 @@ const NewAddress = ({ setShowAddForm }) => {
           <input
             type="text"
             name="phonenumber"
-            value={formData.phonenumber || ""}
+            value={formData.phonenumber || "+63"}
             onChange={handleChange}
             required
             placeholder="e.g., 09123456789"

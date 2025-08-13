@@ -19,10 +19,10 @@ const Otc = () => {
 
   console.log(allOtc);
 
-  const otcSlides = allOtc.map((product) => {
-    const price = product.price || 0;
-    const discountPercent = product.discount
-      ? parseFloat(product.discount.replace("%", "")) || 0
+  const otcSlides = allOtc?.map((product) => {
+    const price = product?.price || 0;
+    const discountPercent = product?.discount
+      ? parseFloat(product?.discount.replace("%", "")) || 0
       : 0;
     const discountedPrice = (price - (price * discountPercent) / 100).toFixed(
       2
@@ -38,7 +38,7 @@ const Otc = () => {
           >
             <Image
               src={
-                product.images?.[0]?.trim() ? product.images[0] : fallbackImage
+                product?.images?.[0]?.trim() ? product?.images[0] : fallbackImage
               }
               alt={product.title || product.genericname}
               fill
@@ -52,10 +52,10 @@ const Otc = () => {
               onClick={() => goToProductPage(product?.id, product?.genericname)}
             >
               <p className="text-xs text-[#0070ba] font-medium">
-                {product.brandname}
+                {product?.brandname}
               </p>
               <h3 className="text-base mt-1 font-semibold text-gray-900">
-                {product.genericname}
+                {product?.genericname}
               </h3>
             </div>
 

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import classNames from "classnames";
 import useProductNavigation from "@/app/hooks/useProductNavigation";
 
-const CartModal = ({ isOpen, onClose }) => {
+const CartModal = ({ isOpen, onClose, modalRef }) => {
   const { token, isAuthLoaded } = useAuth();
   const router = useRouter();
   const { getCartData, removeFromCart, getAllCartData } = useCartContext();
@@ -57,10 +57,14 @@ const CartModal = ({ isOpen, onClose }) => {
   return (
     <>
       {isOpen && (
-        <div className="fixed inset-0 bg-black/40 z-40" onClick={onClose} />
+        <div
+          className="fixed inset-0 bg-black/40 z-40"
+          // onClick={onClose}
+        />
       )}
 
       <div
+         ref={modalRef} 
         onClick={(e) => e.stopPropagation()}
         className={classNames(
           "fixed top-0 right-0 w-[420px] max-w-full h-full bg-white z-50 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col",
