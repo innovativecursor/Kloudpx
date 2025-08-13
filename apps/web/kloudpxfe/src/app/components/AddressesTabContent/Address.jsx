@@ -36,6 +36,15 @@ const Address = () => {
 
   // console.log(getAllAddress, "my add ");
 
+  useEffect(() => {
+    if (Array.isArray(getAllAddress) && getAllAddress.length > 0) {
+      const defaultAddress = getAllAddress.find((addr) => addr.IsDefault);
+      if (defaultAddress && !selectedId) {
+        setSelectedId(defaultAddress.ID);
+      }
+    }
+  }, [getAllAddress]);
+
   return (
     <>
       <SubTitle
@@ -84,14 +93,6 @@ const Address = () => {
                         {address?.NameResidency}
                       </span>
                     </div>
-
-                    {/* <div className="w-[70%] ">
-                      <div className="text-xs  tracking-wide text-gray-600 text-center">
-                        {address?.PhoneNumber} {address?.City},{" "}
-                        {address?.Region}, {address?.Province},{" "}
-                        {address?.ZipCode}
-                      </div>
-                    </div> */}
 
                     <div className="w-[70%]">
                       <div className="text-xs tracking-wide text-gray-700 flex flex-wrap justify-center gap-x-3 gap-y-1">

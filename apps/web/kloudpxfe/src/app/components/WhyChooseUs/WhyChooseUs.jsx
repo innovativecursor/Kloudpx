@@ -36,16 +36,16 @@ export default function WhyChooseUs() {
           <h2 className="sm:text-2xl text-xl font-semibold mb-2">
             Why Choose KloudPharma
           </h2>
-          <p className="text-gray-600 sm:text-sm text-xs tracking-wider mt-4">
+          <p className="text-gray-600 font-normal sm:text-sm text-xs tracking-wider mt-4">
             We're committed to providing the highest quality pharmaceutical
             services with a focus on
           </p>
-          <p className="text-gray-600 sm:text-sm text-xs tracking-wider mt-1">
+          <p className="text-gray-600 font-normal sm:text-sm text-xs tracking-wider mt-1">
             patient care and satisfaction.
           </p>
 
           {/* Swiper Slider */}
-          <div className="sm:mt-12 mt-8 sm:mb-10 mb-8">
+          <div className="sm:mt-12 mt-8 sm:mb-10 mb-8 lg:mx-20">
             <Swiper
               spaceBetween={20}
               breakpoints={{
@@ -57,16 +57,16 @@ export default function WhyChooseUs() {
             >
               {features.map((feature, idx) => (
                 <SwiperSlide key={idx}>
-                  <div className="bg-white rounded-xl mb-1 shadow h-48 p-6 cursor-pointer flex flex-col items-start justify-center hover:shadow-lg transition">
-                    <div className="flex items-center sm:gap-3 gap-2">
+                  <div className="bg-white rounded-xl mb-1 shadow-sm h-48 p-6 cursor-pointer flex flex-col items-start justify-center hover:shadow-lg transition">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       <div className="bg-blue-50/50 p-3 rounded-full">
                         {feature.icon}
                       </div>
-                      <h3 className="font-semibold text-base">
+                      <h3 className="font-semibold text-start text-base">
                         {feature.title}
                       </h3>
                     </div>
-                    <p className="text-gray-500 tracking-wide mt-4 text-start text-sm ">
+                    <p className="text-gray-800 font-light tracking-wide mt-4 text-start text-sm ">
                       {feature.description}
                     </p>
                   </div>
