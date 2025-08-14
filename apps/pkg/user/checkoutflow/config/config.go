@@ -40,7 +40,7 @@ type UserFacingMedicine struct {
 	MeasurementUnitValue      int      `json:"measurement_unit_value"`
 	NumberOfPiecesPerBox      int      `json:"number_of_pieces_per_box"`
 	Price                     float64  `json:"price"`
-	TaxType                   string   `json:"tax_type"`
+	TaxType                   float64  `json:"tax_type"`
 	Prescription              bool     `json:"prescription"`
 	Benefits                  string   `json:"benefits"`
 	KeyIngredients            string   `json:"key_ingredients"`
@@ -61,4 +61,10 @@ type CartResponse struct {
 type ReqPaymentType struct {
 	CheckoutSessionID uint   `json:"checkout_session_id"`
 	PaymentType       string `json:"payment_type"` // GCOD or COD
+}
+
+type SelectClinicDoctorRequest struct {
+	CartIDs     []uint `json:"cart_ids"` // Multiple cart IDs
+	HospitalID  uint   `json:"hospital_id"`
+	PhysicianID uint   `json:"physician_id"`
 }

@@ -31,7 +31,7 @@ type UserFacingMedicine struct {
 	MeasurementUnitValue      int      `json:"measurementunitvalue"`
 	NumberOfPiecesPerBox      int      `json:"numberofpiecesperbox"`
 	Price                     float64  `json:"price"`
-	TaxType                   string   `json:"taxtype"`
+	TaxType                   float64  `json:"taxtype"`
 	Prescription              bool     `json:"prescription"`
 	Benefits                  string   `json:"benefits"`
 	KeyIngredients            string   `json:"keyingredients"`

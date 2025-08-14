@@ -23,7 +23,7 @@ type MedicineData struct {
 	SellingPricePerPiece      float64 `json:"sellingpriceperpiece"`
 	CostPricePerBox           float64 `json:"costpriceperbox"`
 	CostPricePerPiece         float64 `json:"costpriceperpiece"`
-	TaxType                   string  `json:"taxtype"`
+	TaxType                   float64 `json:"taxtype"`
 	MinimumThreshold          int     `json:"minimumthreshold"`
 	MaximumThreshold          int     `json:"maximumthreshold"`
 	EstimatedLeadTimeDays     int     `json:"estimatedleadtimedays"`
@@ -61,7 +61,7 @@ type UpdateMedicineData struct {
 	SellingPricePerPiece      float64 `json:"sellingpriceperpiece"`
 	CostPricePerBox           float64 `json:"costpriceperbox"`
 	CostPricePerPiece         float64 `json:"costpriceperpiece"`
-	TaxType                   string  `json:"taxtype"`
+	TaxType                   float64 `json:"taxtype"`
 	MinimumThreshold          int     `json:"minimumthreshold"`
 	MaximumThreshold          int     `json:"maximumthreshold"`
 	EstimatedLeadTimeDays     int     `json:"estimatedleadtimedays"`

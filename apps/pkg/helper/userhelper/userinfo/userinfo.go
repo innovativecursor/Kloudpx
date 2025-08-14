@@ -49,18 +49,20 @@ type RegionInfo struct {
 	StandardRate      int
 }
 
-func GetRegionInfo(zipCode string) RegionInfo {
+func GetRegionInfo(db *gorm.DB, zipCode string) models.RegionSetting {
 	zip, _ := strconv.Atoi(zipCode)
-	switch {
-	case zip >= 1000 && zip <= 1749:
-		return RegionInfo{"NCR", "2-3 days", 800, 85}
-	case zip >= 2000 && zip <= 5200:
-		return RegionInfo{"Luzon", "3-5 days", 1200, 95}
-	case zip >= 5000 && zip <= 6700:
-		return RegionInfo{"Visayas", "3-7 days", 1600, 100}
-	case zip >= 7000 && zip <= 9800:
-		return RegionInfo{"Mindanao", "3-7 days", 2000, 105}
-	default:
-		return RegionInfo{"Unknown", "Unknown", 1000000, 100}
+	var region models.RegionSetting
+
+	// Find matching range
+	if err := db.Where("? BETWEEN zip_start AND zip_end", zip).First(&region).Error; err != nil {
+		// Default fallback if no region found
+		return models.RegionSetting{
+			RegionName:        "Unknown",
+			DeliveryTime:      "Unknown",
+			FreeShippingLimit: 1000000,
+			StandardRate:      100,
+		}
 	}
+
+	return region
 }
