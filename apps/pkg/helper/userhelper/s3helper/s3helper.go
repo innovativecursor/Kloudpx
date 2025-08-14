@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"math/rand"
 	"mime"
-	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -78,12 +76,11 @@ func GenerateUniqueID() uuid.UUID {
 	return newUUID
 }
 
-// SendSMS sends a 6-digit OTP via AWS SNS to the provided phone number.
-// It returns the expiration time of the OTP and an error (if any).
-func SendSMS(phoneNumber string) (time.Time, error) {
+// SendSMS sends a 6-digit OTP and message via AWS SNS to the provided phone number.
+func SendSMS(phoneNumber, message string) error {
 	cfg, err := config.Env()
 	if err != nil {
-		return time.Time{}, fmt.Errorf("failed to load config: %w", err)
+		return fmt.Errorf("failed to load config: %w", err)
 	}
 
 	awsAccessKeyID := cfg.S3.AccessKey
@@ -96,16 +93,8 @@ func SendSMS(phoneNumber string) (time.Time, error) {
 		Credentials: credentials.NewStaticCredentials(awsAccessKeyID, awsSecretAccessKey, ""),
 	})
 	if err != nil {
-		return time.Time{}, fmt.Errorf("error creating session: %w", err)
+		return fmt.Errorf("error creating session: %w", err)
 	}
-
-	// Generate OTP
-	rand.Seed(time.Now().UnixNano())               // Seed random number generator
-	otp := fmt.Sprintf("%06d", rand.Intn(1000000)) // Generate OTP between 000000–999999
-	expiresAt := time.Now().Add(5 * time.Minute)   // OTP validity = 5 minutes
-
-	// If need to send different message for different case then need to send message field as argument.
-	message := fmt.Sprintf("Your Kloud P&X OTP is %s.\nValid for 5 mins. Do not share.", otp)
 
 	// Prepare SNS Publish input with the message and target phone number
 	svc := sns.New(sess)
@@ -113,15 +102,16 @@ func SendSMS(phoneNumber string) (time.Time, error) {
 		Message:     aws.String(message),
 		PhoneNumber: aws.String(phoneNumber),
 	}
-	// Send SMS via AWS SNS
+	//Send SMS via AWS SNS
 	if _, err := svc.Publish(input); err != nil {
-		return time.Time{}, fmt.Errorf("error publishing message: %w", err)
+		return fmt.Errorf("error publishing message: %w", err)
 	}
 
 	fmt.Println("OTP sent successfully!")
-	return expiresAt, nil
+	return nil
 }
 
+// To send email via AWS SES to the provided email.
 func SendEmail(recipient, subject, body string) error {
 	fmt.Println("recipient", recipient, "subject", subject, "body", body)
 	cfg, err := config.Env()

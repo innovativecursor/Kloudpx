@@ -40,8 +40,20 @@ func User(db *gorm.DB) {
 		usersignup.UserSignUp(c, db)
 	})
 
+	apiV1.POST("/user/signup/verify", func(c *gin.Context) {
+		usersignup.VerifySignupOTP(c, db)
+	})
+
 	apiV1.POST("/user/login", func(c *gin.Context) {
 		userlogin.UserLogin(c, db)
+	})
+
+	apiV1.POST("/user/login/verify", func(c *gin.Context) {
+		userlogin.VerifyLoginOTP(c, db)
+	})
+
+	apiV1.POST("/user/verify/otp", func(c *gin.Context) {
+		userlogin.VerifyOTP(c, db)
 	})
 
 	apiV1.POST("/user/upload-prescription", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/orders/config"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/s3helper"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -182,6 +183,18 @@ func UpdateOrderDetails(c *gin.Context, db *gorm.DB) {
 	if err := db.Save(&order).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update order"})
 		return
+	}
+
+	fullName := order.User.FirstName + order.User.LastName
+	// Send SMS notification
+	message := fmt.Sprintf(
+		"Dear %s,\n\nYour order #%s is now %s.\n\nThank you for shopping with us!\nKloud P&X",
+		fullName,
+		order.OrderNumber,
+		order.Status,
+	)
+	if err := s3helper.SendSMS(*order.User.Phone, message); err != nil {
+		logrus.WithError(err).Error("Failed to send order status SMS")
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Order updated successfully"})

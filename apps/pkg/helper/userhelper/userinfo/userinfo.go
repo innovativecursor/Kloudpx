@@ -15,7 +15,7 @@ import (
 
 func AddUserInfo(c *gin.Context, db *gorm.DB, email, firstName, lastName string) (string, error) {
 	user := models.User{
-		Email:           email,
+		Email:           &email,
 		FirstName:       firstName,
 		LastName:        lastName,
 		EmailVerified:   true,

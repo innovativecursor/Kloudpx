@@ -2,6 +2,7 @@ package userlogin
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/s3helper"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/userlogin/config"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/user/usersignup"
 	"gorm.io/gorm"
 )
 
@@ -18,98 +19,105 @@ import (
 // It verifies the credentials, generates a JWT token, and sends a login notification via email or SMS.
 func UserLogin(c *gin.Context, db *gorm.DB) {
 	var loginRequest config.LoginRequest
-
-	// Bind and validate the incoming JSON request body
 	if err := c.ShouldBindJSON(&loginRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 
-	// Find user based on email or phone
-	var user *models.User
-	if loginRequest.Email != "" {
-		db.Where("email = ?", loginRequest.Email).First(&user)
-	} else if loginRequest.Phone != "" {
-		db.Where("phone = ?", loginRequest.Phone).First(&user)
-	} else {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email or phone required"})
+	var user models.User
+	if err := db.Where("phone = ? AND phone_verified = ?", loginRequest.Phone, true).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User not found or not verified"})
 		return
 	}
 
-	// Validate password using bcrypt hash comparison
-	if CheckPasswordHash(c, loginRequest.Password, user.Password) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Incorrect password"})
+	otpCode := usersignup.GenerateOTP()
+	otp := models.OTP{
+		Phone:     loginRequest.Phone,
+		Code:      otpCode,
+		ExpiresAt: time.Now().Add(5 * time.Minute),
+	}
+	db.Create(&otp)
+	message := fmt.Sprintf("Your Kloud P&X OTP is %s.\nValid for 5 mins. Do not share.", otpCode)
+	s3helper.SendSMS(loginRequest.Phone, message)
+	c.JSON(http.StatusOK, gin.H{"message": "OTP sent"})
+}
+
+func VerifyLoginOTP(c *gin.Context, db *gorm.DB) {
+	var verifyLoginOTP config.VerifyOTP
+	if err := c.ShouldBindJSON(&verifyLoginOTP); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 
-	// Generate JWT token based on email or phone
-	token := GenerateJWTTokenForEmailAndPhone(c, loginRequest, user)
-
-	// Send email or SMS login notification
-	expireAt := SendEmailSMS(db, loginRequest, user)
-
-	c.JSON(http.StatusOK, gin.H{"token": token, "expireAt": expireAt})
-}
-
-// CheckPasswordHash compares a plain password by converting into hash password with a bcrypt hashed password.
-// Returns true if they match, false otherwise.
-func CheckPasswordHash(c *gin.Context, password, hash string) bool {
-	bytes, _ := bcrypt.GenerateFromPassword([]byte(password), 14)
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(bytes))
-	return err == nil
-}
-
-// GenerateJWTTokenForEmailAndPhone generates a JWT token based on whether the user logged in with email or phone.
-func GenerateJWTTokenForEmailAndPhone(c *gin.Context, loginBody config.LoginRequest, userObj *models.User) (token string) {
-	var err error
-	if loginBody.Email != "" {
-		token, err = jwthelper.GenerateJWTToken(userObj.Email)
-	} else {
-		token, err = jwthelper.GenerateJWTFromPhone(userObj.Phone)
+	var otp models.OTP
+	if err := db.Where("phone = ? AND code = ?", verifyLoginOTP.Phone, verifyLoginOTP.OTP).First(&otp).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid OTP"})
+		return
 	}
+
+	if otp.ExpiresAt.Before(time.Now()) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "OTP expired"})
+		return
+	}
+
+	var user models.User
+	db.Where("phone = ?", verifyLoginOTP.Phone).First(&user)
+	token, err := jwthelper.GenerateJWTFromPhone(verifyLoginOTP.Phone)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
 	}
-	return token
+
+	session := models.LoginSession{
+		UserID:    user.ID,
+		JWTToken:  token,
+		UserAgent: c.GetHeader("User-Agent"),
+		IP:        c.ClientIP(),
+		ExpiresAt: time.Now().Add(24 * time.Hour),
+	}
+	db.Create(&session)
+
+	c.JSON(http.StatusOK, gin.H{"token": token})
 }
 
-// SendEmailSMS sends a login notification to the user via email or SMS
-// based on the method they used to log in.
-func SendEmailSMS(db *gorm.DB, loginRequest config.LoginRequest, user *models.User) (expireAt time.Time) {
-	// Send Email or SMS
-	if loginRequest.Email != "" {
-		// var orderID, status string
-		// err := db.Raw("SELECT id, status FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 1", user.ID).
-		// 	Row().
-		// 	Scan(&orderID, &status)
-		// if err != nil {
-		// 	log.Printf("Order fetch error: %v", err)
-		// }
-		userFullName := user.FirstName + user.LastName
-		body := fmt.Sprintf("Dear %s,Your order #ORDER_ID is now delivered.\nThank you for shopping with us! \nKloud P&X", userFullName)
-
-		s3helper.SendEmail(user.Email, "Login Notification", body)
-		//s3helper.SendEmail(user.Email, "Login Notification", GenerateEmailBody(userFullName, orderID, status))
-	} else if loginRequest.Phone != "" {
-		expireAt, _ = s3helper.SendSMS(user.Phone)
+func VerifyOTP(c *gin.Context, db *gorm.DB) {
+	var verifyOTP config.VerifyOTP
+	// Bind JSON request
+	if err := c.ShouldBindJSON(&verifyOTP); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
 	}
 
-	// if loginRequest.Phone != "" {
-	// 	expireAt, _ = s3helper.SendSMS(userObj.Phone)
-	// }
+	// Validate phone pointer
+	if verifyOTP.Phone == "" || verifyOTP.OTP == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Phone and OTP are required"})
+		return
+	}
 
-	return expireAt
-}
+	// Find OTP in database
+	var otp models.OTP
+	if err := db.Where("phone = ? AND code = ?", verifyOTP.Phone, verifyOTP.OTP).First(&otp).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid OTP"})
+		return
+	}
 
-func GenerateEmailBody(customerName, orderID, status string) string {
-	return fmt.Sprintf(`
-		<html>
-		<body>
-		<p>Dear %s,</p>
-		<p>Your order <b>#%s</b> is now <b>%s</b>.</p>
-		<p>Thank you for shopping with us!<br>Kloud P&amp;X</p>
-		</body>
-		</html>
-	`, customerName, orderID, status)
+	// Check if OTP is expired
+	if otp.ExpiresAt.Before(time.Now()) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "OTP expired"})
+		return
+	}
+
+	// Mark user as verified if this is for signup
+	if err := db.Model(&models.User{}).Where("phone = ?", verifyOTP.Phone).Update("phone_verified", true).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+		return
+	}
+
+	// Send confirmation SMS
+	message := "Your phone number has been successfully verified!"
+	if err := s3helper.SendSMS(verifyOTP.Phone, message); err != nil {
+		log.Println("Failed to send confirmation SMS:", err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "OTP verified successfully"})
 }
