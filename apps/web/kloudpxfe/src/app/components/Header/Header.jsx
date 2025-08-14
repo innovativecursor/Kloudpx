@@ -101,7 +101,7 @@ const Header = () => {
                 </span>
 
                 {/* Cart Modal */}
-                <CartModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+                <CartModal isOpen={isOpen} onClose={() => setIsOpen(false)} modalRef={modalRef} />
               </div>
             </div>
           </div>

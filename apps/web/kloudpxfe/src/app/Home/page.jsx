@@ -6,15 +6,20 @@ import Banners from "../components/Banners/Banners";
 import Video from "../components/Videos/Video";
 import Upload from "../components/upload/Upload";
 import Instructions from "../components/Instructions/Instructions";
-import Otc from "../components/OTC/Otc";
+// import Otc from "../components/OTC/Otc";
 import DeliveryHome from "../components/DeliveryHome/DeliveryHome";
 import WhyChooseUs from "../components/WhyChooseUs/WhyChooseUs";
 import HealthArticles from "../components/healtharticles/HealthArticles";
 import Testimonial from "../components/testimonial/Testimonial";
 import Faq from "../components/FaqData/Faq";
 import { faqData } from "../components/FaqData/FaqData";
+import Cards from "@/app/components/cards/Cards";
+import { useProductContext } from "../contexts/ProductContext";
+import { useEffect } from "react";
 
 function Home() {
+  const { getAllOtc, allOtc } = useProductContext();
+
   const testimonials = [
     {
       id: 1,
@@ -58,6 +63,10 @@ function Home() {
     },
   ];
 
+  useEffect(() => {
+    getAllOtc();
+  }, []);
+
   return (
     <div className=" bg-[#F9FAFB]">
       <div className="mt-40 md:mt-64 sm:mt-48">
@@ -67,7 +76,10 @@ function Home() {
       <Video />
       <Upload />
       <Instructions />
-      <Otc />
+      {/* <Otc /> */}
+      <div className="mt-12 sm:mt-16 md:mt-20 lg:mt-28">
+        <Cards data={allOtc} title="OTC Medications & Supplements" />
+      </div>
       <DeliveryHome />
       <WhyChooseUs />
       <HealthArticles />
