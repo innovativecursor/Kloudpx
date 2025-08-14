@@ -4,9 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/orders/config"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/itemscalculation"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -185,8 +187,22 @@ func UpdateOrderDetails(c *gin.Context, db *gorm.DB) {
 
 	// Update fields
 	if req.Status != "" {
+		// If order is being canceled, restore stock
+		if strings.ToLower(req.Status) == "cancelled" && order.Status != "cancelled" {
+			var cartHistory []models.CartHistory
+			if err := db.Preload("Medicine").
+				Where("order_number = ?", order.OrderNumber).
+				Find(&cartHistory).Error; err == nil {
+
+				if err := itemscalculation.RestoreMedicineStock(db, cartHistory); err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to restore stock: " + err.Error()})
+					return
+				}
+			}
+		}
 		order.Status = req.Status
 	}
+
 	if req.PaidAmount > 0 {
 		order.PaidAmount = req.PaidAmount
 	}
