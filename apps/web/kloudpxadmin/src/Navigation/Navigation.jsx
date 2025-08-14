@@ -42,6 +42,8 @@ import Carousel from "../Components/carousel/Carousel";
 import Gallery from "../Components/gallery/Gallery";
 import AllOrders from "../pages/AllOrders";
 import OrderDetails from "../pages/OrderDetails";
+import AddThreshold from "../Components/threshold/AddThreshold";
+import AllThreshold from "../Components/threshold/AllThreshold";
 
 function Navigation(props) {
   const location = useLocation();
@@ -79,16 +81,16 @@ function Navigation(props) {
                 <Route path="/carousel" element={<Carousel />} />
                 <Route path="/gallery" element={<Gallery />} />
                 <Route path="/allorders" element={<AllOrders />} />
+                <Route path="/addthreshold" element={<AddThreshold />} />
+                <Route path="/allthreshold" element={<AllThreshold />} />
                 <Route path="/ordersdetails/:id" element={<OrderDetails />} />
                 <Route path="/edit-medicine" element={<AddMedicine />} />
                 <Route path="/addOtcProduct" element={<AddOtcProduct />} />
                 <Route path="/orderHistory" element={<OrderHistory />} />
                 <Route path="/allmedicine" element={<AllMedicine />} />
+                
                 <Route path="/addsupplier" element={<AddSupplier />} />
-                <Route
-                  path="/edit-medicine/:id"
-                  element={<UpdateMedicine />}
-                />
+                <Route path="/edit-medicine/:id" element={<UpdateMedicine />} />
 
                 <Route
                   path="/updateMedicines"

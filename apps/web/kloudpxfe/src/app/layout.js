@@ -17,6 +17,7 @@ import Loader from "@/app/components/Loader/Loader";
 import CustomToaster from "./utils/NoSSRToaster";
 import { CheckoutProvider } from "./contexts/CheckoutContext";
 import { PaymentProvider } from "./contexts/PaymentContext";
+import ClientOnly from "./components/ClientOnly";
 // import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
 
 export default function RootLayout({ children }) {
@@ -29,33 +30,35 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="antialiased min-h-screen flex flex-col">
-        <GoogleOAuthProvider clientId="573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com">
-          <Provider store={store}>
-            <PersistGate loading={null} persistor={persistor}>
-              <Loader />
-              {/* <ErrorBoundary> */}
-              <AuthProvider>
-                <ProductProvider>
-                  <CheckoutProvider>
-                    <CartProvider>
-                      <PrescriptionProvider>
-                        <PaymentProvider>
-                          <ImageProvider>
-                            <Header />
-                            <main className="flex-1">{children}</main>
-                            <Footer />
-                            <CustomToaster />
-                          </ImageProvider>
-                        </PaymentProvider>
-                      </PrescriptionProvider>
-                    </CartProvider>
-                  </CheckoutProvider>
-                </ProductProvider>
-              </AuthProvider>
-              {/* </ErrorBoundary> */}
-            </PersistGate>
-          </Provider>
-        </GoogleOAuthProvider>
+        <ClientOnly>
+          <GoogleOAuthProvider clientId="573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com">
+            <Provider store={store}>
+              <PersistGate loading={null} persistor={persistor}>
+                <Loader />
+                {/* <ErrorBoundary> */}
+                <AuthProvider>
+                  <ProductProvider>
+                    <CheckoutProvider>
+                      <CartProvider>
+                        <PrescriptionProvider>
+                          <PaymentProvider>
+                            <ImageProvider>
+                              <Header />
+                              <main className="flex-1">{children}</main>
+                              <Footer />
+                              <CustomToaster />
+                            </ImageProvider>
+                          </PaymentProvider>
+                        </PrescriptionProvider>
+                      </CartProvider>
+                    </CheckoutProvider>
+                  </ProductProvider>
+                </AuthProvider>
+                {/* </ErrorBoundary> */}
+              </PersistGate>
+            </Provider>
+          </GoogleOAuthProvider>
+        </ClientOnly>
       </body>
     </html>
   );

@@ -15,7 +15,7 @@ const Home = () => {
     }
   }, []);
 
-  console.log(allPrescriptions);
+  // console.log(allPrescriptions);
 
   const columns = [
     {

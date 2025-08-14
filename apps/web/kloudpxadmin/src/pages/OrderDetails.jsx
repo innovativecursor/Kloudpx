@@ -133,7 +133,7 @@ const OrderDetails = () => {
             </div>
 
             <div>
-              <label className="font-semibold block mb-1">Transaction ID</label>
+              <label className="font-semibold block mb-1">Delivery ID</label>
               <input
                 type="text"
                 placeholder="Transaction Id"

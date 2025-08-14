@@ -5,7 +5,7 @@ import CustomModal from "../../Components/modal/CustomModal";
 
 const PrescriptionDetails = () => {
   const { userid } = useParams();
-  const { allPrescriptions, prescriptionDetails, fetchPrescriptionsDetails } =
+  const { prescriptionDetails, fetchPrescriptionsDetails } =
     usePrescriptionContext();
 
   const [activeTab, setActiveTab] = useState("unsettled");
@@ -17,16 +17,9 @@ const PrescriptionDetails = () => {
     setSelectedPrescription(null);
   };
 
-  console.log(allPrescriptions);
-  
-
   useEffect(() => {
     if (userid) fetchPrescriptionsDetails(userid);
   }, [userid]);
-
-  const userInfo = allPrescriptions.find(
-    (user) => Number(user.userid) === Number(userid)
-  );
 
   const { unsettled = [], past = [] } = prescriptionDetails || {};
 
@@ -87,13 +80,13 @@ const PrescriptionDetails = () => {
       {/* User Info */}
       <div className="max-w-md mx-auto mb-8 bg-white rounded-xl shadow-lg p-6 flex flex-col items-center">
         <div className="w-16 h-16 bg-[#0070ba] text-white rounded-full flex items-center justify-center text-2xl font-bold mb-4 shadow-md">
-          {userInfo?.name?.charAt(0) || "U"}
+          {prescriptionDetails?.user?.name?.charAt(0) || "U"}
         </div>
         <p className="text-xl font-semibold text-gray-800">
-          {userInfo?.name || "Unknown User"}
+          {prescriptionDetails?.user?.name || "Unknown User"}
         </p>
         <p className="text-sm text-gray-500 mt-1">
-          {userInfo?.email || "Not Found"}
+          {prescriptionDetails?.user?.email || "Not Found"}
         </p>
       </div>
 
