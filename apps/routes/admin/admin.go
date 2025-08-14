@@ -141,6 +141,15 @@ func Admin(db *gorm.DB) {
 		cms.DeleteCarouselImage(c, db)
 	})
 
+	//upload video
+	apiV1.POST("/admin/upload-video", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		cms.UploadOrderExplanationVideo(c, db)
+	})
+
+	apiV1.GET("/carousel/get-uploaded-video", func(c *gin.Context) {
+		cms.GetActiveOrderExplanationVideos(c, db)
+	})
+
 	//gallery
 	apiV1.POST("/gallery/add-gallery-img", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		cms.GalleryImageUpload(c, db)

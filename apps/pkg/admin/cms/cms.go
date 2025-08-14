@@ -400,3 +400,94 @@ func DeleteGalleryImage(c *gin.Context, db *gorm.DB) {
 		"image_url":  image.ImageURL,
 	})
 }
+
+func UploadOrderExplanationVideo(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+
+	admin, ok := user.(*models.Admin)
+	if !ok || admin.ApplicationRole != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Only admins can upload videos"})
+		return
+	}
+
+	var req struct {
+		VideoBase64 string `json:"video_base64"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
+		return
+	}
+
+	videoBytes, err := base64.StdEncoding.DecodeString(req.VideoBase64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid base64 video"})
+		return
+	}
+
+	cfg, err := cfg.Env()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Config error"})
+		return
+	}
+
+	profileType := "order-explanation"
+	userType := "admin"
+	uuid := s3helper.GenerateUniqueID().String()
+	userID := fmt.Sprintf("%d", admin.ID)
+	videoName := "explanation-video"
+
+	if err := s3helper.UploadToS3(
+		c.Request.Context(),
+		profileType,
+		userType,
+		cfg.S3.BucketName,
+		uuid,
+		userID,
+		videoName,
+		videoBytes,
+	); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Video upload failed"})
+		return
+	}
+
+	ext, err := getfileextension.GetFileExtension(videoBytes)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid video file"})
+		return
+	}
+
+	videoURL := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s/%s/%s/%s/%s.%s",
+		cfg.S3.BucketName, cfg.S3.Region, profileType, userType, uuid, userID, videoName, ext)
+
+	videoRecord := models.OrderExplanationVideo{
+		VideoURL:   videoURL,
+		IsActive:   true, // default active for user
+		UploadedBy: admin.ID,
+	}
+	if err := db.Create(&videoRecord).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "Video uploaded successfully",
+		"video_url": videoURL,
+	})
+}
+
+func GetActiveOrderExplanationVideos(c *gin.Context, db *gorm.DB) {
+	var videos []models.OrderExplanationVideo
+	if err := db.Where("is_active = ?", true).Order("created_at DESC").Find(&videos).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch videos"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Active videos fetched successfully",
+		"data":    videos,
+	})
+}

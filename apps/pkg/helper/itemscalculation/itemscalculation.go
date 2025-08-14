@@ -97,3 +97,37 @@ func DeductMedicineStock(db *gorm.DB, cartItems []models.Cart) error {
 		return nil
 	})
 }
+
+func RestoreMedicineStock(db *gorm.DB, cartItems []models.CartHistory) error {
+	return db.Transaction(func(tx *gorm.DB) error {
+		for _, item := range cartItems {
+			quantityToRestore := item.Quantity
+			if item.Medicine.UnitOfMeasurement == "per box" {
+				quantityToRestore = item.Quantity * item.Medicine.NumberOfPiecesPerBox
+			}
+
+			// Lock and restore
+			var medicines []models.Medicine
+			if err := tx.
+				Clauses(clause.Locking{Strength: "UPDATE"}).
+				Where("LOWER(brand_name) = ? AND LOWER(power) = ?",
+					strings.ToLower(item.Medicine.BrandName),
+					strings.ToLower(item.Medicine.Power)).
+				Order("id asc").
+				Find(&medicines).Error; err != nil {
+				return fmt.Errorf("failed to fetch medicines for restore: %w", err)
+			}
+
+			for _, med := range medicines {
+				available := getAvailableInPieces(med)
+				available += quantityToRestore
+				updateStockAfterDeduction(&med, available) // reuse your same update logic
+				if err := tx.Save(&med).Error; err != nil {
+					return fmt.Errorf("failed to restore stock for %s: %w", med.BrandName, err)
+				}
+				break // restore to first matching medicine batch
+			}
+		}
+		return nil
+	})
+}

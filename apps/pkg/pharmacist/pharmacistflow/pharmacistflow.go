@@ -74,6 +74,12 @@ func GetUserPrescriptionHistory(c *gin.Context, db *gorm.DB) {
 
 	userID := c.Param("user_id")
 
+	var userInfo models.User
+	if err := db.First(&userInfo, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
 	var past []models.Prescription
 	db.Preload("User").
 		Where("user_id = ? AND status IN ?", userID, []string{"fulfilled", "rejected"}).
@@ -87,6 +93,11 @@ func GetUserPrescriptionHistory(c *gin.Context, db *gorm.DB) {
 		Find(&unsettled)
 
 	c.JSON(http.StatusOK, gin.H{
+		"user": gin.H{
+			"id":    userInfo.ID,
+			"name":  userInfo.FirstName + " " + userInfo.LastName,
+			"email": userInfo.Email,
+		},
 		"past":      past,
 		"unsettled": unsettled,
 	})
