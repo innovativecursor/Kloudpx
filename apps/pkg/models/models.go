@@ -293,3 +293,10 @@ type RegionSetting struct {
 	FreeShippingLimit float64 `gorm:"not null"`
 	StandardRate      int     `gorm:"not null"`
 }
+
+type OrderExplanationVideo struct {
+	gorm.Model
+	VideoURL   string
+	IsActive   bool
+	UploadedBy uint
+}
