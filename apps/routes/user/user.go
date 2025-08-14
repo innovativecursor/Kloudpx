@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/uploadexcel"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/middleware"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/checkoutflow"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/oauthuser"
@@ -135,6 +136,18 @@ func User(db *gorm.DB) {
 
 	apiV1.POST("/user/check-out", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
 		checkoutflow.InitiateCheckout(c, db)
+	})
+
+	apiV1.POST("/user/select-doctor-or-clinic", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		checkoutflow.SelectClinicAndDoctor(c, db)
+	})
+
+	apiV1.GET("/user/get-clinics", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		uploadexcel.GetAllHospitals(c, db)
+	})
+
+	apiV1.GET("/user/get-doctors", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		uploadexcel.GetAllPhysicians(c, db)
 	})
 
 	apiV1.POST("/user/add-update-address", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {

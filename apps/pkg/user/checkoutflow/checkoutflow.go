@@ -53,6 +53,55 @@ func ToggleSaveForLater(c *gin.Context, db *gorm.DB) {
 	})
 }
 
+func SelectClinicAndDoctor(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	userObj, ok := user.(*models.User)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
+		return
+	}
+
+	var req config.SelectClinicDoctorRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	// Validate hospital
+	var hospital models.Hospital
+	if err := db.First(&hospital, req.HospitalID).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid hospital"})
+		return
+	}
+
+	// Validate physician
+	var physician models.Physician
+	if err := db.First(&physician, req.PhysicianID).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid physician"})
+		return
+	}
+
+	// Update all matching cart IDs for this user that are NOT saved for later
+	if err := db.Model(&models.Cart{}).
+		Where("user_id = ? AND id IN ? AND is_saved_for_later = false", userObj.ID, req.CartIDs).
+		Updates(map[string]interface{}{
+			"hospital_id":  req.HospitalID,
+			"physician_id": req.PhysicianID,
+		}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart items"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "Clinic and doctor selected for all specified cart items",
+		"cart_ids": req.CartIDs,
+	})
+}
+
 func InitiateCheckout(c *gin.Context, db *gorm.DB) {
 	// Get authenticated user
 	user, exists := c.Get("user")
@@ -395,7 +444,7 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 		}
 	}
 
-	region := userinfo.GetRegionInfo(address.ZipCode)
+	region := userinfo.GetRegionInfo(db, address.ZipCode)
 
 	var totalCost float64
 	for _, item := range session.CartItems {
@@ -600,6 +649,7 @@ func SelectPaymentType(c *gin.Context, db *gorm.DB) {
 		OrderNumber:       orderNumber,
 		TotalAmount:       grandTotal,
 		DeliveryAddress:   fullAddress,
+		PaymentType:       req.PaymentType,
 		DeliveryType:      session.DeliveryType,
 		Status:            "processing",
 	}
@@ -624,6 +674,8 @@ func SelectPaymentType(c *gin.Context, db *gorm.DB) {
 			IsSavedForLater:   item.IsSavedForLater,
 			MedicineStatus:    item.MedicineStatus,
 			OrderNumber:       orderNumber,
+			HospitalID:        item.HospitalID,
+			PhysicianID:       item.PhysicianID,
 		}
 		db.Create(&historyItem)
 	}

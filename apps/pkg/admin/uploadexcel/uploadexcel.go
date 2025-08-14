@@ -103,6 +103,8 @@ func UploadMedicineExcel(c *gin.Context, db *gorm.DB) {
 		var prescription bool
 		fmt.Sscanf(getCell(22), "%t", &prescription)
 
+		var taxType float64
+		fmt.Sscanf(getCell(7), "%f", &taxType)
 		// Prepare new or updated record
 		medicine := models.Medicine{
 			ItemCode:                  itemCode,
@@ -112,7 +114,7 @@ func UploadMedicineExcel(c *gin.Context, db *gorm.DB) {
 			Packaging:                 getCell(4),
 			DosageForm:                getCell(5),
 			Marketer:                  getCell(6),
-			TaxType:                   getCell(7),
+			TaxType:                   taxType,
 			CategorySubClass:          getCell(8),
 			UnitOfMeasurement:         unitOfMeasurement,
 			Discount:                  getCell(23),
@@ -809,4 +811,43 @@ func generateDentistCode() string {
 	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
 	random := rand.Intn(1000)
 	return fmt.Sprintf("DNT-%d-%03d", timestamp, random)
+}
+
+// get methods
+func GetAllHospitals(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	_, ok := user.(*models.User)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
+		return
+	}
+	var hospitals []models.Hospital
+	if err := db.Find(&hospitals).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch hospitals"})
+		return
+	}
+	c.JSON(http.StatusOK, hospitals)
+}
+
+func GetAllPhysicians(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	_, ok := user.(*models.User)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
+		return
+	}
+	var physicians []models.Physician
+	if err := db.Find(&physicians).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch physicians"})
+		return
+	}
+	c.JSON(http.StatusOK, physicians)
 }

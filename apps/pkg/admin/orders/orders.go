@@ -93,7 +93,7 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 	// Find the order & preload necessary relations
 	var order models.Order
 	if err := db.Preload("User").
-		Preload("CheckoutSession"). // still preload for audit GrandTotal
+		Preload("CheckoutSession").
 		Where("order_number = ?", orderNumber).
 		First(&order).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
@@ -107,20 +107,34 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 	// Get ordered items from CartHistory
 	var cartHistory []models.CartHistory
 	if err := db.Preload("Medicine").
+		Preload("Hospital").
+		Preload("Physician").
 		Where("order_number = ?", order.OrderNumber).
 		Find(&cartHistory).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch cart history"})
 		return
 	}
 
-	// Build items response without recalculating total
+	// Build items response with safe nil checks
 	items := []gin.H{}
 	for _, item := range cartHistory {
+		clinicName := "Not selected"
+		if item.Hospital != nil {
+			clinicName = item.Hospital.Name
+		}
+
+		doctorName := "Not selected"
+		if item.Physician != nil {
+			doctorName = fmt.Sprintf("%s %s", item.Physician.FirstName, item.Physician.LastName)
+		}
+
 		items = append(items, gin.H{
 			"medicine_name":     item.Medicine.BrandName,
 			"quantity":          item.Quantity,
-			"price":             item.Medicine.SellingPricePerPiece, // base price per piece
+			"price":             item.Medicine.SellingPricePerPiece,
 			"pharmacist_status": item.MedicineStatus,
+			"clinic_name":       clinicName,
+			"doctor_name":       doctorName,
 		})
 	}
 
@@ -136,6 +150,7 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 		"remark":           payment.Remark,
 		"delivery_type":    order.DeliveryType,
 		"delivery_address": order.DeliveryAddress,
+		"payment_type":     order.PaymentType,
 		"created_at":       order.CreatedAt.Format("2006-01-02 15:04:05"),
 	})
 }
