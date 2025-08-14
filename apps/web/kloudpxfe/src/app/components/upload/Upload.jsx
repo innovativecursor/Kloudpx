@@ -5,19 +5,16 @@ import { IoQrCodeOutline } from "react-icons/io5";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 
-import { usePrescriptionContext } from "@/app/contexts/PrescriptionContext";
-import Prescription from "../modal/Prescription";
+import LandingPagePrescription from "../modal/LandingPagePrescription";
 
 const Upload = () => {
-  const { setIsOpen } = usePrescriptionContext();
+  const [isPrescriptionOpen, setIsPrescriptionOpen] = useState(false);
 
   const qr = "/assets/qr.png";
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-
-  const openPrescriptionModal = () => setIsOpen(true);
 
   return (
     <>
@@ -46,7 +43,7 @@ const Upload = () => {
 
               {/* Change this button's onClick */}
               <button
-                onClick={openPrescriptionModal} 
+                onClick={() => setIsPrescriptionOpen(true)}
                 className="bg-[#0070ba] text-white font-light mt-4 px-8 sm:py-3 py-2.5 rounded-full sm:text-sm text-xs transition"
               >
                 Upload Now
@@ -56,7 +53,6 @@ const Upload = () => {
 
           {/* QR Code Payment Card */}
           <SwiperSlide>
-          
             <div className="bg-[#EBF7FF] border lg:mr-1 border-[#0070ba] rounded-3xl sm:h-80 h-64 lg:p-8 md:p-6 p-4 flex flex-col items-center justify-center text-center">
               <div className="bg-[#0070ba] rounded-full tracking-wide sm:p-4 p-2 mb-4">
                 <IoQrCodeOutline className="text-white sm:text-2xl text-xl" />
@@ -109,7 +105,10 @@ const Upload = () => {
         )}
       </div>
 
-      <Prescription />
+      <LandingPagePrescription
+        isOpen={isPrescriptionOpen}
+        setIsOpen={setIsPrescriptionOpen}
+      />
     </>
   );
 };

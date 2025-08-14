@@ -85,20 +85,41 @@ const AllOrders = () => {
                 </td>
                 <td className="px-4 py-5">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs md:text-sm font-semibold ${
+                    className={`px-3 py-1 rounded-full uppercase text-xs md:text-sm font-semibold ${
                       order.status === "processing"
                         ? "bg-yellow-100 text-yellow-800"
-                        : order.status === "delivered"
+                        : order.status === "transit"
+                        ? "bg-blue-100 text-blue-800"
+                        : order.status === "shipped"
+                        ? "bg-purple-100 text-purple-800"
+                        : order.status === "success"
                         ? "bg-green-100 text-green-800"
+                        : order.status === "cancelled"
+                        ? "bg-red-100 text-red-800"
                         : "bg-gray-100 text-gray-700"
                     }`}
                   >
                     {order.status}
                   </span>
                 </td>
-                <td className="px-4 py-5 text-sm md:text-base whitespace-nowrap">
+                {/* <td className="px-4 py-5 text-sm md:text-base whitespace-nowrap">
                   {new Date(order.created_at).toLocaleString()}
+                </td> */}
+                <td className="px-4 py-5 text-sm md:text-base whitespace-nowrap">
+                  {(() => {
+                    const utcDate = new Date(order.created_at);
+                    utcDate.setHours(utcDate.getHours() + 8);
+                    return utcDate.toLocaleString("en-PH", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true,
+                    });
+                  })()}
                 </td>
+
                 <td className="px-4 py-5 text-sm md:text-base max-w-[250px] break-words">
                   {order.delivery_address}
                 </td>

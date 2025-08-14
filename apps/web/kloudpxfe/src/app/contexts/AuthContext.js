@@ -61,18 +61,12 @@ export const AuthProvider = ({ children }) => {
         console.error("Login failed", error.message);
       }
     },
-    onError: () => {
-      console.error("Google login failed");
-    },
+    // onError: () => {
+    //   console.error("Google login failed");
+    // },
   });
 
-  // const logout = () => {
-  //   localStorage.removeItem("access_token");
-  //   // sessionStorage.removeItem("access_token");
-  //   setToken(null);
-  //   setUser(null);
-  //   router.push("/");
-  // };
+
 
   return (
     <AuthContext.Provider
