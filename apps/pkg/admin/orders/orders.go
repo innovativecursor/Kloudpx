@@ -201,3 +201,5 @@ func UpdateOrderDetails(c *gin.Context, db *gorm.DB) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Order updated successfully"})
 }
+
+//done
