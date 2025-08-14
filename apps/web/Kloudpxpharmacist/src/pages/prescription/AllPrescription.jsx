@@ -15,6 +15,8 @@ const Home = () => {
     }
   }, []);
 
+  console.log(allPrescriptions);
+
   const columns = [
     {
       title: "Sr. No.",

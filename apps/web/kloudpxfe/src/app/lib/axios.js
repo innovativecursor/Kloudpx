@@ -14,6 +14,17 @@ const instance = axios.create({
   },
 });
 
+instance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401) {
+      localStorage.removeItem("access_token");
+      window.location.href = "/";
+    }
+    return Promise.reject(error);
+  }
+);
+
 const showError = (error) => {
   Swal.fire({
     title: "Error",
@@ -51,9 +62,12 @@ const getAuthHeaders = (sendToken) => {
 //   }
 // };
 
-
-
-export const getAxiosCall = async (endpoint, params = {}, sendToken = true, useGlobalLoader = true) => {
+export const getAxiosCall = async (
+  endpoint,
+  params = {},
+  sendToken = true,
+  useGlobalLoader = true
+) => {
   if (useGlobalLoader) {
     store.dispatch({ type: "LOADING", payload: true });
   }
@@ -73,8 +87,6 @@ export const getAxiosCall = async (endpoint, params = {}, sendToken = true, useG
     }
   }
 };
-
-
 
 // POST
 export const postAxiosCall = async (endpoint, data, sendToken = true) => {

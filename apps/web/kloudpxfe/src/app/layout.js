@@ -17,6 +17,7 @@ import Loader from "@/app/components/Loader/Loader";
 import CustomToaster from "./utils/NoSSRToaster";
 import { CheckoutProvider } from "./contexts/CheckoutContext";
 import { PaymentProvider } from "./contexts/PaymentContext";
+// import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
 
 export default function RootLayout({ children }) {
   return (
@@ -32,6 +33,7 @@ export default function RootLayout({ children }) {
           <Provider store={store}>
             <PersistGate loading={null} persistor={persistor}>
               <Loader />
+              {/* <ErrorBoundary> */}
               <AuthProvider>
                 <ProductProvider>
                   <CheckoutProvider>
@@ -42,7 +44,6 @@ export default function RootLayout({ children }) {
                             <Header />
                             <main className="flex-1">{children}</main>
                             <Footer />
-                            {/* <Toaster position="bottom-right" reverseOrder={false} /> */}
                             <CustomToaster />
                           </ImageProvider>
                         </PaymentProvider>
@@ -51,6 +52,7 @@ export default function RootLayout({ children }) {
                   </CheckoutProvider>
                 </ProductProvider>
               </AuthProvider>
+              {/* </ErrorBoundary> */}
             </PersistGate>
           </Provider>
         </GoogleOAuthProvider>

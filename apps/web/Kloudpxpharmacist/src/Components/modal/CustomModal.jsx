@@ -202,7 +202,13 @@ const CustomModal = ({ isOpen, onClose, selectedPrescription, activeTab }) => {
                                     : "bg-red-100 text-red-600 border border-red-300"
                                 }`}
                               >
-                                {item?.MedicineStatus}
+                                {/* {item?.MedicineStatus} */}
+                                {item?.MedicineStatus
+                                  ? item.MedicineStatus.charAt(
+                                      0
+                                    ).toUpperCase() +
+                                    item.MedicineStatus.slice(1).toLowerCase()
+                                  : ""}
                               </span>
                             )}
                           </td>

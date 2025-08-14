@@ -33,7 +33,6 @@ const PrescriptionProvider = ({ children }) => {
         true
       );
       console.log(res);
-      
 
       setPrescriptionDetails(res?.data || res);
     } catch (error) {

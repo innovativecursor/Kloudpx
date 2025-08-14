@@ -19,11 +19,10 @@ const ProfilePage = () => {
 
   const logout = () => {
     localStorage.removeItem("access_token");
-    // sessionStorage.removeItem("access_token");
+    router.push("/");
     setToken(null);
     setUser(null);
     clearCart();
-    router.push("/");
   };
 
   return (

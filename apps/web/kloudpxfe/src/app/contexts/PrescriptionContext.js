@@ -15,7 +15,7 @@ export const PrescriptionProvider = ({ children }) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
-  const [uploadedPrescriptionId, setUploadedPrescriptionId] = useState(null);
+  // const [uploadedPrescriptionId, setUploadedPrescriptionId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [pendingCartData, setPendingCartData] = useState(null);
   const [allPrescription, setAllPrescription] = useState([]);
@@ -24,18 +24,86 @@ export const PrescriptionProvider = ({ children }) => {
 
   // console.log(pendingCartData);
 
-  const uploadPrescription = async (file, medicineid, quantity) => {
+  // const uploadPrescription = async (file) => {
+  //   if (!file) return;
+
+  //   if (!token) {
+  //     toast.error("Please login first!");
+  //     // login?.();
+  //     return;
+  //   }
+
+  //   try {
+  //     setLoading(true);
+
+  //     const compressedBase64 = await compressImage(file);
+  //     const base64Data = compressedBase64.split(",")[1];
+
+  //     const payload = {
+  //       prescriptionimage: base64Data,
+  //     };
+
+  //     const res = await postAxiosCall(
+  //       endpoints.prescription.upload,
+  //       payload,
+  //       true
+  //     );
+  //     console.log(res);
+  //     getAllPrescription();
+
+  //     const prescriptionId = res?.prescription_id;
+  //     setUploadedPrescriptionId(prescriptionId);
+
+  //     if (res?.url) {
+  //       const img = new Image();
+  //       img.src = res.url;
+
+  //       img.onload = async () => {
+  //         setUploadedImage(res.url);
+  //         setIsOpen(false);
+  //         setLoading(false);
+
+  //         if (!medicineid || !prescriptionId || !quantity) {
+  //           console.error("❌ Missing data in prescription cart call", {
+  //             medicineid,
+  //             prescriptionId,
+  //             quantity,
+  //           });
+  //           toast.error("Something went wrong, missing data.");
+  //           return;
+  //         }
+  //         await addMedicineToCartWithPrescription(
+  //           medicineid,
+  //           prescriptionId,
+  //           quantity
+  //         );
+  //         setIsOpen(false);
+  //       };
+
+  //       img.onerror = () => {
+  //         toast.error("Image failed to load.");
+  //         setLoading(false);
+  //       };
+  //     } else {
+  //       setLoading(false);
+  //     }
+  //   } catch (err) {
+  //     toast.error("Upload failed. Try again.");
+  //     console.error("Upload error:", err);
+  //     setLoading(false);
+  //   }
+  // };
+
+  const uploadPrescription = async (file) => {
     if (!file) return;
 
     if (!token) {
       toast.error("Please login first!");
-      // login?.();
       return;
     }
 
     try {
       setLoading(true);
-
       const compressedBase64 = await compressImage(file);
       const base64Data = compressedBase64.split(",")[1];
 
@@ -49,48 +117,15 @@ export const PrescriptionProvider = ({ children }) => {
         true
       );
 
-      const prescriptionId = res?.prescription_id;
-      setUploadedPrescriptionId(prescriptionId);
+      console.log(res);
+
+      setUploadedImage(res.data?.url || compressedBase64);
+
       getAllPrescription();
-
-      if (res?.url) {
-        const img = new Image();
-        img.src = res.url;
-
-        img.onload = async () => {
-          setUploadedImage(res.url);
-          setIsOpen(false);
-          setLoading(false);
-
-          if (!medicineid || !prescriptionId || !quantity) {
-            console.error("❌ Missing data in prescription cart call", {
-              medicineid,
-              prescriptionId,
-              quantity,
-            });
-            toast.error("Something went wrong, missing data.");
-            return;
-          }
-
-          // ✅ Use the new reusable function here
-          await addMedicineToCartWithPrescription(
-            medicineid,
-            prescriptionId,
-            quantity
-          );
-          setIsOpen(false);
-        };
-
-        img.onerror = () => {
-          toast.error("Image failed to load.");
-          setLoading(false);
-        };
-      } else {
-        setLoading(false);
-      }
     } catch (err) {
       toast.error("Upload failed. Try again.");
       console.error("Upload error:", err);
+    } finally {
       setLoading(false);
     }
   };
@@ -106,7 +141,7 @@ export const PrescriptionProvider = ({ children }) => {
   };
 
   const handleSelectedPrescription = async (id) => {
-    console.log(id);
+    // console.log(id);
     try {
       const res = await updateAxiosCall(
         endpoints.selectedprescription.put,
@@ -148,8 +183,13 @@ export const PrescriptionProvider = ({ children }) => {
       setSelectedPrescriptionId(null);
       getAllCartData();
     } catch (error) {
-      console.error("Cart error response:", error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Failed to add item to cart.");
+      console.error(
+        "Cart error response:",
+        error.response?.data || error.message
+      );
+      toast.error(
+        error.response?.data?.message || "Failed to add item to cart."
+      );
       throw error;
     }
   };
@@ -163,7 +203,7 @@ export const PrescriptionProvider = ({ children }) => {
         uploadPrescription,
         setUploadedImage,
         loading,
-        uploadedPrescriptionId,
+        // uploadedPrescriptionId,
         pendingCartData,
         setPendingCartData,
         getAllPrescription,

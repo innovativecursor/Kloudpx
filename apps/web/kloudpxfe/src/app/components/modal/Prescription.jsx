@@ -38,7 +38,7 @@ const Prescription = () => {
     }
   }, []);
 
-  console.log(allPrescription);
+  // console.log(allPrescription);
 
   const modalRef = useRef(null);
 
@@ -263,12 +263,19 @@ const Prescription = () => {
                 type="file"
                 accept="image/*"
                 className="hidden"
+                // onChange={(e) => {
+                //   const file = e.target.files[0];
+
+                //   if (file && pendingCartData) {
+                //     const { medicineid, quantity } = pendingCartData;
+                //     uploadPrescription(file, medicineid, quantity);
+                //   }
+                // }}
                 onChange={(e) => {
                   const file = e.target.files[0];
 
-                  if (file && pendingCartData) {
-                    const { medicineid, quantity } = pendingCartData;
-                    uploadPrescription(file, medicineid, quantity);
+                  if (file) {
+                    uploadPrescription(file);
                   }
                 }}
               />

@@ -17,6 +17,9 @@ const PrescriptionDetails = () => {
     setSelectedPrescription(null);
   };
 
+  console.log(allPrescriptions);
+  
+
   useEffect(() => {
     if (userid) fetchPrescriptionsDetails(userid);
   }, [userid]);

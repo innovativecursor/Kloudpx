@@ -210,10 +210,12 @@ const DeliveryType = () => {
               onChange={() => setPaymentMethod("GCOD")}
               className="accent-[#0070BA] w-5 h-5"
             />
-            <span className="text-gray-800 font-medium">GCOD</span>
+            <span className="text-gray-800 font-medium">
+              GCOD (Gcash on COD )
+            </span>
           </label>
 
-          <label className="flex items-center gap-3 cursor-pointer">
+          {/* <label className="flex items-center gap-3 cursor-pointer">
             <input
               type="radio"
               name="paymentType"
@@ -223,7 +225,7 @@ const DeliveryType = () => {
               className="accent-[#0070BA] w-5 h-5"
             />
             <span className="text-gray-800 font-medium">COD</span>
-          </label>
+          </label> */}
         </div>
       </div>
 
