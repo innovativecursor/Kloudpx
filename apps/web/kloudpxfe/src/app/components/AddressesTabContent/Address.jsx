@@ -5,12 +5,14 @@ import { FaLocationDot, FaPlus } from "react-icons/fa6";
 import SubTitle from "../Titles/SubTitle";
 import NewAddress from "./NewAddress";
 import DeliveryType from "../DeliveryData/DeliveryType";
-import Screener from "../DeliveryData/Screener";
+// import Screener from "../DeliveryData/Screener";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
 import { IoMdHome } from "react-icons/io";
 import { FaRegEdit } from "react-icons/fa";
 import toast from "react-hot-toast";
-import Cod from "../DeliveryData/Cod";
+// import Cod from "../DeliveryData/Cod";
+import { IoLocation } from "react-icons/io5";
+import { IoMdCall } from "react-icons/io";
 
 const Address = () => {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -35,6 +37,15 @@ const Address = () => {
   }, []);
 
   // console.log(getAllAddress, "my add ");
+
+  useEffect(() => {
+    if (Array.isArray(getAllAddress) && getAllAddress.length > 0) {
+      const defaultAddress = getAllAddress.find((addr) => addr.IsDefault);
+      if (defaultAddress && !selectedId) {
+        setSelectedId(defaultAddress.ID);
+      }
+    }
+  }, [getAllAddress]);
 
   return (
     <>
@@ -85,45 +96,19 @@ const Address = () => {
                       </span>
                     </div>
 
-                    {/* <div className="w-[70%] ">
-                      <div className="text-xs  tracking-wide text-gray-600 text-center">
-                        {address?.PhoneNumber} {address?.City},{" "}
-                        {address?.Region}, {address?.Province},{" "}
-                        {address?.ZipCode}
-                      </div>
-                    </div> */}
-
                     <div className="w-[70%]">
-                      <div className="text-xs tracking-wide text-gray-700 flex flex-wrap justify-center gap-x-3 gap-y-1">
-                        <div>
-                          <span className="font-semibold text-gray-500">
-                            Phone:{" "}
-                          </span>
+                      <div className="text-xs tracking-wide text-gray-700 flex flex-col items-start justify-center gap-2">
+                        <div className="flex gap-1 items-start">
+                          <IoMdCall className="text-base" />
                           <span>{address?.PhoneNumber || "N/A"}</span>
                         </div>
-                        <div>
-                          <span className="font-semibold text-gray-500">
-                            City:{" "}
+                        <div className="flex gap-1 items-start">
+                          <IoLocation className="text-lg sm:text-base" />
+                          <span className="text-xs ">
+                            {address?.City || "N/A"},{address?.Region || "N/A"},{" "}
+                            {address?.Province || "N/A"},{" "}
+                            {address?.ZipCode || "N/A"}{" "}
                           </span>
-                          <span>{address?.City || "N/A"}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-gray-500">
-                            Region:{" "}
-                          </span>
-                          <span>{address?.Region || "N/A"}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-gray-500">
-                            Province:{" "}
-                          </span>
-                          <span>{address?.Province || "N/A"}</span>
-                        </div>
-                        <div>
-                          <span className="font-semibold text-gray-500">
-                            Zip:{" "}
-                          </span>
-                          <span>{address?.ZipCode || "N/A"}</span>
                         </div>
                       </div>
                     </div>

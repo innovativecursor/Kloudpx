@@ -14,6 +14,7 @@ import (
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/medicine"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/oauth"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/orders"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/regionsettings"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/supplier"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/uploadexcel"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/middleware"
@@ -210,6 +211,15 @@ func Admin(db *gorm.DB) {
 
 	apiV1.PUT("/admin/update-order-details/:order_number", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		orders.UpdateOrderDetails(c, db)
+	})
+
+	// region settings
+	apiV1.POST("/admin/region-settings", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		regionsettings.UpsertRegionSetting(c, db)
+	})
+
+	apiV1.GET("/admin/get-region-settings", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		regionsettings.GetAllRegionSettings(c, db)
 	})
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)

@@ -73,7 +73,7 @@ type Medicine struct {
 	SellingPricePerPiece      float64
 	CostPricePerBox           float64
 	CostPricePerPiece         float64
-	TaxType                   string
+	TaxType                   float64
 	MinimumThreshold          int
 	MaximumThreshold          int
 	EstimatedLeadTimeDays     int
@@ -151,6 +151,10 @@ type Cart struct {
 	CheckoutSessionID *uint
 	IsSavedForLater   bool   `gorm:"default:false"`
 	MedicineStatus    string `gorm:"default:'unsettled'"` // "approved", "rejected", "unsettled"
+	HospitalID        *uint
+	Hospital          *Hospital `gorm:"foreignKey:HospitalID"`
+	PhysicianID       *uint
+	Physician         *Physician `gorm:"foreignKey:PhysicianID"`
 }
 
 type CartHistory struct {
@@ -166,6 +170,10 @@ type CartHistory struct {
 	IsSavedForLater   bool
 	MedicineStatus    string
 	OrderNumber       string
+	HospitalID        *uint
+	Hospital          *Hospital `gorm:"foreignKey:HospitalID"`
+	PhysicianID       *uint
+	Physician         *Physician `gorm:"foreignKey:PhysicianID"`
 }
 
 type CarouselImage struct {
@@ -290,9 +298,20 @@ type Order struct {
 	TotalAmount       float64
 	DeliveryAddress   string
 	PaidAmount        float64
+	PaymentType       string
 	ShippingNumber    string
 	DeliveryType      string
 	Status            string          // e.g., "processing", "queued", "completed"
 	User              User            `gorm:"foreignKey:UserID"`
 	CheckoutSession   CheckoutSession `gorm:"foreignKey:CheckoutSessionID"`
+}
+
+type RegionSetting struct {
+	gorm.Model
+	RegionName        string  `gorm:"unique;not null"` // NCR, Luzon, Visayas, Mindanao
+	ZipStart          int     `gorm:"not null"`
+	ZipEnd            int     `gorm:"not null"`
+	DeliveryTime      string  `gorm:"not null"` // e.g., "2-3 days"
+	FreeShippingLimit float64 `gorm:"not null"`
+	StandardRate      int     `gorm:"not null"`
 }
