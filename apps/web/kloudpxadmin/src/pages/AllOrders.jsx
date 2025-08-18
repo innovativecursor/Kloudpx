@@ -6,13 +6,15 @@ const AllOrders = () => {
   const { getAllOrders, allOrders } = useOrderContext();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const ordersPerPage = 5;
+  const ordersPerPage = 15;
 
   useEffect(() => {
     if (!allOrders || allOrders.length === 0) {
       getAllOrders();
     }
   }, []);
+
+  // console.log(allOrders);
 
   // Pagination logic
   const indexOfLastOrder = currentPage * ordersPerPage;
@@ -61,6 +63,9 @@ const AllOrders = () => {
               </th>
               <th className="px-4 py-5 text-left text-sm md:text-base font-medium">
                 Address
+              </th>
+              <th className="px-4 py-5 text-left text-sm md:text-base font-medium">
+                Phone No
               </th>
             </tr>
           </thead>
@@ -122,6 +127,9 @@ const AllOrders = () => {
 
                 <td className="px-4 py-5 text-sm md:text-base max-w-[250px] break-words">
                   {order.delivery_address}
+                </td>
+                <td className="px-4 py-5 text-sm md:text-base max-w-[250px] break-words">
+                  {order.phone_number}
                 </td>
               </tr>
             ))}

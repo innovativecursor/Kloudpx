@@ -47,6 +47,8 @@ const OrderDetails = () => {
     );
   }
 
+  console.log(orderDetails);
+
   const handleSave = async () => {
     const payload = {
       status,
@@ -79,12 +81,18 @@ const OrderDetails = () => {
               >
                 <div className="flex flex-col gap-1">
                   <p className="font-semibold text-lg md:text-xl">
-                    {item.medicine_name}
+                    {item?.medicine_name}
                   </p>
                   <p className="text-sm text-gray-500">
-                    Quantity: {item.quantity}
+                    Quantity: {item?.quantity}
                   </p>
-                  <p className="text-sm text-gray-500">Price: ₱{item.price}</p>
+                  <p className="text-sm text-gray-500">Price: ₱{item?.price}</p>
+                  <p className="text-sm text-gray-500">
+                    Clinic Name: {item?.clinic_name}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Doctor Name : {item?.doctor_name}
+                  </p>
                 </div>
                 <span
                   className={`px-3 py-1 rounded-full text-sm mt-2 md:mt-0 font-medium ${
@@ -172,11 +180,41 @@ const OrderDetails = () => {
               </p>
               <p>
                 <span className="font-semibold">Booking Date:</span>{" "}
-                {orderDetails.created_at}
+                {/* {orderDetails.created_at} */}
+                {(() => {
+                  const utcDate = new Date(orderDetails.created_at);
+                  utcDate.setHours(utcDate.getHours() + 8);
+                  return utcDate.toLocaleString("en-PH", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true,
+                  });
+                })()}
               </p>
+
               <p>
                 <span className="font-semibold">Delivery Type:</span>{" "}
                 {orderDetails.delivery_type}
+              </p>
+              <p>
+                <span className="font-semibold">Payment Type :</span>{" "}
+                {orderDetails.payment_type}
+              </p>
+              <p>
+                <span className="font-semibold">Order Status :</span>{" "}
+                {orderDetails.order_status}
+              </p>
+
+              <p>
+                <span className="font-semibold">Customer Name:</span>{" "}
+                {orderDetails.customer_name}
+              </p>
+              <p>
+                <span className="font-semibold">Phone Number:</span>{" "}
+                {orderDetails.phone_number}
               </p>
               <p>
                 <span className="font-semibold">Delivery Address:</span>{" "}

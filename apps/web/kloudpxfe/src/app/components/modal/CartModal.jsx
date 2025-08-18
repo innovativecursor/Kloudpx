@@ -64,7 +64,7 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
       )}
 
       <div
-         ref={modalRef} 
+        ref={modalRef}
         onClick={(e) => e.stopPropagation()}
         className={classNames(
           "fixed top-0 right-0 w-[420px] max-w-full h-full bg-white z-50 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col",
@@ -183,7 +183,11 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
                         </h4>
                       </div>
                       <button
-                        onClick={() => handleDelete(item.cart_id)}
+                        // onClick={() => handleDelete(item.cart_id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(item.cart_id);
+                        }}
                         className="ml-2 cursor-pointer font-light text-gray-400"
                         title="Remove"
                       >
