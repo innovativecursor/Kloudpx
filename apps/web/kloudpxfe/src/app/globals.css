@@ -87,3 +87,9 @@ body {
   background-color: #0070ba; 
   opacity: 1;
 }
+
+
+
+#__next-dev-overlay {
+  display: none !important;
+}

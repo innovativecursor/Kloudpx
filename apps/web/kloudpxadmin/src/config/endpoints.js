@@ -73,6 +73,10 @@ const endpoints = {
   updateOrder: {
     put: (id) => `${baseUrl}/v1/admin/update-order-details/${id}`,
   },
+  regionSettings: {
+    getAll: `${baseUrl}/v1/admin/get-region-settings`,
+    upsert: `${baseUrl}/v1/admin/region-settings`,
+  },
   protected: {
     basic: `${baseUrl}/api/v1/protected`,
     admin: `${baseUrl}/api/v1/admin`,

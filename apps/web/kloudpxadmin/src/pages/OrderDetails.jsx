@@ -10,15 +10,32 @@ const OrderDetails = () => {
   const [amountPay, setAmountPay] = useState();
   const [transactionId, setTransactionId] = useState("");
 
+  const [originalValues, setOriginalValues] = useState({
+    status: "",
+    amountPay: 0,
+    transactionId: "",
+  });
+
   useEffect(() => {
     getOrderDetails(id);
   }, [id]);
 
   useEffect(() => {
     if (orderDetails?.order_number === id) {
-      setStatus(orderDetails.order_status || "");
-      setAmountPay(orderDetails.paid_amount || 0);
-      setTransactionId(orderDetails.shipping_number || "");
+      const initStatus = orderDetails.order_status || "";
+      const initAmount = orderDetails.paid_amount || 0;
+      const initTransaction = orderDetails.shipping_number || "";
+
+      setStatus(initStatus);
+      setAmountPay(initAmount);
+      setTransactionId(initTransaction);
+
+      // Save original values for comparison
+      setOriginalValues({
+        status: initStatus,
+        amountPay: initAmount,
+        transactionId: initTransaction,
+      });
     }
   }, [orderDetails, id]);
 
@@ -38,6 +55,12 @@ const OrderDetails = () => {
     };
     await updateOrder(id, payload);
   };
+
+  // Check if any value is changed
+  const isChanged =
+    status !== originalValues.status ||
+    parseFloat(amountPay) !== parseFloat(originalValues.amountPay) ||
+    transactionId !== originalValues.transactionId;
 
   return (
     <div className="md:p-6 mt-16 mx-[4vw]">
@@ -72,7 +95,10 @@ const OrderDetails = () => {
                       : "bg-yellow-100 text-yellow-700"
                   }`}
                 >
-                  {item.pharmacist_status}
+                  {item?.pharmacist_status
+                    ? item.pharmacist_status.charAt(0).toUpperCase() +
+                      item.pharmacist_status.slice(1).toLowerCase()
+                    : ""}
                 </span>
               </div>
             ))}
@@ -89,7 +115,7 @@ const OrderDetails = () => {
               >
                 <option value="processing">Processing</option>
                 <option value="transit">Transit</option>
-                <option value="Shipped">Shipped</option>
+                <option value="shipped">Shipped</option>
                 <option value="success">Success</option>
                 <option value="cancelled">Cancelled</option>
               </select>
@@ -107,7 +133,7 @@ const OrderDetails = () => {
             </div>
 
             <div>
-              <label className="font-semibold block mb-1">Transaction ID</label>
+              <label className="font-semibold block mb-1">Delivery ID</label>
               <input
                 type="text"
                 placeholder="Transaction Id"
@@ -119,8 +145,13 @@ const OrderDetails = () => {
 
             <div className="self-end md:self-center">
               <button
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+                className={`px-6 py-2 rounded-lg transition ${
+                  isChanged
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
                 onClick={handleSave}
+                disabled={!isChanged}
               >
                 Save & Send
               </button>
