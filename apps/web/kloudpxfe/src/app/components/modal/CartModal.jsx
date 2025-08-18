@@ -144,18 +144,11 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
                 (price * discountPercent) / 100
               ).toFixed(2);
 
-              const isUnsettled = item.prescription_status === "Unsettled";
-              const isRejected = item.prescription_status === "Rejected";
-
               return (
                 <div
                   key={item.cart_id}
                   className={classNames(
                     "flex items-center gap-4 md:p-3 md:shadow-sm rounded-md transition"
-                    // {
-                    //   "bg-gray-200 opacity-60 pointer-events-none": isUnsettled,
-                    //   "bg-red-100 border border-red-400": isRejected,
-                    // }
                   )}
                   onClick={() => {
                     onClose();
@@ -215,18 +208,6 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
                         {item?.quantity}
                       </div>
                     </div>
-
-                    {/* Prescription Status  */}
-                    {/* {isUnsettled && (
-                      <p className="text-xs text-red-500 mt-1">
-                        Waiting for pharmacist approval
-                      </p>
-                    )}
-                    {isRejected && (
-                      <p className="text-xs text-red-500 mt-1">
-                        This item was rejected by the pharmacist.
-                      </p>
-                    )} */}
                   </div>
                 </div>
               );
@@ -236,12 +217,6 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
 
         {token && data.length > 0 && (
           <div className="p-4 ">
-            {/* <button
-              onClick={handleCheckout}
-              className="w-full py-3 rounded-full text-sm font-semibold cursor-pointer bg-[#0070BA] text-white hover:bg-[#005c96]"
-            >
-              Proceed to Checkout
-            </button> */}
             <button
               onClick={handleCheckout}
               disabled={checkoutLoading}
