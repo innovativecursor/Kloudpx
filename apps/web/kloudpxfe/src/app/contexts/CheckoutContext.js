@@ -31,6 +31,8 @@ export const CheckoutProvider = ({ children }) => {
 
   // console.log(paymentMethod);
 
+  
+
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,

@@ -15,16 +15,17 @@ const DeliveryCart = () => {
     doCheckout();
   }, []);
 
+  // const handleDelete = (id) => {
+  //   removeFromCart(id);
+  // };
+
   const handleDelete = (id) => {
-    removeFromCart(id);
+    removeFromCart(id, { addDelivery: false });
   };
 
   if (deliveryData?.delivery_type) {
     return (
-      <div className="bg-[#EDF4F6] w-full rounded-lg py-5">
-        <div className="flex font-semibold text-black px-6 py-3 items-center text-lg border-b border-gray-200">
-          Billing Details
-        </div>
+      <div className="bg-[#EDF4F6] w-full rounded-lg py-2">
         <BillingDetails deliveryData={deliveryData} />
       </div>
     );
@@ -32,7 +33,7 @@ const DeliveryCart = () => {
 
   return (
     <div className="bg-[#EDF4F6] w-full rounded-lg py-5">
-      {items.length > 0 && (
+      {items.length > 0 ? (
         <>
           <div className="flex font-semibold text-black px-6 py-3 items-center text-lg border-b border-gray-200">
             Your Cart
@@ -100,6 +101,10 @@ const DeliveryCart = () => {
             );
           })}
         </>
+      ) : (
+        <div className="text-center text-gray-500 py-10 font-medium">
+          No data in the cart
+        </div>
       )}
     </div>
   );

@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
 import { usePayment } from "@/app/contexts/PaymentContext";
+import toast from "react-hot-toast";
 
 const DeliveryType = () => {
   const {
@@ -93,7 +94,16 @@ const DeliveryType = () => {
       <div className="pt-8">
         <button
           type="button"
-          onClick={handleOrderSubmit}
+          onClick={() => {
+            if (
+              !deliveryData?.cart_items ||
+              deliveryData?.cart_items.length === 0
+            ) {
+              toast.error("No items in checkout. Add items first!");
+              return;
+            }
+            handleOrderSubmit();
+          }}
           className="bg-[#0070BA] text-white cursor-pointer w-full py-3 text-sm rounded-full font-medium hover:bg-[#005c96]"
         >
           Continue to Pay

@@ -11,7 +11,7 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const { token } = useAuth();
-  const { doCheckout } = useCheckout();
+  const { doCheckout, addDeliveryData } = useCheckout();
   const [cartItems, setCartItems] = useState([]);
   const [getCartData, setGetCartData] = useState({ data: [], loading: false });
 
@@ -22,11 +22,7 @@ export const CartProvider = ({ children }) => {
     }
 
     try {
-      await postAxiosCall(
-        endpoints.cart.add,
-        { medicineid, quantity },
-        true
-      );
+      await postAxiosCall(endpoints.cart.add, { medicineid, quantity }, true);
       toast.success("Item added to cart!");
       getAllCartData();
     } catch (error) {
@@ -57,13 +53,33 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const removeFromCart = async (id) => {
-    // if (!token) return;
+  // const removeFromCart = async (id) => {
+  //   // if (!token) return;
+  //   try {
+  //     await deleteAxiosCall(endpoints.cart.remove(id), true);
+  //     toast.success("Item removed from cart!");
+  //     await getAllCartData();
+  //     await doCheckout();
+  //     await addDeliveryData();
+  //   } catch (error) {
+  //     console.error("Remove item error", error);
+  //     toast.error("Failed to remove item");
+  //   }
+  // };
+
+  const removeFromCart = async (id, options = { addDelivery: true }) => {
     try {
       await deleteAxiosCall(endpoints.cart.remove(id), true);
       toast.success("Item removed from cart!");
-      getAllCartData();
-      doCheckout();
+      await getAllCartData();
+      await doCheckout();
+
+      const pathname =
+        typeof window !== "undefined" ? window.location.pathname : "";
+
+      if (options.addDelivery && !pathname.includes("/Address")) {
+        await addDeliveryData();
+      }
     } catch (error) {
       console.error("Remove item error", error);
       toast.error("Failed to remove item");
@@ -103,7 +119,6 @@ export const CartProvider = ({ children }) => {
     setCartItems([]);
     setGetCartData({ data: [], loading: false });
   };
-
 
   return (
     <CartContext.Provider

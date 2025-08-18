@@ -1,9 +1,8 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import { FaLocationDot, FaPlus } from "react-icons/fa6";
 import SubTitle from "../Titles/SubTitle";
 import NewAddress from "./NewAddress";
+import { useRouter } from "next/navigation";
 import DeliveryType from "../DeliveryData/DeliveryType";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
 import { IoMdHome } from "react-icons/io";
@@ -16,7 +15,7 @@ const Address = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [deliveryType, setDeliveryType] = useState(false);
   const [deliverySuccess, setDeliverySuccess] = useState(false);
-
+  const router = useRouter();
   const {
     fetchAddressData,
     getAllAddress,
@@ -46,6 +45,34 @@ const Address = () => {
       }
     }
   }, [getAllAddress]);
+
+  const handleSaveAndProceed = () => {
+    if (!checkoutData?.items || checkoutData.items.length === 0) {
+      toast.error("No items in checkout. Add items first!");
+      return;
+    }
+
+    let selectedAddressId = selectedId;
+
+    if (!selectedAddressId) {
+      const defaultAddress = getAllAddress.find(
+        (addr) => addr.IsDefault === true
+      );
+      if (defaultAddress) {
+        selectedAddressId = defaultAddress.ID;
+      }
+    }
+
+    if (selectedAddressId) {
+      selectedAddress(selectedAddressId);
+      setSelectedId(selectedAddressId);
+
+      // Navigate to delivery page instead of just showing component
+      router.push("Delivery"); // aapka delivery page route
+    } else {
+      toast.error("Please select an address");
+    }
+  };
 
   return (
     <>
@@ -138,33 +165,34 @@ const Address = () => {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    if (
-                      !checkoutData?.items ||
-                      checkoutData.items.length === 0
-                    ) {
-                      toast.error("No items in checkout. Add items first!");
-                      return;
-                    }
-                    let selectedAddressId = selectedId;
+                  // onClick={() => {
+                  //   if (
+                  //     !checkoutData?.items ||
+                  //     checkoutData.items.length === 0
+                  //   ) {
+                  //     toast.error("No items in checkout. Add items first!");
+                  //     return;
+                  //   }
+                  //   let selectedAddressId = selectedId;
 
-                    if (!selectedAddressId) {
-                      const defaultAddress = getAllAddress.find(
-                        (addr) => addr.IsDefault === true
-                      );
-                      if (defaultAddress) {
-                        selectedAddressId = defaultAddress.ID;
-                      }
-                    }
+                  //   if (!selectedAddressId) {
+                  //     const defaultAddress = getAllAddress.find(
+                  //       (addr) => addr.IsDefault === true
+                  //     );
+                  //     if (defaultAddress) {
+                  //       selectedAddressId = defaultAddress.ID;
+                  //     }
+                  //   }
 
-                    if (selectedAddressId) {
-                      selectedAddress(selectedAddressId);
-                      setSelectedId(selectedAddressId);
-                      setDeliveryType(true);
-                    } else {
-                      toast.error("Please select an address");
-                    }
-                  }}
+                  //   if (selectedAddressId) {
+                  //     selectedAddress(selectedAddressId);
+                  //     setSelectedId(selectedAddressId);
+                  //     setDeliveryType(true);
+                  //   } else {
+                  //     toast.error("Please select an address");
+                  //   }
+                  // }}
+                  onClick={handleSaveAndProceed}
                   className="bg-[#0070BA] text-white w-full py-3 sm:text-sm text-xs rounded-full font-medium mt-8 md:mt-10 cursor-pointer hover:bg-[#005c96]"
                 >
                   Save & Proceed
@@ -176,7 +204,7 @@ const Address = () => {
           </>
         )}
 
-        {deliveryType && !deliverySuccess && <DeliveryType />}
+        {/* {deliveryType && !deliverySuccess && <DeliveryType />} */}
       </div>
     </>
   );
