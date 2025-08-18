@@ -5,8 +5,6 @@ import { updateAxiosCall, postAxiosCall, getAxiosCall } from "../lib/axios";
 import endpoints from "../config/endpoints";
 import toast from "react-hot-toast";
 
-
-
 const CheckoutContext = createContext();
 
 export const CheckoutProvider = ({ children }) => {
@@ -14,7 +12,7 @@ export const CheckoutProvider = ({ children }) => {
   const [checkoutData, setCheckoutData] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [selected, setSelected] = useState("standard");
-  const [deliveryData, setDeliveryData] = useState([]);
+  const [deliveryData, setDeliveryData] = useState(null);
   const [getAllAddress, setGetAllAddress] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState("GCOD");
   // const [OrderSubmit, setOrderSubmit] = useState([])
@@ -32,7 +30,6 @@ export const CheckoutProvider = ({ children }) => {
   });
 
   // console.log(paymentMethod);
-
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -72,6 +69,7 @@ export const CheckoutProvider = ({ children }) => {
       const res = await postAxiosCall(endpoints.checkout.get, {}, true);
       // console.log(res);
       setCheckoutData(res || []);
+      setDeliveryData(null);
     } catch (error) {
       setCheckoutData([]);
     }
@@ -112,7 +110,6 @@ export const CheckoutProvider = ({ children }) => {
 
       const res = await postAxiosCall(endpoints.address.add, payload, true);
 
-
       toast.success(
         formData.id
           ? "Address updated successfully!"
@@ -141,7 +138,6 @@ export const CheckoutProvider = ({ children }) => {
     try {
       const res = await getAxiosCall(endpoints.address.get, {}, true);
 
-
       setGetAllAddress(res?.data || []);
     } catch (error) {
       setGetAllAddress([]);
@@ -158,6 +154,7 @@ export const CheckoutProvider = ({ children }) => {
       );
       // console.log("Address selected:", res);
       toast.success("Address selected successfully!");
+      // addDeliveryData()
     } catch (error) {
       console.error("Error selecting address:", error.message);
       toast.error("Something went wrong!");
@@ -175,43 +172,14 @@ export const CheckoutProvider = ({ children }) => {
         },
         true
       );
-      // console.log("Delivery type:", res);
-      setDeliveryData(res || []);
-      // toast.success("Delivery type selected successfully!");
+      console.log("Delivery type response:", res);
+
+      setDeliveryData(res || null);
     } catch (error) {
       console.error("Error selecting address:", error.message);
-      toast.error("Something went wrong!");
-      setDeliveryData([]);
+      setDeliveryData(null);
     }
   };
-
-
-  // const handleOrderSubmit = async () => {
-  //   if (!paymentMethod) {
-  //     toast.error("Checkout session ID is missing.");
-  //     return;
-  //   }
-
-  //   try {
-  //     const res = await postAxiosCall(
-  //       endpoints.OrderSubmit.add,
-  //       {
-  //         checkout_session_id: checkoutData?.checkout_session_id,
-  //         payment_type: paymentMethod,
-  //       },
-  //       true
-  //     );
-  //     console.log("Delivery type:", res);
-  //     setOrderSubmit(res || []);
-  //     toast.success("Payment submitted successfully!");
-  //     getAllCartData();
-  //     router.push("/Success");
-  //   } catch (error) {
-  //     console.error("Error selecting address:", error.message);
-  //     toast.error("Something went wrong!");
-  //     setOrderSubmit([]);
-  //   }
-  // };
 
   return (
     <CheckoutContext.Provider
@@ -235,6 +203,7 @@ export const CheckoutProvider = ({ children }) => {
         deliveryData,
         paymentMethod,
         setPaymentMethod,
+        setDeliveryData,
         // handleOrderSubmit,
       }}
     >
