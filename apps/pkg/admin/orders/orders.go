@@ -30,7 +30,7 @@ func GetAllOrders(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Fetch all orders with related user and payment
+	// Fetch all orders with related user + checkout session + address
 	var orders []models.Order
 	if err := db.Preload("User").
 		Preload("CheckoutSession").
@@ -55,6 +55,12 @@ func GetAllOrders(c *gin.Context, db *gorm.DB) {
 			continue
 		}
 
+		// Fetch address phone number via CheckoutSession.AddressID
+		var address models.Address
+		if order.CheckoutSession.AddressID != nil {
+			_ = db.First(&address, *order.CheckoutSession.AddressID).Error
+		}
+
 		orderHistory = append(orderHistory, gin.H{
 			"order_number":     order.OrderNumber,
 			"customer_name":    fmt.Sprintf("%s %s", user.FirstName, user.LastName),
@@ -64,6 +70,7 @@ func GetAllOrders(c *gin.Context, db *gorm.DB) {
 			"remark":           payment.Remark,
 			"delivery_type":    order.DeliveryType,
 			"delivery_address": order.DeliveryAddress,
+			"phone_number":     address.PhoneNumber,
 			"status":           order.Status,
 			"created_at":       order.CreatedAt.Format("2006-01-02 15:04:05"),
 		})
@@ -117,7 +124,13 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Build items response with safe nil checks
+	// Fetch phone number from Address
+	var address models.Address
+	if order.CheckoutSession.AddressID != nil {
+		_ = db.First(&address, *order.CheckoutSession.AddressID).Error
+	}
+
+	// Build items response
 	items := []gin.H{}
 	for _, item := range cartHistory {
 		clinicName := "Not selected"
@@ -144,7 +157,7 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 		"order_number":     order.OrderNumber,
 		"customer_name":    fmt.Sprintf("%s %s", order.User.FirstName, order.User.LastName),
 		"items":            items,
-		"grand_total":      order.TotalAmount, // locked at order time
+		"grand_total":      order.TotalAmount,
 		"order_status":     order.Status,
 		"paid_amount":      order.PaidAmount,
 		"shipping_number":  order.ShippingNumber,
@@ -152,6 +165,7 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 		"remark":           payment.Remark,
 		"delivery_type":    order.DeliveryType,
 		"delivery_address": order.DeliveryAddress,
+		"phone_number":     address.PhoneNumber,
 		"payment_type":     order.PaymentType,
 		"created_at":       order.CreatedAt.Format("2006-01-02 15:04:05"),
 	})
