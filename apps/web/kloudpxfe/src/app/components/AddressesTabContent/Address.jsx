@@ -5,12 +5,10 @@ import { FaLocationDot, FaPlus } from "react-icons/fa6";
 import SubTitle from "../Titles/SubTitle";
 import NewAddress from "./NewAddress";
 import DeliveryType from "../DeliveryData/DeliveryType";
-// import Screener from "../DeliveryData/Screener";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
 import { IoMdHome } from "react-icons/io";
 import { FaRegEdit } from "react-icons/fa";
 import toast from "react-hot-toast";
-// import Cod from "../DeliveryData/Cod";
 import { IoLocation } from "react-icons/io5";
 import { IoMdCall } from "react-icons/io";
 
@@ -18,8 +16,7 @@ const Address = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [deliveryType, setDeliveryType] = useState(false);
   const [deliverySuccess, setDeliverySuccess] = useState(false);
-  const [screener, setScreener] = useState(false);
-  // const [selectedId, setSelectedId] = useState(0);
+
   const {
     fetchAddressData,
     getAllAddress,
@@ -28,7 +25,10 @@ const Address = () => {
     selectedId,
     setSelectedId,
     deliveryData,
+    checkoutData,
   } = useCheckout();
+
+  console.log(checkoutData);
 
   useEffect(() => {
     if (Array.isArray(getAllAddress) && getAllAddress.length === 0) {
@@ -139,6 +139,13 @@ const Address = () => {
                 <button
                   type="button"
                   onClick={() => {
+                    if (
+                      !checkoutData?.items ||
+                      checkoutData.items.length === 0
+                    ) {
+                      toast.error("No items in checkout. Add items first!");
+                      return;
+                    }
                     let selectedAddressId = selectedId;
 
                     if (!selectedAddressId) {
@@ -158,7 +165,7 @@ const Address = () => {
                       toast.error("Please select an address");
                     }
                   }}
-                  className="bg-[#0070BA] text-white cursor-pointer md:mt-10 mt-8 w-full py-3 sm:text-sm text-xs rounded-full font-medium hover:bg-[#005c96]"
+                  className="bg-[#0070BA] text-white w-full py-3 sm:text-sm text-xs rounded-full font-medium mt-8 md:mt-10 cursor-pointer hover:bg-[#005c96]"
                 >
                   Save & Proceed
                 </button>
@@ -169,17 +176,7 @@ const Address = () => {
           </>
         )}
 
-        {/* {deliveryType && !deliverySuccess && (
-          <DeliveryType setDeliverySuccess={setDeliverySuccess} />
-        )} */}
-
         {deliveryType && !deliverySuccess && <DeliveryType />}
-
-        {/* {deliverySuccess && deliveryData?.delivery_type === "cod" ? (
-          <Cod />
-        ) : (
-          deliverySuccess && <Screener />
-        )} */}
       </div>
     </>
   );
