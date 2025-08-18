@@ -3,6 +3,7 @@ package s3helper
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"mime"
 
@@ -78,6 +79,10 @@ func GenerateUniqueID() uuid.UUID {
 
 // SendSMS sends a 6-digit OTP and message via AWS SNS to the provided phone number.
 func SendSMS(phoneNumber, message string) error {
+	if phoneNumber == "" {
+		return errors.New("phone number is required to send SMS")
+	}
+
 	cfg, err := config.Env()
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)

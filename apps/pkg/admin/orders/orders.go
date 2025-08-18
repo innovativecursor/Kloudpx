@@ -208,8 +208,10 @@ func UpdateOrderDetails(c *gin.Context, db *gorm.DB) {
 		order.OrderNumber,
 		order.Status,
 	)
-	if err := s3helper.SendSMS(*order.User.Phone, message); err != nil {
-		logrus.WithError(err).Error("Failed to send order status SMS")
+	if order.User.Phone != nil {
+		if err := s3helper.SendSMS(*order.User.Phone, message); err != nil {
+			logrus.WithError(err).Error("Failed to send order status SMS")
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Order updated successfully"})
