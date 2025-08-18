@@ -15,7 +15,14 @@ export const PaymentProvider = ({ children }) => {
   const [gcashNumber, setGcashNumber] = useState("");
   const [amountPaid, setAmountPaid] = useState("");
   const [orderSuccess, setOrderSuccess] = useState([]);
-  const { checkoutData, deliveryData, paymentMethod } = useCheckout();
+  const {
+    checkoutData,
+    deliveryData,
+    setDeliveryData,
+    paymentMethod,
+    addDeliveryData,
+    doCheckout,
+  } = useCheckout();
   const [OrderSubmit, setOrderSubmit] = useState([]);
   const [paymentSlip, setPaymentSlip] = useState([]);
   const { getAllCartData } = useCartContext();
@@ -47,62 +54,6 @@ export const PaymentProvider = ({ children }) => {
     }
   };
 
-  const handleSubmit = async () => {
-    const isCOD = deliveryData?.delivery_type === "cod";
-
-    console.log("isCOD:", isCOD);
-
-    const payload = isCOD
-      ? { checkout_session_id: String(checkoutData?.checkout_session_id) }
-      : {
-          checkout_session_id: String(checkoutData?.checkout_session_id),
-          payment_number: gcashNumber,
-          remark: String(amountPaid),
-          screenshot_base64: selectedFile,
-        };
-
-    console.log(payload);
-
-    // Validation
-    if (!payload.checkout_session_id && !payload.checkout_sessionid) {
-      toast.error("Checkout session ID is missing.");
-      return;
-    }
-
-    if (!isCOD) {
-      if (!amountPaid || isNaN(amountPaid)) {
-        toast.error("Please enter a valid amount.");
-        return;
-      }
-      if (!gcashNumber && !selectedFile) {
-        toast.error("Please provide either payment number or screenshot.");
-        return;
-      }
-    }
-    try {
-      const res = await postAxiosCall(
-        endpoints.paymentSubmit.add,
-        payload,
-        true
-      );
-      console.log(res);
-
-      setOrderSuccess(res || []);
-      toast.success("Payment submitted successfully!");
-      getAllCartData();
-      router.push("/Success");
-
-      if (!isCOD) {
-        setGcashNumber("");
-        setAmountPaid("");
-        setSelectedFile(null);
-      }
-    } catch (error) {
-      toast.error("Something went wrong!");
-      setOrderSuccess([]);
-    }
-  };
-
   const handleOrderSubmit = async () => {
     if (!paymentMethod) {
       toast.error("Checkout session ID is missing.");
@@ -110,6 +61,10 @@ export const PaymentProvider = ({ children }) => {
     }
 
     try {
+      await doCheckout();
+
+      await addDeliveryData();
+
       const res = await postAxiosCall(
         endpoints.OrderSubmit.add,
         {
@@ -118,15 +73,14 @@ export const PaymentProvider = ({ children }) => {
         },
         true
       );
-      // console.log("Delivery type:", res);
-      setOrderSubmit(res || []);
+
       toast.success("Payment submitted successfully!");
+      setDeliveryData(null);
       getAllCartData();
       router.push("/Success");
     } catch (error) {
-      console.error("Error selecting address:", error.message);
+      console.error("Error submitting order:", error.message);
       toast.error("Something went wrong!");
-      setOrderSubmit([]);
     }
   };
 
@@ -140,7 +94,7 @@ export const PaymentProvider = ({ children }) => {
         setGcashNumber,
         amountPaid,
         setAmountPaid,
-        handleSubmit,
+
         orderSuccess,
         getPaymentSlip,
         paymentSlip,

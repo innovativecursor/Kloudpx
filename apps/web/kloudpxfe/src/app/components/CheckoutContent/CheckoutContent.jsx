@@ -1,5 +1,3 @@
-// CheckoutContent.jsx
-
 import React, { useEffect } from "react";
 import { useCartContext } from "@/app/contexts/CartContext";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
@@ -15,7 +13,7 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
   const fallbackImage = "/assets/fallback.png";
 
   const data = cartItems || [];
-  const loading = false; // Or pass loading as a prop if you want
+  const loading = false;
 
   useEffect(() => {
     if (token) {
