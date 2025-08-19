@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -31,7 +32,7 @@ func GetAllOrders(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Fetch all orders with related user + checkout session + address
+	// Fetch all orders with related user and payment
 	var orders []models.Order
 	if err := db.Preload("User").
 		Preload("CheckoutSession").
@@ -56,12 +57,6 @@ func GetAllOrders(c *gin.Context, db *gorm.DB) {
 			continue
 		}
 
-		// Fetch address phone number via CheckoutSession.AddressID
-		var address models.Address
-		if order.CheckoutSession.AddressID != nil {
-			_ = db.First(&address, *order.CheckoutSession.AddressID).Error
-		}
-
 		orderHistory = append(orderHistory, gin.H{
 			"order_number":     order.OrderNumber,
 			"customer_name":    fmt.Sprintf("%s %s", user.FirstName, user.LastName),
@@ -71,7 +66,6 @@ func GetAllOrders(c *gin.Context, db *gorm.DB) {
 			"remark":           payment.Remark,
 			"delivery_type":    order.DeliveryType,
 			"delivery_address": order.DeliveryAddress,
-			"phone_number":     address.PhoneNumber,
 			"status":           order.Status,
 			"created_at":       order.CreatedAt.Format("2006-01-02 15:04:05"),
 		})
@@ -125,13 +119,7 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Fetch phone number from Address
-	var address models.Address
-	if order.CheckoutSession.AddressID != nil {
-		_ = db.First(&address, *order.CheckoutSession.AddressID).Error
-	}
-
-	// Build items response
+	// Build items response with safe nil checks
 	items := []gin.H{}
 	for _, item := range cartHistory {
 		clinicName := "Not selected"
@@ -158,7 +146,7 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 		"order_number":     order.OrderNumber,
 		"customer_name":    fmt.Sprintf("%s %s", order.User.FirstName, order.User.LastName),
 		"items":            items,
-		"grand_total":      order.TotalAmount,
+		"grand_total":      order.TotalAmount, // locked at order time
 		"order_status":     order.Status,
 		"paid_amount":      order.PaidAmount,
 		"shipping_number":  order.ShippingNumber,
@@ -166,7 +154,6 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 		"remark":           payment.Remark,
 		"delivery_type":    order.DeliveryType,
 		"delivery_address": order.DeliveryAddress,
-		"phone_number":     address.PhoneNumber,
 		"payment_type":     order.PaymentType,
 		"created_at":       order.CreatedAt.Format("2006-01-02 15:04:05"),
 	})
@@ -195,7 +182,9 @@ func UpdateOrderDetails(c *gin.Context, db *gorm.DB) {
 	}
 
 	var order models.Order
-	if err := db.Where("order_number = ?", orderNumber).First(&order).Error; err != nil {
+	if err := db.Preload("User").
+		Where("order_number = ?", orderNumber).
+		First(&order).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
 		return
 	}
@@ -230,21 +219,26 @@ func UpdateOrderDetails(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	fullName := order.User.FirstName + order.User.LastName
 	// Send SMS notification
 	message := fmt.Sprintf(
 		"Dear %s,\n\nYour order #%s is now %s.\n\nThank you for shopping with us!\nKloud P&X",
-		fullName,
+		strings.TrimSpace(order.User.FirstName+" "+order.User.LastName),
 		order.OrderNumber,
 		order.Status,
 	)
-	if order.User.Phone != nil {
-		if err := s3helper.SendSMS(*order.User.Phone, message); err != nil {
-			logrus.WithError(err).Error("Failed to send order status SMS")
-		}
+
+	if err := s3helper.SendSMS(ExtractPhoneNumber(order.DeliveryAddress), message); err != nil {
+		logrus.WithError(err).Error("Failed to send order status SMS")
+
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Order updated successfully"})
 }
 
-//done
+// Extracting phone number from delivery address.
+func ExtractPhoneNumber(address string) string {
+	// Regex for Indian + international formats
+	re := regexp.MustCompile(`(\+?\d[\d\s-]{8,15}\d)`)
+	phone := re.FindString(address)
+	return phone
+}
