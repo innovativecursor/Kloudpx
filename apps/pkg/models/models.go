@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Admin struct {
 	gorm.Model
@@ -101,9 +105,27 @@ type User struct {
 	gorm.Model
 	FirstName       string
 	LastName        string
-	Email           string `gorm:"unique"`
+	Email           *string `gorm:"unique"`
+	Phone           *string `gorm:"unique"`
 	EmailVerified   bool
+	PhoneVerified   bool
 	ApplicationRole string
+}
+
+type OTP struct {
+	ID        uint `gorm:"primaryKey"`
+	Phone     string
+	Code      string
+	ExpiresAt time.Time
+}
+
+type LoginSession struct {
+	ID        uint `gorm:"primaryKey"`
+	UserID    uint
+	JWTToken  string
+	UserAgent string
+	IP        string
+	ExpiresAt time.Time
 }
 
 // Prescription uploaded by a user

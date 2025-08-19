@@ -619,8 +619,8 @@ func SelectPaymentType(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch delivery address"})
 		return
 	}
-	fullAddress := fmt.Sprintf("%s, %s, %s, %s, %s",
-		address.NameResidency, address.Barangay, address.City, address.Province, address.ZipCode)
+	fullAddress := fmt.Sprintf("%s, %s, %s, %s, %s,%s",
+		address.NameResidency, address.Barangay, address.City, address.Province, address.ZipCode, address.PhoneNumber)
 
 	grandTotal := session.TotalCost + float64(session.DeliveryCost)
 
