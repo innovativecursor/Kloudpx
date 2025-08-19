@@ -18,7 +18,7 @@ import CustomToaster from "./utils/NoSSRToaster";
 import { CheckoutProvider } from "./contexts/CheckoutContext";
 import { PaymentProvider } from "./contexts/PaymentContext";
 import ClientOnly from "./components/ClientOnly";
-// import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
+import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 
 export default function RootLayout({ children }) {
   return (
@@ -31,11 +31,11 @@ export default function RootLayout({ children }) {
       </head>
       <body className="antialiased min-h-screen flex flex-col">
         <ClientOnly>
+          <ScrollToTop />
           <GoogleOAuthProvider clientId="573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com">
             <Provider store={store}>
               <PersistGate loading={null} persistor={persistor}>
                 <Loader />
-                {/* <ErrorBoundary> */}
                 <AuthProvider>
                   <ProductProvider>
                     <CheckoutProvider>
@@ -54,7 +54,6 @@ export default function RootLayout({ children }) {
                     </CheckoutProvider>
                   </ProductProvider>
                 </AuthProvider>
-                {/* </ErrorBoundary> */}
               </PersistGate>
             </Provider>
           </GoogleOAuthProvider>

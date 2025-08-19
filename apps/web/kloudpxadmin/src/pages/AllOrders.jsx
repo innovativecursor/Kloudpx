@@ -14,12 +14,17 @@ const AllOrders = () => {
     }
   }, []);
 
-  // console.log(allOrders);
+  console.log(allOrders);
 
   // Pagination logic
+
+  const reversedOrders = allOrders ? [...allOrders].reverse() : [];
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-  const currentOrders = allOrders?.slice(indexOfFirstOrder, indexOfLastOrder);
+  const currentOrders = reversedOrders.slice(
+    indexOfFirstOrder,
+    indexOfLastOrder
+  );
 
   const totalPages = allOrders
     ? Math.ceil(allOrders.length / ordersPerPage)
@@ -107,9 +112,7 @@ const AllOrders = () => {
                     {order.status}
                   </span>
                 </td>
-                {/* <td className="px-4 py-5 text-sm md:text-base whitespace-nowrap">
-                  {new Date(order.created_at).toLocaleString()}
-                </td> */}
+
                 <td className="px-4 py-5 text-sm md:text-base whitespace-nowrap">
                   {(() => {
                     const utcDate = new Date(order.created_at);

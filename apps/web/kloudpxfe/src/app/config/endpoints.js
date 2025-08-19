@@ -80,7 +80,7 @@ const endpoints = {
     get: `${baseUrl}/v1/user/get-prescriptions`,
   },
   selectedprescription: {
-    put: `${baseUrl}/v1/user/select-prescription`
+    put: `${baseUrl}/v1/user/select-prescription`,
   },
 
   paymentSubmit: {
@@ -88,6 +88,15 @@ const endpoints = {
   },
   OrderSubmit: {
     add: `${baseUrl}/v1/user/select-payment-type`,
+  },
+  clinics: {
+    get: `${baseUrl}/v1/user/get-clinics`,
+  },
+  doctors: {
+    get: `${baseUrl}/v1/user/get-doctors`,
+  },
+  sendclinicsdoctors: {
+    add: `${baseUrl}/v1/user/select-doctor-or-clinic`,
   },
   paymentslip: {
     get: `${baseUrl}/v1/user/get-payment-slip`,

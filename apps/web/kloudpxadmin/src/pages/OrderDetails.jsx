@@ -108,6 +108,19 @@ const OrderDetails = () => {
                       item.pharmacist_status.slice(1).toLowerCase()
                     : ""}
                 </span>
+
+                <div>
+                  <label className="font-semibold block mb-1">
+                    Amount Paid
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Enter Amount"
+                    value={amountPay}
+                    onChange={(e) => setAmountPay(e.target.value)}
+                    className="border rounded-lg px-3 py-2 w-full md:w-40 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -129,8 +142,8 @@ const OrderDetails = () => {
               </select>
             </div>
 
-            <div>
-              <label className="font-semibold block mb-1">Amount Pay</label>
+            {/* <div>
+              <label className="font-semibold block mb-1">Amount Paid</label>
               <input
                 type="number"
                 placeholder="Enter Amount"
@@ -138,7 +151,7 @@ const OrderDetails = () => {
                 onChange={(e) => setAmountPay(e.target.value)}
                 className="border rounded-lg px-3 py-2 w-full md:w-40 focus:ring-1 focus:ring-blue-500 focus:outline-none"
               />
-            </div>
+            </div> */}
 
             <div>
               <label className="font-semibold block mb-1">Delivery ID</label>
