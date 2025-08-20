@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"regexp"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -219,26 +218,57 @@ func UpdateOrderDetails(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Send SMS notification
-	message := fmt.Sprintf(
-		"Dear %s,\n\nYour order #%s is now %s.\n\nThank you for shopping with us!\nKloud P&X",
-		strings.TrimSpace(order.User.FirstName+" "+order.User.LastName),
-		order.OrderNumber,
-		order.Status,
-	)
-
-	if err := s3helper.SendSMS(ExtractPhoneNumber(order.DeliveryAddress), message); err != nil {
-		logrus.WithError(err).Error("Failed to send order status SMS")
-
+	// Fetch address phone number via CheckoutSession.AddressID
+	var address models.Address
+	if err := db.Where("user_id = ?", order.UserID).First(&address).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Order address not found"})
 	}
+
+	SendOrderUpdateSMS(address.PhoneNumber, order)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Order updated successfully"})
 }
 
-// Extracting phone number from delivery address.
-func ExtractPhoneNumber(address string) string {
-	// Regex for Indian + international formats
-	re := regexp.MustCompile(`(\+?\d[\d\s-]{8,15}\d)`)
-	phone := re.FindString(address)
-	return phone
+// SendOrderUpdateSMS sends an SMS notification to the user whenever an order's status changes.
+// It only triggers for specific statuses (processing, shipped, success, cancelled).
+// For "success", the status shown to the user is changed to "delivered".
+// For "processing" and "shipped", the Delivery ID (ShippingNumber) must be present in the message.
+func SendOrderUpdateSMS(phone string, order models.Order) {
+	// Allowed SMS statuses
+	notifyStatuses := map[string]bool{
+		"processing": true,
+		"shipped":    true,
+		"success":    true,
+		"cancelled":  true,
+	}
+	status := order.Status
+	if notifyStatuses[status] {
+		fullName := strings.TrimSpace(order.User.FirstName + " " + order.User.LastName)
+
+		displayStatus := order.Status
+		if status == "success" {
+			displayStatus = "delivered"
+		}
+		var message string
+		if status == "processing" || status == "shipped" {
+			message = fmt.Sprintf(
+				"Dear %s,\n\nYour order #%s is now %s.\nDelivery ID: %s\n\nThank you for shopping with us!\nKloud P&X",
+				fullName,
+				order.OrderNumber,
+				displayStatus,
+				order.ShippingNumber,
+			)
+		} else {
+			message = fmt.Sprintf(
+				"Dear %s,\n\nYour order #%s is now %s.\n\nThank you for shopping with us!\nKloud P&X",
+				fullName,
+				order.OrderNumber,
+				displayStatus,
+			)
+		}
+
+		if err := s3helper.SendSMS(phone, message); err != nil {
+			logrus.WithError(err).Error("Failed to send order status SMS")
+		}
+	}
 }
