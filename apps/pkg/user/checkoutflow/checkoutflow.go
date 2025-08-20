@@ -8,9 +8,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/itemscalculation"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/s3helper"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/userinfo"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/checkoutflow/config"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -619,8 +621,8 @@ func SelectPaymentType(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch delivery address"})
 		return
 	}
-	fullAddress := fmt.Sprintf("%s, %s, %s, %s, %s,%s",
-		address.NameResidency, address.Barangay, address.City, address.Province, address.ZipCode, address.PhoneNumber)
+	fullAddress := fmt.Sprintf("%s, %s, %s, %s, %s",
+		address.NameResidency, address.Barangay, address.City, address.Province, address.ZipCode)
 
 	grandTotal := session.TotalCost + float64(session.DeliveryCost)
 
@@ -678,6 +680,23 @@ func SelectPaymentType(c *gin.Context, db *gorm.DB) {
 			PhysicianID:       item.PhysicianID,
 		}
 		db.Create(&historyItem)
+	}
+
+	if err := db.Preload("User").
+		Where("order_number = ?", orderNumber).
+		First(&order).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
+		return
+	}
+
+	// Build the SMS message for order placement confirmation
+	message := fmt.Sprintf(
+		"Dear %s,\n\nYour order #%s has been placed successfully.\n\nThank you for shopping with us!\nKloud P&X",
+		strings.TrimSpace(order.User.FirstName+" "+order.User.LastName), // customer full name
+		order.OrderNumber,
+	)
+	if err := s3helper.SendSMS(address.PhoneNumber, message); err != nil {
+		logrus.WithError(err).Error("Failed to send order status SMS")
 	}
 
 	// Clear cart
