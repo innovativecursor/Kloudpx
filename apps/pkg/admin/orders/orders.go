@@ -245,9 +245,9 @@ func SendOrderUpdateSMS(phone string, order models.Order) {
 	if notifyStatuses[status] {
 		fullName := strings.TrimSpace(order.User.FirstName + " " + order.User.LastName)
 
-		displayStatus := order.Status
+		orderStatus := order.Status
 		if status == "success" {
-			displayStatus = "delivered"
+			orderStatus = "delivered"
 		}
 		var message string
 		if status == "processing" || status == "shipped" {
@@ -255,7 +255,7 @@ func SendOrderUpdateSMS(phone string, order models.Order) {
 				"Dear %s,\n\nYour order #%s is now %s.\nDelivery ID: %s\n\nThank you for shopping with us!\nKloud P&X",
 				fullName,
 				order.OrderNumber,
-				displayStatus,
+				orderStatus,
 				order.ShippingNumber,
 			)
 		} else {
@@ -263,7 +263,7 @@ func SendOrderUpdateSMS(phone string, order models.Order) {
 				"Dear %s,\n\nYour order #%s is now %s.\n\nThank you for shopping with us!\nKloud P&X",
 				fullName,
 				order.OrderNumber,
-				displayStatus,
+				orderStatus,
 			)
 		}
 
