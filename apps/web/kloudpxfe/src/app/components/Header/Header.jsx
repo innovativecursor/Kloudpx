@@ -8,12 +8,11 @@ import Hamburger from "@/app/components/modal/Hamburger";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useCartContext } from "@/app/contexts/CartContext";
 import { useRouter } from "next/navigation";
-import { FiShoppingCart } from "react-icons/fi";
 import CartModal from "@/app/components/modal/CartModal";
 import useModal from "@/app/hooks/useModal";
-import { RiAccountCircleLine } from "react-icons/ri";
 import { VscAccount } from "react-icons/vsc";
 import { PiShoppingCartSimple } from "react-icons/pi";
+import UserDropdown from "./UserDropdown";
 // import Signup from "../Auth/Signup";
 // import Login from "../Auth/Login";
 
@@ -57,13 +56,7 @@ const Header = () => {
               <div>
                 {!isAuthLoaded ? null : !loading && user ? (
                   <div className="flex items-center flex-col">
-                    <VscAccount
-                      className="md:text-2xl text-xl cursor-pointer"
-                      onClick={() => router.push("/Profile")}
-                    />
-                    <span className="md:text-sm sm:text-xs text-[9px] mt-1 tracking-wide opacity-70 cursor-pointer">
-                      {user?.first_name} {user?.last_name}
-                    </span>
+                    <UserDropdown />
                   </div>
                 ) : (
                   <div
@@ -101,7 +94,11 @@ const Header = () => {
                 </span>
 
                 {/* Cart Modal */}
-                <CartModal isOpen={isOpen} onClose={() => setIsOpen(false)} modalRef={modalRef} />
+                <CartModal
+                  isOpen={isOpen}
+                  onClose={() => setIsOpen(false)}
+                  modalRef={modalRef}
+                />
               </div>
             </div>
           </div>

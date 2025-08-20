@@ -94,7 +94,11 @@ function Footer() {
                   Home
                 </Link>
               </li>
-              <li>About Us</li>
+              <li>
+                <Link href="/Aboutus" className="hover:underline">
+                  About Us
+                </Link>
+              </li>
               <li>
                 <Link href="/Products" className="hover:underline">
                   Shop Products
@@ -112,9 +116,22 @@ function Footer() {
           <div className="flex flex-col text-xs">
             <h1 className="text-color font-semibold ">Legal</h1>
             <ul className="mt-4 text-[10px] space-y-5 font-normal cursor-pointer">
-              <li>Terms & Conditions</li>
-              <li>Privacy Policy</li>
-              <li>Return & Refund Policy</li>
+              <li>
+                <Link href="/TermsConditions" className="hover:underline">
+                  Terms & Conditions
+                </Link>
+              </li>
+              <li>
+                <Link href="/PrivacyPolicy" className="hover:underline">
+                  Privacy Policy
+                </Link>
+              </li>
+
+              <li>
+                <Link href="/ReturnRefund" className="hover:underline">
+                  Return & Refund Policy
+                </Link>
+              </li>
               <li>Prescription Policy</li>
             </ul>
           </div>

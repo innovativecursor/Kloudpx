@@ -6,7 +6,7 @@ const AllOrders = () => {
   const { getAllOrders, allOrders } = useOrderContext();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const ordersPerPage = 5;
+  const ordersPerPage = 15;
 
   useEffect(() => {
     if (!allOrders || allOrders.length === 0) {
@@ -14,10 +14,17 @@ const AllOrders = () => {
     }
   }, []);
 
+  console.log(allOrders);
+
   // Pagination logic
+
+  const reversedOrders = allOrders ? [...allOrders].reverse() : [];
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-  const currentOrders = allOrders?.slice(indexOfFirstOrder, indexOfLastOrder);
+  const currentOrders = reversedOrders.slice(
+    indexOfFirstOrder,
+    indexOfLastOrder
+  );
 
   const totalPages = allOrders
     ? Math.ceil(allOrders.length / ordersPerPage)
@@ -62,6 +69,9 @@ const AllOrders = () => {
               <th className="px-4 py-5 text-left text-sm md:text-base font-medium">
                 Address
               </th>
+              <th className="px-4 py-5 text-left text-sm md:text-base font-medium">
+                Phone No
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -102,9 +112,7 @@ const AllOrders = () => {
                     {order.status}
                   </span>
                 </td>
-                {/* <td className="px-4 py-5 text-sm md:text-base whitespace-nowrap">
-                  {new Date(order.created_at).toLocaleString()}
-                </td> */}
+
                 <td className="px-4 py-5 text-sm md:text-base whitespace-nowrap">
                   {(() => {
                     const utcDate = new Date(order.created_at);
@@ -122,6 +130,9 @@ const AllOrders = () => {
 
                 <td className="px-4 py-5 text-sm md:text-base max-w-[250px] break-words">
                   {order.delivery_address}
+                </td>
+                <td className="px-4 py-5 text-sm md:text-base max-w-[250px] break-words">
+                  {order.phone_number}
                 </td>
               </tr>
             ))}

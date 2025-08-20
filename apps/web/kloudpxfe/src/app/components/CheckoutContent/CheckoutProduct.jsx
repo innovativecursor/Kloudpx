@@ -30,10 +30,10 @@ const CheckoutProduct = ({ product }) => {
   return (
     <div className="bg-blue-50 w-full rounded-lg py-5">
       {/* Delivery Info */}
-      <div className="flex gap-2 px-4 text-color items-center text-xs">
+      {/* <div className="flex gap-2 px-4 text-color items-center text-xs">
         <PiBusFill className="text-lg" /> Your delivery will arrive within 2
         days.
-      </div>
+      </div> */}
 
       {/* Product Image */}
       <div className="flex justify-center md:w-full w-[80%] items-center mt-7 mx-auto">

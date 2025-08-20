@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useAuth } from "./AuthContext";
 import { postAxiosCall, getAxiosCall, deleteAxiosCall } from "@/app/lib/axios";
@@ -11,9 +11,13 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const { token } = useAuth();
-  const { doCheckout } = useCheckout();
+  const { doCheckout, addDeliveryData } = useCheckout();
   const [cartItems, setCartItems] = useState([]);
+  const [allClinics, setAllClinics] = useState([]);
+  const [allDoctors, setAllDoctors] = useState([]);
   const [getCartData, setGetCartData] = useState({ data: [], loading: false });
+  const [selectedClinicId, setSelectedClinicId] = useState(null);
+  const [selectedDoctorId, setSelectedDoctorId] = useState(null);
 
   const addToCart = async (medicineid, quantity) => {
     if (!token) {
@@ -22,11 +26,7 @@ export const CartProvider = ({ children }) => {
     }
 
     try {
-      await postAxiosCall(
-        endpoints.cart.add,
-        { medicineid, quantity },
-        true
-      );
+      await postAxiosCall(endpoints.cart.add, { medicineid, quantity }, true);
       toast.success("Item added to cart!");
       getAllCartData();
     } catch (error) {
@@ -57,13 +57,19 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const removeFromCart = async (id) => {
-    // if (!token) return;
+  const removeFromCart = async (id, options = { addDelivery: true }) => {
     try {
       await deleteAxiosCall(endpoints.cart.remove(id), true);
       toast.success("Item removed from cart!");
-      getAllCartData();
-      doCheckout();
+      await getAllCartData();
+      await doCheckout();
+
+      const pathname =
+        typeof window !== "undefined" ? window.location.pathname : "";
+
+      if (options.addDelivery && !pathname.includes("/Address")) {
+        await addDeliveryData();
+      }
     } catch (error) {
       console.error("Remove item error", error);
       toast.error("Failed to remove item");
@@ -104,6 +110,62 @@ export const CartProvider = ({ children }) => {
     setGetCartData({ data: [], loading: false });
   };
 
+  const getAllClinics = async () => {
+    try {
+      const res = await getAxiosCall(endpoints.clinics.get, {}, true);
+      if (res?.status === 200) {
+        setAllClinics(res?.data || []);
+      } else {
+        setAllClinics([]);
+      }
+    } catch (error) {
+      setAllClinics([]);
+    }
+  };
+
+  const getAllDoctors = async () => {
+    try {
+      const res = await getAxiosCall(endpoints.doctors.get, {}, true);
+      if (res?.status === 200) {
+        setAllDoctors(res?.data || []);
+      } else {
+        setAllDoctors([]);
+      }
+    } catch (error) {
+      setAllDoctors([]);
+    }
+  };
+
+  useEffect(() => {
+    const callSelectDoctorOrClinic = async () => {
+      if (
+        cartItems.length > 0 &&
+        selectedClinicId !== null &&
+        selectedDoctorId !== null
+      ) {
+        const cart_ids = cartItems.map((item) => item.cart_id);
+        const payload = {
+          cart_ids,
+          hospital_id: selectedClinicId,
+          physician_id: selectedDoctorId,
+        };
+
+        try {
+          const res = await postAxiosCall(
+            endpoints.sendclinicsdoctors.add,
+            payload,
+            true
+          );
+          // console.log("Selected clinic/doctor API called successfully:", res);
+          toast.success(res?.message);
+        } catch (error) {
+          console.error("Error calling select-doctor-or-clinic API", error);
+        }
+      }
+    };
+
+    callSelectDoctorOrClinic();
+  }, [cartItems, selectedClinicId, selectedDoctorId]);
 
   return (
     <CartContext.Provider
@@ -118,6 +180,14 @@ export const CartProvider = ({ children }) => {
         removeFromCart,
         cartLength,
         getAllCartData,
+        getAllClinics,
+        allClinics,
+        allDoctors,
+        getAllDoctors,
+        selectedClinicId,
+        setSelectedClinicId,
+        selectedDoctorId,
+        setSelectedDoctorId,
       }}
     >
       {children}
