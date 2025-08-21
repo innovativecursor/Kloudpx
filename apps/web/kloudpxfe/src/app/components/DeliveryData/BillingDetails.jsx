@@ -104,15 +104,7 @@ const BillingDetails = ({ deliveryData }) => {
               </span>
             </div>
 
-            <div className="flex justify-between items-center">
-              <div className="flex gap-1 items-center">
-                <MdPayment className="text-base" />
-                <span className="text-sm font-medium">COD Cost</span>
-              </div>
-              <span className="text-sm font-semibold text-[#333]">
-                ₱{deliveryData.cod_fee?.toFixed(2)}
-              </span>
-            </div>
+       
 
             <div className="flex justify-between items-center">
               <div className="flex gap-1 items-center">

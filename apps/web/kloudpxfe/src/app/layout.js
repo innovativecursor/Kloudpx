@@ -19,6 +19,7 @@ import { CheckoutProvider } from "./contexts/CheckoutContext";
 import { PaymentProvider } from "./contexts/PaymentContext";
 import ClientOnly from "./components/ClientOnly";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
+import { LoginAuthProvider } from "./contexts/LoginAuth";
 
 export default function RootLayout({ children }) {
   return (
@@ -37,22 +38,24 @@ export default function RootLayout({ children }) {
               <PersistGate loading={null} persistor={persistor}>
                 <Loader />
                 <AuthProvider>
-                  <ProductProvider>
-                    <CheckoutProvider>
-                      <CartProvider>
-                        <PrescriptionProvider>
-                          <PaymentProvider>
-                            <ImageProvider>
-                              <Header />
-                              <main className="flex-1">{children}</main>
-                              <Footer />
-                              <CustomToaster />
-                            </ImageProvider>
-                          </PaymentProvider>
-                        </PrescriptionProvider>
-                      </CartProvider>
-                    </CheckoutProvider>
-                  </ProductProvider>
+                  <LoginAuthProvider>
+                    <ProductProvider>
+                      <CheckoutProvider>
+                        <CartProvider>
+                          <PrescriptionProvider>
+                            <PaymentProvider>
+                              <ImageProvider>
+                                <Header />
+                                <main className="flex-1">{children}</main>
+                                <Footer />
+                                <CustomToaster />
+                              </ImageProvider>
+                            </PaymentProvider>
+                          </PrescriptionProvider>
+                        </CartProvider>
+                      </CheckoutProvider>
+                    </ProductProvider>
+                  </LoginAuthProvider>
                 </AuthProvider>
               </PersistGate>
             </Provider>

@@ -132,7 +132,7 @@ function Footer() {
                   Return & Refund Policy
                 </Link>
               </li>
-              <li>Prescription Policy</li>
+              {/* <li>Prescription Policy</li> */}
             </ul>
           </div>
         </div>

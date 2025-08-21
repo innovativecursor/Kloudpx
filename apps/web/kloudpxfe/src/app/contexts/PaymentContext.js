@@ -18,6 +18,7 @@ export const PaymentProvider = ({ children }) => {
   const {
     checkoutData,
     deliveryData,
+    setCheckoutData,
     setDeliveryData,
     paymentMethod,
     addDeliveryData,
@@ -73,14 +74,16 @@ export const PaymentProvider = ({ children }) => {
         },
         true
       );
-
+      setOrderSubmit(res || [])
       toast.success("Payment submitted successfully!");
-      setDeliveryData(null);
-      getAllCartData();
       router.push("/Success");
+      getAllCartData();
+      setCheckoutData(null);
+      setDeliveryData(null);
     } catch (error) {
       console.error("Error submitting order:", error.message);
       toast.error("Something went wrong!");
+      setOrderSubmit([])
     }
   };
 

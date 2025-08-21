@@ -32,7 +32,7 @@ const Clinics = () => {
   };
 
   const loadOptions = (inputValue, callback) => {
-    if (inputValue.length < 1) {
+    if (inputValue.length < 2) {
       callback([]);
       return;
     }
@@ -70,7 +70,7 @@ const Clinics = () => {
             borderColor: state.isFocused ? "#9CA3AF" : "#6B7280",
             boxShadow: state.isFocused ? "0 0 0 1px #0070BA" : "none",
             padding: "6px 8px",
-            minHeight: "56px",
+            minHeight: "66px",
             cursor: "pointer",
           }),
           option: (provided, state) => ({
