@@ -27,7 +27,7 @@ const Address = () => {
     checkoutData,
   } = useCheckout();
 
-  console.log(checkoutData);
+  // console.log(checkoutData);
 
   useEffect(() => {
     if (Array.isArray(getAllAddress) && getAllAddress.length === 0) {

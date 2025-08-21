@@ -7,6 +7,12 @@ const endpoints = {
     googleLogin: `${baseUrl}/v1/auth/google/callback/user`,
     getCurrentUser: `${baseUrl}/v1/user/get-current-userinfo`,
   },
+  basicauthphone: {
+    signup: `${baseUrl}/v1/user/signup`,
+    signupverify: `${baseUrl}/v1/user/signup/verify`,
+    login: `${baseUrl}/v1/user/login`,
+    loginverify: `${baseUrl}/v1/user/login/verify`,
+  },
   medicine: {
     get: `${baseUrl}/v1/user/get-medicines`,
   },

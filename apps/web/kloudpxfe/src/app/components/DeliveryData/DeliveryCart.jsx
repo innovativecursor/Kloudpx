@@ -15,10 +15,6 @@ const DeliveryCart = () => {
     doCheckout();
   }, []);
 
-  // const handleDelete = (id) => {
-  //   removeFromCart(id);
-  // };
-
   const handleDelete = (id) => {
     removeFromCart(id, { addDelivery: false });
   };

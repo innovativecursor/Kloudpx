@@ -5,11 +5,12 @@ import { updateAxiosCall, postAxiosCall, getAxiosCall } from "../lib/axios";
 import endpoints from "../config/endpoints";
 import toast from "react-hot-toast";
 
+
 const CheckoutContext = createContext();
 
 export const CheckoutProvider = ({ children }) => {
   const [savedForLaterIds, setSavedForLaterIds] = useState([]);
-  const [checkoutData, setCheckoutData] = useState([]);
+  const [checkoutData, setCheckoutData] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [selected, setSelected] = useState("standard");
   const [deliveryData, setDeliveryData] = useState(null);
@@ -31,7 +32,7 @@ export const CheckoutProvider = ({ children }) => {
 
   // console.log(paymentMethod);
 
-  
+
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -69,11 +70,10 @@ export const CheckoutProvider = ({ children }) => {
   const doCheckout = async () => {
     try {
       const res = await postAxiosCall(endpoints.checkout.get, {}, true);
-      // console.log(res);
-      setCheckoutData(res || []);
+      setCheckoutData(res || null);
       setDeliveryData(null);
     } catch (error) {
-      setCheckoutData([]);
+      setCheckoutData(null);
     }
   };
 
@@ -174,11 +174,11 @@ export const CheckoutProvider = ({ children }) => {
         },
         true
       );
-      console.log("Delivery type response:", res);
+      // console.log("Delivery type response:", res);
 
       setDeliveryData(res || null);
     } catch (error) {
-      console.error("Error selecting address:", error.message);
+      // console.error("Error selecting address:", error.message);
       setDeliveryData(null);
     }
   };
@@ -206,6 +206,7 @@ export const CheckoutProvider = ({ children }) => {
         paymentMethod,
         setPaymentMethod,
         setDeliveryData,
+        setCheckoutData
         // handleOrderSubmit,
       }}
     >

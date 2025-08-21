@@ -85,8 +85,8 @@ const Instructions = () => {
       </div>
 
       {/* Stats Section */}
-      <div className="bg-white">
-        <section className="responsive-mx lg:mt-28 md:mt-24 sm:mt-20 mt-12">
+      <div className="bg-white lg:mt-28 md:mt-24 sm:mt-20 mt-12 sm:py-10 py-5 ">
+        <section className="responsive-mx ">
           <div className="grid grid-cols-3 sm:gap-8 gap-5 text-center">
             {stats.map((stat, index) => (
               <div

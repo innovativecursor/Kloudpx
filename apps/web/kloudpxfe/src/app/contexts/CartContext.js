@@ -6,11 +6,13 @@ import { useAuth } from "./AuthContext";
 import { postAxiosCall, getAxiosCall, deleteAxiosCall } from "@/app/lib/axios";
 import endpoints from "../config/endpoints";
 import { useCheckout } from "./CheckoutContext";
+import { usePathname } from "next/navigation";
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const { token } = useAuth();
+  const pathname = usePathname();
   const { doCheckout, addDeliveryData } = useCheckout();
   const [cartItems, setCartItems] = useState([]);
   const [allClinics, setAllClinics] = useState([]);
@@ -50,6 +52,8 @@ export const CartProvider = ({ children }) => {
       const res = await getAxiosCall(endpoints.cart.get, {}, true);
       setGetCartData({ data: res.data || [], loading: false });
       setCartItems(res.data || []);
+      doCheckout();
+
     } catch (error) {
       console.log("Fetch Cart Error:", error.message);
       setCartItems([]);
@@ -139,6 +143,7 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     const callSelectDoctorOrClinic = async () => {
       if (
+        pathname === "/Checkout" &&
         cartItems.length > 0 &&
         selectedClinicId !== null &&
         selectedDoctorId !== null

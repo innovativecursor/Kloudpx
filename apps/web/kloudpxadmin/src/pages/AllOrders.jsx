@@ -98,8 +98,8 @@ const AllOrders = () => {
                     className={`px-3 py-1 rounded-full uppercase text-xs md:text-sm font-semibold ${
                       order.status === "processing"
                         ? "bg-yellow-100 text-yellow-800"
-                        : order.status === "transit"
-                        ? "bg-blue-100 text-blue-800"
+                        // : order.status === "transit"
+                        // ? "bg-blue-100 text-blue-800"
                         : order.status === "shipped"
                         ? "bg-purple-100 text-purple-800"
                         : order.status === "success"
