@@ -61,10 +61,10 @@ export const AuthProvider = ({ children }) => {
         console.error("Login failed", error.message);
       }
     },
-    // onError: () => {
-    //   console.error("Google login failed");
-    // },
   });
+
+
+
 
   return (
     <AuthContext.Provider

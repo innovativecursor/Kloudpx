@@ -1,10 +1,13 @@
 "use client";
+import usePageLoader from "@/app/hooks/usePageLoader";
 import Link from "next/link";
 import { FaShieldAlt, FaTruck, FaClock, FaThumbsUp } from "react-icons/fa";
-import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 
 export default function WhyChooseUs() {
+
+    const { startLoader } = usePageLoader();
+
   const features = [
     {
       icon: <FaShieldAlt className="w-6 h-6 text-[#0070ba]" />,
@@ -47,7 +50,7 @@ export default function WhyChooseUs() {
 
           {/* Swiper Slider */}
           <div className="sm:mt-12 mt-8 sm:mb-10 mb-8 lg:mx-20">
-       <div className=" grid gap-5 md:grid-cols-4 sm:grid-cols-2 grid-cols-1">
+            <div className=" grid gap-5 md:grid-cols-4 sm:grid-cols-2 grid-cols-1">
               {features.map((feature, idx) => (
                 <div key={idx}>
                   <div className="bg-white rounded-xl mb-1 shadow-sm h-48 p-6 cursor-pointer flex flex-col items-start justify-center hover:shadow-lg transition">
@@ -65,11 +68,11 @@ export default function WhyChooseUs() {
                   </div>
                 </div>
               ))}
-       </div>
+            </div>
           </div>
 
           {/* Learn more button */}
-          <Link href="/Aboutus">
+          <Link href="/Aboutus"     onClick={startLoader}>
             <button className="bg-[#0070ba] text-white text-sm font-medium px-10 cursor-pointer sm:py-4 py-3 rounded-full shadow-lg transition">
               Learn More About Us
             </button>

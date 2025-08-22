@@ -20,6 +20,7 @@ import { PaymentProvider } from "./contexts/PaymentContext";
 import ClientOnly from "./components/ClientOnly";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import { LoginAuthProvider } from "./contexts/LoginAuth";
+import LoaderController from "./components/Loader/LoaderController";
 
 export default function RootLayout({ children }) {
   return (
@@ -37,6 +38,7 @@ export default function RootLayout({ children }) {
             <Provider store={store}>
               <PersistGate loading={null} persistor={persistor}>
                 <Loader />
+                <LoaderController />
                 <AuthProvider>
                   <LoginAuthProvider>
                     <ProductProvider>

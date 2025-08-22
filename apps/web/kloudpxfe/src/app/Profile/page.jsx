@@ -9,16 +9,19 @@ import PrescriptionHistoty from "../components/Profile/PrescriptionHistoty";
 // import OrderHistory from "../components/Profile/OrderHistory";
 import { FaPaperclip } from "react-icons/fa";
 import { useCartContext } from "../contexts/CartContext";
+import usePageLoader from "../hooks/usePageLoader";
 
 const ProfilePage = () => {
   const fallbackImage = "/assets/fallback.png";
   const { user, setToken, setUser } = useAuth();
+  const { startLoader } = usePageLoader();
   const { clearCart } = useCartContext();
   const [activeTab, setActiveTab] = useState("");
   const router = useRouter();
 
   const logout = () => {
     localStorage.removeItem("access_token");
+    startLoader();
     router.push("/");
     setToken(null);
     setUser(null);

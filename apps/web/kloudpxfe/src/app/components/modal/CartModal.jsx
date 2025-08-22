@@ -6,10 +6,12 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
 import useProductNavigation from "@/app/hooks/useProductNavigation";
+import usePageLoader from "@/app/hooks/usePageLoader";
 
 const CartModal = ({ isOpen, onClose, modalRef }) => {
   const { token, isAuthLoaded } = useAuth();
   const router = useRouter();
+  const { startLoader } = usePageLoader();
   const { getCartData, removeFromCart, getAllCartData } = useCartContext();
   const { goToProductPage } = useProductNavigation();
   const fallbackImage = "/assets/fallback.png";
@@ -32,6 +34,7 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
   }
 
   const handleCheckout = async () => {
+    startLoader();
     setCheckoutLoading(true);
     try {
       router.push("/Checkout");
