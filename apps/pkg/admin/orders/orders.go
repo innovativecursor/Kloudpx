@@ -118,8 +118,8 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	items := make([]gin.H, 0, len(cartHistory))
 	// Build items response with safe nil checks
-	items := []gin.H{}
 	for _, item := range cartHistory {
 		clinicName := "Not selected"
 		if item.Hospital != nil {
@@ -131,14 +131,20 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 			doctorName = fmt.Sprintf("%s %s", item.Physician.FirstName, item.Physician.LastName)
 		}
 
-		items = append(items, gin.H{
-			"medicine_name":     item.Medicine.BrandName,
-			"quantity":          item.Quantity,
-			"price":             item.Medicine.SellingPricePerPiece,
-			"pharmacist_status": item.MedicineStatus,
-			"clinic_name":       clinicName,
-			"doctor_name":       doctorName,
-		})
+		itemResp := gin.H{
+			"medicine_name": item.Medicine.BrandName,
+			"quantity":      item.Quantity,
+			"price":         item.Medicine.SellingPricePerPiece,
+			//"pharmacist_status": item.MedicineStatus,
+			"clinic_name": clinicName,
+			"doctor_name": doctorName,
+		}
+		// only show pharmacist_status if prescription = true
+		if item.PrescriptionID != nil {
+			itemResp["pharmacist_status"] = item.MedicineStatus
+		}
+
+		items = append(items, itemResp)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
