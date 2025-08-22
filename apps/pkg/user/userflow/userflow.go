@@ -309,6 +309,11 @@ func GetCurrentUserInfo(c *gin.Context, db *gorm.DB) {
 		"email_verified":   userObj.EmailVerified,
 		"application_role": userObj.ApplicationRole,
 		"created_at":       userObj.CreatedAt,
+		"phone":            userObj.Phone,
+		"dob":              userObj.DOB,
+		"age":              userObj.Age,
+		"gender":           userObj.Gender,
+		"phone_verified":   userObj.PhoneVerified,
 	})
 }
 
