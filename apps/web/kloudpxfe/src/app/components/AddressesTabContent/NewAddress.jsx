@@ -152,9 +152,7 @@ export default function NewAddress({ setShowAddForm }) {
 
         {/* Name of Residency */}
         <div>
-          <label className="font-medium text-xs text-gray-700">
-            Name of Residency
-          </label>
+          <label className="font-medium text-xs text-gray-700">Location</label>
           <input
             type="text"
             name="nameresidency"
