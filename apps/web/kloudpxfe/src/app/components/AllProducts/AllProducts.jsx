@@ -58,23 +58,6 @@ const AllProducts = ({ selectedCategoryItems = [] }) => {
           )}
 
           <ProductsCard selectedCategoryItems={next4} />
-          {/* 
-          {first8.length !== 0 && (
-            <>
-              <div className="flex justify-between items-center lg:mt-10 sm:mt-14 sm:gap-4 gap-2 mb-10 sm:mb-20">
-                <img
-                  className="lg:h-[26vw] md:h-[25vw]  h-[37vw] w-auto object-contain"
-                  src={sale1.src}
-                  alt="sale1"
-                />
-                <img
-                  className="lg:h-[26vw] md:h-[25vw] h-[37vw] w-auto object-contain"
-                  src={sale2.src}
-                  alt="sale2"
-                />
-              </div>
-            </>
-          )} */}
 
           <ProductsCard selectedCategoryItems={afterImage4} />
         </>

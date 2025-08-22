@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useThresholdContext } from "../../contexts/ThresholdContext";
 import { useNavigate } from "react-router-dom";
 
-const AddThreshold = () => {
+const EditThreshold = () => {
   const { addOrUpdateRegion, editingRegion, setEditingRegion } =
     useThresholdContext();
   const navigate = useNavigate();
@@ -51,11 +51,34 @@ const AddThreshold = () => {
     navigate("/allthreshold");
   };
 
+  if (!editingRegion) {
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <div className="bg-white border border-gray-200 shadow-lg rounded-2xl p-10 max-w-md text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-3">
+            No Region Selected
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Please go to{" "}
+            <span className="font-semibold text-[#0070ba]">All Thresholds</span>
+            and select a region to edit.
+          </p>
+          <button
+            onClick={() => navigate("/allthreshold")}
+            className="bg-[#0070ba] text-white px-6 py-3 rounded-xl font-medium hover:scale-105 transition-transform shadow-md"
+          >
+            Go to All Thresholds
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="md:p-4 mt-16 mx-[4vw] flex justify-center mb-32">
       <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl p-8 border border-gray-200">
         <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-          {editingRegion ? "Edit Region Threshold" : "Add Region Threshold"}
+          Edit Region Threshold
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -87,7 +110,7 @@ const AddThreshold = () => {
                 value={formData.zip_start}
                 onChange={handleChange}
                 placeholder="Start ZIP"
-                className="w-full p-4 outline-none  border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+                className="w-full p-4 outline-none border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
                 required
               />
             </div>
@@ -101,7 +124,7 @@ const AddThreshold = () => {
                 value={formData.zip_end}
                 onChange={handleChange}
                 placeholder="End ZIP"
-                className="w-full p-4 border outline-none  border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+                className="w-full p-4 outline-none border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
                 required
               />
             </div>
@@ -118,7 +141,7 @@ const AddThreshold = () => {
               value={formData.delivery_time}
               onChange={handleChange}
               placeholder="E.g., 3-7 days"
-              className="w-full p-4 border outline-none  border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+              className="w-full p-4 border outline-none border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
               required
             />
           </div>
@@ -135,7 +158,7 @@ const AddThreshold = () => {
                 value={formData.free_shipping_limit}
                 onChange={handleChange}
                 placeholder="Free Shipping Limit"
-                className="w-full p-4 border outline-none  border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+                className="w-full p-4 outline-none border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
                 required
               />
             </div>
@@ -149,7 +172,7 @@ const AddThreshold = () => {
                 value={formData.standard_rate}
                 onChange={handleChange}
                 placeholder="Standard Rate"
-                className="w-full p-4 border outline-none  border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+                className="w-full p-4 outline-none border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
                 required
               />
             </div>
@@ -160,7 +183,7 @@ const AddThreshold = () => {
             type="submit"
             className="w-full bg-[#0070ba] text-white py-4 rounded-xl font-semibold text-lg hover:scale-105 transition-transform shadow-lg"
           >
-            {editingRegion ? "Update Region" : "Add Region"}
+            Update Region
           </button>
         </form>
       </div>
@@ -168,4 +191,4 @@ const AddThreshold = () => {
   );
 };
 
-export default AddThreshold;
+export default EditThreshold;

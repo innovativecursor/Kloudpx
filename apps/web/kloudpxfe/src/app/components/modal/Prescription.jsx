@@ -7,8 +7,8 @@ import toast from "react-hot-toast";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
-// import "swiper/css/pagination";
 import "swiper/css/navigation";
+import { FiMaximize2, FiMinimize2 } from "react-icons/fi";
 
 const Prescription = () => {
   const {
@@ -28,7 +28,7 @@ const Prescription = () => {
   const { getAllPrescription, allPrescription } = usePrescriptionContext();
   const swiperRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
-
+  const [expandedImage, setExpandedImage] = useState(null);
   const medicineid = pendingCartData?.medicineid;
   const quantity = pendingCartData?.quantity;
 
@@ -83,7 +83,7 @@ const Prescription = () => {
                   ✕
                 </button>
               </div>
-              <p className="md:text-center text-start tracking-wider text-base mb-5 font-semibold dark-text">
+              <p className="md:text-center text-start tracking-wider sm:text-base text-sm mb-5 font-semibold dark-text">
                 Would You Like To Upload A Prescription?
               </p>
 
@@ -124,23 +124,70 @@ const Prescription = () => {
                       allPrescription.length > 0
                         ? allPrescription.map(({ ID, UploadedImage }) => (
                             <SwiperSlide key={ID} className="relative">
-                              <img
-                                src={UploadedImage || fallbackImage}
-                                alt="Prescription"
-                                className={`cursor-pointer w-full h-56 object-cover rounded-2xl shadow`}
-                                onClick={() => {
-                                  setSelectedPrescriptionId(ID);
-                                  handleSelectedPrescription(ID);
-                                }}
-                              />
-                              {selectedPrescriptionId === ID && (
-                                <div className="absolute top-2 right-2 bg-green-600 rounded-full w-8 h-8 flex items-center justify-center text-white text-xl font-bold pointer-events-none">
-                                  ✔
+                              <div className="relative">
+                                {/* Normal Image */}
+                                <img
+                                  src={UploadedImage || fallbackImage}
+                                  alt="Prescription"
+                                  className="cursor-pointer w-full h-56 border-2 border-gray-200 object-cover rounded-2xl shadow-md"
+                                  onClick={() => {
+                                    setSelectedPrescriptionId(ID);
+                                    handleSelectedPrescription(ID);
+                                  }}
+                                />
+
+                                {/* Expand Button (Bottom Center) */}
+                                <div className="absolute bottom-0 right-0 ">
+                                  <button
+                                    className="bg-[#0070ba] text-white px-3 py-2 cursor-pointer text-xs rounded-br-2xl"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setExpandedImage(
+                                        UploadedImage || fallbackImage
+                                      );
+                                    }}
+                                  >
+                                    <FiMaximize2 className="text-4xl" />
+                                  </button>
                                 </div>
-                              )}
+
+                                {/* Selected Checkmark */}
+                                {selectedPrescriptionId === ID && (
+                                  <div className="absolute top-2 right-2 bg-green-600 rounded-full w-8 h-8 flex items-center justify-center text-white text-xl font-bold pointer-events-none">
+                                    ✔
+                                  </div>
+                                )}
+                              </div>
                             </SwiperSlide>
                           ))
                         : null}
+
+                      {/* Expand Modal */}
+                      {expandedImage && (
+                        <div
+                          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+                          onClick={() => setExpandedImage(null)}
+                        >
+                          <div
+                            className="relative rounded-lg shadow-lg w-fit px-12 py-8 h-[90%] bg-white overflow-hidden"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {/* Close Button Top-Right */}
+                            <button
+                              className="absolute top-0 right-0 bg-[#0070ba] text-white p-2  hover:bg-red-600 transition"
+                              onClick={() => setExpandedImage(null)}
+                            >
+                              <FiMinimize2 className="text-xl" />
+                            </button>
+
+                            <img
+                              src={expandedImage}
+                              alt="Expanded"
+                              className="w-full h-full object-contain rounded"
+                            />
+                          </div>
+                        </div>
+                      )}
                     </Swiper>
                   </div>
 
@@ -150,7 +197,7 @@ const Prescription = () => {
                       ? allPrescription.map(({ ID, UploadedImage }) => (
                           <div
                             key={ID}
-                            className="relative  flex-shrink-0 cursor-pointer"
+                            className="relative flex-shrink-0 cursor-pointer"
                           >
                             <img
                               src={UploadedImage || fallbackImage}
@@ -161,6 +208,21 @@ const Prescription = () => {
                                 handleSelectedPrescription(ID);
                               }}
                             />
+
+                            <div className="absolute bottom-0 right-0">
+                              <button
+                                className="bg-[#0070ba] text-white px-3 py-2 cursor-pointer text-xs rounded-br-lg"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpandedImage(
+                                    UploadedImage || fallbackImage
+                                  );
+                                }}
+                              >
+                                <FiMaximize2 className="text-xl" />
+                              </button>
+                            </div>
+
                             {selectedPrescriptionId === ID && (
                               <div className="absolute top-2 right-2 bg-green-600 rounded-full w-8 h-8 flex items-center justify-center text-white text-xl font-bold pointer-events-none">
                                 ✔
@@ -169,6 +231,31 @@ const Prescription = () => {
                           </div>
                         ))
                       : null}
+
+                    {expandedImage && (
+                      <div
+                        className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+                        onClick={() => setExpandedImage(null)}
+                      >
+                        <div
+                          className="relative rounded-lg shadow-lg w-fit px-5 py-3 h-[90%] bg-white overflow-hidden"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            className="absolute top-0 right-0 bg-[#0070ba] text-white p-2 hover:bg-red-600 transition"
+                            onClick={() => setExpandedImage(null)}
+                          >
+                            <FiMinimize2 className="text-xl" />
+                          </button>
+
+                          <img
+                            src={expandedImage}
+                            alt="Expanded"
+                            className="w-full h-full object-contain rounded"
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -263,14 +350,6 @@ const Prescription = () => {
                 type="file"
                 accept="image/*"
                 className="hidden"
-                // onChange={(e) => {
-                //   const file = e.target.files[0];
-
-                //   if (file && pendingCartData) {
-                //     const { medicineid, quantity } = pendingCartData;
-                //     uploadPrescription(file, medicineid, quantity);
-                //   }
-                // }}
                 onChange={(e) => {
                   const file = e.target.files[0];
 
@@ -280,6 +359,16 @@ const Prescription = () => {
                 }}
               />
             </label>
+            <div className="flex items-start sm:items-center gap-1 sm:mt-3 sm:mx-0 mb-4 mx-3">
+              <span className="font-semibold text-[#0070ba] text-sm">
+                Note:{" "}
+              </span>
+              <span className="text-[10px]">
+                {" "}
+                Always upload a clean version of your Prescription for better
+                result.{" "}
+              </span>
+            </div>
           </div>
 
           {/* Right side - Guide / Preview */}

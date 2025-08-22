@@ -81,7 +81,7 @@ function Navigation(props) {
                 <Route path="/carousel" element={<Carousel />} />
                 <Route path="/gallery" element={<Gallery />} />
                 <Route path="/allorders" element={<AllOrders />} />
-                <Route path="/addthreshold" element={<AddThreshold />} />
+                <Route path="/updatethreshold" element={<AddThreshold />} />
                 <Route path="/allthreshold" element={<AllThreshold />} />
                 <Route path="/ordersdetails/:id" element={<OrderDetails />} />
                 <Route path="/edit-medicine" element={<AddMedicine />} />

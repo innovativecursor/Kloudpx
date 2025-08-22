@@ -26,7 +26,8 @@ export const PaymentProvider = ({ children }) => {
   } = useCheckout();
   const [OrderSubmit, setOrderSubmit] = useState([]);
   const [paymentSlip, setPaymentSlip] = useState([]);
-  const { getAllCartData } = useCartContext();
+  const { getAllCartData, setSelectedClinicId,
+    setSelectedDoctorId, } = useCartContext();
   const router = useRouter();
 
   const handleFileChange = (e) => {
@@ -78,6 +79,8 @@ export const PaymentProvider = ({ children }) => {
       toast.success("Payment submitted successfully!");
       router.push("/Success");
       getAllCartData();
+      setSelectedClinicId(null);
+      setSelectedDoctorId(null);
       setCheckoutData(null);
       setDeliveryData(null);
     } catch (error) {

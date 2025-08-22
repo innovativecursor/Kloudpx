@@ -5,8 +5,8 @@ export const Menu = {
     { text: "Delete Product", link: "/allmedicine" },
   ],
   Threshold: [
-    { text: "Add Threshold", link: "/addthreshold" },
-    { text: "Update Threshold", link: "/allthreshold" },
+    { text: "Update Threshold", link: "/updatethreshold" },
+    { text: "All Threshold", link: "/allthreshold" },
   ],
   Carousel: [{ text: "Add Carousel", link: "/carousel" }],
   Gallery: [{ text: "Add Images", link: "/gallery" }],

@@ -7,10 +7,11 @@ import aboutbanner from "@/assets/aboutbanner.png";
 import banner1 from "@/assets/aboutb1.png";
 import aboutcore from "@/assets/aboutcore.png";
 import team from "@/assets/team.png";
-
+import Val from "@/assets/Val.png";
+import Mikeey from "@/assets/Mikeey.png";
+import Jayson from "@/assets/Jayson.png";
 import pharmacy from "@/assets/pharmacy-store.png";
 import pharmacy1 from "@/assets/Rectangle 4756.png";
-import WhyChooseUs from "../components/WhyChooseUs/WhyChooseUs";
 
 const Page = () => {
   return (
@@ -19,14 +20,14 @@ const Page = () => {
       <Image
         src={aboutbanner}
         alt="about banner"
-        className="w-full h-auto object-cover"
+        className="w-full h-full object-cover"
         priority
       />
 
       {/* About Section */}
       <div className="responsive-mx grid grid-cols-1 md:grid-cols-2 gap-10 items-center  sm:px-6 md:px-8">
         <div className="mt-8 md:mt-12">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 mb-4">
+          <h2 className="text-base sm:text-xl md:text-2xl font-semibold text-gray-800 mb-4">
             Committed to Your Health & Well-Being
           </h2>
           <p className="text-gray-600 leading-relaxed mt-3 text-xs sm:text-sm text-start">
@@ -55,7 +56,7 @@ const Page = () => {
       </div>
 
       {/* Mission Section */}
-      <div className="responsive-mx sm:px-10 md:px-20 py-10 mt-10 md:mt-20">
+      <div className="responsive-mx sm:px-10 md:px-20 py-10 mt-6 md:mt-20">
         <div className="bg-white rounded-2xl overflow-hidden">
           <div className="relative">
             <Image
@@ -72,7 +73,7 @@ const Page = () => {
               {[...Array(4)].map((_, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <FaCheckCircle className="text-blue-600 mt-1 flex-shrink-0" />
-                  <span className="text-xs sm:text-sm">
+                  <span className="text-[10px] sm:text-sm">
                     To be one of the top on-line retailers that provides
                     quality, effective, and safe medicines, food, cosmetics and
                     consumer goods, providing availability for both branded and
@@ -85,7 +86,7 @@ const Page = () => {
         </div>
       </div>
 
-      <div className="my-6 sm:my-10">
+      <div className=" sm:my-10">
         <Image
           src={banner1}
           alt="about banner"
@@ -95,9 +96,9 @@ const Page = () => {
       </div>
 
       {/* Core Values */}
-      <div className="py-10 md:py-12">
+      <div className="py-8 md:py-12">
         <div className="responsive-mx  text-center">
-          <h3 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-8 sm:mb-11">
+          <h3 className="text-xl sm:text-3xl font-bold text-gray-800 mb-5 sm:mb-11">
             Our Core Values
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -127,24 +128,22 @@ const Page = () => {
       </div>
 
       {/* Team Section */}
-      <div className="bg-[#006EBB] py-10 sm:py-12 mt-10 sm:mt-16">
+      <div className="bg-[#006EBB] py-12 sm:py-16 mt-8 sm:mt-16">
         <h3 className="text-2xl sm:text-3xl font-semibold text-center text-white mb-8 sm:mb-11">
           Meet Our Team
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 responsive-mx px-4">
-          {[...Array(3)].map((_, i) => (
+          {[Val, Mikeey, Jayson].map((member, i) => (
             <div key={i} className="flex justify-center">
               <Image
-                src={team}
-                alt="team member"
+                src={member}
+                alt={`team member ${i + 1}`}
                 className="w-full max-w-[280px] sm:max-w-[320px] object-contain"
               />
             </div>
           ))}
         </div>
       </div>
-
-      <WhyChooseUs />
     </div>
   );
 };

@@ -40,24 +40,6 @@ export default function SearchBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // const fetchSuggestions = debounce(async (query) => {
-  //   if (!query.trim()) {
-  //     setResults([]);
-  //     setShowDropdown(false);
-  //     return;
-  //   }
-
-  //   try {
-  //     const res = await getAxiosCall(endpoints.search.get(query), {}, false);
-  //     // console.log(res);
-  //     setResults(res?.data?.medicines || []);
-  //     setShowDropdown(true);
-  //   } catch (error) {
-  //     console.error("Search error:", error);
-  //     setResults([]);
-  //   }
-  // }, 300);
-
   const fetchSuggestions = debounce(async (query) => {
     if (!query.trim()) {
       setResults([]);
@@ -68,7 +50,6 @@ export default function SearchBar() {
 
     try {
       setLoading(true);
-      // const res = await getAxiosCall(endpoints.search.get(query), {}, false);
       const res = await getAxiosCall(
         endpoints.search.get(query),
         {},
@@ -88,11 +69,6 @@ export default function SearchBar() {
   useEffect(() => {
     fetchSuggestions(searchTerm);
   }, [searchTerm]);
-
-  // const handleSelect = (item) => {
-  //   setSearchTerm(item.brandname || item.category || "");
-  //   setShowDropdown(false);
-  // };
 
   const handleClicked = (id, genericname) => {
     const slug = generateSlug(genericname);

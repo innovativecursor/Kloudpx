@@ -4,8 +4,6 @@ import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import PrimaryButton from "../button/PrimaryButton";
-// import banner1 from "@/assets/banner1.png";
-// import banner2 from "@/assets/banner2.png";
 import container from "@/assets/Container.png";
 import container1 from "@/assets/Container (1).png";
 import container2 from "@/assets/Container (2).png";
@@ -44,8 +42,8 @@ const Banners = () => {
     : [];
 
   return (
-    <div className="responsive-mx lg:mt-14 md:mt-12 mt-9">
-      <h1 className="font-semibold sm:text-2xl text-lg tracking-wide lg:mb-7 md:mb-5 mb-3">
+    <div className="responsive-mx lg:mt-20 md:mt-14 mt-9">
+      <h1 className="font-semibold sm:text-2xl text-lg tracking-wide lg:mb-9 md:mb-6 mb-4">
         Featured Products
       </h1>
 
@@ -54,8 +52,8 @@ const Banners = () => {
         breakpoints={{
           1024: { slidesPerView: 2, spaceBetween: 20 },
           768: { slidesPerView: 2, spaceBetween: 18 },
-          640: { slidesPerView: 1.2, spaceBetween: 15 },
-          0: { slidesPerView: 1.2, spaceBetween: 12 },
+          640: { slidesPerView: 2, spaceBetween: 15 },
+          0: { slidesPerView: 2, spaceBetween: 12 },
         }}
       >
         {allImages.map((image, index) => (
