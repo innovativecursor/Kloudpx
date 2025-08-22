@@ -6,6 +6,7 @@ import { getAxiosCall } from "@/app/lib/axios";
 import endpoints from "@/app/config/endpoints";
 import { generateSlug } from "@/app/utils/slugify";
 import { useRouter } from "next/navigation";
+import usePageLoader from "@/app/hooks/usePageLoader";
 
 // ✅ Debounce function
 function debounce(func, delay) {
@@ -24,7 +25,7 @@ export default function SearchBar() {
   const [results, setResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const { startLoader } = usePageLoader();
   const searchbar = "/assets/searchbar.jpg";
   const fallbackImage = "/assets/fallback.png";
   const wrapperRef = useRef(null);
@@ -72,6 +73,7 @@ export default function SearchBar() {
 
   const handleClicked = (id, genericname) => {
     const slug = generateSlug(genericname);
+    startLoader(`/Products/${slug}/${id}`);
     router.push(`/Products/${slug}/${id}`);
     setShowDropdown(false);
   };

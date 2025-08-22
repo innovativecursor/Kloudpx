@@ -2,8 +2,6 @@
 import React, { useEffect, useState } from "react";
 import ProductsCard from "@/app/components/cards/ProductsCard";
 import FeaturedBrand from "../featuredbrand/FeaturedBrand";
-// import sale1 from "@/assets/1.svg";
-// import sale2 from "@/assets/2.svg";
 import Pagination from "../Pagination/Pagination";
 import { useProductContext } from "@/app/contexts/ProductContext";
 import { FiAlertCircle } from "react-icons/fi";

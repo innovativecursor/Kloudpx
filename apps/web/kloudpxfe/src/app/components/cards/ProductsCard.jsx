@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
-import { generateSlug } from "@/app/utils/slugify";
 import AddToCart from "../button/AddToCart";
 import { usePrescriptionContext } from "@/app/contexts/PrescriptionContext";
 import Prescription from "../modal/Prescription";

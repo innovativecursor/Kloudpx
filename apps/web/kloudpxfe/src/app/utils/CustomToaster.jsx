@@ -93,7 +93,7 @@ export default function CustomToaster() {
       `}</style>
 
       <Toaster
-        position="top-right"
+        position="top-center"
         toastOptions={{
           duration: 3500,
           style: {

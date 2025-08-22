@@ -3,12 +3,15 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { usePayment } from "../contexts/PaymentContext";
+import usePageLoader from "../hooks/usePageLoader";
 
 const SuccessPage = () => {
   const router = useRouter();
   const { OrderSubmit } = usePayment();
+  const { startLoader } = usePageLoader();
 
   const handleBackToShopping = () => {
+    startLoader();
     router.push("/");
   };
 

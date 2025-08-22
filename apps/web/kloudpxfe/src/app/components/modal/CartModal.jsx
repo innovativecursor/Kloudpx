@@ -98,8 +98,9 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
           <button
             className="text-[#0070ba] cursor-pointer font-medium flex items-center gap-1"
             onClick={() => {
-              onClose();
+              startLoader();
               router.push("/Products");
+              onClose();
             }}
           >
             <i className="ri-add-line text-xl"></i> Add more
@@ -179,7 +180,6 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
                         </h4>
                       </div>
                       <button
-                        // onClick={() => handleDelete(item.cart_id)}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDelete(item.cart_id);
