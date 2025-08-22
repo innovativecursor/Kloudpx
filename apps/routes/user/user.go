@@ -204,6 +204,19 @@ func User(db *gorm.DB) {
 	apiV1.GET("/user/prescription history", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
 		useraccount.GetUserPrescriptionHistory(c, db)
 	})
+
+	apiV1.GET("/user/orders", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		useraccount.GetUserOrders(c, db)
+	})
+
+	apiV1.PUT("/user/profile/update/:id", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		useraccount.UpdateUserProfile(c, db)
+	})
+
+	apiV1.GET("/user/order/details/:order_number", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		useraccount.GetUserOrderDetails(c, db)
+	})
+
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
 	router.Run(":" + port)

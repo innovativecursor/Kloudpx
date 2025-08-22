@@ -107,6 +107,9 @@ type User struct {
 	LastName        string
 	Email           *string `gorm:"unique"`
 	Phone           *string `gorm:"unique"`
+	DOB             string
+	Age             int
+	Gender          string
 	EmailVerified   bool
 	PhoneVerified   bool
 	ApplicationRole string
