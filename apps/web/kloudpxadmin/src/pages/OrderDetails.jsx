@@ -106,27 +106,14 @@ const OrderDetails = () => {
                   {item?.pharmacist_status
                     ? item.pharmacist_status.charAt(0).toUpperCase() +
                       item.pharmacist_status.slice(1).toLowerCase()
-                    : ""}
+                    : null}
                 </span>
-
-                <div>
-                  <label className="font-semibold block mb-1">
-                    Amount Paid
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="Enter Amount"
-                    value={amountPay}
-                    onChange={(e) => setAmountPay(e.target.value)}
-                    className="border rounded-lg px-3 py-2 w-full md:w-40 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                  />
-                </div>
               </div>
             ))}
           </div>
 
           {/* Status + Amount + Transaction + Save */}
-          <div className="flex flex-col md:flex-row md:items-center md:space-x-4 gap-4">
+          <div className="flex flex-col md:flex-row md:items-end gap-4">
             <div>
               <label className="font-semibold block mb-1">Status</label>
               <select
@@ -135,38 +122,27 @@ const OrderDetails = () => {
                 onChange={(e) => setStatus(e.target.value)}
               >
                 <option value="processing">Processing</option>
-                <option value="transit">Transit</option>
                 <option value="shipped">Shipped</option>
                 <option value="success">Success</option>
                 <option value="cancelled">Cancelled</option>
               </select>
             </div>
 
-            {/* <div>
-              <label className="font-semibold block mb-1">Amount Paid</label>
-              <input
-                type="number"
-                placeholder="Enter Amount"
-                value={amountPay}
-                onChange={(e) => setAmountPay(e.target.value)}
-                className="border rounded-lg px-3 py-2 w-full md:w-40 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-              />
-            </div> */}
 
             <div>
               <label className="font-semibold block mb-1">Delivery ID</label>
               <input
                 type="text"
-                placeholder="Transaction Id"
+                placeholder="Delivery ID"
                 value={transactionId}
                 onChange={(e) => setTransactionId(e.target.value)}
                 className="border rounded-lg px-3 py-2 w-full md:w-60 bg-blue-50 focus:ring-1 focus:ring-blue-500 focus:outline-none"
               />
             </div>
 
-            <div className="self-end md:self-center">
+            <div className="">
               <button
-                className={`px-6 py-2 rounded-lg transition ${
+                className={`px-10 py-2 rounded-lg transition ${
                   isChanged
                     ? "bg-blue-600 text-white hover:bg-blue-700"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -240,6 +216,16 @@ const OrderDetails = () => {
             <h3 className="font-semibold mb-3 border-b pb-2">
               Billing Details
             </h3>
+            <div className="flex justify-between py-2">
+              <label className="font-semibold block mb-1">Amount Paid</label>
+              <input
+                type="number"
+                placeholder="Enter Amount"
+                value={amountPay}
+                onChange={(e) => setAmountPay(e.target.value)}
+                className="border rounded-lg px-3 py-2 w-full md:w-40 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+              />
+            </div>
             <div className="bg-blue-50 p-4 rounded-lg space-y-2 text-sm">
               <p className="flex justify-between">
                 <span>Payable Amount</span>{" "}

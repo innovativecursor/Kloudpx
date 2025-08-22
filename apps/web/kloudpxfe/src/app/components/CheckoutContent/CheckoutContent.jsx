@@ -14,9 +14,9 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
   const {
     getAllCartData,
     getAllClinics,
+    getAllDoctors,
     allClinics,
     allDoctors,
-    getAllDoctors,
   } = useCartContext();
   const { toggleSaveForLater, savedForLaterIds, doCheckout } = useCheckout();
   const fallbackImage = "/assets/fallback.png";
@@ -30,7 +30,7 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
     }
   }, [token]);
 
-  console.log(cartItems, "cart data ");
+  // console.log(allDoctors, "cart data ");
 
   const handleSaveForLater = async (cartId) => {
     await toggleSaveForLater(cartId);
@@ -57,8 +57,15 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
   };
 
   useEffect(() => {
-    getAllClinics();
-    getAllDoctors();
+    if (!allClinics?.length) {
+      getAllClinics();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!allDoctors?.length) {
+      getAllDoctors();
+    }
   }, []);
 
   return (

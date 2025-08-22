@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import video from "@/assets/video.png";
+import ordervideo from "@/assets/ordervideo.webp";
 
 const Video = () => {
   return (
@@ -13,9 +13,9 @@ const Video = () => {
         Learn how easy it to get your medicines delivered safely and quickly.
       </p>
       <Image
-        src={video}
+        src={ordervideo}
         alt="video"
-        className="lg:w-[60%] md:w-[70%] w-[80%] h-full lg:mt-7 mt-3"
+        className="lg:w-[60%] md:w-[70%] w-[80%] h-auto lg:mt-7 mt-3 rounded-xl"
         priority
       />
       <p className="font-light mt-2 sm:text-[12px] dark-text text-[7px] md:text-base">

@@ -15,16 +15,24 @@ import { PiShoppingCartSimple } from "react-icons/pi";
 import UserDropdown from "./UserDropdown";
 // import Signup from "../Auth/Signup";
 // import Login from "../Auth/Login";
+// import { useLoginAuth } from "@/app/contexts/LoginAuth";
 
 const Header = () => {
   const router = useRouter();
-  const { login, loading, user, isAuthLoaded } = useAuth();
+  const {
+    login,
+    loading,
+    user,
+    isAuthLoaded,
+    showSignup,
+    openSignup,
+    closeSignup,
+    isLoginOpen,
+    openLogin,
+    closeLogin,
+  } = useAuth();
   const { cartLength } = useCartContext();
   const { isOpen, setIsOpen, modalRef } = useModal();
-  // const [showSignup, setShowSignup] = useState(false);
-  // const [isLoginOpen, setIsLoginOpen] = useState(false);
-
-  // console.log(user?.first_name);
 
   return (
     <>
@@ -45,11 +53,11 @@ const Header = () => {
 
             {/* <button
               className="font-semibold sm:text-xs text-xs cursor-pointer"
-              onClick={() => setShowSignup(true)}
+              onClick={openSignup}
             >
               Signup
             </button>
-            <button onClick={() => setIsLoginOpen(true)}>Open Login</button> */}
+            <button onClick={openLogin}>Open Login</button> */}
 
             {/* Right: User & Cart */}
             <div className="flex items-center justify-center gap-6 ">
@@ -122,8 +130,9 @@ const Header = () => {
         </div>
       </div>
 
-      {/* <Signup isOpen={showSignup} onClose={() => setShowSignup(false)} />
-      <Login isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} /> */}
+      {/* 
+      <Signup isOpen={showSignup} onClose={closeSignup} />
+      <Login isOpen={isLoginOpen} onClose={closeLogin} /> */}
     </>
   );
 };

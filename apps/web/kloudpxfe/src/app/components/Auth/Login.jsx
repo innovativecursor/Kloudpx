@@ -1,116 +1,113 @@
 "use client";
-import React, { useState } from "react";
+
+import React from "react";
 import { FcGoogle } from "react-icons/fc";
 import { BsFacebook } from "react-icons/bs";
+import { useLoginAuth } from "@/app/contexts/LoginAuth";
+import { useAuth } from "@/app/contexts/AuthContext";
 
-const Login = ({ isOpen, onClose }) => {
-  const [activeTab, setActiveTab] = useState("phone");
+const Login = () => {
+  const {
+    isLoginOpen,
+    closeLogin,
+    formData,
+    handleChange,
+    loading,
+    loginOtpSent,
+    handleLoginSendOtp,
+    handleLoginVerifyOtp,
+    countryCodes,
+  } = useAuth();
 
-  if (!isOpen) return null;
+  if (!isLoginOpen) return null;
 
   return (
     <div
       className="fixed inset-0 bg-black/30 flex items-center justify-center z-[999]"
-      onClick={onClose}
+      onClick={closeLogin}
     >
       <div
         className="bg-white rounded-2xl w-full sm:max-w-md sm:mx-0 mx-3 sm:py-8 py-6 sm:px-14 px-6 relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button */}
-        {/* <button
-          onClick={onClose}
-          className="absolute right-3 top-3 text-gray-400 hover:text-black text-xl"
-        >
-          &times;
-        </button> */}
-
         <h2 className="sm:text-2xl text-xl font-bold text-center sm:mb-4 mb-2">
           Log In
         </h2>
 
-        {/* Tabs */}
-        <div className="flex border-b sm:text-sm text-xs border-gray-100 mb-5">
-          <button
-            onClick={() => setActiveTab("phone")}
-            className={`w-1/2 cursor-pointer text-center py-2 font-medium ${
-              activeTab === "phone"
-                ? "text-[#0070ba] border-b border-[#0070ba]"
-                : "text-gray-500"
-            }`}
-          >
-            Phone
-          </button>
-          <button
-            onClick={() => setActiveTab("email")}
-            className={`w-1/2 cursor-pointer text-center py-2 font-medium ${
-              activeTab === "email"
-                ? "text-[#0070ba] border-b border-[#0070ba]"
-                : "text-gray-500"
-            }`}
-          >
-            Email
-          </button>
-        </div>
-
-        {/* Form */}
-        <form className="space-y-4 sm:pt-5 pt-3">
+        {/* ✅ Prevent form reload */}
+        <form
+          className="space-y-4"
+          onSubmit={(e) => e.preventDefault()}
+          // onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
+        >
+          {/* Phone input */}
           <div className="border border-gray-300 rounded-md">
-            {activeTab === "phone" ? (
-              <>
-                <div className="py-2 px-4 border-b border-gray-200 focus-within:border focus-within:border-[#0070ba] focus-within:rounded-md">
-                  <label className="text-[10px] text-gray-500">Phone</label>
-                  <input
-                    type="tel"
-                    placeholder="+63 | 6666666666"
-                    className="w-full placeholder:text-xs text-base outline-none"
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="py-2 px-4 border-b border-gray-200 focus-within:border focus-within:border-[#0070ba] focus-within:rounded-md">
-                  <label className="text-[10px] text-gray-500">Email</label>
-                  <input
-                    type="email"
-                    placeholder="john@example.com"
-                    className="w-full placeholder:text-xs text-base outline-none"
-                  />
-                </div>
-              </>
-            )}
-
-            <div className="py-2 px-4 border-b border-gray-200 focus-within:border focus-within:border-[#0070ba] focus-within:rounded-md">
-              <label className="text-[10px] text-gray-500">PASSWORD</label>
+            <div className="py-2 px-4 flex gap-2">
+              <select
+                name="countryCode"
+                value={formData.countryCode}
+                onChange={handleChange}
+                className="w-20 text-xs rounded-l-md outline-none"
+              >
+                {countryCodes.map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
               <input
-                type="password"
-                placeholder="********"
-                className="w-full placeholder:text-xs text-base outline-none"
+                type="tel"
+                name="phone"
+                placeholder="Phone Number"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full rounded-r-md outline-none placeholder:text-xs"
               />
             </div>
           </div>
 
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2 ">
-              <input type="checkbox" className="" />
-              <div className="text-[9px] underline opacity-60">Remember Me</div>
+          {/* OTP input */}
+          {loginOtpSent && (
+            <div className="border border-gray-300 rounded-md">
+              <div className="py-2 px-4">
+                <label className="text-[10px] text-gray-500">OTP</label>
+                <input
+                  type="text"
+                  name="otp"
+                  placeholder="Enter OTP"
+                  value={formData.otp}
+                  onChange={handleChange}
+                  className="w-full text-base outline-none placeholder:text-xs"
+                />
+              </div>
             </div>
+          )}
 
-            <div className=" text-[10px] underline opacity-60 cursor-pointer">
-              Forgot Password?
-            </div>
-          </div>
-
+          {/* Button */}
           <button
-            type="submit"
-            className="w-full bg-[#0070ba] cursor-pointer text-white sm:py-4 py-2 sm:text-sm text-[10px] rounded-full font-semibold"
+            type="button" // ✅ important
+            onSubmit={(e) => e.preventDefault()}
+            onClick={(e) =>
+              loginOtpSent ? handleLoginVerifyOtp(e) : handleLoginSendOtp(e)
+            }
+            disabled={loading}
+            className="w-full bg-[#0070ba] text-white sm:py-4 py-2 sm:text-sm text-[10px] rounded-full font-semibold"
           >
-            LOGIN
+            {loading
+              ? loginOtpSent
+                ? "Verifying..."
+                : "Sending..."
+              : loginOtpSent
+              ? "Verify OTP"
+              : "Send OTP"}
           </button>
 
           <div className="text-center sm:text-xs text-[10px]">
             Don’t have an account?{" "}
-            <span className="text-[#0070ba] underline cursor-pointer">
+            <span
+              className="text-[#0070ba] underline cursor-pointer"
+              onClick={closeLogin}
+            >
               SIGN UP
             </span>
           </div>
@@ -122,10 +119,16 @@ const Login = ({ isOpen, onClose }) => {
           </div>
 
           <div className="flex justify-center gap-4">
-            <button className="p-2 border border-gray-200 cursor-pointer rounded-md">
+            <button
+              type="button"
+              className="p-2 border border-gray-200 rounded-md"
+            >
               <FcGoogle className="sm:text-2xl text-xl" />
             </button>
-            <button className="p-2 border border-gray-200 cursor-pointer rounded-md">
+            <button
+              type="button"
+              className="p-2 border border-gray-200 rounded-md"
+            >
               <BsFacebook className="text-blue-600 sm:text-2xl text-xl" />
             </button>
           </div>

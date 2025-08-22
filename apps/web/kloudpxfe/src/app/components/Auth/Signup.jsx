@@ -1,10 +1,21 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
+import { useLoginAuth } from "@/app/contexts/LoginAuth";
 import { FcGoogle } from "react-icons/fc";
 import { BsFacebook } from "react-icons/bs";
+import { useAuth } from "@/app/contexts/AuthContext";
+// import { useAuth } from "@/app/contexts/AuthContext";
 
 const Signup = ({ isOpen, onClose }) => {
-  const [activeTab, setActiveTab] = useState("phone");
+  const {
+    step,
+    loading,
+    formData,
+    countryCodes,
+    handleChange,
+    handleSendOtp,
+    handleVerifyOtp,
+  } = useAuth();
 
   if (!isOpen) return null;
 
@@ -17,97 +28,127 @@ const Signup = ({ isOpen, onClose }) => {
         className="bg-white rounded-2xl w-full sm:max-w-lg sm:mx-0 mx-3 sm:py-8 py-6 sm:px-20 px-6 relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button */}
-        {/* <button
-          onClick={onClose}
-          className="absolute right-3 top-3 text-gray-400 hover:text-black text-xl"
-        >
-          &times;
-        </button> */}
-
-        <h2 className="sm:text-2xl text-xl font-bold text-center sm:mb-6 mb-3">
-          Sign up
+        <h2 className="sm:text-2xl text-xl font-bold text-center mb-4">
+          {step === "signup" ? "Create Account" : "Verify OTP"}
         </h2>
 
-        {/* Tabs */}
-        <div className="flex border-b sm:text-sm text-xs border-gray-100 mb-5">
-          <button
-            onClick={() => setActiveTab("phone")}
-            className={`w-1/2 cursor-pointer  text-center py-2 font-medium ${
-              activeTab === "phone"
-                ? "text-[#0070ba] border-b border-[#0070ba]"
-                : "text-gray-500"
-            }`}
-          >
-            Phone
-          </button>
-          <button
-            onClick={() => setActiveTab("email")}
-            className={`w-1/2 cursor-pointer text-center py-2 font-medium ${
-              activeTab === "email"
-                ? "text-[#0070ba] border-b border-[#0070ba]"
-                : "text-gray-500"
-            }`}
-          >
-            Email
-          </button>
-        </div>
-
-        {/* Form */}
-        <form className="space-y-4 sm:pt-5 pt-3">
-          <div className="border  border-gray-300  rounded-md">
-            <div className="py-2 px-4 border-b border-gray-200 focus-within:border focus-within:border-[#0070ba] focus-within:rounded-md">
-              <label className="text-[10px] text-gray-500">FIRST NAME</label>
-              <input
-                type="text"
-                placeholder="Your name"
-                className="w-full placeholder:text-xs text-base outline-none"
-              />
-            </div>
-
-            {activeTab === "phone" ? (
-              <div className="py-2 px-4 border-b border-gray-200 focus-within:border focus-within:border-[#0070ba] focus-within:rounded-md">
-                <label className="text-[10px] text-gray-500">Phone</label>
-                <input
-                  type="tel"
-                  placeholder="+63 | 6666666666"
-                  className="w-full placeholder:text-xs text-base outline-none"
-                />
+        <form className="space-y-4">
+          {step === "signup" ? (
+            <>
+              <div className="border border-gray-300 rounded-md">
+                <div className="py-2 px-4 border-b border-gray-200 focus-within:border focus-within:border-[#0070ba] focus-within:rounded-md">
+                  <label className="text-[10px] text-gray-500">
+                    FIRST NAME
+                  </label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    placeholder="Your first name"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="w-full placeholder:text-xs text-base outline-none"
+                  />
+                </div>
+                <div className="py-2 px-4 border-b border-gray-200 focus-within:border focus-within:border-[#0070ba] focus-within:rounded-md">
+                  <label className="text-[10px] text-gray-500">LAST NAME</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder="Your last name"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="w-full placeholder:text-xs text-base outline-none"
+                  />
+                </div>
+                <div className="py-2 px-4 border-b border-gray-200 focus-within:border focus-within:border-[#0070ba] focus-within:rounded-md">
+                  <label className="text-[10px] text-gray-500">PHONE</label>
+                  <div className="flex">
+                    <select
+                      name="countryCode"
+                      value={formData.countryCode}
+                      onChange={handleChange}
+                      className="w-20 text-xs rounded-l-md outline-none"
+                    >
+                      {countryCodes.map((c) => (
+                        <option key={c.value} value={c.value}>
+                          {c.label}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder="Phone Number"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="w-full  rounded-r-md outline-none placeholder:text-xs"
+                    />
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div className="py-2 px-4 border-b border-gray-200 focus-within:border focus-within:border-[#0070ba] focus-within:rounded-md">
-                <label className="text-[10px] text-gray-500">Email</label>
-                <input
-                  type="email"
-                  placeholder="john@example.com"
-                  className="w-full placeholder:text-xs text-base outline-none"
-                />
+
+              <div className="flex items-center gap-2 mt-1">
+                <input type="checkbox" />
+                <div className="text-[9px] underline opacity-60">
+                  I agree to the Terms of Service and Privacy Policy
+                </div>
               </div>
-            )}
 
-            <div className="py-2 px-4 border-b border-gray-200 focus-within:border focus-within:border-[#0070ba] focus-within:rounded-md">
-              <label className="text-[10px] text-gray-500">PASSWORD</label>
-              <input
-                type="password"
-                placeholder="********"
-                className="w-full placeholder:text-xs text-base outline-none"
-              />
-            </div>
-          </div>
+              <button
+                type="button"
+                onClick={handleSendOtp}
+                disabled={loading}
+                className="w-full bg-[#0070ba] cursor-pointer text-white sm:py-4 py-2 sm:text-sm text-[10px] rounded-full font-semibold"
+              >
+                {loading ? "Sending..." : "CREATE AN ACCOUNT"}
+              </button>
+            </>
+          ) : (
+            <>
+              {/* Verify OTP Section */}
+              <div className="border border-gray-300 rounded-md overflow-hidden">
+                {/* Phone Display */}
+                <div className="flex border-b border-gray-200">
+                  <input
+                    type="text"
+                    value={formData.countryCode}
+                    readOnly
+                    className="w-20 text-xs text-gray-700 bg-gray-100 px-3 py-2 rounded-l-md outline-none"
+                  />
+                  <input
+                    type="text"
+                    value={formData.phone}
+                    readOnly
+                    className="flex-1 text-xs text-gray-700 bg-gray-100 px-3 py-2 rounded-r-md outline-none placeholder:text-xs"
+                  />
+                </div>
 
-          <div className="flex items-center gap-2 ">
-            <input type="checkbox" className="" />
-            <div className="text-[9px] underline opacity-60">
-              I agree to the Terms of Service and Privacy Policy
-            </div>
-          </div>
+                {/* OTP Input */}
+                <div className="px-3 py-3">
+                  <label className="block text-[10px] text-gray-500 mb-1">
+                    OTP
+                  </label>
+                  <input
+                    type="text"
+                    name="otp"
+                    placeholder="Enter OTP"
+                    value={formData.otp}
+                    onChange={handleChange}
+                    className="w-full text-sm placeholder:text-xs text-gray-800 px-3 py-2 border border-gray-200 rounded-md outline-none focus:border-[#0070ba] focus:ring-1 focus:ring-[#0070ba]"
+                  />
+                </div>
+              </div>
 
-          <button
-            type="submit"
-            className="w-full bg-[#0070ba] cursor-pointer text-white sm:py-4 py-2 sm:text-sm text-[10px] rounded-full font-semibold"
-          >
-            CREATE AN ACCOUNT
-          </button>
+              <button
+                type="button"
+                onClick={handleVerifyOtp}
+                disabled={loading}
+                className="w-full bg-green-600 cursor-pointer text-white sm:py-4 py-2 sm:text-sm text-[10px] rounded-full font-semibold mt-3"
+              >
+                {loading ? "Verifying..." : "VERIFY OTP"}
+              </button>
+            </>
+          )}
 
           <div className="text-center sm:text-xs text-[10px]">
             Already have an account?{" "}
