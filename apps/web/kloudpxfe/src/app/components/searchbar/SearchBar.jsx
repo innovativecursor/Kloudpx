@@ -6,6 +6,7 @@ import { getAxiosCall } from "@/app/lib/axios";
 import endpoints from "@/app/config/endpoints";
 import { generateSlug } from "@/app/utils/slugify";
 import { useRouter } from "next/navigation";
+import usePageLoader from "@/app/hooks/usePageLoader";
 
 // ✅ Debounce function
 function debounce(func, delay) {
@@ -24,7 +25,7 @@ export default function SearchBar() {
   const [results, setResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const { startLoader } = usePageLoader();
   const searchbar = "/assets/searchbar.jpg";
   const fallbackImage = "/assets/fallback.png";
   const wrapperRef = useRef(null);
@@ -40,24 +41,6 @@ export default function SearchBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // const fetchSuggestions = debounce(async (query) => {
-  //   if (!query.trim()) {
-  //     setResults([]);
-  //     setShowDropdown(false);
-  //     return;
-  //   }
-
-  //   try {
-  //     const res = await getAxiosCall(endpoints.search.get(query), {}, false);
-  //     // console.log(res);
-  //     setResults(res?.data?.medicines || []);
-  //     setShowDropdown(true);
-  //   } catch (error) {
-  //     console.error("Search error:", error);
-  //     setResults([]);
-  //   }
-  // }, 300);
-
   const fetchSuggestions = debounce(async (query) => {
     if (!query.trim()) {
       setResults([]);
@@ -68,7 +51,6 @@ export default function SearchBar() {
 
     try {
       setLoading(true);
-      // const res = await getAxiosCall(endpoints.search.get(query), {}, false);
       const res = await getAxiosCall(
         endpoints.search.get(query),
         {},
@@ -89,13 +71,9 @@ export default function SearchBar() {
     fetchSuggestions(searchTerm);
   }, [searchTerm]);
 
-  // const handleSelect = (item) => {
-  //   setSearchTerm(item.brandname || item.category || "");
-  //   setShowDropdown(false);
-  // };
-
   const handleClicked = (id, genericname) => {
     const slug = generateSlug(genericname);
+    startLoader(`/Products/${slug}/${id}`);
     router.push(`/Products/${slug}/${id}`);
     setShowDropdown(false);
   };

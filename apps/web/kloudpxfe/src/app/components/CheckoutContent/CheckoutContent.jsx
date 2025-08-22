@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import Clinics from "../Clinics/Clinics";
 import Doctors from "../Doctors/Doctors";
+import usePageLoader from "@/app/hooks/usePageLoader";
 
 const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
   const { token } = useAuth();
@@ -20,7 +21,7 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
   } = useCartContext();
   const { toggleSaveForLater, savedForLaterIds, doCheckout } = useCheckout();
   const fallbackImage = "/assets/fallback.png";
-
+  const { startLoader } = usePageLoader();
   const data = cartItems || [];
   const loading = false;
 
@@ -29,8 +30,6 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
       getAllCartData();
     }
   }, [token]);
-
-  // console.log(allDoctors, "cart data ");
 
   const handleSaveForLater = async (cartId) => {
     await toggleSaveForLater(cartId);
@@ -49,6 +48,7 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
     }
 
     try {
+      startLoader();
       await doCheckout();
       router.push("/Address");
     } catch (error) {

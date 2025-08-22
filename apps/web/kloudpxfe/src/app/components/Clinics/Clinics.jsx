@@ -32,7 +32,7 @@ const Clinics = () => {
   };
 
   const loadOptions = (inputValue, callback) => {
-    if (inputValue.length < 2) {
+    if (inputValue.length < 3) {
       callback([]);
       return;
     }

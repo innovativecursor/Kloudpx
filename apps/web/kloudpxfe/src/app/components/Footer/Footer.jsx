@@ -1,6 +1,10 @@
 "use client";
+import usePageLoader from "@/app/hooks/usePageLoader";
 import Link from "next/link";
+
 function Footer() {
+  const { startLoader } = usePageLoader();
+
   return (
     <footer className="mt-8 sm:mt-16">
       <div className="responsive-mx">
@@ -95,19 +99,31 @@ function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/Aboutus" className="hover:underline">
+                <Link
+                  href="/Aboutus"
+                  onClick={startLoader}
+                  className="hover:underline"
+                >
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="/Products" className="hover:underline">
+                <Link
+                  href="/Products"
+                  onClick={startLoader}
+                  className="hover:underline"
+                >
                   Shop Products
                 </Link>
               </li>
               <li>Blog/ Health Tips</li>
               <li>Contact Us</li>
               <li>
-                <Link href="/Faq" className="hover:underline">
+                <Link
+                  href="/Faq"
+                  onClick={startLoader}
+                  className="hover:underline"
+                >
                   FAQS
                 </Link>
               </li>
@@ -117,18 +133,30 @@ function Footer() {
             <h1 className="text-color font-semibold ">Legal</h1>
             <ul className="mt-4 text-[10px] space-y-5 font-normal cursor-pointer">
               <li>
-                <Link href="/TermsConditions" className="hover:underline">
+                <Link
+                  href="/TermsConditions"
+                  onClick={startLoader}
+                  className="hover:underline"
+                >
                   Terms & Conditions
                 </Link>
               </li>
               <li>
-                <Link href="/PrivacyPolicy" className="hover:underline">
+                <Link
+                  href="/PrivacyPolicy"
+                  onClick={startLoader}
+                  className="hover:underline"
+                >
                   Privacy Policy
                 </Link>
               </li>
 
               <li>
-                <Link href="/ReturnRefund" className="hover:underline">
+                <Link
+                  href="/ReturnRefund"
+                  onClick={startLoader}
+                  className="hover:underline"
+                >
                   Return & Refund Policy
                 </Link>
               </li>

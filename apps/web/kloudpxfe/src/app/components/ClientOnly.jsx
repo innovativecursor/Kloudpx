@@ -2,16 +2,14 @@
 
 import { useEffect, useState } from "react";
 
-const ClientOnly = ({ children }) => {
-  const [isClient, setIsClient] = useState(false);
+export default function ClientOnly({ children }) {
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
+    setMounted(true);
   }, []);
 
-  if (!isClient) return null;
+  if (!mounted) return null;
 
   return <>{children}</>;
-};
-
-export default ClientOnly;
+}

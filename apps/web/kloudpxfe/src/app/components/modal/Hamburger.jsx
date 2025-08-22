@@ -60,14 +60,16 @@ const Hamburger = () => {
                     <li
                       key={index}
                       onClick={() =>
-                        // handleCategoryClick(item.ID, () => setIsOpen(false))
                         handleCategoryClick(item.ID, true, () =>
                           setIsOpen(false)
                         )
                       }
                       className="px-6 py-2 hover:bg-[#0070BA]/20 hover:font-medium transition-all cursor-pointer"
                     >
-                      {item.CategoryName}
+                      {/* {item.CategoryName} */}
+                      {item.CategoryName.length > 20
+                        ? item.CategoryName.slice(0, 20) + "..."
+                        : item.CategoryName}
                     </li>
                   ))}
                 </ul>

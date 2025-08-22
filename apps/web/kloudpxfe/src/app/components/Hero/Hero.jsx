@@ -11,18 +11,28 @@ import { useImageContext } from "@/app/contexts/ImagesContext";
 
 export default function Hero() {
   const { carousel, getCarousel } = useImageContext();
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     getCarousel();
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
     <div className="responsive-mx ">
       <Swiper
-        key={carousel.length} 
+        key={carousel.length}
         loop={true}
         pagination={{ clickable: true }}
-        navigation={true}
+        navigation={!isMobile}
         autoplay={{ delay: 3000, disableOnInteraction: false }}
         modules={[Pagination, Navigation, Autoplay]}
         className="mySwiper"
@@ -34,7 +44,7 @@ export default function Hero() {
                 src={slide.ImageURL}
                 alt={slide.title1 || "Carousel Slide"}
                 className="w-full h-full rounded-md"
-                 loading="eager" 
+                loading="eager"
               />
             </div>
           </SwiperSlide>

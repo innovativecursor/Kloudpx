@@ -6,6 +6,7 @@ import endpoints from "../config/endpoints";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useCartContext } from "./CartContext";
+import usePageLoader from "../hooks/usePageLoader";
 
 const PaymentContext = createContext();
 
@@ -14,10 +15,10 @@ export const PaymentProvider = ({ children }) => {
   const [previewImage, setPreviewImage] = useState(null);
   const [gcashNumber, setGcashNumber] = useState("");
   const [amountPaid, setAmountPaid] = useState("");
+  const { startLoader } = usePageLoader();
   const [orderSuccess, setOrderSuccess] = useState([]);
   const {
     checkoutData,
-    deliveryData,
     setCheckoutData,
     setDeliveryData,
     paymentMethod,
@@ -26,7 +27,8 @@ export const PaymentProvider = ({ children }) => {
   } = useCheckout();
   const [OrderSubmit, setOrderSubmit] = useState([]);
   const [paymentSlip, setPaymentSlip] = useState([]);
-  const { getAllCartData } = useCartContext();
+  const { getAllCartData, setSelectedClinicId,
+    setSelectedDoctorId, } = useCartContext();
   const router = useRouter();
 
   const handleFileChange = (e) => {
@@ -62,6 +64,7 @@ export const PaymentProvider = ({ children }) => {
     }
 
     try {
+      startLoader();
       await doCheckout();
 
       await addDeliveryData();
@@ -79,6 +82,8 @@ export const PaymentProvider = ({ children }) => {
       router.push("/Success");
       getAllCartData();
       setCheckoutData(null);
+      setSelectedClinicId(null);
+      setSelectedDoctorId(null);
       setDeliveryData(null);
     } catch (error) {
       console.error("Error submitting order:", error.message);

@@ -6,10 +6,12 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import classNames from "classnames";
 import useProductNavigation from "@/app/hooks/useProductNavigation";
+import usePageLoader from "@/app/hooks/usePageLoader";
 
 const CartModal = ({ isOpen, onClose, modalRef }) => {
   const { token, isAuthLoaded } = useAuth();
   const router = useRouter();
+  const { startLoader } = usePageLoader();
   const { getCartData, removeFromCart, getAllCartData } = useCartContext();
   const { goToProductPage } = useProductNavigation();
   const fallbackImage = "/assets/fallback.png";
@@ -32,6 +34,7 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
   }
 
   const handleCheckout = async () => {
+    startLoader();
     setCheckoutLoading(true);
     try {
       router.push("/Checkout");
@@ -95,8 +98,9 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
           <button
             className="text-[#0070ba] cursor-pointer font-medium flex items-center gap-1"
             onClick={() => {
-              onClose();
+              startLoader();
               router.push("/Products");
+              onClose();
             }}
           >
             <i className="ri-add-line text-xl"></i> Add more
@@ -176,7 +180,6 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
                         </h4>
                       </div>
                       <button
-                        // onClick={() => handleDelete(item.cart_id)}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDelete(item.cart_id);

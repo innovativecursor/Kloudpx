@@ -9,7 +9,7 @@ const AllThreshold = () => {
 
   const handleEdit = (region) => {
     setEditingRegion(region);
-    navigate("/addthreshold");
+    navigate("/updatethreshold");
   };
 
   return (

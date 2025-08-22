@@ -3,18 +3,17 @@ import { FaLocationDot, FaPlus } from "react-icons/fa6";
 import SubTitle from "../Titles/SubTitle";
 import NewAddress from "./NewAddress";
 import { useRouter } from "next/navigation";
-import DeliveryType from "../DeliveryData/DeliveryType";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
 import { IoMdHome } from "react-icons/io";
 import { FaRegEdit } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { IoLocation } from "react-icons/io5";
 import { IoMdCall } from "react-icons/io";
+import usePageLoader from "@/app/hooks/usePageLoader";
 
 const Address = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [deliveryType, setDeliveryType] = useState(false);
-  const [deliverySuccess, setDeliverySuccess] = useState(false);
   const router = useRouter();
   const {
     fetchAddressData,
@@ -23,10 +22,9 @@ const Address = () => {
     selectedAddress,
     selectedId,
     setSelectedId,
-    deliveryData,
     checkoutData,
   } = useCheckout();
-
+  const { startLoader } = usePageLoader();
   // console.log(checkoutData);
 
   useEffect(() => {
@@ -64,11 +62,10 @@ const Address = () => {
     }
 
     if (selectedAddressId) {
+      startLoader();
       selectedAddress(selectedAddressId);
       setSelectedId(selectedAddressId);
-
-      // Navigate to delivery page instead of just showing component
-      router.push("Delivery"); // aapka delivery page route
+      router.push("Delivery");
     } else {
       toast.error("Please select an address");
     }
@@ -165,33 +162,6 @@ const Address = () => {
 
                 <button
                   type="button"
-                  // onClick={() => {
-                  //   if (
-                  //     !checkoutData?.items ||
-                  //     checkoutData.items.length === 0
-                  //   ) {
-                  //     toast.error("No items in checkout. Add items first!");
-                  //     return;
-                  //   }
-                  //   let selectedAddressId = selectedId;
-
-                  //   if (!selectedAddressId) {
-                  //     const defaultAddress = getAllAddress.find(
-                  //       (addr) => addr.IsDefault === true
-                  //     );
-                  //     if (defaultAddress) {
-                  //       selectedAddressId = defaultAddress.ID;
-                  //     }
-                  //   }
-
-                  //   if (selectedAddressId) {
-                  //     selectedAddress(selectedAddressId);
-                  //     setSelectedId(selectedAddressId);
-                  //     setDeliveryType(true);
-                  //   } else {
-                  //     toast.error("Please select an address");
-                  //   }
-                  // }}
                   onClick={handleSaveAndProceed}
                   className="bg-[#0070BA] text-white w-full py-3 sm:text-sm text-xs rounded-full font-medium mt-8 md:mt-10 cursor-pointer hover:bg-[#005c96]"
                 >
@@ -203,8 +173,6 @@ const Address = () => {
             {showAddForm && <NewAddress setShowAddForm={setShowAddForm} />}
           </>
         )}
-
-        {/* {deliveryType && !deliverySuccess && <DeliveryType />} */}
       </div>
     </>
   );

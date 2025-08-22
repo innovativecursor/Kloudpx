@@ -41,7 +41,7 @@ const LandingPagePrescription = ({ isOpen, setIsOpen }) => {
       >
         <button
           onClick={() => setIsOpen(false)}
-          className="absolute top-1 right-4 text-gray-500 hover:text-gray-900 text-xl font-bold z-50"
+          className="absolute top-1 right-4 cursor-pointer text-gray-500 hover:text-gray-900 text-xl font-bold z-50"
           aria-label="Close modal"
         >
           &times;
@@ -83,6 +83,10 @@ const LandingPagePrescription = ({ isOpen, setIsOpen }) => {
                 }}
               />
             </label>
+               <div className="flex items-start sm:items-center gap-1 sm:mt-3 sm:mx-0 mb-2 mx-3">
+              <span className="font-semibold text-[#0070ba] text-sm">Note: </span>
+              <span className="text-[10px]"> Always upload a clean version of your Prescription for better result. </span>
+            </div>
           </div>
 
           {/* Right side - Guide / Preview */}
