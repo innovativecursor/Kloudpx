@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Thumbs } from "swiper/modules";
 import "swiper/css";
@@ -13,38 +14,43 @@ import "react-medium-image-zoom/dist/styles.css";
 const ImageSwiper = ({ images }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [isClient, setIsClient] = useState(false);
+  const prevRef = useRef(null);
+  const nextRef = useRef(null);
+
   const fallbackImage = "/assets/fallback.png";
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const filteredImages =
-    images?.filter((img) => typeof img === "string" && img.trim() !== "") || [];
   const safeImages =
-    filteredImages.length > 0 ? filteredImages : [fallbackImage];
+    images?.filter((img) => typeof img === "string" && img.trim() !== "") || [];
+  const displayImages = safeImages.length ? safeImages : [fallbackImage];
 
-  const prevRef = useRef(null);
-  const nextRef = useRef(null);
-
-  useEffect(() => {
-    if (thumbsSwiper && prevRef.current && nextRef.current) {
-      thumbsSwiper.params.navigation.prevEl = prevRef.current;
-      thumbsSwiper.params.navigation.nextEl = nextRef.current;
-      thumbsSwiper.navigation.init();
-      thumbsSwiper.navigation.update();
+  const onThumbsSwiperInit = (swiper) => {
+    setThumbsSwiper(swiper);
+    if (prevRef.current && nextRef.current) {
+      swiper.params.navigation.prevEl = prevRef.current;
+      swiper.params.navigation.nextEl = nextRef.current;
+      swiper.navigation.init();
+      swiper.navigation.update();
     }
-  }, [thumbsSwiper]);
-
-  const SafeImage = ({ src, alt, className }) => {
-    if (typeof src !== "string" || src.trim() === "") {
-      return <img src={fallbackImage} alt={alt} className={className} />;
-    }
-    return <img src={src} alt={alt} className={className} />;
   };
+
+  const SafeImage = ({ src, alt, className }) => (
+    <Image
+      src={src || fallbackImage}
+      alt={alt}
+      width={200}
+      height={80}
+      className={className}
+      style={{ objectFit: "contain" }}
+    />
+  );
 
   return (
     <div className="md:w-[50%]">
+      {/* Main Swiper */}
       <div className="relative rounded-xl">
         <div className="flex flex-col pb-4 justify-center items-center bg-[#F4F8FB] pt-4 shadow-md w-full h-full">
           <Swiper
@@ -54,22 +60,26 @@ const ImageSwiper = ({ images }) => {
             modules={[Navigation, Thumbs]}
             className="w-full h-full"
           >
-            {safeImages.map((img, index) => (
+            {displayImages.map((img, index) => (
               <SwiperSlide key={index}>
                 <div className="flex justify-center items-center w-full sm:h-[70vh] h-[50vh] p-4 bg-white">
                   {isClient ? (
                     <Zoom>
-                      <img
+                      <Image
                         src={img || fallbackImage}
                         alt={`product-${index}`}
-                        className="object-contain max-h-[70vh] max-w-full"
+                        width={600}
+                        height={500}
+                        style={{ objectFit: "contain", maxHeight: "70vh" }}
                       />
                     </Zoom>
                   ) : (
-                    <img
+                    <Image
                       src={img || fallbackImage}
                       alt={`product-${index}`}
-                      className="object-contain max-h-[70vh] max-w-full"
+                      width={600}
+                      height={500}
+                      style={{ objectFit: "contain", maxHeight: "70vh" }}
                     />
                   )}
                 </div>
@@ -92,11 +102,10 @@ const ImageSwiper = ({ images }) => {
 
           {isClient && (
             <Swiper
-              onSwiper={setThumbsSwiper}
+              onSwiper={onThumbsSwiperInit}
               spaceBetween={10}
               slidesPerView={4}
               watchSlidesProgress
-              navigation={{ prevEl: prevRef.current, nextEl: nextRef.current }}
               modules={[Navigation, Thumbs]}
               breakpoints={{
                 0: { slidesPerView: 3 },
@@ -104,7 +113,7 @@ const ImageSwiper = ({ images }) => {
               }}
               className="w-full mx-2"
             >
-              {safeImages.map((img, index) => (
+              {displayImages.map((img, index) => (
                 <SwiperSlide key={index}>
                   <SafeImage
                     src={img}

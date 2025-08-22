@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 import SubTitle from "@/app/components/Titles/SubTitle";
 import ImageSwiper from "@/app/components/ImageSwiper/ImageSwiper";
 import { useProductContext } from "@/app/contexts/ProductContext";
@@ -16,7 +17,6 @@ const ProductDetails = () => {
   const { getProductDeatils, productDetails } = useProductContext();
   const { isOpen } = usePrescriptionContext();
   const details = productDetails?.medicine || [];
-  // console.log(details);
 
   useEffect(() => {
     if (id) getProductDeatils(id);
@@ -31,14 +31,17 @@ const ProductDetails = () => {
   }
 
   const fallbackImage = "/assets/fallback.png";
-  const filteredImages =
-    details.images?.filter((img) => img && img.trim() !== "") || [];
-  const images = filteredImages.length > 0 ? filteredImages : [fallbackImage];
+
+  // ✅ Final sanitized images
+  const images =
+    details.images?.filter(img => typeof img === "string" && img.trim() !== "")?.length > 0
+      ? details.images.filter(img => typeof img === "string" && img.trim() !== "")
+      : [fallbackImage];
 
   const similarProduuct = productDetails?.related_medicines;
 
   return (
-    <div className=" pb-10 min-h-screen md:mt-52 sm:mt-48 mt-36">
+    <div className="pb-10 min-h-screen md:mt-52 sm:mt-48 mt-36">
       <div className="responsive-mx pt-7 md:pt-11">
         <SubTitle
           paths={["Home", details?.category || "Category", details?.brandname]}
@@ -54,19 +57,19 @@ const ProductDetails = () => {
       </div>
 
       <div className="md:mt-16 sm:mt-12 mt-10 sm:px-0 px-2">
-        {similarProduuct?.length > 0 ? (
-          <div>
-            <Cards data={similarProduuct} title="Similar Produuct" />
-          </div>
-        ) : null}
+        {similarProduuct?.length > 0 && (
+          <Cards data={similarProduuct} title="Similar Products" />
+        )}
       </div>
 
       <ProDetailsDes details={details} />
 
       <div className="mt-10 sm:mt-16 md:mt-24">
-        <img
+        <Image
           src="/assets/time.png"
           alt="Upload"
+          width={800}
+          height={200}
           className="w-full object-contain"
         />
       </div>
