@@ -311,8 +311,8 @@ func GetCurrentUserInfo(c *gin.Context, db *gorm.DB) {
 		"created_at":       userObj.CreatedAt,
 		"phone":            userObj.Phone,
 		"dob":              userObj.DOB,
-		"age":              userObj.Age,
 		"gender":           userObj.Gender,
+		"age":              userObj.Age,
 		"phone_verified":   userObj.PhoneVerified,
 	})
 }
