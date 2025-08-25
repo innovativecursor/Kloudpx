@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
-import { useRouter } from "next/navigation";
+
 import { getAxiosCall } from "@/app/lib/axios";
 import endpoints from "@/app/config/endpoints";
 
@@ -10,8 +10,6 @@ const AuthContext = createContext(null);
 AuthContext.displayName = "AuthContext";
 
 export const AuthProvider = ({ children }) => {
-  const router = useRouter();
-
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
   const [isAuthLoaded, setIsAuthLoaded] = useState(false);
@@ -26,19 +24,36 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  // useEffect(() => {
+  //   if (!token) return;
+  //   const fetchUser = async () => {
+  //     try {
+  //       const res = await getAxiosCall(endpoints.auth.getCurrentUser, {}, true);
+  //       setUser(res?.data);
+  //     } catch (err) {
+  //       console.error("Error fetching user info", err);
+  //       setUser(null);
+  //     }
+  //   };
+  //   fetchUser();
+  // }, [token]);
+
   useEffect(() => {
     if (!token) return;
-    const fetchUser = async () => {
-      try {
-        const res = await getAxiosCall(endpoints.auth.getCurrentUser, {}, true);
-        setUser(res?.data);
-      } catch (err) {
-        console.error("Error fetching user info", err);
-        setUser(null);
-      }
-    };
     fetchUser();
   }, [token]);
+
+  const fetchUser = async () => {
+    try {
+      const res = await getAxiosCall(endpoints.auth.getCurrentUser, {}, true);
+      setUser(res?.data);
+      return res?.data;
+    } catch (err) {
+      console.error("Error fetching user info", err);
+      setUser(null);
+      return null;
+    }
+  };
 
   console.log(user, "mu yser");
 
@@ -75,6 +90,7 @@ export const AuthProvider = ({ children }) => {
         // logout,
         isAuthenticated: !!token,
         user,
+        fetchUser,
         isAuthLoaded,
       }}
     >

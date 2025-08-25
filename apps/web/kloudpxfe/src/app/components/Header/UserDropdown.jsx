@@ -24,6 +24,7 @@ const UserDropdown = () => {
   const { clearCart } = useCartContext();
   const { clearPrescription } = usePrescriptionContext();
   const { startLoader } = usePageLoader();
+
   const logout = () => {
     localStorage.removeItem("access_token");
     router.push("/");
@@ -31,6 +32,12 @@ const UserDropdown = () => {
     setUser(null);
     clearCart();
     clearPrescription();
+  };
+
+  const goToProfile = (tab) => {
+    startLoader("/Profile");
+    router.push(`/Profile?tab=${tab}`);
+    setIsOpen(false);
   };
 
   const getBgColor = (item) => {
@@ -88,9 +95,7 @@ const UserDropdown = () => {
             )}`}
             onClick={() => {
               setActiveItem("edit");
-              startLoader();
-              router.push("/Profile");
-              setIsOpen(false);
+              goToProfile("edit");
             }}
           >
             <FaEdit className="text-base sm:text-lg flex-shrink-0 text-gray-600" />
@@ -105,9 +110,7 @@ const UserDropdown = () => {
             )}`}
             onClick={() => {
               setActiveItem("prescription");
-              startLoader();
-              router.push("/Profile");
-              setIsOpen(false);
+              goToProfile("prescription");
             }}
           >
             <FaPrescriptionBottleAlt className="text-base sm:text-lg flex-shrink-0 text-gray-600" />
@@ -122,9 +125,7 @@ const UserDropdown = () => {
             )}`}
             onClick={() => {
               setActiveItem("pwd");
-              startLoader();
-              router.push("/Profile");
-              setIsOpen(false);
+              goToProfile("pwd");
             }}
           >
             <FaFileMedical className="text-base sm:text-lg flex-shrink-0 text-gray-600" />
@@ -139,9 +140,7 @@ const UserDropdown = () => {
             )}`}
             onClick={() => {
               setActiveItem("history");
-              startLoader();
-              router.push("/Profile");
-              setIsOpen(false);
+              goToProfile("history");
             }}
           >
             <FaHistory className="text-base sm:text-lg flex-shrink-0 text-gray-600" />

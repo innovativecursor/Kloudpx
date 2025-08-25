@@ -21,6 +21,8 @@ import ClientOnly from "./components/ClientOnly";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import { LoginAuthProvider } from "./contexts/LoginAuth";
 import LoaderController from "./components/Loader/LoaderController";
+import { ProfileProvider } from "./contexts/ProfileContext";
+
 
 export default function RootLayout({ children }) {
   return (
@@ -41,22 +43,24 @@ export default function RootLayout({ children }) {
                 <LoaderController />
                 <AuthProvider>
                   <LoginAuthProvider>
-                    <ProductProvider>
-                      <CheckoutProvider>
-                        <CartProvider>
-                          <PrescriptionProvider>
-                            <PaymentProvider>
-                              <ImageProvider>
-                                <Header />
-                                <main className="flex-1">{children}</main>
-                                <Footer />
-                                <CustomToaster />
-                              </ImageProvider>
-                            </PaymentProvider>
-                          </PrescriptionProvider>
-                        </CartProvider>
-                      </CheckoutProvider>
-                    </ProductProvider>
+                    <ProfileProvider>
+                      <ProductProvider>
+                        <CheckoutProvider>
+                          <CartProvider>
+                            <PrescriptionProvider>
+                              <PaymentProvider>
+                                <ImageProvider>
+                                  <Header />
+                                  <main className="flex-1">{children}</main>
+                                  <Footer />
+                                  <CustomToaster />
+                                </ImageProvider>
+                              </PaymentProvider>
+                            </PrescriptionProvider>
+                          </CartProvider>
+                        </CheckoutProvider>
+                      </ProductProvider>
+                    </ProfileProvider>
                   </LoginAuthProvider>
                 </AuthProvider>
               </PersistGate>
