@@ -21,20 +21,20 @@ const FormDataProvider = ({ children }) => {
     directionsforuse: "",
     safetyinformation: "",
     storage: "",
-    itemcode: ""
+    itemcode: "",
+    taxtype: 0,
   });
 
   const [isBranded, setIsBranded] = useState(false);
   const [isPrescriptionRequired, setIsPrescriptionRequired] = useState(false);
   const [isInhouseBrand, setIsInhouseBrand] = useState(false);
   const [isfeature, setIsFeature] = useState(false);
-  const [taxOption, setTaxOption] = useState(null);
   const [brandName, setBrandName] = useState("");
 
   const updateFormData = (name, value) => {
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: name === "taxtype" ? value : value,
     }));
   };
 
@@ -49,8 +49,8 @@ const FormDataProvider = ({ children }) => {
         setIsPrescriptionRequired,
         isInhouseBrand,
         setIsInhouseBrand,
-        taxOption,
-        setTaxOption,
+        // taxOption,
+        // setTaxOption,
         brandName,
         setBrandName,
         setFormData,

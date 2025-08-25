@@ -18,8 +18,6 @@ const AddItemsProvider = ({ children }) => {
     setBrandName,
     formData,
     setFormData,
-    taxOption,
-    setTaxOption,
     isBranded,
     setIsBranded,
     isPrescriptionRequired,
@@ -79,6 +77,11 @@ const AddItemsProvider = ({ children }) => {
       recommendeddailyallowance: formData.recommendeddailyallowance,
       directionsforuse: formData.directionsforuse,
       safetyinformation: formData.safetyinformation,
+
+      taxtype:
+        formData.taxtype && !isNaN(formData.taxtype)
+          ? parseFloat(formData.taxtype)
+          : 0,
       storage: formData.storage,
       supplierdiscount: `${formData.supplierDiscount}%`,
       description: formData.description,
@@ -90,7 +93,7 @@ const AddItemsProvider = ({ children }) => {
       sellingpriceperpiece: Number(sellingPricePerPiece),
       costpriceperbox: Number(costPricePerBox),
       costpriceperpiece: Number(costPricePerPiece),
-      taxtype: taxOption?.value?.toLowerCase() || "non-vat",
+      // taxtype: taxOption?.value?.toLowerCase() || "non-vat",
       minimumthreshold: Number(formData.minThreshold),
       maximumthreshold: Number(formData.maxThreshold),
       estimatedleadtimedays: Number(formData.leadTime),
@@ -126,9 +129,11 @@ const AddItemsProvider = ({ children }) => {
         recommendeddailyallowance: "",
         directionsforuse: "",
         safetyinformation: "",
+        // taxtype: 0,
+        taxtype: "",
         storage: "",
       });
-      setTaxOption(null);
+      // setTaxOption(null);
       setIsBranded(false);
       setIsPrescriptionRequired(false);
       setIsInhouseBrand(false);
@@ -154,7 +159,6 @@ const AddItemsProvider = ({ children }) => {
       console.error("❌ API Error:", error);
     }
   };
-
 
   return (
     <AddItemsContext.Provider value={{ handleSubmit }}>

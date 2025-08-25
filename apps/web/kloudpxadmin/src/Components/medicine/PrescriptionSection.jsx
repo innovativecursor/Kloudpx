@@ -6,9 +6,9 @@ import BooleanCheckbox from "../comman/BooleanCheckbox";
 const PrescriptionSection = ({
   formData,
   handleChange,
-  taxType,
-  handleTaxTypeChange,
-  taxTypeOptions,
+  // taxType,
+  // handleTaxTypeChange,
+  // taxTypeOptions,
   handleImageChange,
   handleUpload,
   images,
@@ -22,7 +22,7 @@ const PrescriptionSection = ({
 }) => {
   return (
     <>
-      <LabeledSelect
+      {/* <LabeledSelect
         label="Tax Type"
         value={taxType}
         onChange={(val) => {
@@ -30,9 +30,9 @@ const PrescriptionSection = ({
           handleChange("taxType", val);
         }}
         options={taxTypeOptions}
-        // disabled={!formData.leadTime}
+        disabled={!formData.leadTime}
         placeholder="Select or create tax type"
-      />
+      /> */}
       <ImageUploader
         handleImageChange={handleImageChange}
         handleUpload={handleUpload}
@@ -40,7 +40,7 @@ const PrescriptionSection = ({
         previewUrls={previewUrls}
         message={message}
         id={id}
-        disabled={images?.length >= 5 }
+        disabled={images?.length >= 5}
         uploadedImageIds={uploadedImageIds}
         setUploadedImageIds={setUploadedImageIds}
         setPreviewUrls={setPreviewUrls}
@@ -48,7 +48,7 @@ const PrescriptionSection = ({
       />
       <BooleanCheckbox
         label="Prescription Required"
-        disabled={!taxType?.value}
+        // disabled={!taxType?.value}
       />
     </>
   );

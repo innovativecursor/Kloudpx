@@ -1,10 +1,9 @@
 "use client";
 import React from "react";
-import { useLoginAuth } from "@/app/contexts/LoginAuth";
 import { FcGoogle } from "react-icons/fc";
 import { BsFacebook } from "react-icons/bs";
+import { useLoginAuth } from "@/app/contexts/LoginAuth";
 import { useAuth } from "@/app/contexts/AuthContext";
-// import { useAuth } from "@/app/contexts/AuthContext";
 
 const Signup = ({ isOpen, onClose }) => {
   const {
@@ -15,8 +14,9 @@ const Signup = ({ isOpen, onClose }) => {
     handleChange,
     handleSendOtp,
     handleVerifyOtp,
-  } = useAuth();
-
+    openLogin,
+  } = useLoginAuth();
+  const { googleLogin } = useAuth();
   if (!isOpen) return null;
 
   return (
@@ -25,7 +25,7 @@ const Signup = ({ isOpen, onClose }) => {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full sm:max-w-lg sm:mx-0 mx-3 sm:py-8 py-6 sm:px-20 px-6 relative"
+        className="bg-white cursor-pointer rounded-2xl w-full sm:max-w-lg sm:mx-0 mx-3 sm:py-8 py-6 sm:px-20 px-6 relative"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="sm:text-2xl text-xl font-bold text-center mb-4">
@@ -45,6 +45,7 @@ const Signup = ({ isOpen, onClose }) => {
                     name="firstName"
                     placeholder="Your first name"
                     value={formData.firstName}
+                    required
                     onChange={handleChange}
                     className="w-full placeholder:text-xs text-base outline-none"
                   />
@@ -56,6 +57,7 @@ const Signup = ({ isOpen, onClose }) => {
                     name="lastName"
                     placeholder="Your last name"
                     value={formData.lastName}
+                    required
                     onChange={handleChange}
                     className="w-full placeholder:text-xs text-base outline-none"
                   />
@@ -81,13 +83,14 @@ const Signup = ({ isOpen, onClose }) => {
                       placeholder="Phone Number"
                       value={formData.phone}
                       onChange={handleChange}
+                      required
                       className="w-full  rounded-r-md outline-none placeholder:text-xs"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex cursor-pointer items-center gap-2 mt-1">
                 <input type="checkbox" />
                 <div className="text-[9px] underline opacity-60">
                   I agree to the Terms of Service and Privacy Policy
@@ -133,6 +136,7 @@ const Signup = ({ isOpen, onClose }) => {
                     name="otp"
                     placeholder="Enter OTP"
                     value={formData.otp}
+                    required
                     onChange={handleChange}
                     className="w-full text-sm placeholder:text-xs text-gray-800 px-3 py-2 border border-gray-200 rounded-md outline-none focus:border-[#0070ba] focus:ring-1 focus:ring-[#0070ba]"
                   />
@@ -152,7 +156,13 @@ const Signup = ({ isOpen, onClose }) => {
 
           <div className="text-center sm:text-xs text-[10px]">
             Already have an account?{" "}
-            <span className="text-[#0070ba] underline cursor-pointer">
+            <span
+              className="text-[#0070ba] underline cursor-pointer"
+              onClick={() => {
+                onClose();
+                openLogin();
+              }}
+            >
               LOGIN
             </span>
           </div>
@@ -164,11 +174,26 @@ const Signup = ({ isOpen, onClose }) => {
           </div>
 
           <div className="flex justify-center gap-4">
-            <button className="p-2 border border-gray-200 cursor-pointer rounded-md">
+            {/* <button
+              type="button"
+              onClick={googleLogin}
+              className="p-2 border border-gray-200 cursor-pointer rounded-md"
+            >
               <FcGoogle className="sm:text-2xl text-xl" />
-            </button>
-            <button className="p-2 border border-gray-200 cursor-pointer rounded-md">
-              <BsFacebook className="text-blue-600 sm:text-2xl text-xl" />
+            </button> */}
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  await googleLogin();
+                  onClose();
+                } catch (err) {
+                  console.error("Google login failed", err);
+                }
+              }}
+              className="p-2 border border-gray-200 cursor-pointer rounded-md"
+            >
+              <FcGoogle className="sm:text-2xl text-xl" />
             </button>
           </div>
         </form>

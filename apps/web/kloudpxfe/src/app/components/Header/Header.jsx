@@ -13,24 +13,20 @@ import useModal from "@/app/hooks/useModal";
 import { VscAccount } from "react-icons/vsc";
 import { PiShoppingCartSimple } from "react-icons/pi";
 import UserDropdown from "./UserDropdown";
-// import Signup from "../Auth/Signup";
-// import Login from "../Auth/Login";
-// import { useLoginAuth } from "@/app/contexts/LoginAuth";
+import { useLoginAuth } from "@/app/contexts/LoginAuth";
+import Signup from "../Auth/Signup";
+import Login from "../Auth/Login";
 
 const Header = () => {
-  const router = useRouter();
+  const { loading, user, isAuthLoaded } = useAuth();
   const {
-    login,
-    loading,
-    user,
-    isAuthLoaded,
     showSignup,
     openSignup,
     closeSignup,
     isLoginOpen,
-    openLogin,
+
     closeLogin,
-  } = useAuth();
+  } = useLoginAuth();
   const { cartLength } = useCartContext();
   const { isOpen, setIsOpen, modalRef } = useModal();
 
@@ -51,14 +47,6 @@ const Header = () => {
               <SearchBar />
             </div>
 
-            {/* <button
-              className="font-semibold sm:text-xs text-xs cursor-pointer"
-              onClick={openSignup}
-            >
-              Signup
-            </button>
-            <button onClick={openLogin}>Open Login</button> */}
-
             {/* Right: User & Cart */}
             <div className="flex items-center justify-center gap-6 ">
               <div>
@@ -67,20 +55,14 @@ const Header = () => {
                     <UserDropdown />
                   </div>
                 ) : (
-                  <div
-                    onClick={!loading ? login : undefined}
-                    className="cursor-pointer"
-                  >
-                    {loading ? (
-                      "Signing In..."
-                    ) : (
-                      <div className="flex items-center flex-col">
-                        <VscAccount className="md:text-2xl text-xl cursor-pointer" />
-                        <span className="md:text-sm sm:text-xs text-[9px] mt-1 tracking-wide opacity-70 cursor-pointer">
-                          Login
-                        </span>
-                      </div>
-                    )}
+                  <div className="">
+                    <button
+                      className="md:text-sm flex items-center flex-col sm:text-xs text-[9px] mt-1 tracking-wide opacity-70 cursor-pointer"
+                      onClick={openSignup}
+                    >
+                      <VscAccount className="md:text-2xl mb-1 text-xl cursor-pointer" />
+                      Signup/Login
+                    </button>
                   </div>
                 )}
               </div>
@@ -130,9 +112,8 @@ const Header = () => {
         </div>
       </div>
 
-      {/* 
       <Signup isOpen={showSignup} onClose={closeSignup} />
-      <Login isOpen={isLoginOpen} onClose={closeLogin} /> */}
+      <Login isOpen={isLoginOpen} onClose={closeLogin} />
     </>
   );
 };
