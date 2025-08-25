@@ -4,7 +4,6 @@ import React from "react";
 import { FcGoogle } from "react-icons/fc";
 import { BsFacebook } from "react-icons/bs";
 import { useLoginAuth } from "@/app/contexts/LoginAuth";
-import { useAuth } from "@/app/contexts/AuthContext";
 
 const Login = () => {
   const {
@@ -17,7 +16,7 @@ const Login = () => {
     handleLoginSendOtp,
     handleLoginVerifyOtp,
     countryCodes,
-  } = useAuth();
+  } = useLoginAuth();
 
   if (!isLoginOpen) return null;
 
@@ -33,14 +32,7 @@ const Login = () => {
         <h2 className="sm:text-2xl text-xl font-bold text-center sm:mb-4 mb-2">
           Log In
         </h2>
-
-        {/* ✅ Prevent form reload */}
-        <form
-          className="space-y-4"
-          onSubmit={(e) => e.preventDefault()}
-          // onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
-        >
-          {/* Phone input */}
+        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
           <div className="border border-gray-300 rounded-md">
             <div className="py-2 px-4 flex gap-2">
               <select
@@ -85,7 +77,7 @@ const Login = () => {
 
           {/* Button */}
           <button
-            type="button" // ✅ important
+            type="button"
             onSubmit={(e) => e.preventDefault()}
             onClick={(e) =>
               loginOtpSent ? handleLoginVerifyOtp(e) : handleLoginSendOtp(e)

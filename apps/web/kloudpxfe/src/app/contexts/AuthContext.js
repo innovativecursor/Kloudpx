@@ -40,6 +40,8 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, [token]);
 
+  console.log(user, "mu yser");
+
   const login = useGoogleLogin({
     flow: "auth-code",
     onSuccess: async (codeResponse) => {
@@ -62,9 +64,6 @@ export const AuthProvider = ({ children }) => {
       }
     },
   });
-
-
-
 
   return (
     <AuthContext.Provider

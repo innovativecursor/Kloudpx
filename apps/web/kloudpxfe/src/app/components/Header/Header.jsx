@@ -13,24 +13,22 @@ import useModal from "@/app/hooks/useModal";
 import { VscAccount } from "react-icons/vsc";
 import { PiShoppingCartSimple } from "react-icons/pi";
 import UserDropdown from "./UserDropdown";
-// import Signup from "../Auth/Signup";
-// import Login from "../Auth/Login";
-// import { useLoginAuth } from "@/app/contexts/LoginAuth";
+import { useLoginAuth } from "@/app/contexts/LoginAuth";
+import Signup from "../Auth/Signup";
+import Login from "../Auth/Login";
+
 
 const Header = () => {
   const router = useRouter();
+  const { login, loading, user, isAuthLoaded } = useAuth();
   const {
-    login,
-    loading,
-    user,
-    isAuthLoaded,
     showSignup,
     openSignup,
     closeSignup,
     isLoginOpen,
     openLogin,
     closeLogin,
-  } = useAuth();
+  } = useLoginAuth();
   const { cartLength } = useCartContext();
   const { isOpen, setIsOpen, modalRef } = useModal();
 
@@ -51,13 +49,13 @@ const Header = () => {
               <SearchBar />
             </div>
 
-            {/* <button
+            <button
               className="font-semibold sm:text-xs text-xs cursor-pointer"
               onClick={openSignup}
             >
               Signup
             </button>
-            <button onClick={openLogin}>Open Login</button> */}
+            <button onClick={openLogin}>Open Login</button>
 
             {/* Right: User & Cart */}
             <div className="flex items-center justify-center gap-6 ">
@@ -130,9 +128,9 @@ const Header = () => {
         </div>
       </div>
 
-      {/* 
+      
       <Signup isOpen={showSignup} onClose={closeSignup} />
-      <Login isOpen={isLoginOpen} onClose={closeLogin} /> */}
+      <Login isOpen={isLoginOpen} onClose={closeLogin} />
     </>
   );
 };

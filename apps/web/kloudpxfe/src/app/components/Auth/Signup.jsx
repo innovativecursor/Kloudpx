@@ -1,10 +1,8 @@
 "use client";
 import React from "react";
-import { useLoginAuth } from "@/app/contexts/LoginAuth";
 import { FcGoogle } from "react-icons/fc";
 import { BsFacebook } from "react-icons/bs";
-import { useAuth } from "@/app/contexts/AuthContext";
-// import { useAuth } from "@/app/contexts/AuthContext";
+import { useLoginAuth } from "@/app/contexts/LoginAuth";
 
 const Signup = ({ isOpen, onClose }) => {
   const {
@@ -15,7 +13,7 @@ const Signup = ({ isOpen, onClose }) => {
     handleChange,
     handleSendOtp,
     handleVerifyOtp,
-  } = useAuth();
+  } = useLoginAuth();
 
   if (!isOpen) return null;
 

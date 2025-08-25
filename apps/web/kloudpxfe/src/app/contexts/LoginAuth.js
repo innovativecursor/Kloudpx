@@ -14,7 +14,7 @@ export const LoginAuthProvider = ({ children }) => {
   const [showSignup, setShowSignup] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [loginOtpSent, setLoginOtpSent] = useState(false);
-
+  const { setToken } = useAuth();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -144,7 +144,7 @@ export const LoginAuthProvider = ({ children }) => {
       const tokenFromServer = response?.token;
       if (tokenFromServer) {
         localStorage.setItem("access_token", tokenFromServer);
-        setToken(tokenFromServer); // now it will work
+        setToken(tokenFromServer);
       }
 
       Swal.fire("Success", "Login successful!", "success");
