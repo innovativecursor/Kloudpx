@@ -88,7 +88,7 @@ function Navigation(props) {
                 <Route path="/addOtcProduct" element={<AddOtcProduct />} />
                 <Route path="/orderHistory" element={<OrderHistory />} />
                 <Route path="/allmedicine" element={<AllMedicine />} />
-                
+
                 <Route path="/addsupplier" element={<AddSupplier />} />
                 <Route path="/edit-medicine/:id" element={<UpdateMedicine />} />
 

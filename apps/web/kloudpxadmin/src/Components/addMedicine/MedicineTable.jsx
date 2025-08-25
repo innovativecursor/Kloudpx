@@ -111,12 +111,12 @@ export const getMedicineColumns = ({ handleEdit, deleteMedicine }) => [
     align: "center",
     render: (price) => `₹${price?.toFixed(2)}`,
   },
-  {
-    title: "Tax",
-    dataIndex: "TaxType",
-    key: "TaxType",
-    align: "center",
-  },
+  // {
+  //   title: "Tax",
+  //   dataIndex: "TaxType",
+  //   key: "TaxType",
+  //   align: "center",
+  // },
   {
     title: "Discount",
     dataIndex: "Discount",
@@ -171,7 +171,7 @@ export const getMedicineColumns = ({ handleEdit, deleteMedicine }) => [
     key: "Marketer",
     align: "center",
   },
-    {
+  {
     title: "Itemcode",
     dataIndex: "ItemCode",
     key: "ItemCode",
@@ -209,6 +209,12 @@ export const getMedicineColumns = ({ handleEdit, deleteMedicine }) => [
     title: "SafetyInformation",
     dataIndex: "SafetyInformation",
     key: "SafetyInformation",
+    align: "center",
+  },
+  {
+    title: "TaxType",
+    dataIndex: "TaxType",
+    key: "TaxType",
     align: "center",
   },
 

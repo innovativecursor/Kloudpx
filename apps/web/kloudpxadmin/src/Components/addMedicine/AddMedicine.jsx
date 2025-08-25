@@ -21,8 +21,8 @@ const AddMedicine = () => {
     brandName,
     setBrandName,
     setFormData,
-    taxOption,
-    setTaxOption,
+    // taxOption,
+    // setTaxOption,
     setIsBranded,
     setIsInhouseBrand,
     setIsPrescriptionRequired,
@@ -52,7 +52,6 @@ const AddMedicine = () => {
 
   const prefillData = (data) => {
     setBrandName(data.BrandName);
-    setTaxOption({ label: data.TaxType, value: data.TaxType });
     setFormData({
       power: data.Power,
       productDiscount: data.Discount?.replace("%", ""),
@@ -70,6 +69,8 @@ const AddMedicine = () => {
       recommendeddailyallowance: data.RecommendedDailyAllowance,
       directionsforuse: data.DirectionsForUse,
       safetyinformation: data.SafetyInformation,
+      taxtype: data.TaxType?.toString() || "",
+
       storage: data.Storage,
       description: data.Description,
     });
@@ -199,10 +200,10 @@ const AddMedicine = () => {
           placeholder="Enter estimated delivery time"
         />
       </div>
-
+      {/* 
       <div>
         <TaxSelect value={taxOption} onChange={setTaxOption} />
-      </div>
+      </div> */}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 my-10">
         <Input
@@ -211,30 +212,35 @@ const AddMedicine = () => {
           placeholder="Enter benefits name"
         />
         <Input
-          label="Keyingredients"
+          label="Keying Redients"
           name="keyingredients"
           placeholder="Enter Keyingredients name"
         />
         <Input
-          label="Recommendeddailyallowance"
+          label="Recommended Daily Allowance"
           name="recommendeddailyallowance"
           placeholder="Enter Recommendeddailyallowance name"
         />
         <Input
-          label="Directionsforuse"
+          label="Directions For Use"
           name="directionsforuse"
           placeholder="Enter Directionsforuse name"
         />
         <Input
-          label="Safetyinformation"
+          label="Safety Information"
           name="safetyinformation"
           placeholder="Enter Safetyinformation name"
         />
+
         <Input
           label="Storage"
           name="storage"
           placeholder="Enter Storage name"
         />
+      </div>
+
+      <div className="my-10">
+        <Input label="Taxtype %" name="taxtype" placeholder="Taxtype" />
       </div>
 
       <div className="my-10">
