@@ -25,7 +25,7 @@ const Signup = ({ isOpen, onClose }) => {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full sm:max-w-lg sm:mx-0 mx-3 sm:py-8 py-6 sm:px-20 px-6 relative"
+        className="bg-white cursor-pointer rounded-2xl w-full sm:max-w-lg sm:mx-0 mx-3 sm:py-8 py-6 sm:px-20 px-6 relative"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="sm:text-2xl text-xl font-bold text-center mb-4">
@@ -90,7 +90,7 @@ const Signup = ({ isOpen, onClose }) => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex cursor-pointer items-center gap-2 mt-1">
                 <input type="checkbox" />
                 <div className="text-[9px] underline opacity-60">
                   I agree to the Terms of Service and Privacy Policy

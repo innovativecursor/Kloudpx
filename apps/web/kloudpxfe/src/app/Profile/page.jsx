@@ -10,6 +10,7 @@ import PrescriptionHistoty from "../components/Profile/PrescriptionHistoty";
 import { FaPaperclip } from "react-icons/fa";
 import { useCartContext } from "../contexts/CartContext";
 import usePageLoader from "../hooks/usePageLoader";
+import { usePrescriptionContext } from "../contexts/PrescriptionContext";
 
 const ProfilePage = () => {
   const fallbackImage = "/assets/fallback.png";
@@ -18,6 +19,7 @@ const ProfilePage = () => {
   const { clearCart } = useCartContext();
   const [activeTab, setActiveTab] = useState("");
   const router = useRouter();
+  const { clearPrescription } = usePrescriptionContext();
 
   const logout = () => {
     localStorage.removeItem("access_token");
@@ -26,6 +28,7 @@ const ProfilePage = () => {
     setToken(null);
     setUser(null);
     clearCart();
+    clearPrescription();
   };
 
   return (

@@ -85,7 +85,7 @@ const Login = () => {
               loginOtpSent ? handleLoginVerifyOtp(e) : handleLoginSendOtp(e)
             }
             disabled={loading}
-            className="w-full bg-[#0070ba] text-white sm:py-4 py-2 sm:text-sm text-[10px] rounded-full font-semibold"
+            className="w-full bg-[#0070ba] cursor-pointer text-white sm:py-4 py-2 sm:text-sm text-[10px] rounded-full font-semibold"
           >
             {loading
               ? loginOtpSent

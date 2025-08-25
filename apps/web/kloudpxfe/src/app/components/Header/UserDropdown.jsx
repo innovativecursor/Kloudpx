@@ -13,6 +13,8 @@ import {
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useCartContext } from "@/app/contexts/CartContext";
 import useModal from "@/app/hooks/useModal";
+import { usePrescriptionContext } from "@/app/contexts/PrescriptionContext";
+import usePageLoader from "@/app/hooks/usePageLoader";
 
 const UserDropdown = () => {
   const router = useRouter();
@@ -20,13 +22,15 @@ const UserDropdown = () => {
   const [activeItem, setActiveItem] = useState(null);
   const { user, setToken, setUser } = useAuth();
   const { clearCart } = useCartContext();
-
+  const { clearPrescription } = usePrescriptionContext();
+  const { startLoader } = usePageLoader();
   const logout = () => {
     localStorage.removeItem("access_token");
     router.push("/");
     setToken(null);
     setUser(null);
     clearCart();
+    clearPrescription();
   };
 
   const getBgColor = (item) => {
@@ -84,6 +88,7 @@ const UserDropdown = () => {
             )}`}
             onClick={() => {
               setActiveItem("edit");
+              startLoader();
               router.push("/Profile");
               setIsOpen(false);
             }}
@@ -100,6 +105,7 @@ const UserDropdown = () => {
             )}`}
             onClick={() => {
               setActiveItem("prescription");
+              startLoader();
               router.push("/Profile");
               setIsOpen(false);
             }}
@@ -116,6 +122,7 @@ const UserDropdown = () => {
             )}`}
             onClick={() => {
               setActiveItem("pwd");
+              startLoader();
               router.push("/Profile");
               setIsOpen(false);
             }}
@@ -132,6 +139,7 @@ const UserDropdown = () => {
             )}`}
             onClick={() => {
               setActiveItem("history");
+              startLoader();
               router.push("/Profile");
               setIsOpen(false);
             }}
