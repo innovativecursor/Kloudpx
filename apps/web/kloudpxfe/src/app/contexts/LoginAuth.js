@@ -144,14 +144,23 @@ export const LoginAuthProvider = ({ children }) => {
     try {
       const payload = { phone: `${formData.countryCode}${formData.phone}` };
       await postAxiosCall(endpoints.basicauthphone.login, payload, false);
+
       Swal.fire("Success", "Login OTP sent!", "success");
       setLoginOtpSent(true);
     } catch (err) {
-      Swal.fire(
-        "Error",
-        err.response?.data?.message || "Failed to send OTP",
-        "error"
-      );
+      const message = err.response?.data?.error || "Failed to send OTP";
+
+      if (message === "User not found or not verified") {
+        Swal.fire(
+          "Info",
+          "You are not registered yet. Please signup first!",
+          "info"
+        );
+        closeLogin();
+        openSignup();
+      } else {
+        Swal.fire("Error", message, "error");
+      }
     } finally {
       setLoading(false);
     }
