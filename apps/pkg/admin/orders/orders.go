@@ -188,6 +188,7 @@ func UpdateOrderDetails(c *gin.Context, db *gorm.DB) {
 
 	var order models.Order
 	if err := db.Preload("User").
+		Preload("CheckoutSession").
 		Where("order_number = ?", orderNumber).
 		First(&order).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
@@ -226,8 +227,9 @@ func UpdateOrderDetails(c *gin.Context, db *gorm.DB) {
 
 	// Fetch address phone number via CheckoutSession.AddressID
 	var address models.Address
-	if err := db.Where("user_id = ?", order.UserID).First(&address).Error; err != nil {
+	if err := db.First(&address, order.CheckoutSession.AddressID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order address not found"})
+		return
 	}
 
 	SendOrderUpdateSMS(address.PhoneNumber, order)
