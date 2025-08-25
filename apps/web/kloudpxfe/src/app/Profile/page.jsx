@@ -11,6 +11,7 @@ import { FaPaperclip } from "react-icons/fa";
 import { useCartContext } from "../contexts/CartContext";
 import usePageLoader from "../hooks/usePageLoader";
 import { usePrescriptionContext } from "../contexts/PrescriptionContext";
+import OrderHistory from "../components/Profile/OrderHistory";
 
 const ProfilePage = () => {
   const fallbackImage = "/assets/fallback.png";
@@ -100,7 +101,7 @@ const ProfilePage = () => {
             >
               <FaPaperclip className="text-xs" />
               <span className="lg:text-xs text-[11px]">
-                Upload Gcash Payment
+                Upload Pwd Certificate
               </span>
               <input
                 type="file"
@@ -111,7 +112,7 @@ const ProfilePage = () => {
             </label>
           </div>
         )}
-        {/* {activeTab === "order" && <OrderHistory />} */}
+        {activeTab === "order" && <OrderHistory />}
       </main>
     </div>
   );

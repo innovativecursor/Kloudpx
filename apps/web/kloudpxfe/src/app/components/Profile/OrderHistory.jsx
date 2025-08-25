@@ -1,138 +1,104 @@
 "use client";
 
-import React, { useState } from "react";
-import { Pagination, Modal } from "antd";
+import React, { useEffect, useState } from "react";
+import { Pagination, Modal, Spin } from "antd";
 import "antd/dist/reset.css";
-
-const allOrders = Array.from({ length: 20 }, (_, i) => ({
-  orderNumber: `XYT3456${222 + i}`,
-  transactionId: `UTI8945${55 + i}`,
-  customerName: `Customer ${i + 1}`,
-  status: i % 2 === 0 ? "Partially Paid" : "Paid",
-  orderDate: "26 Jul, 25",
-  paymentType: "Credit Card",
-  items: [
-    {
-      name: "Sugar free gold",
-      price: 220,
-      quantity: 1,
-      category: "Supplements, Vitamins",
-      image: "/product1.png",
-    },
-    {
-      name: "Sugar free gold",
-      price: 180,
-      quantity: 2,
-      category: "Supplements, Vitamins",
-      image: "/product2.png",
-    },
-  ],
-  deliveryCharge: 220,
-  offerDiscount: 220,
-  gst: "12%",
-  total: 220,
-}));
-
-const statusOptions = ["Paid", "Partially Paid", "Pending"];
+import { useProfileContext } from "@/app/contexts/ProfileContext";
 
 const OrderHistory = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
   const fallbackImage = "/assets/fallback.png";
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
 
-  const paginatedOrders = allOrders.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  const { getAllOrder, allOrder, getOrderDetails, selectedOrder } =
+    useProfileContext();
 
-  const handleStatusChange = (index, newStatus) => {
-    const updated = [...paginatedOrders];
-    updated[index].status = newStatus;
-    const globalIndex = (currentPage - 1) * pageSize + index;
-    allOrders[globalIndex] = updated[index];
-  };
+  useEffect(() => {
+    getAllOrder();
+  }, []);
 
-  const openModal = (order) => {
-    setSelectedOrder(order);
+  const paginatedOrders =
+    allOrder?.slice((currentPage - 1) * pageSize, currentPage * pageSize) || [];
+
+  const openModal = async (order) => {
     setIsModalOpen(true);
+    setLoadingDetails(true);
+    await getOrderDetails(order.order_number);
+    setLoadingDetails(false);
   };
+
+  console.log(selectedOrder, "shdka");
 
   return (
-    <div className="max-w-3xl my-16 bg-white rounded-lg shadow overflow-hidden ">
+    <div className="max-w-4xl my-16 bg-white rounded-lg shadow overflow-hidden mx-auto">
+      {/* Orders Table */}
       <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300">
         <table className="md:min-w-[700px] w-full text-left">
           <thead className="bg-[#0070ba] text-sm font-light text-white">
             <tr>
               <th className="py-5 px-6">Order Number</th>
-              <th className="py-5 px-6">Transaction ID</th>
+              <th className="py-5 px-6">Shipping Number</th>
               <th className="py-5 px-6">Customer Name</th>
               <th className="py-5 px-6">Status</th>
             </tr>
           </thead>
           <tbody>
-            {paginatedOrders.map((order, index) => (
+            {paginatedOrders.map((order) => (
               <tr
-                key={order.orderNumber}
+                key={order.order_number}
                 onClick={() => openModal(order)}
                 className="border-b border-gray-100 cursor-pointer font-light hover:bg-gray-50 text-sm transition"
               >
-                <td className="py-5 px-6">{order.orderNumber}</td>
-                <td className="py-5 px-6">{order.transactionId}</td>
-                <td className="py-5 px-6">{order.customerName}</td>
-                <td className="py-5 px-6">
-                  <select
-                    value={order.status}
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={(e) => handleStatusChange(index, e.target.value)}
-                    className="bg-blue-50 text-blue-900 py-1 px-3 rounded-lg cursor-pointer focus:outline-none"
-                  >
-                    {statusOptions.map((opt) => (
-                      <option key={opt} value={opt}>
-                        {opt}
-                      </option>
-                    ))}
-                  </select>
-                </td>
+                <td className="py-5 px-6">{order.order_number}</td>
+                <td className="py-5 px-6">{order.shipping_number || "-"}</td>
+                <td className="py-5 px-6">{order.customer_name || "-"}</td>
+                <td className="py-5 px-6">{order.order_status || "-"}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
+      {/* Pagination */}
       <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 text-sm gap-2">
         <div className="text-gray-600">
           Showing {(currentPage - 1) * pageSize + 1} -{" "}
-          {Math.min(currentPage * pageSize, allOrders.length)} of{" "}
-          {allOrders.length} records
+          {Math.min(currentPage * pageSize, allOrder.length)} of{" "}
+          {allOrder.length} records
         </div>
         <Pagination
           current={currentPage}
-          total={allOrders.length}
+          total={allOrder.length}
           pageSize={pageSize}
           onChange={(page) => setCurrentPage(page)}
           showSizeChanger={false}
         />
       </div>
 
-      {/* MODAL */}
+      {/* Modal */}
       <Modal
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         footer={null}
         width={900}
       >
-        {selectedOrder && (
+        {loadingDetails ? (
+          <div className="flex justify-center py-16">
+            <Spin size="large" />
+          </div>
+        ) : selectedOrder ? (
           <div className="p-2 sm:p-4">
-            <div className="shadow-sm">
-              <h2 className="text-lg sm:text-xl font-semibold mb-1">
-                {selectedOrder.customerName}
-              </h2>
-              <p className="text-sm text-gray-500 mb-4">
-                {selectedOrder.orderNumber}
-              </p>
-            </div>
+            <h2 className="text-lg sm:text-xl font-semibold mb-1">
+              {selectedOrder.customer_name || "Customer Name"}
+            </h2>
+            <p className="text-sm text-gray-500 mb-2">
+              Order #: {selectedOrder.order_number}
+            </p>
+            <p className="text-sm text-gray-500 mb-4">
+              Shipping Address: {selectedOrder.delivery_address || "-"}
+            </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6 sm:mt-10">
               {/* Product Details */}
@@ -141,28 +107,29 @@ const OrderHistory = () => {
                   <h3 className="text-base sm:text-lg font-semibold mb-4">
                     Product Details
                   </h3>
-                  {selectedOrder.items.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-4 mb-4 transition"
-                    >
-                      <img
-                        src={item.image || fallbackImage}
-                        alt={item.name}
-                        className="w-16 h-16 object-cover rounded-md"
-                      />
-                      <div className="flex-1">
-                        <h1 className="text-xs text-[#0070ba] font-medium">
-                          {item.category}
-                        </h1>
-                        <h4 className="font-semibold text-sm sm:text-base">
-                          {item.name}
-                        </h4>
-                        <h1 className="text-sm font-medium">₱{item.price}</h1>
-                        <span className="text-xs">Qty: {item.quantity}</span>
+                  {selectedOrder.items && selectedOrder.items.length > 0 ? (
+                    selectedOrder.items.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="flex flex-row items-start sm:items-center gap-4 mb-4 transition"
+                      >
+                        <img
+                          src={item.image || fallbackImage}
+                          alt={item.medicine_name || "Product"}
+                          className="w-16 h-16 object-cover rounded-md"
+                        />
+                        <div className="flex-1 text-sm sm:text-base">
+                          <h4 className="font-semibold">
+                            {item.medicine_name}
+                          </h4>
+                          <p>Price: ₱{item.price}</p>
+                          <p>Qty: {item.quantity}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p>No items in this order.</p>
+                  )}
                 </div>
               </div>
 
@@ -174,37 +141,43 @@ const OrderHistory = () => {
                 <div className="text-sm space-y-2">
                   <div className="flex justify-between">
                     <span>Order date</span>
-                    <span>{selectedOrder.orderDate}</span>
+                    <span>{selectedOrder.created_at || "-"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Payment Type</span>
-                    <span>{selectedOrder.paymentType}</span>
+                    <span>{selectedOrder.payment_type || "-"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Item Total</span>
-                    <span>₱{selectedOrder.total}</span>
+                    <span>Paid Amount</span>
+                    <span>₱{selectedOrder.paid_amount || 0}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Delivery charge</span>
-                    <span>₱{selectedOrder.deliveryCharge}</span>
+                    <span>Delivery Type</span>
+                    <span>{selectedOrder.delivery_type || "-"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Offer discount</span>
-                    <span>₱{selectedOrder.offerDiscount}</span>
+                    <span>Shipping Number</span>
+                    <span>{selectedOrder.shipping_number || "-"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>GST</span>
-                    <span>{selectedOrder.gst}</span>
+                    <span>Order Status</span>
+                    <span>{selectedOrder.order_status || "-"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Remark</span>
+                    <span>{selectedOrder.remark || "-"}</span>
                   </div>
                   <hr className="my-2" />
                   <div className="flex justify-between font-semibold">
-                    <span>Total amount</span>
-                    <span>₱{selectedOrder.total}</span>
+                    <span>Total Amount</span>
+                    <span>₱{selectedOrder.grand_total || 0}</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        ) : (
+          <p className="text-center py-16">No order details found.</p>
         )}
       </Modal>
     </div>

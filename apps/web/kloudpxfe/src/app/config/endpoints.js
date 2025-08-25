@@ -36,11 +36,13 @@ const endpoints = {
     remove: (id) => `${baseUrl}/v1/user/remove-item-cart/${id}`,
     saveForLater: `${baseUrl}/v1/user/save-for-later`,
   },
-account: {
-  edit: () => `${baseUrl}/v1/user/profile/update`, // base URL only
-},
-
-
+  account: {
+    edit: () => `${baseUrl}/v1/user/profile/update`,
+    prescriptionhistory: `${baseUrl}/v1/user/prescription history`,
+    order: `${baseUrl}/v1/user/orders`,
+    orderdetails: (order_number) =>
+      `${baseUrl}/v1/user/order/details/${order_number}`,
+  },
   prescriptioncart: {
     add: `${baseUrl}/v1/user/add-to-cart-medicine`,
   },
