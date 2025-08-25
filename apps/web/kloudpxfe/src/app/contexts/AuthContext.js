@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
 
   console.log(user, "mu yser");
 
-  const login = useGoogleLogin({
+  const googleLogin = useGoogleLogin({
     flow: "auth-code",
     onSuccess: async (codeResponse) => {
       try {
@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         token,
-        login,
+        googleLogin,
         setToken,
         setUser,
         // logout,

@@ -4,6 +4,7 @@ import React from "react";
 import { FcGoogle } from "react-icons/fc";
 import { BsFacebook } from "react-icons/bs";
 import { useLoginAuth } from "@/app/contexts/LoginAuth";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 const Login = () => {
   const {
@@ -16,8 +17,9 @@ const Login = () => {
     handleLoginSendOtp,
     handleLoginVerifyOtp,
     countryCodes,
+    openSignup,
   } = useLoginAuth();
-
+  const { googleLogin } = useAuth();
   if (!isLoginOpen) return null;
 
   return (
@@ -98,7 +100,10 @@ const Login = () => {
             Don’t have an account?{" "}
             <span
               className="text-[#0070ba] underline cursor-pointer"
-              onClick={closeLogin}
+              onClick={() => {
+                closeLogin();
+                openSignup();
+              }}
             >
               SIGN UP
             </span>
@@ -111,17 +116,26 @@ const Login = () => {
           </div>
 
           <div className="flex justify-center gap-4">
-            <button
+            {/* <button
               type="button"
-              className="p-2 border border-gray-200 rounded-md"
+              onClick={googleLogin}
+              className="p-2 border border-gray-200 cursor-pointer rounded-md"
             >
               <FcGoogle className="sm:text-2xl text-xl" />
-            </button>
+            </button> */}
             <button
               type="button"
-              className="p-2 border border-gray-200 rounded-md"
+              onClick={async () => {
+                try {
+                  await googleLogin();
+                  closeLogin();
+                } catch (err) {
+                  console.error("Google login failed", err);
+                }
+              }}
+              className="p-2 border border-gray-200 cursor-pointer rounded-md"
             >
-              <BsFacebook className="text-blue-600 sm:text-2xl text-xl" />
+              <FcGoogle className="sm:text-2xl text-xl" />
             </button>
           </div>
         </form>

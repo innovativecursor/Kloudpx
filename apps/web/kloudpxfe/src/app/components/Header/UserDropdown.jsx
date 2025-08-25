@@ -55,7 +55,9 @@ const UserDropdown = () => {
       >
         <VscAccount className="md:text-2xl text-xl cursor-pointer text-gray-600" />
         <span className="md:text-sm sm:text-xs text-[10px] mt-1 tracking-wide opacity-70 truncate max-w-[60px] sm:max-w-[70px] text-center">
-          {user?.first_name} {user?.last_name}
+          {user?.first_name || user?.last_name
+            ? `${user?.first_name || ""} ${user?.last_name || ""}`
+            : "Hi, User"}
         </span>
       </div>
 

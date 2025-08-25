@@ -43,33 +43,59 @@ export const LoginAuthProvider = ({ children }) => {
     setFormData((prev) => ({ ...prev, otp: "" }));
   };
 
-  /*** Signup Logic ***/
   const handleSendOtp = async () => {
-    if (!formData.phone)
+    if (!formData.firstName.trim()) {
+      return Swal.fire("Error", "Enter first name", "error");
+    }
+
+    if (!formData.lastName.trim()) {
+      return Swal.fire("Error", "Enter last name", "error");
+    }
+
+    if (!formData.phone.trim()) {
       return Swal.fire("Error", "Enter phone number", "error");
+    }
+    if (!/^[0-9]{10}$/.test(formData.phone.trim())) {
+      return Swal.fire(
+        "Error",
+        "Phone number must be exactly 10 digits",
+        "error"
+      );
+    }
+
     setLoading(true);
     try {
       const payload = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: `${formData.countryCode}${formData.phone}`,
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        phone: `${formData.countryCode}${formData.phone.trim()}`,
       };
+
       await postAxiosCall(endpoints.basicauthphone.signup, payload, false);
       setStep("verify");
       Swal.fire("Success", "OTP sent successfully!", "success");
     } catch (error) {
-      Swal.fire(
-        "Error",
-        error.response?.data?.message || "Failed to send OTP",
-        "error"
-      );
+      const message = error.response?.data?.message || "Failed to send OTP";
+
+      if (message === "Failed to send OTP") {
+        Swal.fire("Info", "You are already signed up, please login!", "info");
+        closeSignup();
+        openLogin();
+      } else {
+        Swal.fire("Error", message, "error");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const handleVerifyOtp = async () => {
-    if (!formData.otp) return Swal.fire("Error", "Enter OTP", "error");
+    if (!formData.otp.trim()) {
+      return Swal.fire("Error", "Enter OTP", "error");
+    }
+    if (!/^[0-9]{6}$/.test(formData.otp.trim())) {
+      return Swal.fire("Error", "OTP must be exactly 6 digits", "error");
+    }
     setLoading(true);
     try {
       const payload = {
@@ -106,8 +132,14 @@ export const LoginAuthProvider = ({ children }) => {
   /*** LOGIN Logic ***/
   const handleLoginSendOtp = async (e) => {
     e?.preventDefault();
-    if (!formData.phone)
+
+    if (!formData.phone.trim()) {
       return Swal.fire("Error", "Enter phone number", "error");
+    }
+    if (!/^[0-9]{7,15}$/.test(formData.phone.trim())) {
+      return Swal.fire("Error", "Phone number must be 7-15 digits", "error");
+    }
+
     setLoading(true);
     try {
       const payload = { phone: `${formData.countryCode}${formData.phone}` };
@@ -127,7 +159,13 @@ export const LoginAuthProvider = ({ children }) => {
 
   const handleLoginVerifyOtp = async (e) => {
     e.preventDefault();
-    if (!formData.otp) return Swal.fire("Error", "Enter OTP", "error");
+
+    if (!formData.otp.trim()) {
+      return Swal.fire("Error", "Enter OTP", "error");
+    }
+    if (!/^[0-9]{6}$/.test(formData.otp.trim())) {
+      return Swal.fire("Error", "OTP must be exactly 6 digits", "error");
+    }
 
     setLoading(true);
     try {
