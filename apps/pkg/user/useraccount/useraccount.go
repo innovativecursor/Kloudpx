@@ -308,7 +308,7 @@ func UploadPWDCertificate(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Decode base64 into byte array
+	// Decode base64 into byte array.
 	decodedFile, err := base64.StdEncoding.DecodeString(payload.File)
 	if err != nil {
 		logrus.WithError(err).Error("Invalid base64 file")
