@@ -55,7 +55,7 @@ const ProductDeatilsCard = ({ details }) => {
           )}
         </div>
 
-        <p className="opacity-60 leading-relaxed items-start sm:mb-6 mb-3 sm:mt-5 mt-4 sm:text-sm text-xs md:text-lg text-justify">
+        <p className="opacity-60 leading-relaxed items-start sm:mb-6 mb-3 sm:mt-5 mt-4 sm:text-sm text-xs md:text-lg text-justify break-words hyphens-auto">
           {details?.description || "No description available."}
         </p>
 

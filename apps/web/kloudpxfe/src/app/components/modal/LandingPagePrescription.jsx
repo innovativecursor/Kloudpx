@@ -4,10 +4,23 @@ import React, { useEffect, useRef, useState } from "react";
 import { usePrescriptionContext } from "@/app/contexts/PrescriptionContext";
 import "swiper/css";
 import "swiper/css/navigation";
+import Image from "next/image";
+import prescriptionguide from "@/assets/prescriptionguide.jpeg";
 
 const LandingPagePrescription = ({ isOpen, setIsOpen }) => {
-  const { uploadedImage, uploadPrescription, loading } =
-    usePrescriptionContext();
+  const {
+    uploadedImage,
+    uploadPrescription,
+    loading,
+    allPrescription,
+    getAllPrescription,
+  } = usePrescriptionContext();
+
+  useEffect(() => {
+    if (!allPrescription || allPrescription.length === 0) {
+      getAllPrescription();
+    }
+  }, []);
 
   useEffect(() => {
     if (uploadedImage) {
@@ -18,6 +31,8 @@ const LandingPagePrescription = ({ isOpen, setIsOpen }) => {
   const modalRef = useRef(null);
 
   if (!isOpen) return null;
+
+  console.log(allPrescription);
 
   return (
     <>
@@ -83,30 +98,42 @@ const LandingPagePrescription = ({ isOpen, setIsOpen }) => {
                 }}
               />
             </label>
-               <div className="flex items-start sm:items-center gap-1 sm:mt-3 sm:mx-0 mb-2 mx-3">
-              <span className="font-semibold text-[#0070ba] text-sm">Note: </span>
-              <span className="text-[10px]"> Always upload a clean version of your Prescription for better result. </span>
+            <div className="flex items-start sm:items-center gap-1 sm:mt-3 sm:mx-0 mb-4 mx-3">
+              <span className="font-semibold text-[#0070ba] text-sm">
+                Note:{" "}
+              </span>
+              <span className="text-[10px]">
+                {" "}
+                Always upload a clean version of your Prescription for better
+                result.{" "}
+              </span>
             </div>
           </div>
 
           {/* Right side - Guide / Preview */}
-          <div className="bg-[#F6F5FA] block ">
-            <div className="flex justify-end "></div>
-            <div className=" rounded-xl py-6 px-6 flex flex-col items-center justify-center">
+          <div className="bg-[#F6F5FA] md:block hidden">
+            <div className="rounded-xl py-6 px-6 flex flex-col items-center justify-center">
               <h3 className="sm:text-sm dark-text font-semibold mb-4">
                 Guide for Prescription
               </h3>
-              <div className="w-full h-40 overflow-hidden rounded-md border border-gray-300 flex items-center justify-center">
+              <div className="w-full overflow-hidden rounded-md border border-gray-300 flex items-center justify-center">
                 {uploadedImage ? (
                   <img
                     src={uploadedImage}
                     alt="Prescription Preview"
                     className="object-contain w-full p-5 h-40 rounded-md"
                   />
+                ) : allPrescription.length === 0 ? (
+                  <Image
+                    src={prescriptionguide}
+                    alt="Prescription Guide"
+                    className="w-full h-full p-3 object-cover"
+                    priority
+                  />
                 ) : (
-                  <h1 className="text-center text-sm opacity-60">
-                    Upload Prescription
-                  </h1>
+                  <div className="flex justify-center items-center text-gray-500 h-40 text-sm ">
+                    Uploaded prescriptions are lis ted above.
+                  </div>
                 )}
               </div>
               <div className="flex flex-col items-center justify-center tracking-wider mt-2">
@@ -120,6 +147,17 @@ const LandingPagePrescription = ({ isOpen, setIsOpen }) => {
               </div>
             </div>
           </div>
+
+          {!loading && allPrescription.length === 0 && !uploadedImage && (
+            <div className="md:hidden bg-[#F6F5FA] rounded-xl py-6 px-6 flex flex-col items-center justify-center">
+              <Image
+                src={prescriptionguide}
+                alt="Prescription Guide"
+                className="w-full h-full p-3 object-cover"
+                priority
+              />
+            </div>
+          )}
         </div>
       </div>
     </>

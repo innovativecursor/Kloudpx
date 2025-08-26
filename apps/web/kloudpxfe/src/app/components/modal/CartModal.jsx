@@ -224,7 +224,7 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
               onClick={handleCheckout}
               disabled={checkoutLoading}
               className={classNames(
-                "w-full py-3 rounded-full text-sm font-semibold cursor-pointer text-white transition",
+                "w-full py-3 rounded-full text-sm font-semibold cursor-pointer !text-white transition",
                 checkoutLoading
                   ? "bg-[#7aaed8] cursor-not-allowed"
                   : "bg-[#0070BA] hover:bg-[#005c96]"

@@ -52,7 +52,7 @@ const DeliveryCart = () => {
             return (
               <div
                 key={index}
-                className="flex items-center gap-4 md:py-4 px-6 border-b border-gray-200"
+                className="flex items-center gap-4 space-y-5 sm:space-y-0 md:py-4 px-6 border-b border-gray-200"
               >
                 <div>
                   <img

@@ -26,13 +26,13 @@ const ProDetailsDes = ({ details }) => {
           </h3>
         </div>
 
-        <span className="text-gray-700 mb-7 w-full text-justify  leading-relaxed">
+        <span className="text-gray-700 mb-7 w-full text-justify break-words hyphens-auto leading-relaxed">
           {details.description}
         </span>
 
         {details.benefits && (
           <>
-            <h3 className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
+            <h3 className="text-gray-700 leading-relaxed text-justify break-words hyphens-auto whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               Benefits of {details.benefits}:
             </h3>
           </>
@@ -46,7 +46,7 @@ const ProDetailsDes = ({ details }) => {
               </h3>
             </div>
 
-            <span className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
+            <span className="text-gray-700 leading-relaxed text-justify break-words hyphens-auto whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               {details?.keyingredients}
             </span>
           </>
@@ -60,7 +60,7 @@ const ProDetailsDes = ({ details }) => {
               </h3>
             </div>
 
-            <span className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
+            <span className="text-gray-700 leading-relaxed text-justify break-words hyphens-auto whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               {details?.recommendeddailyallowance}
             </span>
           </>
@@ -74,7 +74,7 @@ const ProDetailsDes = ({ details }) => {
               </h3>
             </div>
 
-            <span className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
+            <span className="text-gray-700 leading-relaxed text-justify break-words hyphens-auto whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               {details?.directionsforuse}
             </span>
           </>
@@ -88,7 +88,7 @@ const ProDetailsDes = ({ details }) => {
               </h3>
             </div>
 
-            <span className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
+            <span className="text-gray-700 leading-relaxed text-justify break-words hyphens-auto whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               {details?.safetyinformation}
             </span>
           </>
@@ -102,7 +102,7 @@ const ProDetailsDes = ({ details }) => {
               </h3>
             </div>
 
-            <span className="text-gray-700 leading-relaxed text-justify whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
+            <span className="text-gray-700 leading-relaxed text-justify break-words hyphens-auto whitespace-pre-line w-full lg:text-base sm:text-sm text-xs tracking-wide ">
               {details?.storage}
             </span>
           </>
