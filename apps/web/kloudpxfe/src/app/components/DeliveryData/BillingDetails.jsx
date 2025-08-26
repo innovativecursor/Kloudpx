@@ -34,7 +34,7 @@ const BillingDetails = ({ deliveryData }) => {
             return (
               <div
                 key={index}
-                className="flex items-center gap-4 md:py-4 px-6 border-b border-gray-200"
+                className="flex items-center my-7 sm:my-0 gap-4 md:py-4 px-6 border-b border-gray-200"
               >
                 <div>
                   <img
@@ -104,8 +104,6 @@ const BillingDetails = ({ deliveryData }) => {
               </span>
             </div>
 
-       
-
             <div className="flex justify-between items-center">
               <div className="flex gap-1 items-center">
                 <CiDeliveryTruck className="text-base" />
@@ -117,8 +115,8 @@ const BillingDetails = ({ deliveryData }) => {
             </div>
 
             {/* Total Amount */}
-            <div className="w-full h-[0.5px] bg-[#0070ba] mt-4"></div>
-            <div className="flex justify-between items-center py-3">
+            <div className="w-full h-[0.5px] bg-[#0070ba] mt-4 "></div>
+            <div className="flex justify-between items-center mb-4 py-3">
               <span className="text-sm font-semibold">Total Amount</span>
               <span className="text-sm font-semibold text-[#333]">
                 ₱{deliveryData.grand_total?.toFixed(2)}
