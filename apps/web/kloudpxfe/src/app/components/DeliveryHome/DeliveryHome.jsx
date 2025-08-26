@@ -26,7 +26,7 @@ const DeliveryHome = () => {
           <h2 className="sm:text-2xl text-xl font-bold mb-4">
             100% Authentic Medicines
           </h2>
-          <p className="text-gray-600 text-justify md:text-start tracking-wide mb-6">
+          <p className="text-gray-600 text-justify tracking-wide mb-6 break-words hyphens-auto">
             Our licensed pharmacists are available to provide personalized
             advice and answer your questions about medications, potential
             interactions, and side effects. We ensure you have all the
@@ -54,7 +54,7 @@ const DeliveryHome = () => {
           <h2 className="sm:text-2xl text-xl font-bold mb-6">
             Fast &amp; Secure Delivery Service
           </h2>
-          <p className="text-gray-600 text-justify md:text-start tracking-wide mb-8">
+          <p className="text-gray-600 text-justify break-words hyphens-auto md:text-start tracking-wide mb-8">
             Get your medications and health products delivered right to your
             doorstep with our reliable delivery service. We ensure your privacy
             and the integrity of your medications with temperature-controlled

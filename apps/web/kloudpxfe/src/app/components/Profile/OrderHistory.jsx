@@ -37,7 +37,7 @@ const OrderHistory = () => {
       {/* Orders Table */}
       <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300">
         <table className="md:min-w-[700px] w-full text-left">
-          <thead className="bg-[#0070ba] text-sm font-light text-white">
+          <thead className="bg-[#0070ba] sm:text-sm text-xs font-light text-white">
             <tr>
               <th className="py-5 px-6">Order Number</th>
               <th className="py-5 px-6">Shipping Number</th>

@@ -71,7 +71,9 @@ const ProfilePage = () => {
                 </h2>
                 <h2 className="text-sm mt-1 font-medium">{user?.email}</h2>
                 {user?.age > 0 && (
-                  <h2 className="text-sm mt-1 font-medium">{user.age}s old</h2>
+                  <h2 className="text-sm mt-1 font-medium">
+                    {user.age} {user.age === 1 ? "year" : "years"} old
+                  </h2>
                 )}
 
                 <h2 className="text-sm mt-1 font-medium">{user?.phone}</h2>
