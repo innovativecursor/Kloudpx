@@ -111,12 +111,7 @@ export const getMedicineColumns = ({ handleEdit, deleteMedicine }) => [
     align: "center",
     render: (price) => `₹${price?.toFixed(2)}`,
   },
-  // {
-  //   title: "Tax",
-  //   dataIndex: "TaxType",
-  //   key: "TaxType",
-  //   align: "center",
-  // },
+
   {
     title: "Discount",
     dataIndex: "Discount",
@@ -185,28 +180,28 @@ export const getMedicineColumns = ({ handleEdit, deleteMedicine }) => [
   },
 
   {
-    title: "KeyIngredients",
+    title: "Key Ingredients",
     dataIndex: "KeyIngredients",
     key: "KeyIngredients",
     align: "center",
   },
 
   {
-    title: "RecommendedDailyAllowance",
+    title: "Recommended Daily Allowance",
     dataIndex: "RecommendedDailyAllowance",
     key: "RecommendedDailyAllowance",
     align: "center",
   },
 
   {
-    title: "DirectionsForUse",
+    title: "Directions For Use",
     dataIndex: "DirectionsForUse",
     key: "DirectionsForUse",
     align: "center",
   },
 
   {
-    title: "SafetyInformation",
+    title: "Safety Information",
     dataIndex: "SafetyInformation",
     key: "SafetyInformation",
     align: "center",

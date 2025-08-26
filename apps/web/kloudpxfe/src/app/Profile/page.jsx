@@ -78,7 +78,7 @@ const ProfilePage = () => {
 
                 <button
                   onClick={logout}
-                  className="mt-3 text-base cursor-pointer text-red-600 hover:underline"
+                  className="mt-3 text-base cursor-pointer !text-red-600 hover:underline"
                 >
                   Logout
                 </button>

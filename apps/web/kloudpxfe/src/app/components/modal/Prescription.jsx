@@ -9,6 +9,8 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { FiMaximize2, FiMinimize2 } from "react-icons/fi";
+import Image from "next/image";
+import prescriptionguide from "@/assets/prescriptionguide.jpeg";
 
 const Prescription = () => {
   const {
@@ -371,14 +373,17 @@ const Prescription = () => {
             </div>
           </div>
 
-          {/* Right side - Guide / Preview */}
-          <div className="bg-[#F6F5FA] md:block hidden ">
-            <div className="md:flex justify-end hidden"></div>
-            <div className=" rounded-xl py-6 px-6 flex flex-col items-center justify-center">
+          {/* Desktop View */}
+          <div className="bg-[#F6F5FA] md:block hidden">
+            <div className="rounded-xl py-6 px-6 flex flex-col items-center justify-center">
               <h3 className="sm:text-sm dark-text font-semibold mb-4">
                 Guide for Prescription
               </h3>
-              <div className="w-full h-40 overflow-hidden rounded-md border border-gray-300 flex items-center justify-center">
+              <div
+                className={`w-full overflow-hidden rounded-md border border-gray-300 flex items-center justify-center ${
+                  uploadedImage ? "h-40" : "h-full"
+                }`}
+              >
                 {uploadedImage ? (
                   <img
                     src={uploadedImage}
@@ -386,9 +391,12 @@ const Prescription = () => {
                     className="object-contain w-full p-5 h-40 rounded-md"
                   />
                 ) : (
-                  <h1 className="text-center text-sm opacity-60">
-                    Upload Prescription
-                  </h1>
+                  <Image
+                    src={prescriptionguide}
+                    alt="Prescription Guide"
+                    className="w-full h-full p-3 object-cover"
+                    priority
+                  />
                 )}
               </div>
               <div className="flex flex-col items-center justify-center tracking-wider mt-2">
@@ -401,6 +409,18 @@ const Prescription = () => {
                 </h1>
               </div>
             </div>
+          </div>
+
+          {/* Mobile View */}
+          <div className="md:hidden bg-[#F6F5FA] rounded-xl py-6 px-6 flex flex-col items-center justify-center">
+            {uploadedImage ? null : (
+              <Image
+                src={prescriptionguide}
+                alt="Prescription Guide"
+                className="w-full h-full p-3 object-cover"
+                priority
+              />
+            )}
           </div>
         </div>
       </div>

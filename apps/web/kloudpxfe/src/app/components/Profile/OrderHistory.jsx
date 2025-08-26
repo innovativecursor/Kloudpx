@@ -19,8 +19,9 @@ const OrderHistory = () => {
     getAllOrder();
   }, []);
 
-  const paginatedOrders =
-    allOrder?.slice((currentPage - 1) * pageSize, currentPage * pageSize) || [];
+  const paginatedOrders = Array.isArray(allOrder)
+    ? allOrder.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    : [];
 
   const openModal = async (order) => {
     setIsModalOpen(true);

@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { usePrescriptionContext } from "@/app/contexts/PrescriptionContext";
 import "swiper/css";
 import "swiper/css/navigation";
+import Image from "next/image";
+import prescriptionguide from "@/assets/prescriptionguide.jpeg";
 
 const LandingPagePrescription = ({ isOpen, setIsOpen }) => {
   const { uploadedImage, uploadPrescription, loading } =
@@ -83,20 +85,29 @@ const LandingPagePrescription = ({ isOpen, setIsOpen }) => {
                 }}
               />
             </label>
-               <div className="flex items-start sm:items-center gap-1 sm:mt-3 sm:mx-0 mb-2 mx-3">
-              <span className="font-semibold text-[#0070ba] text-sm">Note: </span>
-              <span className="text-[10px]"> Always upload a clean version of your Prescription for better result. </span>
+            <div className="flex items-start sm:items-center gap-1 sm:mt-3 sm:mx-0 mb-2 mx-3">
+              <span className="font-semibold text-[#0070ba] text-sm">
+                Note:{" "}
+              </span>
+              <span className="text-[10px]">
+                {" "}
+                Always upload a clean version of your Prescription for better
+                result.{" "}
+              </span>
             </div>
           </div>
 
           {/* Right side - Guide / Preview */}
-          <div className="bg-[#F6F5FA] block ">
-            <div className="flex justify-end "></div>
-            <div className=" rounded-xl py-6 px-6 flex flex-col items-center justify-center">
+          <div className="bg-[#F6F5FA] md:block hidden">
+            <div className="rounded-xl py-6 px-6 flex flex-col items-center justify-center">
               <h3 className="sm:text-sm dark-text font-semibold mb-4">
                 Guide for Prescription
               </h3>
-              <div className="w-full h-40 overflow-hidden rounded-md border border-gray-300 flex items-center justify-center">
+              <div
+                className={`w-full overflow-hidden rounded-md border border-gray-300 flex items-center justify-center ${
+                  uploadedImage ? "h-40" : "h-full"
+                }`}
+              >
                 {uploadedImage ? (
                   <img
                     src={uploadedImage}
@@ -104,9 +115,12 @@ const LandingPagePrescription = ({ isOpen, setIsOpen }) => {
                     className="object-contain w-full p-5 h-40 rounded-md"
                   />
                 ) : (
-                  <h1 className="text-center text-sm opacity-60">
-                    Upload Prescription
-                  </h1>
+                  <Image
+                    src={prescriptionguide}
+                    alt="Prescription Guide"
+                    className="w-full h-full p-3 object-cover"
+                    priority
+                  />
                 )}
               </div>
               <div className="flex flex-col items-center justify-center tracking-wider mt-2">
@@ -119,6 +133,17 @@ const LandingPagePrescription = ({ isOpen, setIsOpen }) => {
                 </h1>
               </div>
             </div>
+          </div>
+          {/* Mobile View */}
+          <div className="md:hidden bg-[#F6F5FA] rounded-xl py-6 px-6 flex flex-col items-center justify-center">
+            {uploadedImage ? null : (
+              <Image
+                src={prescriptionguide}
+                alt="Prescription Guide"
+                className="w-full h-full p-3 object-cover"
+                priority
+              />
+            )}
           </div>
         </div>
       </div>

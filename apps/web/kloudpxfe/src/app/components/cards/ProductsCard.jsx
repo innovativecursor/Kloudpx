@@ -90,7 +90,7 @@ const ProductCardItem = ({ item, fallbackImage }) => {
 
       <div className=" mx-3.5 mb-2">
         <div className="flex justify-between sm:mt-3 mt-2 pb-2 items-center">
-          <span className="font-semibold sm:text-base text-sm">
+          <span className="font-semibold sm:text-base text-xs">
             ₱
             {(
               item?.price -
@@ -101,7 +101,7 @@ const ProductCardItem = ({ item, fallbackImage }) => {
           <AddToCart
             title="Add To Cart"
             productDetails={item}
-            className="md:text-xs text-[9px] flex items-center gap-1 rounded-full font-medium sm:px-5 px-3 py-1.5 justify-center text-white bg-[#0070ba] cursor-pointer "
+            className="md:text-xs text-[8px] flex items-center gap-1 rounded-full font-medium sm:px-5 px-2 py-1.5 justify-center !text-white bg-[#0070ba] cursor-pointer "
           />
         </div>
       </div>
