@@ -43,6 +43,12 @@ func GetAllOrders(c *gin.Context, db *gorm.DB) {
 	// Prepare the response
 	var orderHistory []gin.H
 	for _, order := range orders {
+		// Fetch address phone number via CheckoutSession.AddressID
+		var address models.Address
+		if order.CheckoutSession.AddressID != nil {
+			_ = db.First(&address, *order.CheckoutSession.AddressID).Error
+		}
+
 		var payment models.Payment
 		err := db.Where("checkout_session_id = ?", order.CheckoutSessionID).First(&payment).Error
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -65,6 +71,7 @@ func GetAllOrders(c *gin.Context, db *gorm.DB) {
 			"remark":           payment.Remark,
 			"delivery_type":    order.DeliveryType,
 			"delivery_address": order.DeliveryAddress,
+			"phone_number":     address.PhoneNumber,
 			"status":           order.Status,
 			"created_at":       order.CreatedAt.Format("2006-01-02 15:04:05"),
 		})
@@ -147,6 +154,12 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 		items = append(items, itemResp)
 	}
 
+	// Fetch phone number from Address
+	var address models.Address
+	if order.CheckoutSession.AddressID != nil {
+		_ = db.First(&address, *order.CheckoutSession.AddressID).Error
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"order_number":     order.OrderNumber,
 		"customer_name":    fmt.Sprintf("%s %s", order.User.FirstName, order.User.LastName),
@@ -159,6 +172,7 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 		"remark":           payment.Remark,
 		"delivery_type":    order.DeliveryType,
 		"delivery_address": order.DeliveryAddress,
+		"phone_number":     address.PhoneNumber,
 		"payment_type":     order.PaymentType,
 		"created_at":       order.CreatedAt.Format("2006-01-02 15:04:05"),
 	})
@@ -227,9 +241,8 @@ func UpdateOrderDetails(c *gin.Context, db *gorm.DB) {
 
 	// Fetch address phone number via CheckoutSession.AddressID
 	var address models.Address
-	if err := db.First(&address, order.CheckoutSession.AddressID).Error; err != nil {
+	if err := db.First(&address, *order.CheckoutSession.AddressID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order address not found"})
-		return
 	}
 
 	SendOrderUpdateSMS(address.PhoneNumber, order)
