@@ -254,6 +254,11 @@ func GetUserOrderDetails(c *gin.Context, db *gorm.DB) {
 
 		items = append(items, itemResp)
 	}
+	// Fetch phone number from Address
+	var address models.Address
+	if order.CheckoutSession.AddressID != nil {
+		_ = db.First(&address, *order.CheckoutSession.AddressID).Error
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"order_number":     order.OrderNumber,
@@ -267,6 +272,7 @@ func GetUserOrderDetails(c *gin.Context, db *gorm.DB) {
 		"remark":           payment.Remark,
 		"delivery_type":    order.DeliveryType,
 		"delivery_address": order.DeliveryAddress,
+		"phone_number":     address.PhoneNumber,
 		"payment_type":     order.PaymentType,
 		"created_at":       order.CreatedAt.Format("2006-01-02 15:04:05"),
 	})
