@@ -7,6 +7,7 @@ import { postAxiosCall, getAxiosCall, deleteAxiosCall } from "@/app/lib/axios";
 import endpoints from "../config/endpoints";
 import { useCheckout } from "./CheckoutContext";
 import { usePathname } from "next/navigation";
+import { useLoginAuth } from "./LoginAuth";
 
 const CartContext = createContext();
 
@@ -14,6 +15,7 @@ export const CartProvider = ({ children }) => {
   const { token } = useAuth();
   const pathname = usePathname();
   const { doCheckout, addDeliveryData } = useCheckout();
+  const { openSignup } = useLoginAuth();
   const [cartItems, setCartItems] = useState([]);
   const [allClinics, setAllClinics] = useState([]);
   const [allDoctors, setAllDoctors] = useState([]);
@@ -23,7 +25,8 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (medicineid, quantity) => {
     if (!token) {
-      toast.error("Please login first");
+      // toast.error("Please login first");
+      openSignup();
       return;
     }
 

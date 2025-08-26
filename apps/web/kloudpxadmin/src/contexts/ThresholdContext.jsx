@@ -40,8 +40,12 @@ const ThresholdProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    fetchRegions();
+    if (!regions || regions.length === 0){
+      fetchRegions();
+    }
   }, []);
+
+  console.log(regions, "hhh")
 
   return (
     <ThresholdContext.Provider

@@ -1,15 +1,17 @@
 "use client";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import SubTitle from "../components/Titles/SubTitle";
 import { useAuth } from "../contexts/AuthContext";
 import UserMenu from "../components/Profile/UserMenu";
 import EditProfile from "../components/Profile/EditProfile";
 import PrescriptionHistoty from "../components/Profile/PrescriptionHistoty";
-// import OrderHistory from "../components/Profile/OrderHistory";
+
 import { FaPaperclip } from "react-icons/fa";
 import { useCartContext } from "../contexts/CartContext";
 import usePageLoader from "../hooks/usePageLoader";
+import { usePrescriptionContext } from "../contexts/PrescriptionContext";
+import OrderHistory from "../components/Profile/OrderHistory";
 
 const ProfilePage = () => {
   const fallbackImage = "/assets/fallback.png";
@@ -18,6 +20,13 @@ const ProfilePage = () => {
   const { clearCart } = useCartContext();
   const [activeTab, setActiveTab] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { clearPrescription } = usePrescriptionContext();
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab) setActiveTab(tab);
+  }, [searchParams]);
 
   const logout = () => {
     localStorage.removeItem("access_token");
@@ -26,6 +35,7 @@ const ProfilePage = () => {
     setToken(null);
     setUser(null);
     clearCart();
+    clearPrescription();
   };
 
   return (
@@ -39,13 +49,13 @@ const ProfilePage = () => {
       <main className="flex-1 w-full">
         <div
           className={`
-      flex items-start gap-4 sm:mb-8 mb-4
-      ${""}
-      ${activeTab === "account" ? "block" : "hidden"} 
-      md:flex
-    `}
+            flex items-start gap-4 sm:mb-8 mb-4
+            ${""}
+            ${activeTab === "account" ? "block" : "hidden"} 
+            md:flex
+          `}
         >
-          <div className="  w-full">
+          <div className="w-full">
             <h1 className="text-2xl md:text-start text-center font-semibold mb-6">
               My Profile
             </h1>
@@ -60,6 +70,12 @@ const ProfilePage = () => {
                   {user?.first_name} {user?.last_name}
                 </h2>
                 <h2 className="text-sm mt-1 font-medium">{user?.email}</h2>
+                {user?.age > 0 && (
+                  <h2 className="text-sm mt-1 font-medium">{user.age}s old</h2>
+                )}
+
+                <h2 className="text-sm mt-1 font-medium">{user?.phone}</h2>
+
                 <button
                   onClick={logout}
                   className="mt-3 text-base cursor-pointer text-red-600 hover:underline"
@@ -74,7 +90,7 @@ const ProfilePage = () => {
         {activeTab === "edit" && <EditProfile />}
         {activeTab === "prescription" && <PrescriptionHistoty />}
         {activeTab === "pwd" && (
-          <div className="flex justify-between md:items-end items-center bg-blue-50/20 md:p-8 rounded-xl md:max-w-3xl w-full md:gap-0 gap-10  space-y-6">
+          <div className="flex justify-between md:items-end items-center bg-blue-50/20 md:p-8 rounded-xl md:max-w-3xl w-full md:gap-0 gap-10 space-y-6">
             <h2 className="md:text-xl text-xs font-semibold mb-4">
               PWD Certificate
             </h2>
@@ -85,7 +101,7 @@ const ProfilePage = () => {
             >
               <FaPaperclip className="text-xs" />
               <span className="lg:text-xs text-[11px]">
-                Upload Gcash Payment
+                Upload Pwd Certificate
               </span>
               <input
                 type="file"
@@ -96,7 +112,7 @@ const ProfilePage = () => {
             </label>
           </div>
         )}
-        {/* {activeTab === "order" && <OrderHistory />} */}
+        {activeTab === "order" && <OrderHistory />}
       </main>
     </div>
   );

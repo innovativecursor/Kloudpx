@@ -6,99 +6,29 @@ import { getAxiosCall, postAxiosCall, updateAxiosCall } from "@/app/lib/axios";
 import endpoints from "@/app/config/endpoints";
 import useImageCompressor from "@/app/hooks/useImageCompressor";
 import { useCartContext } from "./CartContext";
+import { useLoginAuth } from "./LoginAuth";
 
 const PrescriptionContext = createContext();
 
 export const PrescriptionProvider = ({ children }) => {
-  const { token, login } = useAuth();
+  const { token } = useAuth();
   const { compressImage } = useImageCompressor();
-
+  const { openSignup } = useLoginAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
-  // const [uploadedPrescriptionId, setUploadedPrescriptionId] = useState(null);
+
   const [loading, setLoading] = useState(false);
   const [pendingCartData, setPendingCartData] = useState(null);
   const [allPrescription, setAllPrescription] = useState([]);
   const [selectedPrescriptionId, setSelectedPrescriptionId] = useState(null);
   const { getAllCartData } = useCartContext();
 
-  // console.log(pendingCartData);
-
-  // const uploadPrescription = async (file) => {
-  //   if (!file) return;
-
-  //   if (!token) {
-  //     toast.error("Please login first!");
-  //     // login?.();
-  //     return;
-  //   }
-
-  //   try {
-  //     setLoading(true);
-
-  //     const compressedBase64 = await compressImage(file);
-  //     const base64Data = compressedBase64.split(",")[1];
-
-  //     const payload = {
-  //       prescriptionimage: base64Data,
-  //     };
-
-  //     const res = await postAxiosCall(
-  //       endpoints.prescription.upload,
-  //       payload,
-  //       true
-  //     );
-  //     console.log(res);
-  //     getAllPrescription();
-
-  //     const prescriptionId = res?.prescription_id;
-  //     setUploadedPrescriptionId(prescriptionId);
-
-  //     if (res?.url) {
-  //       const img = new Image();
-  //       img.src = res.url;
-
-  //       img.onload = async () => {
-  //         setUploadedImage(res.url);
-  //         setIsOpen(false);
-  //         setLoading(false);
-
-  //         if (!medicineid || !prescriptionId || !quantity) {
-  //           console.error("❌ Missing data in prescription cart call", {
-  //             medicineid,
-  //             prescriptionId,
-  //             quantity,
-  //           });
-  //           toast.error("Something went wrong, missing data.");
-  //           return;
-  //         }
-  //         await addMedicineToCartWithPrescription(
-  //           medicineid,
-  //           prescriptionId,
-  //           quantity
-  //         );
-  //         setIsOpen(false);
-  //       };
-
-  //       img.onerror = () => {
-  //         toast.error("Image failed to load.");
-  //         setLoading(false);
-  //       };
-  //     } else {
-  //       setLoading(false);
-  //     }
-  //   } catch (err) {
-  //     toast.error("Upload failed. Try again.");
-  //     console.error("Upload error:", err);
-  //     setLoading(false);
-  //   }
-  // };
-
   const uploadPrescription = async (file) => {
     if (!file) return;
 
     if (!token) {
-      toast.error("Please login first!");
+      // toast.error("Please login first!");
+      openSignup();
       return;
     }
 
@@ -141,7 +71,6 @@ export const PrescriptionProvider = ({ children }) => {
   };
 
   const handleSelectedPrescription = async (id) => {
-    // console.log(id);
     try {
       const res = await updateAxiosCall(
         endpoints.selectedprescription.put,
@@ -149,7 +78,6 @@ export const PrescriptionProvider = ({ children }) => {
         {},
         true
       );
-      // setSelectedPrescriptionId(null);
     } catch (error) {
       console.error("Error selecting prescription:", error);
     }
@@ -194,6 +122,10 @@ export const PrescriptionProvider = ({ children }) => {
     }
   };
 
+  const clearPrescription = () => {
+    setAllPrescription([]);
+  };
+
   return (
     <PrescriptionContext.Provider
       value={{
@@ -203,7 +135,7 @@ export const PrescriptionProvider = ({ children }) => {
         uploadPrescription,
         setUploadedImage,
         loading,
-        // uploadedPrescriptionId,
+
         pendingCartData,
         setPendingCartData,
         getAllPrescription,
@@ -212,6 +144,7 @@ export const PrescriptionProvider = ({ children }) => {
         selectedPrescriptionId,
         setSelectedPrescriptionId,
         addMedicineToCartWithPrescription,
+        clearPrescription
       }}
     >
       {children}

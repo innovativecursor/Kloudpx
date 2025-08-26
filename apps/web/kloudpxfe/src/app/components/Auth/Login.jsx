@@ -17,8 +17,9 @@ const Login = () => {
     handleLoginSendOtp,
     handleLoginVerifyOtp,
     countryCodes,
-  } = useAuth();
-
+    openSignup,
+  } = useLoginAuth();
+  const { googleLogin } = useAuth();
   if (!isLoginOpen) return null;
 
   return (
@@ -33,14 +34,7 @@ const Login = () => {
         <h2 className="sm:text-2xl text-xl font-bold text-center sm:mb-4 mb-2">
           Log In
         </h2>
-
-        {/* ✅ Prevent form reload */}
-        <form
-          className="space-y-4"
-          onSubmit={(e) => e.preventDefault()}
-          // onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
-        >
-          {/* Phone input */}
+        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
           <div className="border border-gray-300 rounded-md">
             <div className="py-2 px-4 flex gap-2">
               <select
@@ -85,13 +79,13 @@ const Login = () => {
 
           {/* Button */}
           <button
-            type="button" // ✅ important
+            type="button"
             onSubmit={(e) => e.preventDefault()}
             onClick={(e) =>
               loginOtpSent ? handleLoginVerifyOtp(e) : handleLoginSendOtp(e)
             }
             disabled={loading}
-            className="w-full bg-[#0070ba] text-white sm:py-4 py-2 sm:text-sm text-[10px] rounded-full font-semibold"
+            className="w-full bg-[#0070ba] cursor-pointer text-white sm:py-4 py-2 sm:text-sm text-[10px] rounded-full font-semibold"
           >
             {loading
               ? loginOtpSent
@@ -106,7 +100,10 @@ const Login = () => {
             Don’t have an account?{" "}
             <span
               className="text-[#0070ba] underline cursor-pointer"
-              onClick={closeLogin}
+              onClick={() => {
+                closeLogin();
+                openSignup();
+              }}
             >
               SIGN UP
             </span>
@@ -119,17 +116,26 @@ const Login = () => {
           </div>
 
           <div className="flex justify-center gap-4">
-            <button
+            {/* <button
               type="button"
-              className="p-2 border border-gray-200 rounded-md"
+              onClick={googleLogin}
+              className="p-2 border border-gray-200 cursor-pointer rounded-md"
             >
               <FcGoogle className="sm:text-2xl text-xl" />
-            </button>
+            </button> */}
             <button
               type="button"
-              className="p-2 border border-gray-200 rounded-md"
+              onClick={async () => {
+                try {
+                  await googleLogin();
+                  closeLogin();
+                } catch (err) {
+                  console.error("Google login failed", err);
+                }
+              }}
+              className="p-2 border border-gray-200 cursor-pointer rounded-md"
             >
-              <BsFacebook className="text-blue-600 sm:text-2xl text-xl" />
+              <FcGoogle className="sm:text-2xl text-xl" />
             </button>
           </div>
         </form>

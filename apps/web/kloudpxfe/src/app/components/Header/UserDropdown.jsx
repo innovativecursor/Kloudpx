@@ -13,6 +13,8 @@ import {
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useCartContext } from "@/app/contexts/CartContext";
 import useModal from "@/app/hooks/useModal";
+import { usePrescriptionContext } from "@/app/contexts/PrescriptionContext";
+import usePageLoader from "@/app/hooks/usePageLoader";
 
 const UserDropdown = () => {
   const router = useRouter();
@@ -20,6 +22,8 @@ const UserDropdown = () => {
   const [activeItem, setActiveItem] = useState(null);
   const { user, setToken, setUser } = useAuth();
   const { clearCart } = useCartContext();
+  const { clearPrescription } = usePrescriptionContext();
+  const { startLoader } = usePageLoader();
 
   const logout = () => {
     localStorage.removeItem("access_token");
@@ -27,6 +31,13 @@ const UserDropdown = () => {
     setToken(null);
     setUser(null);
     clearCart();
+    clearPrescription();
+  };
+
+  const goToProfile = (tab) => {
+    startLoader("/Profile");
+    router.push(`/Profile?tab=${tab}`);
+    setIsOpen(false);
   };
 
   const getBgColor = (item) => {
@@ -55,7 +66,9 @@ const UserDropdown = () => {
       >
         <VscAccount className="md:text-2xl text-xl cursor-pointer text-gray-600" />
         <span className="md:text-sm sm:text-xs text-[10px] mt-1 tracking-wide opacity-70 truncate max-w-[60px] sm:max-w-[70px] text-center">
-          {user?.first_name} {user?.last_name}
+          {user?.first_name || user?.last_name
+            ? `${user?.first_name || ""} ${user?.last_name || ""}`
+            : "Hi, User"}
         </span>
       </div>
 
@@ -82,8 +95,7 @@ const UserDropdown = () => {
             )}`}
             onClick={() => {
               setActiveItem("edit");
-              router.push("/Profile");
-              setIsOpen(false);
+              goToProfile("edit");
             }}
           >
             <FaEdit className="text-base sm:text-lg flex-shrink-0 text-gray-600" />
@@ -98,8 +110,7 @@ const UserDropdown = () => {
             )}`}
             onClick={() => {
               setActiveItem("prescription");
-              router.push("/Profile");
-              setIsOpen(false);
+              goToProfile("prescription");
             }}
           >
             <FaPrescriptionBottleAlt className="text-base sm:text-lg flex-shrink-0 text-gray-600" />
@@ -114,8 +125,7 @@ const UserDropdown = () => {
             )}`}
             onClick={() => {
               setActiveItem("pwd");
-              router.push("/Profile");
-              setIsOpen(false);
+              goToProfile("pwd");
             }}
           >
             <FaFileMedical className="text-base sm:text-lg flex-shrink-0 text-gray-600" />
@@ -130,8 +140,7 @@ const UserDropdown = () => {
             )}`}
             onClick={() => {
               setActiveItem("history");
-              router.push("/Profile");
-              setIsOpen(false);
+              goToProfile("history");
             }}
           >
             <FaHistory className="text-base sm:text-lg flex-shrink-0 text-gray-600" />
