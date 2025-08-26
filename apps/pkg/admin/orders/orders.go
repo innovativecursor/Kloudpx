@@ -43,6 +43,7 @@ func GetAllOrders(c *gin.Context, db *gorm.DB) {
 	// Prepare the response
 	var orderHistory []gin.H
 	for _, order := range orders {
+
 		// Fetch address phone number via CheckoutSession.AddressID
 		var address models.Address
 		if order.CheckoutSession.AddressID != nil {
