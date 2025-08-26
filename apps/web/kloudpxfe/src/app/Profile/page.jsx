@@ -1,19 +1,19 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import SubTitle from "../components/Titles/SubTitle";
+import { usePrescriptionContext } from "../contexts/PrescriptionContext";
 import { useAuth } from "../contexts/AuthContext";
+import usePageLoader from "../hooks/usePageLoader";
+import { useCartContext } from "../contexts/CartContext";
+import SubTitle from "../components/Titles/SubTitle";
 import UserMenu from "../components/Profile/UserMenu";
 import EditProfile from "../components/Profile/EditProfile";
 import PrescriptionHistoty from "../components/Profile/PrescriptionHistoty";
-
 import { FaPaperclip } from "react-icons/fa";
-import { useCartContext } from "../contexts/CartContext";
-import usePageLoader from "../hooks/usePageLoader";
-import { usePrescriptionContext } from "../contexts/PrescriptionContext";
 import OrderHistory from "../components/Profile/OrderHistory";
 
-const ProfilePage = () => {
+const Page = () => {
   const fallbackImage = "/assets/fallback.png";
   const { user, setToken, setUser } = useAuth();
   const { startLoader } = usePageLoader();
@@ -39,13 +39,12 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="mt-40 md:mt-64 sm:mt-48 mb-24 responsive-mx flex md:flex-row flex-col justify-start gap-10 items-start">
+    <div className="demo-page mt-40 md:mt-64 sm:mt-48 mb-24 responsive-mx flex md:flex-row flex-col justify-start gap-10 items-start not-prose">
       <div className="md:w-64 w-full">
         {/* Sidebar */}
         <SubTitle paths={["Home", "Profile"]} />
         <UserMenu setActiveTab={setActiveTab} activeTab={activeTab} />
       </div>
-
       <main className="flex-1 w-full">
         <div
           className={`
@@ -80,7 +79,7 @@ const ProfilePage = () => {
 
                 <button
                   onClick={logout}
-                  className="mt-3 text-base cursor-pointer !text-red-600 hover:underline"
+                  className="mt-3 text-base cursor-pointer text-red-600 hover:underline"
                 >
                   Logout
                 </button>
@@ -120,4 +119,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default Page;

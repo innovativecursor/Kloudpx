@@ -160,7 +160,7 @@ const EditProfile = () => {
       <div className="flex justify-center items-center md:max-w-3xl w-full sm:mt-10 mt-6 text-xs">
         <button
           onClick={handleSave}
-          className="bg-[#0070ba] !text-white py-3 cursor-pointer px-12 rounded-full"
+          className="bg-[#0070ba] text-white py-3 cursor-pointer px-12 rounded-full"
         >
           Save
         </button>

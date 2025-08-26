@@ -68,7 +68,7 @@ const SwiperSlider = ({ data, title }) => {
                   <AddToCart
                     title="Add To Cart"
                     productDetails={product}
-                    className="md:text-xs text-[10px] flex items-center gap-3 rounded-full font-medium py-1.5 justify-center text-black bg-[#EDF4F6] cursor-pointer w-full"
+                    className="md:text-xs text-[12px] flex items-center gap-3 rounded-full font-medium py-1.5 justify-center text-black bg-[#EDF4F6] border-2 border-gray-100 cursor-pointer w-full"
                   />
                 </div>
               </div>

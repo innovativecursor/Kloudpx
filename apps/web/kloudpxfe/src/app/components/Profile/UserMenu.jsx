@@ -14,7 +14,7 @@ const UserMenu = ({ setActiveTab, activeTab }) => {
     const baseClasses =
       "menu-button flex items-center px-3 py-2 rounded-md cursor-pointer";
     // const activeClasses = "bg-[#0070ba] text-white";
-    const activeClasses = "bg-[#0070ba] !text-white";
+    const activeClasses = "bg-[#0070ba] text-white";
 
     const inactiveClasses = "hover:bg-blue-600 ";
     return tabName === activeTab
