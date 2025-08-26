@@ -7,7 +7,6 @@ import TopItems from "@/app/components/topitems/TopItems";
 import Hamburger from "@/app/components/modal/Hamburger";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useCartContext } from "@/app/contexts/CartContext";
-import { useRouter } from "next/navigation";
 import CartModal from "@/app/components/modal/CartModal";
 import useModal from "@/app/hooks/useModal";
 import { VscAccount } from "react-icons/vsc";
@@ -48,7 +47,7 @@ const Header = () => {
             </div>
 
             {/* Right: User & Cart */}
-            <div className="flex items-center justify-center gap-6 ">
+            <div className="flex items-start sm:items-center justify-center sm:gap-6 gap-3 ">
               <div>
                 {!isAuthLoaded ? null : !loading && user ? (
                   <div className="flex items-center flex-col">

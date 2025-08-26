@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Pagination, Modal, Spin } from "antd";
-import "antd/dist/reset.css";
+// import "antd/dist/reset.css"; // ❌ remove global reset
 import { useProfileContext } from "@/app/contexts/ProfileContext";
 
 const OrderHistory = () => {
@@ -19,8 +19,9 @@ const OrderHistory = () => {
     getAllOrder();
   }, []);
 
-  const paginatedOrders =
-    allOrder?.slice((currentPage - 1) * pageSize, currentPage * pageSize) || [];
+  const paginatedOrders = Array.isArray(allOrder)
+    ? allOrder.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    : [];
 
   const openModal = async (order) => {
     setIsModalOpen(true);
@@ -29,19 +30,17 @@ const OrderHistory = () => {
     setLoadingDetails(false);
   };
 
-  console.log(selectedOrder, "shdka");
-
   return (
-    <div className="max-w-4xl my-16 bg-white rounded-lg shadow overflow-hidden mx-auto">
+    <div className="order-history-page my-16 bg-white rounded-lg shadow overflow-hidden mx-auto not-prose">
       {/* Orders Table */}
-      <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300">
-        <table className="md:min-w-[700px] w-full text-left">
-          <thead className="bg-[#0070ba] text-sm font-light text-white">
+      <div className="w-full overflow-x-auto">
+        <table className="min-w-[700px] w-full text-left border-collapse">
+          <thead className="bg-[#0070ba] text-white text-sm">
             <tr>
-              <th className="py-5 px-6">Order Number</th>
-              <th className="py-5 px-6">Shipping Number</th>
-              <th className="py-5 px-6">Customer Name</th>
-              <th className="py-5 px-6">Status</th>
+              <th className="py-3 px-4">Order Number</th>
+              <th className="py-3 px-4">Shipping Number</th>
+              <th className="py-3 px-4">Customer Name</th>
+              <th className="py-3 px-4">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -49,12 +48,12 @@ const OrderHistory = () => {
               <tr
                 key={order.order_number}
                 onClick={() => openModal(order)}
-                className="border-b border-gray-100 cursor-pointer font-light hover:bg-gray-50 text-sm transition"
+                className="border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition text-gray-700 text-sm"
               >
-                <td className="py-5 px-6">{order.order_number}</td>
-                <td className="py-5 px-6">{order.shipping_number || "-"}</td>
-                <td className="py-5 px-6">{order.customer_name || "-"}</td>
-                <td className="py-5 px-6">{order.order_status || "-"}</td>
+                <td className="py-3 px-4">{order.order_number}</td>
+                <td className="py-3 px-4">{order.shipping_number || "-"}</td>
+                <td className="py-3 px-4">{order.customer_name || "-"}</td>
+                <td className="py-3 px-4">{order.order_status || "-"}</td>
               </tr>
             ))}
           </tbody>
@@ -62,8 +61,8 @@ const OrderHistory = () => {
       </div>
 
       {/* Pagination */}
-      <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 text-sm gap-2">
-        <div className="text-gray-600">
+      <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 text-sm gap-2 text-gray-600">
+        <div>
           Showing {(currentPage - 1) * pageSize + 1} -{" "}
           {Math.min(currentPage * pageSize, allOrder.length)} of{" "}
           {allOrder.length} records
@@ -83,14 +82,15 @@ const OrderHistory = () => {
         onCancel={() => setIsModalOpen(false)}
         footer={null}
         width={900}
+        className="order-history-modal"
       >
         {loadingDetails ? (
           <div className="flex justify-center py-16">
             <Spin size="large" />
           </div>
         ) : selectedOrder ? (
-          <div className="p-2 sm:p-4">
-            <h2 className="text-lg sm:text-xl font-semibold mb-1">
+          <div className="p-4">
+            <h2 className="text-lg font-semibold mb-1 text-gray-800">
               {selectedOrder.customer_name || "Customer Name"}
             </h2>
             <p className="text-sm text-gray-500 mb-2">
@@ -100,25 +100,25 @@ const OrderHistory = () => {
               Shipping Address: {selectedOrder.delivery_address || "-"}
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6 sm:mt-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
               {/* Product Details */}
               <div>
-                <div className="bg-[#EDF4F6] rounded-lg py-4 px-4 sm:px-6">
-                  <h3 className="text-base sm:text-lg font-semibold mb-4">
+                <div className="bg-gray-100 rounded-lg p-4">
+                  <h3 className="text-base font-semibold mb-4 text-gray-800">
                     Product Details
                   </h3>
                   {selectedOrder.items && selectedOrder.items.length > 0 ? (
                     selectedOrder.items.map((item, idx) => (
                       <div
                         key={idx}
-                        className="flex flex-row items-start sm:items-center gap-4 mb-4 transition"
+                        className="flex items-start sm:items-center gap-4 mb-4"
                       >
                         <img
                           src={item.image || fallbackImage}
                           alt={item.medicine_name || "Product"}
                           className="w-16 h-16 object-cover rounded-md"
                         />
-                        <div className="flex-1 text-sm sm:text-base">
+                        <div className="flex-1 text-sm sm:text-base text-gray-700">
                           <h4 className="font-semibold">
                             {item.medicine_name}
                           </h4>
@@ -135,10 +135,10 @@ const OrderHistory = () => {
 
               {/* Billing Details */}
               <div>
-                <h3 className="text-base sm:text-lg font-semibold mb-4">
+                <h3 className="text-base font-semibold mb-4 text-gray-800">
                   Billing Details
                 </h3>
-                <div className="text-sm space-y-2">
+                <div className="text-sm space-y-2 text-gray-700">
                   <div className="flex justify-between">
                     <span>Order date</span>
                     <span>{selectedOrder.created_at || "-"}</span>
@@ -177,7 +177,9 @@ const OrderHistory = () => {
             </div>
           </div>
         ) : (
-          <p className="text-center py-16">No order details found.</p>
+          <p className="text-center py-16 text-gray-500">
+            No order details found.
+          </p>
         )}
       </Modal>
     </div>

@@ -47,7 +47,7 @@ export const PrescriptionProvider = ({ children }) => {
         true
       );
 
-      console.log(res);
+      // console.log(res);
 
       setUploadedImage(res.data?.url || compressedBase64);
 

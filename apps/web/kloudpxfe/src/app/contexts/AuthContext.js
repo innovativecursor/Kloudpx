@@ -55,8 +55,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  console.log(user, "mu yser");
-
   const googleLogin = useGoogleLogin({
     flow: "auth-code",
     onSuccess: async (codeResponse) => {

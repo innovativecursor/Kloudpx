@@ -5,6 +5,7 @@ import { useProductContext } from "@/app/contexts/ProductContext";
 import { useAuth } from "@/app/contexts/AuthContext";
 import useModal from "@/app/hooks/useModal";
 import useCategoryHandler from "@/app/hooks/useCategoryHandler";
+import { VscAccount } from "react-icons/vsc";
 
 const Hamburger = () => {
   const { isOpen, setIsOpen, modalRef } = useModal();
@@ -34,11 +35,7 @@ const Hamburger = () => {
             {/* User Info */}
             <div className="pt-6 pb-3 px-6 ">
               <div className="flex items-center gap-3">
-                <img
-                  src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-                  alt="avatar"
-                  className="w-8 h-8 rounded-full"
-                />
+                        <VscAccount className="md:text-2xl mb-1 text-xl cursor-pointer" />
                 <div className="text-[10px] tracking-wider font-normal">
                   <div>
                     <span className="opacity-70">Welcome back,</span>{" "}

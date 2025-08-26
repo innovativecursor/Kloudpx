@@ -64,10 +64,10 @@ export default function NewAddress({ setShowAddForm }) {
   if (!isLoaded) return <p>Loading...</p>;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 font-sans">
+    <div className="min-h-screen flex items-center justify-center sm:p-4 font-sans">
       <form
         onSubmit={onSubmit}
-        className="bg-white shadow-lg rounded-2xl p-6 md:p-8 w-full max-w-lg grid grid-cols-1 gap-5"
+        className="bg-white  p-4 md:p-8 w-full max-w-lg grid grid-cols-1 gap-5"
       >
         {/* Google Autocomplete */}
         <div>

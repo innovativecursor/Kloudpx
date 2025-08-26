@@ -23,7 +23,7 @@ const page = () => {
             <Address />
           </div>
 
-          <div className="md:w-[40%] w-full mt-12">
+          <div className="md:w-[40%] w-full sm:mt-12 mt-10">
             <DeliveryCart />
           </div>
         </div>
