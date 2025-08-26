@@ -2,12 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { Pagination, Modal, Spin } from "antd";
-// import "antd/dist/reset.css"; // ❌ remove global reset
 import { useProfileContext } from "@/app/contexts/ProfileContext";
 
 const OrderHistory = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
+  const pageSize = 8;
   const fallbackImage = "/assets/fallback.png";
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -20,7 +19,9 @@ const OrderHistory = () => {
   }, []);
 
   const paginatedOrders = Array.isArray(allOrder)
-    ? allOrder.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    ? [...allOrder]
+        .reverse()
+        .slice((currentPage - 1) * pageSize, currentPage * pageSize)
     : [];
 
   const openModal = async (order) => {
@@ -31,7 +32,10 @@ const OrderHistory = () => {
   };
 
   return (
-    <div className="order-history-page my-16 bg-white rounded-lg shadow overflow-hidden mx-auto not-prose">
+    <div className="order-history-page  bg-white rounded-lg shadow overflow-hidden mx-auto not-prose">
+      <h2 className="text-2xl md:text-start text-center font-semibold mb-4">
+        All Orders
+      </h2>
       {/* Orders Table */}
       <div className="w-full overflow-x-auto">
         <table className="min-w-[700px] w-full text-left border-collapse">
@@ -53,7 +57,7 @@ const OrderHistory = () => {
                 <td className="py-3 px-4">{order.order_number}</td>
                 <td className="py-3 px-4">{order.shipping_number || "-"}</td>
                 <td className="py-3 px-4">{order.customer_name || "-"}</td>
-                <td className="py-3 px-4">{order.order_status || "-"}</td>
+                <td className="py-3 px-4">{order.status || "-"}</td>
               </tr>
             ))}
           </tbody>
@@ -89,7 +93,7 @@ const OrderHistory = () => {
             <Spin size="large" />
           </div>
         ) : selectedOrder ? (
-          <div className="p-4">
+          <div className="md:p-4">
             <h2 className="text-lg font-semibold mb-1 text-gray-800">
               {selectedOrder.customer_name || "Customer Name"}
             </h2>
@@ -100,10 +104,10 @@ const OrderHistory = () => {
               Shipping Address: {selectedOrder.delivery_address || "-"}
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            <div className="grid cursor-pointer grid-cols-1 md:grid-cols-2 md:gap-4 gap-6 mt-6">
               {/* Product Details */}
               <div>
-                <div className="bg-gray-100 rounded-lg p-4">
+                <div className="bg-gray-100 rounded-lg p-4  md:max-h-80 max-h-52 overflow-y-auto thin-scrollbar">
                   <h3 className="text-base font-semibold mb-4 text-gray-800">
                     Product Details
                   </h3>
@@ -124,6 +128,7 @@ const OrderHistory = () => {
                           </h4>
                           <p>Price: ₱{item.price}</p>
                           <p>Qty: {item.quantity}</p>
+                          <p>{item.pharmacist_status}</p>
                         </div>
                       </div>
                     ))
@@ -147,10 +152,7 @@ const OrderHistory = () => {
                     <span>Payment Type</span>
                     <span>{selectedOrder.payment_type || "-"}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Paid Amount</span>
-                    <span>₱{selectedOrder.paid_amount || 0}</span>
-                  </div>
+
                   <div className="flex justify-between">
                     <span>Delivery Type</span>
                     <span>{selectedOrder.delivery_type || "-"}</span>
@@ -163,14 +165,11 @@ const OrderHistory = () => {
                     <span>Order Status</span>
                     <span>{selectedOrder.order_status || "-"}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Remark</span>
-                    <span>{selectedOrder.remark || "-"}</span>
-                  </div>
+
                   <hr className="my-2" />
                   <div className="flex justify-between font-semibold">
                     <span>Total Amount</span>
-                    <span>₱{selectedOrder.grand_total || 0}</span>
+                    <span>₱{(selectedOrder.grand_total || 0).toFixed(2)}</span>
                   </div>
                 </div>
               </div>

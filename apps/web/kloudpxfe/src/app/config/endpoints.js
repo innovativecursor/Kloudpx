@@ -42,6 +42,7 @@ const endpoints = {
     order: `${baseUrl}/v1/user/orders`,
     orderdetails: (order_number) =>
       `${baseUrl}/v1/user/order/details/${order_number}`,
+    pwd: `${baseUrl}/v1/user/profile/pwd/upload`,
   },
   prescriptioncart: {
     add: `${baseUrl}/v1/user/add-to-cart-medicine`,

@@ -13,7 +13,6 @@ const UserMenu = ({ setActiveTab, activeTab }) => {
   const getButtonClass = (tabName) => {
     const baseClasses =
       "menu-button flex items-center px-3 py-2 rounded-md cursor-pointer";
-    // const activeClasses = "bg-[#0070ba] text-white";
     const activeClasses = "bg-[#0070ba] text-white";
 
     const inactiveClasses = "hover:bg-blue-600 ";
@@ -50,7 +49,7 @@ const UserMenu = ({ setActiveTab, activeTab }) => {
           <FaHistory className="mr-2" /> Order History
         </button>
 
-        {/* Account button - visible only on mobile */}
+
         <button
           onClick={() => setActiveTab("account")}
           className={`${getButtonClass("account")} md:hidden`}
