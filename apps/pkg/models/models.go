@@ -115,7 +115,19 @@ type User struct {
 	ApplicationRole string
 }
 
+type PwdCard struct {
+	gorm.Model
+	ID         uint   `gorm:"primaryKey"`
+	UserID     uint   `gorm:"index"`
+	FileURL    string // Path to uploaded certificate
+	UploadedAt time.Time
+	UpdatedAt  time.Time
+	//TODO: Need confirmation to add this field
+	//Status     string `gorm:"default:Pending"` // Pending, Approved, Rejected
+}
+
 type OTP struct {
+	gorm.Model
 	ID        uint `gorm:"primaryKey"`
 	Phone     string
 	Code      string
@@ -123,6 +135,7 @@ type OTP struct {
 }
 
 type LoginSession struct {
+	gorm.Model
 	ID        uint `gorm:"primaryKey"`
 	UserID    uint
 	JWTToken  string

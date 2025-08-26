@@ -217,6 +217,10 @@ func User(db *gorm.DB) {
 		useraccount.GetUserOrderDetails(c, db)
 	})
 
+	apiV1.POST("/user/profile/pwd/upload", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		useraccount.UploadPWDCertificate(c, db)
+	})
+
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
 	router.Run(":" + port)

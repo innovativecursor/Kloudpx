@@ -1,6 +1,7 @@
 package useraccount
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -8,8 +9,12 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	cfg "github.com/innovativecursor/Kloudpx/apps/pkg/config"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/getfileextension"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/helper/userhelper/s3helper"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/models"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/user/useraccount/config"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -152,6 +157,7 @@ func GetUserPrescriptionHistory(c *gin.Context, db *gorm.DB) {
 	})
 }
 
+// Fetching all orders for a particular user.
 func GetUserOrders(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -188,6 +194,7 @@ func GetUserOrders(c *gin.Context, db *gorm.DB) {
 	})
 }
 
+// Fetching user order details by order number.
 func GetUserOrderDetails(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -275,5 +282,123 @@ func GetUserOrderDetails(c *gin.Context, db *gorm.DB) {
 		"phone_number":     address.PhoneNumber,
 		"payment_type":     order.PaymentType,
 		"created_at":       order.CreatedAt.Format("2006-01-02 15:04:05"),
+	})
+}
+
+// UploadPWDCertificate handles uploading or updating a PWD certificate for a user.
+func UploadPWDCertificate(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		logrus.Warn("Unauthorized access: user not found in context")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+
+	userObj, ok := user.(*models.User)
+	if !ok {
+		logrus.WithField("user", user).Warn("Invalid user object in context")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	var payload config.PwdPayload
+	// Parse request payload (base64 file string)
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input", "details": err.Error()})
+		return
+	}
+
+	// Decode base64 into byte array.
+	decodedFile, err := base64.StdEncoding.DecodeString(payload.File)
+	if err != nil {
+		logrus.WithError(err).Error("Invalid base64 file")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid base64 file"})
+		return
+	}
+
+	// Detect file extension (e.g., pdf, jpg, png)
+	extension, err := getfileextension.GetFileExtension(decodedFile)
+	if err != nil {
+		logrus.WithError(err).Error("Unsupported file format")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unsupported file format"})
+		return
+	}
+
+	// Load environment config for S3
+	envCfg, err := cfg.Env()
+	if err != nil {
+		logrus.WithError(err).Error("Failed to load environment config")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Configuration error"})
+		return
+	}
+
+	// Generate unique file identifiers
+	uniqueUUID := s3helper.GenerateUniqueID().String()
+	fileName := "pwd_certificate"
+	profileType := "profile"
+	userType := "pwd"
+	userIDString := fmt.Sprintf("%d", userObj.ID)
+
+	// Upload file to S3
+	err = s3helper.UploadToS3(
+		c.Request.Context(),
+		profileType,
+		userType,
+		envCfg.S3.BucketName,
+		uniqueUUID,
+		userIDString,
+		fileName,
+		decodedFile,
+	)
+	if err != nil {
+		logrus.WithError(err).Error("S3 upload failed for PWD certificate")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "S3 upload failed"})
+		return
+	}
+
+	// Build public file URL
+	filePath := fmt.Sprintf(
+		"https://%s.s3.%s.amazonaws.com/%s/%s/%s/%s/%s.%s",
+		envCfg.S3.BucketName,
+		envCfg.S3.Region,
+		profileType,
+		userType,
+		uniqueUUID,
+		userIDString,
+		fileName,
+		extension,
+	)
+
+	//  Save or update certificate record in DB
+	var pwd models.PwdCard
+	err = db.Where("user_id = ?", userObj.ID).First(&pwd).Error
+	if err == nil {
+		// Update existing record
+		pwd.FileURL = filePath
+		pwd.UpdatedAt = time.Now()
+		//TODO: Need confirmation to add status field
+		//pwd.Status = "Pending" // Reset status on re-upload
+		db.Save(&pwd)
+	} else {
+		// Create new record
+		pwd = models.PwdCard{
+			UserID:     userObj.ID,
+			FileURL:    filePath,
+			UploadedAt: time.Now(),
+			//TODO: Need confirmation to add status field
+			//Status:     "Pending",
+		}
+		if err := db.Create(&pwd).Error; err != nil {
+			logrus.WithError(err).Error("DB save failed for PWD certificate")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "DB save failed"})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "PWD certificate uploaded successfully",
+		"file_url": filePath,
+		//TODO: Need confirmation to add status field
+		//"status":   pwd.Status,
 	})
 }
