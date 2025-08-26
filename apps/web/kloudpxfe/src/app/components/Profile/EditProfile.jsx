@@ -53,7 +53,7 @@ const EditProfile = () => {
   return (
     <div>
       <div className="bg-blue-50/30 sm:p-8 p-4 rounded-xl shadow-sm md:max-w-3xl w-full sm:space-y-6">
-        <h2 className="text-xl md:text-start text-center font-semibold sm:mb-4 mb-2">
+        <h2 className="text-2xl md:text-start text-center font-semibold sm:mb-4 mb-2">
           My Profile
         </h2>
 
@@ -157,10 +157,10 @@ const EditProfile = () => {
       </div>
 
       {/* Save Button */}
-      <div className="flex justify-center items-center md:max-w-3xl w-full sm:mt-10 mt-6 text-xs">
+      <div className="flex justify-center items-center md:max-w-3xl w-full sm:mt-10 mt-6 md:text-base text-sm">
         <button
           onClick={handleSave}
-          className="bg-[#0070ba] text-white py-3 cursor-pointer px-12 rounded-full"
+          className="bg-[#0070ba] text-white py-3 cursor-pointer px-20 w-full md:w-60 rounded-full"
         >
           Save
         </button>

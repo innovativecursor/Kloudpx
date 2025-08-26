@@ -156,7 +156,7 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
         <div className="sm:w-[40%] w-full">
           <button
             className="bg-[#0070BA]/10 text-black hover:bg-[#005c96]/20 w-full h-12 border-2 border-gray-200 shadow rounded-full font-medium
-             sm:text-sm text-[11px] cursor-pointer"
+             text-sm cursor-pointer"
             onClick={() => router.push("/")}
           >
             Continue to Shop
@@ -164,7 +164,7 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
         </div>
         <div className="sm:w-[60%] w-full">
           <button
-            className={`bg-[#0070BA] text-white hover:bg-[#005c96] sm:text-sm text-[11px] w-full h-12 border-2 border-gray-200 shadow rounded-full font-semibold ${
+            className={`bg-[#0070BA] text-white hover:bg-[#005c96] text-sm w-full h-12 border-2 border-gray-200 shadow rounded-full font-semibold ${
               data.length === 0 ||
               data.every((item) => savedForLaterIds.includes(item.cart_id))
                 ? "opacity-50 cursor-not-allowed"

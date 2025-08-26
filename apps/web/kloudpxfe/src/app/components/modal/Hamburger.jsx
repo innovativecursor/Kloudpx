@@ -38,9 +38,9 @@ const Hamburger = () => {
                         <VscAccount className="md:text-2xl mb-1 text-xl cursor-pointer" />
                 <div className="text-[10px] tracking-wider font-normal">
                   <div>
-                    <span className="opacity-70">Welcome back,</span>{" "}
+                    <span className="opacity-70">Welcome back, </span>{" "}
                     <span className="font-semibold text-[#0070BA]">
-                      {user?.first_name}
+                      {user?.first_name} {" "}
                       {user?.last_name}
                     </span>
                   </div>

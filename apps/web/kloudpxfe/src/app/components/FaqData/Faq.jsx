@@ -1,4 +1,5 @@
 "use client";
+import usePageLoader from "@/app/hooks/usePageLoader";
 import { useRouter } from "next/navigation";
 import React, { useState, useRef, useEffect } from "react";
 
@@ -6,7 +7,9 @@ const Faq = ({ data = [], showAll = false }) => {
   const [openIndex, setOpenIndex] = useState(null);
   const contentRefs = useRef([]);
   const router = useRouter();
+  const { startLoader } = usePageLoader();
   const handleViewMore = () => {
+    startLoader();
     router.push("/Faq");
   };
   const toggleFAQ = (index) => {

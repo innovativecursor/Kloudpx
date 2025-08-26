@@ -48,8 +48,8 @@ const UserDropdown = () => {
         return activeItem === "prescription" ? "bg-green-100" : "";
       case "pwd":
         return activeItem === "pwd" ? "bg-purple-100" : "";
-      case "history":
-        return activeItem === "history" ? "bg-orange-100" : "";
+      case "order":
+        return activeItem === "order" ? "bg-orange-100" : "";
       case "logout":
         return activeItem === "logout" ? "bg-red-100" : "";
       default:
@@ -74,15 +74,15 @@ const UserDropdown = () => {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute top-full right-0 sm:w-80 w-64 xs:w-56 mt-5 bg-[#EDF4F6] shadow-lg rounded-lg border border-gray-200 z-[999]">
+        <div className="absolute top-full right-0 mt-3 w-64 sm:w-72 xs:w-64 bg-[#EDF4F6] shadow-lg rounded-lg border border-gray-200 z-[999]">
           {/* User Info */}
           <div className="flex px-4 sm:px-6 py-3 bg-[#CAEAFF]/80 rounded-t-lg justify-start gap-3 items-center">
-            <VscAccount className="text-3xl sm:text-4xl flex-shrink-0 text-gray-600" />
+            <VscAccount className="text-2xl sm:text-3xl flex-shrink-0 text-gray-600" />
             <div className="flex flex-col items-start overflow-hidden">
-              <span className="truncate w-full text-sm sm:text-base font-medium">
+              <span className="truncate w-full text-sm  font-medium">
                 {user?.first_name} {user?.last_name}
               </span>
-              <h1 className="truncate font-light text-xs sm:text-sm w-full">
+              <h1 className="truncate font-light text-xs  w-full">
                 {user?.email}
               </h1>
             </div>
@@ -98,10 +98,8 @@ const UserDropdown = () => {
               goToProfile("edit");
             }}
           >
-            <FaEdit className="text-base sm:text-lg flex-shrink-0 text-gray-600" />
-            <p className="truncate w-full text-sm sm:text-base font-normal">
-              Edit Profile
-            </p>
+            <FaEdit className="text-base  flex-shrink-0 text-gray-600" />
+            <p className="truncate w-full text-sm  font-normal">Edit Profile</p>
           </div>
 
           <div
@@ -113,10 +111,8 @@ const UserDropdown = () => {
               goToProfile("prescription");
             }}
           >
-            <FaPrescriptionBottleAlt className="text-base sm:text-lg flex-shrink-0 text-gray-600" />
-            <p className="truncate w-full text-sm sm:text-base font-normal">
-              Prescription
-            </p>
+            <FaPrescriptionBottleAlt className="text-base flex-shrink-0 text-gray-600" />
+            <p className="truncate w-full text-sm  font-normal">Prescription</p>
           </div>
 
           <div
@@ -128,30 +124,26 @@ const UserDropdown = () => {
               goToProfile("pwd");
             }}
           >
-            <FaFileMedical className="text-base sm:text-lg flex-shrink-0 text-gray-600" />
-            <p className="truncate w-full text-sm sm:text-base font-normal">
-              PWD
-            </p>
+            <FaFileMedical className="text-base flex-shrink-0 text-gray-600" />
+            <p className="truncate w-full text-sm  font-normal">PWD</p>
           </div>
 
           <div
             className={`px-4 sm:px-6 py-3 cursor-pointer flex border-b border-gray-200 justify-start gap-3 items-center ${getBgColor(
-              "history"
+              "order"
             )}`}
             onClick={() => {
-              setActiveItem("history");
-              goToProfile("history");
+              setActiveItem("order");
+              goToProfile("order");
             }}
           >
-            <FaHistory className="text-base sm:text-lg flex-shrink-0 text-gray-600" />
-            <p className="truncate w-full text-sm sm:text-base font-normal">
-              Order History
-            </p>
+            <FaHistory className="text-base flex-shrink-0 text-gray-600" />
+            <p className="truncate w-full text-sm font-normal">Order History</p>
           </div>
 
           {/* Logout */}
           <div
-            className={`px-4 sm:px-6 py-3 cursor-pointer flex border-b border-gray-200 justify-start gap-3 items-center rounded-b-lg ${getBgColor(
+            className={`px-4 sm:px-6 py-3 cursor-pointer flex justify-start gap-3 items-center rounded-b-lg ${getBgColor(
               "logout"
             )}`}
             onClick={() => {
@@ -160,8 +152,8 @@ const UserDropdown = () => {
               setIsOpen(false);
             }}
           >
-            <FaSignOutAlt className="text-base sm:text-lg flex-shrink-0 text-gray-600" />
-            <p className="truncate w-full text-sm sm:text-base font-normal text-red-600">
+            <FaSignOutAlt className="text-base flex-shrink-0 text-gray-600" />
+            <p className="truncate w-full text-sm  font-normal text-red-600">
               Logout
             </p>
           </div>
