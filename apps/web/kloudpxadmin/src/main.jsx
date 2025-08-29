@@ -7,7 +7,6 @@ import { PersistGate } from "redux-persist/integration/react";
 import { BrowserRouter } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import AuthProvider from "./contexts/AuthContext.jsx";
-// import ImageProvider from "./contexts/ImageContext.jsx";
 import { ImageProvider } from "./contexts/ImageContext.jsx";
 import DropdownProvider from "./contexts/DropdownContext.jsx";
 import CategoryProvider from "./contexts/CategoryContext.jsx";
@@ -19,6 +18,7 @@ import FormDataProvider from "./contexts/FormDataContext.jsx";
 import GetDataProvider from "./contexts/GetDataContext.jsx";
 import OrderProvider from "./contexts/OrderContext.jsx";
 import ThresholdProvider from "./contexts/ThresholdContext.jsx";
+import PwdProvider from "./contexts/Pwdcontext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <GoogleOAuthProvider clientId="573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com">
@@ -37,7 +37,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                             <GalleryProvider>
                               <OrderProvider>
                                 <ThresholdProvider>
-                                <App />
+                                  <PwdProvider>
+                                    <App />
+                                  </PwdProvider>
                                 </ThresholdProvider>
                               </OrderProvider>
                             </GalleryProvider>

@@ -4,12 +4,16 @@ import React from "react";
 import { AiFillProduct } from "react-icons/ai";
 import { MdDeliveryDining, MdLocalOffer, MdPayment } from "react-icons/md";
 import { CiDeliveryTruck } from "react-icons/ci";
+import { useCheckout } from "@/app/contexts/CheckoutContext";
 
-const BillingDetails = ({ deliveryData }) => {
+const BillingDetails = () => {
+  const { deliveryData } = useCheckout();
   if (!deliveryData) return null;
   const fallbackImage = "/assets/fallback.png";
   const cartLength = deliveryData?.cart_items?.length || 0;
   console.log(deliveryData?.cart_items?.length);
+
+  console.log(deliveryData);
 
   return (
     <div className="mt-4">
@@ -101,6 +105,25 @@ const BillingDetails = ({ deliveryData }) => {
               </div>
               <span className="text-sm font-semibold text-[#333]">
                 ₱{deliveryData.delivery_cost?.toFixed(2)}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center">
+              <div className="flex gap-1 items-center">
+                <MdLocalOffer className="text-base" />
+                <span className="text-sm font-medium">PWD Discount</span>
+              </div>
+              <span className="text-sm font-semibold text-[#333]">
+                - ₱{deliveryData.pwd_discount?.toFixed(2) || 0}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <div className="flex gap-1 items-center">
+                <MdLocalOffer className="text-base" />
+                <span className="text-sm font-medium">Senior Discount</span>
+              </div>
+              <span className="text-sm font-semibold text-[#333]">
+                - ₱{deliveryData.senior_discount?.toFixed(2) || 0}
               </span>
             </div>
 

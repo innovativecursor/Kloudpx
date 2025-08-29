@@ -59,15 +59,15 @@ const TrendingProducts = ({}) => {
                   {hasDiscount ? (
                     <>
                       <span className="opacity-55 line-through">
-                        ₹{price.toFixed(2)}
+                         ₱{price.toFixed(2)}
                       </span>
                       <span className="font-medium text-[#0070BA]">
-                        ₹{discountedPrice}
+                         ₱{discountedPrice}
                       </span>
                     </>
                   ) : (
                     <span className="font-medium text-[#0070BA]">
-                      ₹{price.toFixed(2)}
+                       ₱{price.toFixed(2)}
                     </span>
                   )}
                 </div>

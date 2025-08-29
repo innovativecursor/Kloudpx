@@ -4,7 +4,6 @@ import { getAxiosCall, postAxiosCall } from "../Axios/UniversalAxiosCalls";
 import Swal from "sweetalert2";
 import endpoints from "../config/endpoints";
 
-
 export const ThresholdContext = createContext();
 
 const ThresholdProvider = ({ children }) => {
@@ -15,6 +14,7 @@ const ThresholdProvider = ({ children }) => {
   const fetchRegions = async () => {
     setLoading(true);
     const response = await getAxiosCall(endpoints.regionSettings.getAll);
+
     setLoading(false);
 
     if (response?.data?.regions && Array.isArray(response.data.regions)) {
@@ -40,12 +40,10 @@ const ThresholdProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!regions || regions.length === 0){
+    if (!regions || regions.length === 0) {
       fetchRegions();
     }
   }, []);
-
-  console.log(regions, "hhh")
 
   return (
     <ThresholdContext.Provider
