@@ -97,7 +97,7 @@ func GetPwdCertificateByID(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, gin.H{"pwd": pwd})
 }
 
-// Fetching all pwd certificates with pending status
+// Fetching all pwd certificates with pending status.
 func ListPendingPwdCertificate(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
