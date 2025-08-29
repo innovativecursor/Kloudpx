@@ -14,6 +14,7 @@ import (
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/medicine"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/oauth"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/orders"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/pwd"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/regionsettings"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/supplier"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/uploadexcel"
@@ -230,6 +231,19 @@ func Admin(db *gorm.DB) {
 	apiV1.GET("/admin/get-region-settings", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		regionsettings.GetAllRegionSettings(c, db)
 	})
+
+	apiV1.PUT("/admin/verify-pwd", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		pwd.VerifyUserPwdCertificate(c, db)
+	})
+
+	apiV1.GET("admin/pwd/:id", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		pwd.GetPwdCertificateByID(c, db)
+	})
+
+	apiV1.GET("/admin/pending-pwds", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		pwd.ListPendingPwdCertificate(c, db)
+	})
+
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
 	router.Run(":" + port)

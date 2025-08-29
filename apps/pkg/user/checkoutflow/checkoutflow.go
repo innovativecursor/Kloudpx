@@ -2,6 +2,7 @@ package checkoutflow
 
 import (
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -463,8 +464,28 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 		totalCost += price
 	}
 
+	var pwd models.PwdCard
+	if err := db.Where("user_id = ?", userObj.ID).First(&pwd).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No default address found. Please select an address."})
+	}
+
 	deliveryCost := 0
 	codFee := 0.0
+	pwdDiscount := 0.0
+	seniorDiscount := 0.0
+
+	// Apply PWD discount if approved
+	if pwd.Status == "approved" {
+		pwdDiscount = roundTo2Dec(totalCost * 0.20)
+
+	}
+
+	// Apply senior discount if age >= 60
+	if userObj.Age >= 60 {
+		seniorDiscount = roundTo2Dec(totalCost * 0.20)
+	}
+
+	finalTotal := totalCost - pwdDiscount - seniorDiscount
 
 	switch dataConfig.DeliveryType {
 	case "standard":
@@ -501,9 +522,12 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 	session.AddressID = &address.ID
 	session.DeliveryType = dataConfig.DeliveryType
 	session.DeliveryCost = deliveryCost + int(codFee)
-
+	session.PwdDiscount = pwdDiscount
+	session.SeniorDiscount = seniorDiscount
 	session.TotalCost = totalCost
-	session.GrandTotal = totalCost + float64(deliveryCost) + codFee
+	session.GrandTotal = roundTo2Dec(finalTotal + float64(deliveryCost) + codFee)
+
+	//session.GrandTotal = totalCost + float64(deliveryCost) + codFee
 
 	if err := db.Save(&session).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update delivery info"})
@@ -571,7 +595,7 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 		})
 	}
 
-	grandTotal := totalCost + float64(deliveryCost) + codFee
+	grandTotal := roundTo2Dec(finalTotal + float64(deliveryCost) + codFee)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message":             "Delivery type selected successfully",
@@ -583,8 +607,15 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 		"address":             address,
 		"cart_items":          response,
 		"total_price":         totalCost,
+		"pwd_discount":        pwdDiscount,
+		"senior_discount":     seniorDiscount,
 		"grand_total":         grandTotal,
 	})
+}
+
+// helper to round float to 2 decimals
+func roundTo2Dec(val float64) float64 {
+	return math.Round(val*100) / 100
 }
 
 func SelectPaymentType(c *gin.Context, db *gorm.DB) {
@@ -624,7 +655,8 @@ func SelectPaymentType(c *gin.Context, db *gorm.DB) {
 	fullAddress := fmt.Sprintf("%s, %s, %s, %s, %s",
 		address.NameResidency, address.Barangay, address.City, address.Province, address.ZipCode)
 
-	grandTotal := session.TotalCost + float64(session.DeliveryCost)
+	//grandTotal := session.TotalCost + float64(session.DeliveryCost)
+	grandTotal := session.GrandTotal
 
 	// Fetch cart items
 	var orderedItems []models.Cart

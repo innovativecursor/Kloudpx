@@ -376,8 +376,7 @@ func UploadPWDCertificate(c *gin.Context, db *gorm.DB) {
 		// Update existing record
 		pwd.FileURL = filePath
 		pwd.UpdatedAt = time.Now()
-		//TODO: Need confirmation to add status field
-		//pwd.Status = "Pending" // Reset status on re-upload
+		pwd.Status = "pending" // Reset status on re-upload
 		db.Save(&pwd)
 	} else {
 		// Create new record
@@ -385,8 +384,7 @@ func UploadPWDCertificate(c *gin.Context, db *gorm.DB) {
 			UserID:     userObj.ID,
 			FileURL:    filePath,
 			UploadedAt: time.Now(),
-			//TODO: Need confirmation to add status field
-			//Status:     "Pending",
+			Status:     "pending",
 		}
 		if err := db.Create(&pwd).Error; err != nil {
 			logrus.WithError(err).Error("DB save failed for PWD certificate")
@@ -398,7 +396,29 @@ func UploadPWDCertificate(c *gin.Context, db *gorm.DB) {
 	c.JSON(http.StatusOK, gin.H{
 		"message":  "PWD certificate uploaded successfully",
 		"file_url": filePath,
-		//TODO: Need confirmation to add status field
-		//"status":   pwd.Status,
+		"pwd_id":   pwd.ID,
 	})
+}
+
+// GET user pwd certificate.
+func GetUserPwdCertificate(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+	userObj, ok := user.(*models.User)
+	if !ok {
+		logrus.WithField("user", user).Warn("Invalid user object in context")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	var pwd models.PwdCard
+	if err := db.Where("user_id = ?", userObj.ID).Find(&pwd).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch pwd certificates"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"pwd": pwd})
 }
