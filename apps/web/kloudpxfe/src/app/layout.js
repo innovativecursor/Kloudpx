@@ -22,6 +22,7 @@ import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import { LoginAuthProvider } from "./contexts/LoginAuth";
 import LoaderController from "./components/Loader/LoaderController";
 import { ProfileProvider } from "./contexts/ProfileContext";
+import { PwdProvider } from "./contexts/PwdContext";
 
 
 export default function RootLayout({ children }) {
@@ -44,22 +45,24 @@ export default function RootLayout({ children }) {
                 <AuthProvider>
                   <LoginAuthProvider>
                     <ProfileProvider>
-                      <ProductProvider>
-                        <CheckoutProvider>
-                          <CartProvider>
-                            <PrescriptionProvider>
-                              <PaymentProvider>
-                                <ImageProvider>
-                                  <Header />
-                                  <main className="flex-1">{children}</main>
-                                  <Footer />
-                                  <CustomToaster />
-                                </ImageProvider>
-                              </PaymentProvider>
-                            </PrescriptionProvider>
-                          </CartProvider>
-                        </CheckoutProvider>
-                      </ProductProvider>
+                      <PwdProvider>
+                        <ProductProvider>
+                          <CheckoutProvider>
+                            <CartProvider>
+                              <PrescriptionProvider>
+                                <PaymentProvider>
+                                  <ImageProvider>
+                                    <Header />
+                                    <main className="flex-1">{children}</main>
+                                    <Footer />
+                                    <CustomToaster />
+                                  </ImageProvider>
+                                </PaymentProvider>
+                              </PrescriptionProvider>
+                            </CartProvider>
+                          </CheckoutProvider>
+                        </ProductProvider>
+                      </PwdProvider>
                     </ProfileProvider>
                   </LoginAuthProvider>
                 </AuthProvider>

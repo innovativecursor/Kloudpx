@@ -1,53 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { usePwdContext } from "@/app/contexts/PwdContext";
 import { FaPaperclip } from "react-icons/fa";
-import Swal from "sweetalert2";
-import { postAxiosCall } from "@/app/lib/axios";
-import useImageCompressor from "@/app/hooks/useImageCompressor";
-import endpoints from "@/app/config/endpoints";
 
 const Pwd = () => {
-  const { compressImage } = useImageCompressor();
-  const [uploading, setUploading] = useState(false);
-  const [fileUrl, setFileUrl] = useState("");
+  const { uploading, handleFileChange, fileUrl, getAllPwd, allPwd } =
+    usePwdContext();
 
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  useEffect(() => {
+    getAllPwd();
+  }, []);
 
-    try {
-      setUploading(true);
-      const compressedBase64 = await compressImage(file, 800, 800, 0.6);
-      const base64Data = compressedBase64.split(",")[1];
-      const response = await postAxiosCall(
-        endpoints.account.pwd,
-        { file: base64Data },
-        true
-      );
-
-      const uploadedUrl = response?.file_url || "";
-      setFileUrl(uploadedUrl);
-
-      Swal.fire({
-        title: "Success",
-        text: "PWD certificate uploaded successfully.",
-        icon: "success",
-        confirmButtonText: "OK",
-      });
-    } catch (error) {
-      console.error("PWD upload failed:", error);
-      Swal.fire({
-        title: "Error",
-        text:
-          error?.response?.data?.message || "Failed to upload PWD certificate",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
-    } finally {
-      setUploading(false);
-    }
-  };
+  console.log(allPwd, "hdsakdj");
 
   return (
     <div>
@@ -78,7 +43,7 @@ const Pwd = () => {
         </label>
       </div>
 
-      {fileUrl && (
+      {/* {fileUrl && (
         <div className="mt-4 md:max-w-3xl w-full flex flex-col items-start gap-2">
           <span className="text-sm text-gray-700 cursor-pointer">
             Your PWD Certificate
@@ -89,7 +54,35 @@ const Pwd = () => {
             className="w-full h-full p-4 rounded-xl border-2 border-[#0070ba] cursor-pointer"
           />
         </div>
-      )}
+      )} */}
+
+      <div className="mt-8 md:max-w-3xl w-full flex flex-col items-start gap-3">
+        {/* Status */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700">Status:</span>
+          <span
+            className={`px-3 py-1 text-xs font-semibold rounded-full 
+      ${
+        allPwd?.Status === "approved"
+          ? "bg-green-100 text-green-700"
+          : allPwd?.Status === "pending"
+          ? "bg-yellow-100 text-yellow-700"
+          : "bg-red-100 text-red-700"
+      }`}
+          >
+            {allPwd?.Status}
+          </span>
+        </div>
+
+        {/* Certificate Image */}
+        <div className="w-full rounded-xl border border-gray-300 shadow-sm overflow-hidden">
+          <img
+            src={allPwd?.FileURL}
+            alt="PWD Certificate"
+            className="w-full h-auto object-contain cursor-pointer hover:scale-[1.02] transition-transform duration-300"
+          />
+        </div>
+      </div>
     </div>
   );
 };

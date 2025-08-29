@@ -30,7 +30,6 @@ const OrderDetails = () => {
       setAmountPay(initAmount);
       setTransactionId(initTransaction);
 
-      // Save original values for comparison
       setOriginalValues({
         status: initStatus,
         amountPay: initAmount,
@@ -128,7 +127,6 @@ const OrderDetails = () => {
               </select>
             </div>
 
-
             <div>
               <label className="font-semibold block mb-1">Delivery ID</label>
               <input
@@ -187,6 +185,14 @@ const OrderDetails = () => {
               <p>
                 <span className="font-semibold">Delivery Type:</span>{" "}
                 {orderDetails.delivery_type}
+              </p>
+              <p>
+                <span className="font-semibold">Pwd Discount :</span> - ₱
+                {(orderDetails?.pwd_discount || 0).toFixed(2)}
+              </p>
+              <p>
+                <span className="font-semibold">Senior Discount :</span> - ₱
+                {(orderDetails?.senior_discount || 0).toFixed(2)}
               </p>
               <p>
                 <span className="font-semibold">Payment Type :</span>{" "}

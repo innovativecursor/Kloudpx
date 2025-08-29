@@ -33,6 +33,11 @@ const endpoints = {
     delete: (id) => `${baseUrl}/v1/medicine/delete-medicine/${id}`,
     search: `${baseUrl}/v1/medicine/search-medicine`,
   },
+  pwd: {
+    getAll: `${baseUrl}/v1/admin/pending-pwds`,
+    getone: (id) => `${baseUrl}/v1/admin/pwd/${id}`,
+    verify: `${baseUrl}/v1/admin/verify-pwd`,
+  },
   itemimage: {
     add: `${baseUrl}/v1/itemimage/add-itemimage`,
     delete: (id) => `${baseUrl}/v1/itemimage/delete-itemimage/${id}`,
@@ -81,7 +86,6 @@ const endpoints = {
     basic: `${baseUrl}/api/v1/protected`,
     admin: `${baseUrl}/api/v1/admin`,
   },
-
 };
 
 export default endpoints;

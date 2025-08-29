@@ -88,28 +88,28 @@ export const getMedicineColumns = ({ handleEdit, deleteMedicine }) => [
     dataIndex: "SellingPricePerBox",
     key: "SellingPricePerBox",
     align: "center",
-    render: (price) => `₹${price?.toFixed(2)}`,
+    render: (price) => ` ₱${price?.toFixed(2)}`,
   },
   {
     title: "SP/Piece",
     dataIndex: "SellingPricePerPiece",
     key: "SellingPricePerPiece",
     align: "center",
-    render: (price) => `₹${price?.toFixed(2)}`,
+    render: (price) => ` ₱${price?.toFixed(2)}`,
   },
   {
     title: "CP/Box",
     dataIndex: "CostPricePerBox",
     key: "CostPricePerBox",
     align: "center",
-    render: (price) => `₹${price?.toFixed(2)}`,
+    render: (price) => ` ₱${price?.toFixed(2)}`,
   },
   {
     title: "CP/Piece",
     dataIndex: "CostPricePerPiece",
     key: "CostPricePerPiece",
     align: "center",
-    render: (price) => `₹${price?.toFixed(2)}`,
+    render: (price) => ` ₱${price?.toFixed(2)}`,
   },
 
   {

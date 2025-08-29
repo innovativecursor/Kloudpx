@@ -31,6 +31,8 @@ const OrderHistory = () => {
     setLoadingDetails(false);
   };
 
+  console.log(selectedOrder);
+
   return (
     <div className="order-history-page  bg-white rounded-lg shadow overflow-hidden mx-auto not-prose">
       <h2 className="text-2xl md:text-start text-center font-semibold mb-4">
@@ -161,6 +163,17 @@ const OrderHistory = () => {
                     <span>Shipping Number</span>
                     <span>{selectedOrder.shipping_number || "-"}</span>
                   </div>
+
+                  <div className="flex justify-between">
+                    <span>Pwd Discount</span>
+                    <span> - ₱{(selectedOrder.pwd_discount || 0).toFixed(2)}</span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span>Senior Discount</span>
+                    <span> - ₱{(selectedOrder.senior_discount || 0).toFixed(2)}</span>
+                  </div>
+
                   <div className="flex justify-between">
                     <span>Order Status</span>
                     <span>{selectedOrder.order_status || "-"}</span>
