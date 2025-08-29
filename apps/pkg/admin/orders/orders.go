@@ -175,6 +175,8 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 		"delivery_address": order.DeliveryAddress,
 		"phone_number":     address.PhoneNumber,
 		"payment_type":     order.PaymentType,
+		"pwd_discount":     order.CheckoutSession.PwdDiscount,
+		"senior_discount":  order.CheckoutSession.SeniorDiscount,
 		"created_at":       order.CreatedAt.Format("2006-01-02 15:04:05"),
 	})
 }
