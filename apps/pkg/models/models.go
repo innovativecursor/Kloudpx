@@ -122,8 +122,9 @@ type PwdCard struct {
 	FileURL    string // Path to uploaded certificate
 	UploadedAt time.Time
 	UpdatedAt  time.Time
-	//TODO: Need confirmation to add this field
-	//Status     string `gorm:"default:Pending"` // Pending, Approved, Rejected
+	Status     string    `gorm:"default:Pending"` // Pending, Approved, Rejected
+	VerifiedBy *uint     `gorm:"default:null"`
+	VerifiedAt time.Time `gorm:"default:null"`
 }
 
 type OTP struct {
@@ -283,14 +284,16 @@ type Address struct {
 
 type CheckoutSession struct {
 	gorm.Model
-	UserID       uint
-	AddressID    *uint
-	DeliveryType string
-	DeliveryCost int
-	TotalCost    float64
-	GrandTotal   float64
-	Status       string // pending, completed
-	CartItems    []Cart `gorm:"foreignKey:CheckoutSessionID"`
+	UserID         uint
+	AddressID      *uint
+	DeliveryType   string
+	DeliveryCost   int
+	TotalCost      float64
+	GrandTotal     float64
+	PwdDiscount    float64
+	SeniorDiscount float64
+	Status         string // pending, completed
+	CartItems      []Cart `gorm:"foreignKey:CheckoutSessionID"`
 }
 
 type Payment struct {
