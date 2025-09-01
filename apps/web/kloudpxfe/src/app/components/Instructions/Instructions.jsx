@@ -1,9 +1,11 @@
 "use client";
 import React from "react";
+import { motion } from "framer-motion";
 import { BiClipboard } from "react-icons/bi";
 import { BsCartCheck } from "react-icons/bs";
+import { FiFileText } from "react-icons/fi";
+import { MdDeliveryDining } from "react-icons/md";
 import { AiOutlineCreditCard } from "react-icons/ai";
-import { FiTruck } from "react-icons/fi";
 import Image from "next/image";
 import icon1 from "@/assets/icon1.svg";
 import icon2 from "@/assets/icon2.svg";
@@ -28,72 +30,84 @@ const Instructions = () => {
     },
   ];
 
+  const steps = [
+    {
+      icon: <BiClipboard size={28} />,
+      title: "Step 1",
+      desc: "Upload your prescription",
+      color: "#2563EB",
+    },
+    {
+      icon: <BsCartCheck size={28} />,
+      title: "Step 2",
+      desc: "Add items to your cart",
+      color: "#16A34A",
+    },
+    {
+      icon: <FiFileText size={28} />,
+      title: "Step 3",
+      desc: "Enter contact number & delivery address",
+      color: "#9333EA",
+    },
+    {
+      icon: <MdDeliveryDining size={28} />,
+      title: "Step 4",
+      desc: "Get your order delivered",
+      color: "#EC4899",
+    },
+    {
+      icon: <AiOutlineCreditCard size={28} />,
+      title: "Step 5",
+      desc: "Pay by GCOD/COD on delivery",
+      color: "#006EBB",
+    },
+  ];
+
   return (
     <>
-      {/* Instructions Section */}
-      <div className="responsive-mx md:py-6 py-5  bg-[#F9FCFF] sm:px-0 px-2 border-2 border-gray-100 rounded-2xl sm:shadow-md shadow lg:mt-20 sm:mt-16 mt-12">
-        <h2 className="text-center font-semibold sm:text-lg text-base md:text-2xl mt-4 mb-8">
+      <div className="responsive-mx lg:px-8 relative overflow-hidden md:py-6 py-5 bg-[#F9FCFF] sm:px-0 px-2 border-2 border-gray-100 rounded-2xl sm:shadow-md shadow md:mt-24 sm:mt-16 mt-12">
+        <h2 className="text-center font-medium sm:text-lg text-base md:text-3xl tracking-wide mt-6 md:mb-12 mb-9">
           Instructions on how to order
         </h2>
 
-        <div className="grid w-full grid-cols-2 md:grid-cols-4 lg:gap-8 gap-6 px-4 sm:px-6 md:px-8">
-          <div className="flex  flex-col items-center justify-start text-center space-y-2">
-            <div className="sm:p-3 rounded-full text-blue-600">
-              <BiClipboard size={28} />
-            </div>
-            <p className="font-medium sm:mt-2 mt-1">Step 1</p>
-            <p className="text-gray-600 sm:text-sm text-[10px]">
-              Upload your prescription
-            </p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-5 mb-5 gap-12 items-center relative z-10">
+          {steps.map((step, i) => (
+            <motion.div
+              key={i}
+              initial={{ y: 50, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              transition={{ delay: i * 0.3, type: "spring", stiffness: 120 }}
+              whileHover={{ scale: 1.2, y: -10 }}
+              className="flex flex-col items-center text-center cursor-pointer"
+            >
+              <div
+                style={{ backgroundColor: step.color }} // use hex color here
+                className="p-5 rounded-full shadow-xl flex items-center text-white justify-center ring-2 ring-white hover:shadow-2xl"
+              >
+                {step.icon}
+              </div>
 
-          <div className="flex flex-col items-center text-center space-y-2">
-            <div className="sm:p-3 rounded-full text-green-600">
-              <BsCartCheck size={28} />
-            </div>
-            <p className="font-medium sm:mt-2 mt-1">Step 2</p>
-            <p className="text-gray-600 sm:text-sm text-[10px]">
-              Add items to your cart
-            </p>
-          </div>
-
-          <div className="flex  flex-col items-center text-center space-y-2">
-            <div className="sm:p-3 rounded-full text-purple-600">
-              <FiTruck size={28} />
-            </div>
-            <p className="font-medium sm:mt-2 mt-1">Step 3</p>
-            <p className="text-gray-600 sm:text-sm text-[10px]">
-              Get your order delivered
-            </p>
-          </div>
-
-          <div className="flex  flex-col items-center text-center space-y-2">
-            <div className="sm:p-3 rounded-full text-blue-600">
-              <AiOutlineCreditCard size={28} />
-            </div>
-            <p className="font-medium sm:mt-2 mt-1">Step 4</p>
-            <div>
-              <p className="text-gray-600 sm:text-sm text-[10px]">
-                Pay by GCOD/COD as it
-              </p>
-              <p className="text-gray-600 sm:text-sm text-[10px]">
-                gets delivered
-              </p>
-            </div>
-          </div>
+              <p className="font-medium mt-4 text-base">{step.title}</p>
+              <p className="text-gray-500 text-xs mt-1 max-w-xs">{step.desc}</p>
+            </motion.div>
+          ))}
         </div>
       </div>
 
       {/* Stats Section */}
-      <div className="bg-white lg:mt-28 md:mt-24 sm:mt-20 mt-12 sm:py-16 py-7 ">
-        <section className="responsive-mx ">
+      <div className="bg-white lg:mt-28 md:mt-24 sm:mt-20 mt-12 sm:py-16 py-7">
+        <section className="responsive-mx">
           <div className="grid grid-cols-3 sm:gap-8 gap-5 text-center">
             {stats.map((stat, index) => (
-              <div
+              <motion.div
                 key={index}
-                className="flex flex-col items-center justify-start"
+                initial={{ y: 20, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ delay: index * 0.2, duration: 0.6 }}
+                whileHover={{ scale: 1.05 }}
+                className="flex flex-col items-center justify-start cursor-pointer"
               >
-                <div className=" h-16 sm:h-full">
+                <div className="h-16 sm:h-full">
                   <Image
                     src={stat.icon}
                     alt={stat.label}
@@ -106,7 +120,7 @@ const Instructions = () => {
                 <p className="text-gray-600 text-[8px] sm:text-sm mt-1">
                   {stat.label}
                 </p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </section>

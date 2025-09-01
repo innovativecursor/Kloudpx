@@ -76,7 +76,6 @@ function Home() {
       <Video />
       <Upload />
       <Instructions />
-      {/* <Otc /> */}
       <div className="mt-12 sm:mt-16 md:mt-20 lg:mt-28">
         <Cards data={allOtc} title="OTC Medications & Supplements" />
       </div>

@@ -32,11 +32,11 @@ const ProductDetails = () => {
 
   const fallbackImage = "/assets/fallback.png";
 
-  // ✅ Final sanitized images
-  const images =
-    details.images?.filter(img => typeof img === "string" && img.trim() !== "")?.length > 0
-      ? details.images.filter(img => typeof img === "string" && img.trim() !== "")
-      : [fallbackImage];
+  const images = Array.isArray(details.images)
+    ? details.images.filter((img) => typeof img === "string" && img?.trim())
+    : [];
+
+  const displayImages = images.length > 0 ? images : [fallbackImage];
 
   const similarProduuct = productDetails?.related_medicines;
 
@@ -48,7 +48,7 @@ const ProductDetails = () => {
         />
 
         <div className="md:flex gap-10 mt-6 sm:mt-12">
-          <ImageSwiper images={images} />
+          <ImageSwiper images={displayImages} />
 
           <div className="w-full md:w-1/2 mt-8 md:mt-4 flex flex-col px-2 sm:px-6 md:px-0">
             <ProductDeatilsCard details={details} />

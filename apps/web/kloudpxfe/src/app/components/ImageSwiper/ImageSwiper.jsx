@@ -23,9 +23,11 @@ const ImageSwiper = ({ images }) => {
     setIsClient(true);
   }, []);
 
-  const safeImages =
-    images?.filter((img) => typeof img === "string" && img.trim() !== "") || [];
-  const displayImages = safeImages.length ? safeImages : [fallbackImage];
+  // ✅ Fully safe images array
+  const safeImages = Array.isArray(images)
+    ? images.filter((img) => typeof img === "string" && img?.trim())
+    : [];
+  const displayImages = safeImages.length > 0 ? safeImages : [fallbackImage];
 
   const onThumbsSwiperInit = (swiper) => {
     setThumbsSwiper(swiper);
@@ -39,7 +41,7 @@ const ImageSwiper = ({ images }) => {
 
   const SafeImage = ({ src, alt, className }) => (
     <Image
-      src={src || fallbackImage}
+      src={src && src.trim() ? src : fallbackImage} // ✅ never empty string
       alt={alt}
       width={200}
       height={80}
@@ -66,7 +68,7 @@ const ImageSwiper = ({ images }) => {
                   {isClient ? (
                     <Zoom>
                       <Image
-                        src={img || fallbackImage}
+                        src={img && img.trim() ? img : fallbackImage} // ✅ safe
                         alt={`product-${index}`}
                         width={600}
                         height={500}
@@ -75,7 +77,7 @@ const ImageSwiper = ({ images }) => {
                     </Zoom>
                   ) : (
                     <Image
-                      src={img || fallbackImage}
+                      src={img && img.trim() ? img : fallbackImage} // ✅ safe
                       alt={`product-${index}`}
                       width={600}
                       height={500}
@@ -89,7 +91,7 @@ const ImageSwiper = ({ images }) => {
         </div>
       </div>
 
-      {/* Thumbnail Swiper with navigation buttons */}
+      {/* Thumbnail Swiper */}
       <div className="mt-6 relative">
         <div className="flex items-center justify-between px-2">
           <button
@@ -116,7 +118,7 @@ const ImageSwiper = ({ images }) => {
               {displayImages.map((img, index) => (
                 <SwiperSlide key={index}>
                   <SafeImage
-                    src={img}
+                    src={img && img.trim() ? img : fallbackImage}
                     alt={`thumb-${index}`}
                     className="w-[200px] h-[80px] object-contain p-1 bg-white cursor-pointer rounded-md border border-[#0070ba] transition-all duration-300"
                   />

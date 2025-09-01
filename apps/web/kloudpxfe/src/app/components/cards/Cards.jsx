@@ -9,6 +9,7 @@ import { Navigation } from "swiper/modules";
 import TitleSlider from "../titleslider/TitleSlider";
 import AddToCart from "../button/AddToCart";
 import DetailsCard from "./DetailsCard";
+import Image from "next/image";
 import useSwiperNavigation from "@/app/hooks/useSwiperNavigation";
 import { usePrescriptionContext } from "@/app/contexts/PrescriptionContext";
 import Prescription from "../modal/Prescription";
@@ -46,9 +47,15 @@ const SwiperSlider = ({ data, title }) => {
                   }
                   className="bg-[#F6F5FA] cursor-pointer sm:py-5 px-5 p-4 sm:h-72 h-44 rounded-md flex items-center justify-center overflow-hidden"
                 >
-                  <img
-                    src={product.images?.[0] || fallbackImage}
+                  <Image
+                    src={
+                      Array.isArray(product.images) && product.images[0]?.trim()
+                        ? product.images[0]
+                        : fallbackImage
+                    }
                     alt={product.genericname || "Product Image"}
+                    width={300}
+                    height={300}
                     className="object-contain h-full w-full"
                   />
                 </div>

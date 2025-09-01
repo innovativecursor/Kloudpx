@@ -9,7 +9,6 @@ const AddToCart = ({ productDetails, title, className = "" }) => {
   const { setIsOpen, setPendingCartData } = usePrescriptionContext();
 
   // console.log(productDetails);
-  
 
   if (!productDetails) return null;
 

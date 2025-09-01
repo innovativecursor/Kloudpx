@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
+import { motion } from "framer-motion";
 import PrimaryButton from "../button/PrimaryButton";
 import container from "@/assets/Container.png";
 import container1 from "@/assets/Container (1).png";
@@ -29,7 +30,7 @@ const Banners = () => {
       bg: "#F0FDFA",
       img: container2,
       title: "Free Delivery",
-      desc: "Enjoy Free Shipping on Selected Medications!",
+      desc: "Applies to Standard Delivery with minimum purchase",
     },
   ];
 
@@ -43,28 +44,25 @@ const Banners = () => {
 
   return (
     <div className="responsive-mx lg:mt-20 md:mt-14 mt-9">
-      <h1 className="font-semibold sm:text-2xl text-lg tracking-wide lg:mb-9 md:mb-6 mb-4">
-        Featured Products
-      </h1>
-
-      <Swiper
-        spaceBetween={15}
-        breakpoints={{
-          1024: { slidesPerView: 2, spaceBetween: 20 },
-          768: { slidesPerView: 2, spaceBetween: 18 },
-          640: { slidesPerView: 2, spaceBetween: 15 },
-          0: { slidesPerView: 2, spaceBetween: 12 },
-        }}
+      <motion.h1
+        className="font-semibold sm:text-2xl text-lg tracking-wide lg:mb-9 md:mb-6 mb-4"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
       >
+        Featured Products
+      </motion.h1>
+
+      <div className="grid grid-cols-2 md:gap-6 gap-3">
         {allImages.map((image, index) => (
-          <SwiperSlide key={image.ID || index}>
+          <div key={image.ID || index}>
             <div className="relative group cursor-pointer overflow-hidden rounded-xl">
               <img
                 src={image.ImageURL}
                 alt={image.ButtonText || `Banner ${index + 1}`}
                 className="w-full h-auto object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
               />
-
               <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-60 transition-opacity duration-300 rounded-xl"></div>
               {(image.ButtonText || image.Link) && (
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -78,11 +76,10 @@ const Banners = () => {
                 </div>
               )}
             </div>
-          </SwiperSlide>
+          </div>
         ))}
-      </Swiper>
+      </div>
 
-      {/* Cards Section with Swiper */}
       <div className="lg:mt-24 md:mt-20 sm:mt-16 mt-11">
         <Swiper
           spaceBetween={15}
@@ -96,7 +93,7 @@ const Banners = () => {
           {cards.map((card, index) => (
             <SwiperSlide key={index}>
               <div
-                className="flex sm:h-28 mb-2 cursor-pointer h-24 items-center gap-3 sm:gap-4 border rounded-xl border-gray-100 shadow px-5 md:px-6"
+                className="flex sm:h-28 mb-2 cursor-pointer h-24 items-center gap-3 sm:gap-4 border rounded-xl border-gray-50 px-5 md:px-6"
                 style={{ backgroundColor: card.bg }}
               >
                 <Image
@@ -109,7 +106,7 @@ const Banners = () => {
                   <h1 className="font-semibold text-xs md:text-base sm:text-sm">
                     {card.title}
                   </h1>
-                  <h1 className="font-light opacity-80 mt-1 sm:text-[12px] text-[11px] md:text-sm">
+                  <h1 className="font-light opacity-80 mt-1 sm:text-[12px] text-[11px] md:text-xs">
                     {card.desc}
                   </h1>
                 </div>

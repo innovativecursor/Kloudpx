@@ -387,17 +387,13 @@ const Prescription = () => {
                     alt="Prescription Preview"
                     className="object-contain w-full p-5 h-40 rounded-md"
                   />
-                ) : allPrescription.length === 0 ? (
+                ) : (
                   <Image
                     src={prescriptionguide}
                     alt="Prescription Guide"
                     className="w-full h-full p-3 object-cover"
                     priority
                   />
-                ) : (
-                  <div className="flex justify-center items-center text-gray-500 h-40 text-sm ">
-                    Uploaded prescriptions are lis ted above.
-                  </div>
                 )}
               </div>
               <div className="flex flex-col items-center justify-center tracking-wider mt-2">
@@ -412,7 +408,7 @@ const Prescription = () => {
             </div>
           </div>
 
-          {allPrescription.length === 0 && !uploadedImage && (
+          {!uploadedImage && (
             <div className="md:hidden bg-[#F6F5FA] rounded-xl py-6 px-6 flex flex-col items-center justify-center">
               <Image
                 src={prescriptionguide}

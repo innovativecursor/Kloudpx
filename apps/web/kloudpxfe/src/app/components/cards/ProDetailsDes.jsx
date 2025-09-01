@@ -56,7 +56,7 @@ const ProDetailsDes = ({ details }) => {
           <>
             <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
               <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
-                Recommendeddaily Allowance
+               Recommended Usual Dose
               </h3>
             </div>
 
@@ -98,7 +98,7 @@ const ProDetailsDes = ({ details }) => {
           <>
             <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
               <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
-                Satorage
+                Storage
               </h3>
             </div>
 

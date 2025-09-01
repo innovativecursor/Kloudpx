@@ -56,7 +56,6 @@ export const CartProvider = ({ children }) => {
       setGetCartData({ data: res.data || [], loading: false });
       setCartItems(res.data || []);
       doCheckout();
-
     } catch (error) {
       console.log("Fetch Cart Error:", error.message);
       setCartItems([]);
@@ -115,6 +114,19 @@ export const CartProvider = ({ children }) => {
   const clearCart = () => {
     setCartItems([]);
     setGetCartData({ data: [], loading: false });
+  };
+
+  const setQuantityInCart = (medicineid, quantity) => {
+    setCartItems((prev) => {
+      const exists = prev.find((item) => item.medicineid === medicineid);
+      if (exists) {
+        return prev.map((item) =>
+          item.medicineid === medicineid ? { ...item, quantity } : item
+        );
+      } else {
+        return [...prev, { medicineid, quantity }];
+      }
+    });
   };
 
   const getAllClinics = async () => {
@@ -196,6 +208,7 @@ export const CartProvider = ({ children }) => {
         setSelectedClinicId,
         selectedDoctorId,
         setSelectedDoctorId,
+        setQuantityInCart,
       }}
     >
       {children}

@@ -73,7 +73,7 @@ const LandingPagePrescription = ({ isOpen, setIsOpen }) => {
             </h1>
 
             <label
-              className="flex flex-col md:mb-0 mb-8 items-center justify-center border md:px-0 px-4 border-dashed border-gray-900  rounded-lg md:p-4
+              className="flex flex-col ml-0.5 md:mb-0 mb-8 items-center justify-center border md:px-0 px-4 border-dashed border-gray-900  rounded-lg md:p-4
              md:w-full w-[90%] bg-[#F6F5FA] md:h-48 h-32 cursor-pointer hover:border-[#0070BA]"
             >
               <img
@@ -111,7 +111,7 @@ const LandingPagePrescription = ({ isOpen, setIsOpen }) => {
           </div>
 
           {/* Right side - Guide / Preview */}
-          <div className="bg-[#F6F5FA] md:block hidden">
+          <div className="bg-[#F6F5FA]">
             <div className="rounded-xl py-6 px-6 flex flex-col items-center justify-center">
               <h3 className="sm:text-sm dark-text font-semibold mb-4">
                 Guide for Prescription
@@ -123,17 +123,13 @@ const LandingPagePrescription = ({ isOpen, setIsOpen }) => {
                     alt="Prescription Preview"
                     className="object-contain w-full p-5 h-40 rounded-md"
                   />
-                ) : allPrescription.length === 0 ? (
+                ) : (
                   <Image
                     src={prescriptionguide}
                     alt="Prescription Guide"
                     className="w-full h-full p-3 object-cover"
                     priority
                   />
-                ) : (
-                  <div className="flex justify-center items-center text-gray-500 h-40 text-sm ">
-                    Uploaded prescriptions are lis ted above.
-                  </div>
                 )}
               </div>
               <div className="flex flex-col items-center justify-center tracking-wider mt-2">
@@ -148,7 +144,7 @@ const LandingPagePrescription = ({ isOpen, setIsOpen }) => {
             </div>
           </div>
 
-          {!loading && allPrescription.length === 0 && !uploadedImage && (
+          {/* {!uploadedImage && (
             <div className="md:hidden bg-[#F6F5FA] rounded-xl py-6 px-6 flex flex-col items-center justify-center">
               <Image
                 src={prescriptionguide}
@@ -157,7 +153,7 @@ const LandingPagePrescription = ({ isOpen, setIsOpen }) => {
                 priority
               />
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </>
