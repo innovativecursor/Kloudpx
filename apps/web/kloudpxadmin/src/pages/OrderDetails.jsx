@@ -187,11 +187,11 @@ const OrderDetails = () => {
                 {orderDetails.delivery_type}
               </p>
               <p>
-                <span className="font-semibold">Pwd Discount :</span> - ₱
+                <span className="font-semibold">Pwd Discount :</span>  ₱
                 {(orderDetails?.pwd_discount || 0).toFixed(2)}
               </p>
               <p>
-                <span className="font-semibold">Senior Discount :</span> - ₱
+                <span className="font-semibold">Senior Discount :</span>  ₱
                 {(orderDetails?.senior_discount || 0).toFixed(2)}
               </p>
               <p>

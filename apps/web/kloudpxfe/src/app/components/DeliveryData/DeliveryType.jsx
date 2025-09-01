@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
 import { usePayment } from "@/app/contexts/PaymentContext";
 import toast from "react-hot-toast";
+import { FaTruckFast } from "react-icons/fa6";
 
 const DeliveryType = () => {
   const {
@@ -34,7 +35,11 @@ const DeliveryType = () => {
   }, [selected, setSelected]);
 
   return (
-    <div className="mt-10">
+    <div className="mt-7">
+      <div className="flex items-center gap-2 mb-7 opacity-70">
+        <FaTruckFast className="text-2xl" />
+        <span className="font-medium text-lg">Select Delivery Type</span>
+      </div>
       {/* Delivery Type */}
       <label
         htmlFor="standard"

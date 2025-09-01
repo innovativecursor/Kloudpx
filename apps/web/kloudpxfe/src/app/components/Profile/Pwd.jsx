@@ -11,9 +11,6 @@ const Pwd = () => {
   useEffect(() => {
     getAllPwd();
   }, []);
-
-  console.log(allPwd, "hdsakdj");
-
   return (
     <div>
       <div className="flex md:flex-row flex-col justify-between md:items-end items-center bg-blue-50/20 md:p-8 rounded-xl md:max-w-3xl w-full  space-y-6">
@@ -43,25 +40,14 @@ const Pwd = () => {
         </label>
       </div>
 
-      {/* {fileUrl && (
-        <div className="mt-4 md:max-w-3xl w-full flex flex-col items-start gap-2">
-          <span className="text-sm text-gray-700 cursor-pointer">
-            Your PWD Certificate
-          </span>
-          <img
-            src={fileUrl}
-            alt="PWD Certificate"
-            className="w-full h-full p-4 rounded-xl border-2 border-[#0070ba] cursor-pointer"
-          />
-        </div>
-      )} */}
-
       <div className="mt-8 md:max-w-3xl w-full flex flex-col items-start gap-3">
-        {/* Status */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-700">Status:</span>
-          <span
-            className={`px-3 py-1 text-xs font-semibold rounded-full 
+        {allPwd?.FileURL ? (
+          <>
+            {/* Status */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">Status:</span>
+              <span
+                className={`px-3 py-1 text-xs font-semibold rounded-full 
       ${
         allPwd?.Status === "approved"
           ? "bg-green-100 text-green-700"
@@ -69,19 +55,21 @@ const Pwd = () => {
           ? "bg-yellow-100 text-yellow-700"
           : "bg-red-100 text-red-700"
       }`}
-          >
-            {allPwd?.Status}
-          </span>
-        </div>
+              >
+                {allPwd?.Status}
+              </span>
+            </div>
 
-        {/* Certificate Image */}
-        <div className="w-full rounded-xl border border-gray-300 shadow-sm overflow-hidden">
-          <img
-            src={allPwd?.FileURL}
-            alt="PWD Certificate"
-            className="w-full h-auto object-contain cursor-pointer hover:scale-[1.02] transition-transform duration-300"
-          />
-        </div>
+            {/* Certificate Image */}
+            <div className="w-full rounded-xl border border-gray-300 shadow-sm overflow-hidden">
+              <img
+                src={allPwd?.FileURL}
+                alt="PWD Certificate"
+                className="w-full h-auto object-contain cursor-pointer hover:scale-[1.02] transition-transform duration-300"
+              />
+            </div>
+          </>
+        ) : null}
       </div>
     </div>
   );
