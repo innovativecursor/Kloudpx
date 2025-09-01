@@ -267,9 +267,16 @@ func GetUserOrderDetails(c *gin.Context, db *gorm.DB) {
 		_ = db.First(&address, *order.CheckoutSession.AddressID).Error
 	}
 
+	// fetching pwd id by user id .
+	var pwd models.PwdCard
+	if err := db.Where("user_id = ?", order.User.ID).First(&pwd).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No default address found. Please select an address."})
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"order_number":     order.OrderNumber,
-		"customer_name":    fmt.Sprintf("%s %s", order.User.FirstName, order.User.LastName),
+		"user_details":     order.User,
+		"pwd_id":           pwd.ID,
 		"items":            items,
 		"grand_total":      order.TotalAmount, // locked at order time
 		"order_status":     order.Status,
