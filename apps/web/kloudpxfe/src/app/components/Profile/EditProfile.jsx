@@ -114,14 +114,13 @@ const EditProfile = () => {
                 }
                 className={`w-full outline-none placeholder:text-xs`}
                 placeholder="Phone Number"
-                disabled={!!user?.phone} 
+                disabled={!!user?.phone}
               />
             </div>
           </div>
 
           {/* DOB & Gender */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
             <div>
               <label className="block text-xs dark-text mb-1">
                 Date of Birth<span className="text-red-500">*</span>
@@ -131,6 +130,7 @@ const EditProfile = () => {
                 name="dob"
                 value={formData.dob}
                 onChange={handleChange}
+                max={new Date().toISOString().split("T")[0]}
                 className="w-full border-2 px-4 py-2 outline-none mt-1 rounded-lg placeholder:text-xs border-gray-200 backdrop-blur-lg"
               />
             </div>

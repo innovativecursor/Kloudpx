@@ -166,12 +166,12 @@ const OrderHistory = () => {
 
                   <div className="flex justify-between">
                     <span>Pwd Discount</span>
-                    <span> - ₱{(selectedOrder.pwd_discount || 0).toFixed(2)}</span>
+                    <span>  ₱{(selectedOrder.pwd_discount || 0).toFixed(2)}</span>
                   </div>
 
                   <div className="flex justify-between">
                     <span>Senior Discount</span>
-                    <span> - ₱{(selectedOrder.senior_discount || 0).toFixed(2)}</span>
+                    <span>  ₱{(selectedOrder.senior_discount || 0).toFixed(2)}</span>
                   </div>
 
                   <div className="flex justify-between">

@@ -114,7 +114,7 @@ const BillingDetails = () => {
                 <span className="text-sm font-medium">PWD Discount</span>
               </div>
               <span className="text-sm font-semibold text-[#333]">
-                - ₱{deliveryData.pwd_discount?.toFixed(2) || 0}
+                ₱{deliveryData.pwd_discount?.toFixed(2) || 0}
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -123,7 +123,7 @@ const BillingDetails = () => {
                 <span className="text-sm font-medium">Senior Discount</span>
               </div>
               <span className="text-sm font-semibold text-[#333]">
-                - ₱{deliveryData.senior_discount?.toFixed(2) || 0}
+                ₱{deliveryData.senior_discount?.toFixed(2) || 0}
               </span>
             </div>
 
