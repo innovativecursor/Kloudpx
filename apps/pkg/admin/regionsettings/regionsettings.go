@@ -29,19 +29,26 @@ func UpsertRegionSetting(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// 🔹 Update by ID instead of RegionName
 	var existing models.RegionSetting
-	err := db.Where("region_name = ?", req.RegionName).First(&existing).Error
+	err := db.First(&existing, req.ID).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot create new regions, only edit existing"})
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Region with given ID not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
 		return
 	}
 
-	// Update only
+	// Update fields
+	existing.RegionName = req.RegionName
 	existing.ZipStart = req.ZipStart
 	existing.ZipEnd = req.ZipEnd
 	existing.DeliveryTime = req.DeliveryTime
 	existing.FreeShippingLimit = req.FreeShippingLimit
 	existing.StandardRate = req.StandardRate
+
 	if err := db.Save(&existing).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update region"})
 		return
