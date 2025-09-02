@@ -2,6 +2,7 @@ package useraccount
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -310,7 +311,7 @@ func UploadPWDCertificate(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	var payload config.PwdPayload
+	var payload config.PwdAndSeniorIdPayload
 	// Parse request payload (base64 file string)
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input", "details": err.Error()})
@@ -430,4 +431,162 @@ func GetUserPwdCertificate(c *gin.Context, db *gorm.DB) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"pwd": pwd})
+}
+
+// UploadSeniorCitizenID handles uploading or updating a Senior Citizen ID for a user.
+// Unlike PWD certificates, no admin approval is required.
+func UploadSeniorCitizenID(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		logrus.Warn("Unauthorized access: user not found in context")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+
+	userObj, ok := user.(*models.User)
+	if !ok {
+		logrus.WithField("user", user).Warn("Invalid user object in context")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	// Parse request payload (expects base64 file string)
+	var payload config.PwdAndSeniorIdPayload
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		logrus.WithError(err).Warn("Invalid request payload")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input", "details": err.Error()})
+		return
+	}
+
+	//  Decode base64 file
+	decodedFile, err := base64.StdEncoding.DecodeString(payload.File)
+	if err != nil {
+		logrus.WithError(err).Error("Base64 decode failed")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid base64 file"})
+		return
+	}
+
+	//  Detect file extension (pdf, jpg, png, etc.)
+	extension, err := getfileextension.GetFileExtension(decodedFile)
+	if err != nil {
+		logrus.WithError(err).Error("Unsupported file format")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unsupported file format"})
+		return
+	}
+
+	//  Load environment config for S3
+	envCfg, err := cfg.Env()
+	if err != nil {
+		logrus.WithError(err).Error("Failed to load environment config")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Configuration error"})
+		return
+	}
+
+	//  Generate unique identifiers for S3 path
+	uniqueUUID := s3helper.GenerateUniqueID().String()
+	fileName := "senior_citizen_id"
+	profileType := "profile"
+	userType := "senior"
+	userIDString := fmt.Sprintf("%d", userObj.ID)
+
+	//  Upload file to S3
+	err = s3helper.UploadToS3(
+		c.Request.Context(),
+		profileType,
+		userType,
+		envCfg.S3.BucketName,
+		uniqueUUID,
+		userIDString,
+		fileName,
+		decodedFile,
+	)
+	if err != nil {
+		logrus.WithError(err).Error("S3 upload failed for Senior Citizen ID")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "S3 upload failed"})
+		return
+	}
+
+	//  Build public file URL
+	filePath := fmt.Sprintf(
+		"https://%s.s3.%s.amazonaws.com/%s/%s/%s/%s/%s.%s",
+		envCfg.S3.BucketName,
+		envCfg.S3.Region,
+		profileType,
+		userType,
+		uniqueUUID,
+		userIDString,
+		fileName,
+		extension,
+	)
+
+	// Save or update Senior Citizen record in DB
+	var senior models.SeniorCitizenCard
+	err = db.Where("user_id = ?", userObj.ID).First(&senior).Error
+
+	if err == nil {
+		// Update existing record
+		senior.FileURL = filePath
+		senior.Status = "verified" // Always verified since no admin approval needed
+		senior.UpdatedAt = time.Now()
+
+		if err := db.Save(&senior).Error; err != nil {
+			logrus.WithError(err).Error("DB update failed for Senior Citizen ID")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "DB update failed"})
+			return
+		}
+	} else if errors.Is(err, gorm.ErrRecordNotFound) {
+		// Create new record
+		senior = models.SeniorCitizenCard{
+			UserID:     userObj.ID,
+			FileURL:    filePath,
+			UploadedAt: time.Now(),
+			Status:     "verified", // directly mark as verified
+		}
+		if err := db.Create(&senior).Error; err != nil {
+			logrus.WithError(err).Error("DB save failed for Senior Citizen ID")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "DB save failed"})
+			return
+		}
+	} else {
+		// Unexpected DB error
+		logrus.WithError(err).Error("DB query failed while fetching Senior Citizen record")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "Senior Citizen ID uploaded successfully",
+		"file_url":  filePath,
+		"senior_id": senior.ID,
+	})
+}
+
+// GetSeniorCitizenID returns the Senior Citizen ID details for the logged-in user.
+func GetSeniorCitizenID(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+	userObj, ok := user.(*models.User)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	// Fetch Senior Citizen ID record
+	var senior models.SeniorCitizenCard
+	if err := db.Where("user_id = ?", userObj.ID).First(&senior).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No Senior Citizen ID uploaded"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"senior_id":   senior.ID,
+		"user_id":     senior.UserID,
+		"file_url":    senior.FileURL,
+		"status":      senior.Status,
+		"uploaded_at": senior.UploadedAt,
+		"updated_at":  senior.UpdatedAt,
+	})
 }

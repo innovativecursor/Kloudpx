@@ -14,10 +14,10 @@ import (
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/medicine"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/oauth"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/orders"
-	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/pwd"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/regionsettings"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/supplier"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/uploadexcel"
+	"github.com/innovativecursor/Kloudpx/apps/pkg/admin/userdocs"
 	"github.com/innovativecursor/Kloudpx/apps/pkg/middleware"
 	"github.com/innovativecursor/Kloudpx/apps/routes/getapiroutes"
 	"gorm.io/gorm"
@@ -233,15 +233,31 @@ func Admin(db *gorm.DB) {
 	})
 
 	apiV1.PUT("/admin/verify-pwd", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
-		pwd.VerifyUserPwdCertificate(c, db)
+		userdocs.VerifyUserPwdCertificate(c, db)
 	})
 
 	apiV1.GET("admin/pwd/:id", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
-		pwd.GetPwdCertificateByID(c, db)
+		userdocs.GetPwdCertificateByID(c, db)
 	})
 
 	apiV1.GET("/admin/pending-pwds", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
-		pwd.ListPendingPwdCertificate(c, db)
+		userdocs.PendingAndApprovedPwdCertificate(c, db)
+	})
+
+	apiV1.GET("admin/senior/:id", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		userdocs.GetSeniorCitizenIDByID(c, db)
+	})
+
+	apiV1.GET("admin/senior", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		userdocs.GetAllSeniorCitizenIDs(c, db)
+	})
+
+	apiV1.GET("admin/prescription-summary", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		userdocs.UsersWithPrescriptionSummary(c, db)
+	})
+
+	apiV1.GET("admin/prescriptions/:user_id/history", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+		userdocs.UserPrescriptionHistory(c, db)
 	})
 
 	// Listen and serve on defined port

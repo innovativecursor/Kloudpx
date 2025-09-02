@@ -127,6 +127,16 @@ type PwdCard struct {
 	VerifiedAt time.Time `gorm:"default:null"`
 }
 
+type SeniorCitizenCard struct {
+	gorm.Model
+	ID         uint   `gorm:"primaryKey"`
+	UserID     uint   `gorm:"index"`
+	FileURL    string // Path to uploaded certificate
+	UploadedAt time.Time
+	UpdatedAt  time.Time
+	Status     string
+}
+
 type OTP struct {
 	gorm.Model
 	ID        uint `gorm:"primaryKey"`
