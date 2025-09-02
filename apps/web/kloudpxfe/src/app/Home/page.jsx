@@ -1,12 +1,10 @@
 "use client";
 import Hero from "@/app/components/Hero/Hero";
-// import Products from "@/app/components/Products/Products";
 import HomeFloatingBtn from "@/app/components/HomeFloatingBtn/HomeFloatingBtn";
 import Banners from "../components/Banners/Banners";
 import Video from "../components/Videos/Video";
 import Upload from "../components/upload/Upload";
 import Instructions from "../components/Instructions/Instructions";
-// import Otc from "../components/OTC/Otc";
 import DeliveryHome from "../components/DeliveryHome/DeliveryHome";
 import WhyChooseUs from "../components/WhyChooseUs/WhyChooseUs";
 import HealthArticles from "../components/healtharticles/HealthArticles";
@@ -68,23 +66,22 @@ function Home() {
   }, []);
 
   return (
-    <div className=" bg-[#F9FAFB]">
+    <div className="bg-[#F9FAFB]">
       <div className="mt-40 md:mt-64 sm:mt-48">
-        <Hero />
+      <Hero />
       </div>
       <Banners />
       <Video />
       <Upload />
       <Instructions />
-      <div className="mt-12 sm:mt-16 md:mt-20 lg:mt-28">
-        <Cards data={allOtc} title="OTC Medications & Supplements" />
+      <div className="mt-12 md:mt-24">
+      <Cards data={allOtc} title="OTC Medications & Supplements" />
       </div>
       <DeliveryHome />
       <WhyChooseUs />
       <HealthArticles />
       <Testimonial testimonials={testimonials} />
       <Faq data={faqData} showAll={false} />
-      {/* <Products /> */}
       <HomeFloatingBtn />
     </div>
   );

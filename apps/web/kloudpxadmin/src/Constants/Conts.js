@@ -11,7 +11,12 @@ export const Menu = {
   Carousel: [{ text: "Add Carousel", link: "/carousel" }],
   Gallery: [{ text: "Add Images", link: "/gallery" }],
   Orders: [{ text: "All Orders", link: "/allorders" }],
-  Pwd: [{ text: "All Pwd", link: "/allpwd" }],
+  All_Documents: [
+    { text: "PWD IDs", link: "/allpwd" },
+    { text: "SC (Senior Citizen) IDs", link: "/seniorcitizenid" },
+    { text: "Prescriptions", link: "/prescription" },
+
+  ],
   // Invoices: [{ text: "Order History", link: "/orderHistory" }],
 };
 

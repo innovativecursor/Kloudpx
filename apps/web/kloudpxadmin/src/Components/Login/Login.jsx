@@ -6,6 +6,7 @@ import { useNavigate } from "react-router";
 import { useState } from "react";
 import { getAxiosCall } from "../../Axios/UniversalAxiosCalls";
 import endpoints from "../../config/endpoints";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const Login = () => {
 
         const { token } = res?.data || {};
 
-        if (!token) throw new Error("No token found");
+        if (!token) toast.error("No token found");
         localStorage.setItem("access_token", token);
         await loginUser(null, token);
         navigate("/home");

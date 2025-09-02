@@ -6,10 +6,18 @@ import { BsCartCheck } from "react-icons/bs";
 import { FiFileText } from "react-icons/fi";
 import { MdDeliveryDining } from "react-icons/md";
 import { AiOutlineCreditCard } from "react-icons/ai";
+import { BsArrowRight } from "react-icons/bs";
 import Image from "next/image";
 import icon1 from "@/assets/icon1.svg";
 import icon2 from "@/assets/icon2.svg";
 import icon3 from "@/assets/icon3.svg";
+
+import step1 from "@/assets/step1.png";
+import step2 from "@/assets/step2.png";
+import step3 from "@/assets/step3.png";
+import step4 from "@/assets/step4.png";
+import step5 from "@/assets/step5.png";
+import rightarrow from "@/assets/rightarrow.png";
 
 const Instructions = () => {
   const stats = [
@@ -32,31 +40,36 @@ const Instructions = () => {
 
   const steps = [
     {
-      icon: <BiClipboard size={28} />,
+      icon: step5,
       title: "Step 1",
       desc: "Upload your prescription",
+      rightarrow: <BsArrowRight />,
       color: "#2563EB",
     },
     {
-      icon: <BsCartCheck size={28} />,
+      icon: step4,
       title: "Step 2",
       desc: "Add items to your cart",
+      rightarrow: <BsArrowRight />,
       color: "#16A34A",
     },
     {
-      icon: <FiFileText size={28} />,
+      icon: step3,
       title: "Step 3",
-      desc: "Enter contact number & delivery address",
+      desc: "Get your order delivered",
+
+      rightarrow: <BsArrowRight />,
       color: "#9333EA",
     },
     {
-      icon: <MdDeliveryDining size={28} />,
+      icon: step2,
       title: "Step 4",
-      desc: "Get your order delivered",
+      desc: "Enter contact number & delivery address",
+      rightarrow: <BsArrowRight />,
       color: "#EC4899",
     },
     {
-      icon: <AiOutlineCreditCard size={28} />,
+      icon: step1,
       title: "Step 5",
       desc: "Pay by GCOD/COD on delivery",
       color: "#006EBB",
@@ -65,38 +78,51 @@ const Instructions = () => {
 
   return (
     <>
-      <div className="responsive-mx lg:px-8 relative overflow-hidden md:py-6 py-5 bg-[#F9FCFF] sm:px-0 px-2 border-2 border-gray-100 rounded-2xl sm:shadow-md shadow md:mt-24 sm:mt-16 mt-12">
-        <h2 className="text-center font-medium sm:text-lg text-base md:text-3xl tracking-wide mt-6 md:mb-12 mb-9">
-          Instructions on how to order
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-5 mb-5 gap-12 items-center relative z-10">
+      <div className="responsive-mx lg:px-8 relative overflow-hidden md:mt-28 mt-14 bg-[#F9FCFF] border-2 border-gray-100 rounded-2xl sm:shadow-md shadow">
+        <div className="text-center text-base md:text-4xl tracking-wide md:pt-16 pt-10 font-bold uppercase ">
+          Instructions on how to <span className="text-color">order</span>
+        </div>
+        <div className="grid grid-cols-2  lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-2 lg:gap-5 sm:gap-12 gap-5 items-start  px-2  relative z-10 md:my-20 my-9">
           {steps.map((step, i) => (
             <motion.div
               key={i}
               initial={{ y: 50, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               transition={{ delay: i * 0.3, type: "spring", stiffness: 120 }}
-              whileHover={{ scale: 1.2, y: -10 }}
-              className="flex flex-col items-center text-center cursor-pointer"
+              whileHover={{ scale: 1.1, y: -8 }}
+              className="cursor-pointer relative flex flex-col items-center"
             >
-              <div
-                style={{ backgroundColor: step.color }} // use hex color here
-                className="p-5 rounded-full shadow-xl flex items-center text-white justify-center ring-2 ring-white hover:shadow-2xl"
-              >
-                {step.icon}
-              </div>
+              <div className="flex  items-center justify-between">
+                <div className=" flex  flex-col  items-center">
+                  <p className="font-bold mb-2 text-sm md:text-2xl text-[#2996D9]/24 text-center ml-16 w-full ">
+                    {step.title}
+                  </p>
+                  <div className="text-black ">
+                    <Image
+                      src={step.icon}
+                      alt={step.title}
+                      width="full"
+                      height={60}
+                    />
+                  </div>
 
-              <p className="font-medium mt-4 text-base">{step.title}</p>
-              <p className="text-gray-500 text-xs mt-1 max-w-xs">{step.desc}</p>
+                  <p className="font-medium md:px-5  text-center tracking-wide text-sm md:text-base mt-5 ">
+                    {step.desc}
+                  </p>
+                </div>
+
+                <div className="text-[#000000]/24 text-5xl -mt-6 lg:block hidden ">
+                  {step?.rightarrow}
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>
       </div>
 
       {/* Stats Section */}
-      <div className="bg-white lg:mt-28 md:mt-24 sm:mt-20 mt-12 sm:py-16 py-7">
-        <section className="responsive-mx">
+      <div className="bg-white  md:mt-24 mt-8 ">
+        <section className="responsive-mx sm:py-16 py-7">
           <div className="grid grid-cols-3 sm:gap-8 gap-5 text-center">
             {stats.map((stat, index) => (
               <motion.div
@@ -111,13 +137,13 @@ const Instructions = () => {
                   <Image
                     src={stat.icon}
                     alt={stat.label}
-                    className="mb-3 w-12 h-12 sm:w-14 sm:h-14 md:w-20 md:h-20 lg:w-20 lg:h-20"
+                    className="mb-3 w-12 h-12 sm:w-14 sm:h-14 md:w-24 md:h-24"
                   />
                 </div>
-                <h2 className="text-sm sm:text-xl md:text-2xl font-bold text-black">
+                <h2 className="text-base sm:text-xl md:text-2xl font-bold text-black">
                   {stat.number}
                 </h2>
-                <p className="text-gray-600 text-[8px] sm:text-sm mt-1">
+                <p className="text-gray-600 text-[10px] sm:text-sm mt-1">
                   {stat.label}
                 </p>
               </motion.div>

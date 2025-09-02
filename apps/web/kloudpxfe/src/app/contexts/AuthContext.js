@@ -5,6 +5,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 
 import { getAxiosCall } from "@/app/lib/axios";
 import endpoints from "@/app/config/endpoints";
+import toast from "react-hot-toast";
 
 const AuthContext = createContext(null);
 AuthContext.displayName = "AuthContext";
@@ -60,13 +61,13 @@ export const AuthProvider = ({ children }) => {
     onSuccess: async (codeResponse) => {
       try {
         if (!codeResponse?.code)
-          throw new Error("Authorization code not found");
+          toast.error("Authorization code not found");
         const encodedCode = encodeURIComponent(codeResponse.code);
         const res = await getAxiosCall(
           endpoints.auth.googleLogin + `?code=${encodedCode}`
         );
         const token = res?.data?.token;
-        if (!token) throw new Error("Token missing from server");
+        if (!token) toast.error("Token missing from server");
 
         localStorage.setItem("access_token", token);
         setToken(token);

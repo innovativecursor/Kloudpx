@@ -16,7 +16,7 @@ const Upload = () => {
 
   return (
     <>
-      <div className="responsive-mx cursor-pointer md:mt-20 sm:mt-16 mt-11 relative">
+      <div className="responsive-mx cursor-pointer md:mt-28 mt-14 relative">
         <div className="grid md:grid-cols-2 grid-cols-1 md:gap-8 gap-5">
           <div className="bg-[#EBF7FF] border border-[#0070ba] rounded-3xl sm:h-80 h-64 lg:p-8 md:p-6 p-4 flex flex-col items-center justify-center text-center">
             <div className="bg-[#0070ba] rounded-full tracking-wide sm:p-4 p-2 mb-4">

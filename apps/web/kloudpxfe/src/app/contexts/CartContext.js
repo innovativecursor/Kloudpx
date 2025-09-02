@@ -15,7 +15,7 @@ export const CartProvider = ({ children }) => {
   const { token } = useAuth();
   const pathname = usePathname();
   const { doCheckout, addDeliveryData } = useCheckout();
-  const { openSignup } = useLoginAuth();
+  const { openLogin } = useLoginAuth();
   const [cartItems, setCartItems] = useState([]);
   const [allClinics, setAllClinics] = useState([]);
   const [allDoctors, setAllDoctors] = useState([]);
@@ -25,8 +25,7 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (medicineid, quantity) => {
     if (!token) {
-      // toast.error("Please login first");
-      openSignup();
+      openLogin();
       return;
     }
 
@@ -39,12 +38,16 @@ export const CartProvider = ({ children }) => {
       const available = error?.response?.data?.available;
 
       if (errMsg === "Insufficient stock") {
-        toast.error(`Only ${available} items available in stock.`);
+        if (available === 0) {
+          toast.error("This item is out of stock.");
+        } else {
+          toast.error(`Only ${available} item(s) available in stock.`);
+        }
       } else {
         toast.error(errMsg || "Failed to add item to cart");
       }
 
-      console.error("Add to cart failed:", error?.response?.data);
+      // console.error("Add to cart failed:", error?.response?.data);
     }
   };
 
