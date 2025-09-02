@@ -224,6 +224,14 @@ func User(db *gorm.DB) {
 		useraccount.GetUserPwdCertificate(c, db)
 	})
 
+	apiV1.POST("/user/senior/upload", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		useraccount.UploadSeniorCitizenID(c, db)
+	})
+
+	apiV1.GET("/user/senior", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		useraccount.GetSeniorCitizenID(c, db)
+	})
+
 	// Listen and serve on defined port
 	log.Printf("Application started, Listening on Port %s", port)
 	router.Run(":" + port)

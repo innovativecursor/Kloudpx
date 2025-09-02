@@ -7,6 +7,6 @@ type UpdateProfileInput struct {
 	Gender   string  `json:"gender" binding:"required,oneof=Male Female Other"`
 }
 
-type PwdPayload struct {
+type PwdAndSeniorIdPayload struct {
 	File string `json:"file" binding:"required"` // base64-encoded certificate
 }
