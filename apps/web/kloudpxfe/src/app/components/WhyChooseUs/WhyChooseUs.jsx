@@ -35,7 +35,7 @@ export default function WhyChooseUs() {
 
   return (
     <div className="bg-[#F5FAFF]">
-      <section className="responsive-mx sm:py-14 py-12 md:mt-20 sm:mt-16 mt-5">
+      <section className="responsive-mx sm:py-16 py-12 md:mt-20 sm:mt-16 mt-10">
         <div className="text-center">
           <h2 className="sm:text-2xl text-xl font-semibold mb-2">
             Why Choose KloudPharma

@@ -14,7 +14,7 @@ body {
 }
 
 .responsive-mx {
-  @apply mx-3 sm:mx-5  md:mx-[4vw] lg:mx-[8vw];
+  @apply mx-4 sm:mx-5  md:mx-[5vw] lg:mx-[9vw];
 }
 
 .flex-between-center {

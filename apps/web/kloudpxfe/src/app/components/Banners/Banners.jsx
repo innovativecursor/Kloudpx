@@ -43,9 +43,9 @@ const Banners = () => {
     : [];
 
   return (
-    <div className="responsive-mx lg:mt-20 md:mt-14 mt-9">
+    <div className="responsive-mx md:mt-24 mt-12">
       <motion.h1
-        className="font-semibold sm:text-2xl text-lg tracking-wide lg:mb-9 md:mb-6 mb-4"
+        className="font-semibold sm:text-2xl text-lg tracking-wide md:mb-4 mb-4"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
@@ -54,7 +54,7 @@ const Banners = () => {
         Featured Products
       </motion.h1>
 
-      <div className="grid grid-cols-2 md:gap-6 gap-3">
+      <div className="grid grid-cols-2 md:gap-6 gap-2">
         {allImages.map((image, index) => (
           <div key={image.ID || index}>
             <div className="relative group cursor-pointer overflow-hidden rounded-xl">
@@ -80,7 +80,7 @@ const Banners = () => {
         ))}
       </div>
 
-      <div className="lg:mt-24 md:mt-20 sm:mt-16 mt-11">
+      <div className="md:mt-24 mt-12">
         <Swiper
           spaceBetween={15}
           breakpoints={{

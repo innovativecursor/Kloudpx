@@ -65,12 +65,12 @@ const Instructions = () => {
 
   return (
     <>
-      <div className="responsive-mx lg:px-8 relative overflow-hidden md:py-6 py-5 bg-[#F9FCFF] sm:px-0 px-2 border-2 border-gray-100 rounded-2xl sm:shadow-md shadow md:mt-24 sm:mt-16 mt-12">
+      <div className="responsive-mx lg:px-8 relative overflow-hidden  md:mt-28 mt-14 bg-[#F9FCFF]  border-2 border-gray-100 rounded-2xl sm:shadow-md shadow ">
         <h2 className="text-center font-medium sm:text-lg text-base md:text-3xl tracking-wide mt-6 md:mb-12 mb-9">
           Instructions on how to order
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 mb-5 gap-12 items-center relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-5 mb-8 gap-10 items-center relative z-10">
           {steps.map((step, i) => (
             <motion.div
               key={i}
@@ -95,8 +95,8 @@ const Instructions = () => {
       </div>
 
       {/* Stats Section */}
-      <div className="bg-white lg:mt-28 md:mt-24 sm:mt-20 mt-12 sm:py-16 py-7">
-        <section className="responsive-mx">
+      <div className="bg-white  md:mt-24 mt-12 ">
+        <section className="responsive-mx sm:py-16 py-7">
           <div className="grid grid-cols-3 sm:gap-8 gap-5 text-center">
             {stats.map((stat, index) => (
               <motion.div

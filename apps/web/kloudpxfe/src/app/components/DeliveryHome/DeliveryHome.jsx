@@ -8,7 +8,7 @@ import delivery2 from "@/assets/delivery2.png";
 
 const DeliveryHome = () => {
   return (
-    <div className="responsive-mx lg:mt-28 md:mt-24 sm:mt-16 mt-14">
+    <div className="responsive-mx lg:mt-36 md:mt-28 mt-14">
       {/* Top Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:gap-28 gap-10 lg:items-center md:items-start items-center">
         {/* Image */}
@@ -16,7 +16,7 @@ const DeliveryHome = () => {
           <Image
             src={delivery1}
             alt="Delivery Service"
-            className="w-full md:h-96 h-auto rounded-xl"
+            className="w-full h-auto rounded-xl"
             priority
           />
         </div>
