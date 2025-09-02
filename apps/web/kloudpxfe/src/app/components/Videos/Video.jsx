@@ -136,28 +136,28 @@ const Video = () => {
 
   return (
     <motion.div
-      className="responsive-mx md:mt-24 mt-10  flex flex-col justify-center items-start rounded-xl"
+      className="responsive-mx md:mt-24 mt-10  flex flex-col justify-center md:items-start items-center rounded-xl"
       variants={containerVariants}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.3 }}
     >
       <motion.h1
-        className="font-semibold lg:text-4xl md:text-3xl text-lg tracking-wide "
+        className="font-semibold lg:text-4xl md:text-3xl text-xl tracking-wide "
         variants={itemVariants}
       >
         How <span className="text-color"> Kloud P&X</span> Works
       </motion.h1>
 
       <motion.p
-        className="font-normal text-gray-800 sm:mt-2 sm:text-[12px] text-[7px] md:text-sm"
+        className="font-normal text-gray-800 sm:mt-2 mt-1 sm:text-[12px] text-[8px] md:text-sm"
         variants={itemVariants}
       >
         Learn how easy it to get your medicines delivered safely and quickly.
       </motion.p>
 
       {/* Video wrapper with overlay */}
-      <div className="relative w-full md:mt-7 mt-3">
+      <div className="relative w-full md:mt-7 mt-4">
         <motion.video
           ref={videoRef}
           src="/video.webm"
@@ -190,7 +190,7 @@ const Video = () => {
                 onClick={handlePlay}
                 className="flex items-center gap-2 font-medium md:text-sm text-xs px-6 py-2.5 md:px-10 md:py-3.5 cursor-pointer border border-[#FFFFFF]/80 text-white rounded-xs hover:bg-white hover:text-[#001D57] transition"
               >
-                <FaPlay className="text-xs" /> WATCH 01:00
+                <FaPlay className="text-xs" /> WATCH 01:13
               </button>
             </div>
           </div>

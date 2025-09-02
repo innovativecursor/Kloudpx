@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useCartContext } from "@/app/contexts/CartContext";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
 import { useAuth } from "@/app/contexts/AuthContext";
@@ -20,6 +20,7 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
     allDoctors,
   } = useCartContext();
   const { toggleSaveForLater, savedForLaterIds, doCheckout } = useCheckout();
+  const [agreedTerms, setAgreedTerms] = useState(false);
   const fallbackImage = "/assets/fallback.png";
   const { startLoader } = usePageLoader();
   const data = cartItems || [];
@@ -36,6 +37,12 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
   };
 
   const handleCheckout = async () => {
+    if (!agreedTerms) {
+      toast.error(
+        "Please agree with the Terms and Conditions before checkout."
+      );
+      return;
+    }
     const allItemsSavedForLater = data.every((item) =>
       savedForLaterIds.includes(item.cart_id)
     );
@@ -152,6 +159,46 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
           </div>
         )}
       </div>
+      <div className="flex items-center gap-3 mt-5">
+        <label className="relative flex items-center cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={agreedTerms}
+            onChange={(e) => setAgreedTerms(e.target.checked)}
+            className="sr-only"
+          />
+
+          <span
+            className={`w-5 h-5 flex-shrink-0 rounded-md border-2 border-gray-300 flex items-center justify-center transition-colors duration-200 ${
+              agreedTerms ? "bg-blue-600 border-blue-600" : "bg-white"
+            }`}
+          >
+            {agreedTerms && (
+              <svg
+                className="w-3 h-3 text-white"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            )}
+          </span>
+          {/* Label text */}
+          <span className="ml-2 text-sm text-gray-700 hover:text-blue-600 transition-colors duration-200">
+            I agree with the{" "}
+            <span className="text-blue-600 underline">
+              Terms and Conditions
+            </span>
+          </span>
+        </label>
+      </div>
+
       <div className="flex justify-between sm:flex-row flex-col-reverse gap-5 sm:mt-10 mt-8 items-center">
         <div className="sm:w-[40%] w-full">
           <button
@@ -166,7 +213,8 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
           <button
             className={`bg-[#0070BA] text-white hover:bg-[#005c96] text-sm w-full h-12 border-2 border-gray-200 shadow rounded-full font-semibold ${
               data.length === 0 ||
-              data.every((item) => savedForLaterIds.includes(item.cart_id))
+              data.every((item) => savedForLaterIds.includes(item.cart_id)) ||
+              !agreedTerms
                 ? "opacity-50 cursor-not-allowed"
                 : "cursor-pointer"
             }`}

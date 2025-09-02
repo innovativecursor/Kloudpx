@@ -15,13 +15,10 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
   const { getCartData, removeFromCart, getAllCartData } = useCartContext();
   const { goToProductPage } = useProductNavigation();
   const fallbackImage = "/assets/fallback.png";
-  const [activeTab, setActiveTab] = useState("All");
   const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   const data = getCartData?.data || [];
   const loading = getCartData?.loading || false;
-
-  // console.log(data);
 
   useEffect(() => {
     if (token) {
@@ -48,23 +45,9 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
     removeFromCart(id);
   };
 
-  const filteredData = data?.filter((item) => {
-    if (activeTab === "All") return true;
-    if (activeTab === "Regular")
-      return item.prescription_status === "Not Required";
-    if (activeTab === "Prescribed Drug")
-      return item.prescription_status !== "Not Required";
-    return true;
-  });
-
   return (
     <>
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-40"
-          // onClick={onClose}
-        />
-      )}
+      {isOpen && <div className="fixed inset-0 bg-black/40 z-40" />}
 
       <div
         ref={modalRef}
@@ -107,34 +90,16 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex justify-between items-center px-4 py-2">
-          {["All", "Regular", "Prescribed Drug"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={classNames(
-                "md:px-7 px-6 py-2 rounded-full border cursor-pointer md:text-sm text-xs font-medium transition-all",
-                activeTab === tab
-                  ? "border-[#0070ba] text-[#0070ba]"
-                  : "bg-gray-100 text-gray-700 border-gray-100"
-              )}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-
         {/* Cart Items */}
         <div className="flex-1 overflow-y-auto thin-scrollbar px-4 md:space-y-4 space-y-8 mt-7">
           {loading ? (
             <h2 className="text-center text-gray-500 mt-8">Loading cart...</h2>
-          ) : !filteredData || filteredData.length === 0 ? (
+          ) : !data || data.length === 0 ? (
             <h2 className="text-center text-gray-500 mt-8">
-              No items in this category.
+              No items in your cart.
             </h2>
           ) : (
-            filteredData.map((item) => {
+            data.map((item) => {
               const medicine = item?.medicine;
               const imageUrl =
                 Array.isArray(medicine?.images) && medicine.images[0]
@@ -151,9 +116,7 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
               return (
                 <div
                   key={item.cart_id}
-                  className={classNames(
-                    "flex items-center gap-4 md:p-3 md:shadow-sm rounded-md transition"
-                  )}
+                  className="flex items-center gap-4 md:p-3 md:shadow-sm rounded-md transition"
                   onClick={() => {
                     onClose();
                     goToProductPage(

@@ -303,14 +303,24 @@ const Prescription = () => {
 
                     setIsOpen(false);
                   } catch (error) {
-                    console.error(
-                      "Cart error response:",
-                      error.response?.data || error.message
-                    );
-                    toast.error(
-                      error.response?.data?.message ||
-                        "Failed to add item to cart."
-                    );
+                    const errData = error?.response?.data;
+                    const errMsg =
+                      errData?.message ||
+                      errData?.error ||
+                      "Failed to add item to cart";
+                    const available = errData?.available;
+
+                    if (errMsg === "Insufficient stock") {
+                      if (available === 0) {
+                        toast.error("This item is out of stock.");
+                      } else {
+                        toast.error(
+                          `Only ${available} item(s) available in stock.`
+                        );
+                      }
+                    } else {
+                      toast.error(errMsg);
+                    }
                   }
                 }}
               >
@@ -391,7 +401,7 @@ const Prescription = () => {
                   <Image
                     src={prescriptionguide}
                     alt="Prescription Guide"
-                    className="w-full h-full p-3 object-cover"
+                    className="w-full h-44 p-5 object-cover"
                     priority
                   />
                 )}

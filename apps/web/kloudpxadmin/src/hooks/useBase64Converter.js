@@ -1,10 +1,11 @@
 import imageCompression from "browser-image-compression";
+import toast from "react-hot-toast";
 
 const useBase64Converter = () => {
   const convertToBase64 = async (file, maxSizeMB = 0.5) => {
     try {
       if (!file.type.startsWith("image/")) {
-        throw new Error("Only image files are allowed");
+        toast.error("Only image files are allowed");
       }
 
       const options = {

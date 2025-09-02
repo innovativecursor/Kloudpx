@@ -23,8 +23,8 @@ const Banners = () => {
     {
       bg: "#F0FDF4",
       img: container1,
-      title: "Hassle-free Delivery",
-      desc: "We provide hassle-free delivery",
+      title: "Secure Transactions",
+      desc: "Safe and reliable payments through COD, G-Cash, PayMaya, and QRPh",
     },
     {
       bg: "#F0FDFA",

@@ -44,23 +44,7 @@ const getAuthHeaders = (sendToken) => {
   return token ? { Authorization: token } : {};
 };
 
-// GET
-// export const getAxiosCall = async (endpoint, params = {}, sendToken = true) => {
-//   store.dispatch({ type: "LOADING", payload: true });
-//   try {
-//     const headers = getAuthHeaders(sendToken);
-//     const response = await instance.get(endpoint, {
-//       headers,
-//       params,
-//     });
-//     return response;
-//   } catch (error) {
-//     // showError(error);
-//     throw error;
-//   } finally {
-//     store.dispatch({ type: "LOADING", payload: false });
-//   }
-// };
+
 
 export const getAxiosCall = async (
   endpoint,
@@ -81,6 +65,7 @@ export const getAxiosCall = async (
     return response;
   } catch (error) {
     throw error;
+
   } finally {
     if (useGlobalLoader) {
       store.dispatch({ type: "LOADING", payload: false });
@@ -99,8 +84,8 @@ export const postAxiosCall = async (endpoint, data, sendToken = true) => {
     const response = await instance.post(endpoint, data, { headers });
     return response.data;
   } catch (error) {
-    // showError(error);
     throw error;
+
   } finally {
     store.dispatch({ type: "LOADING", payload: false });
   }
@@ -117,7 +102,6 @@ export const updateAxiosCall = async (endpoint, id, data, sendToken = true) => {
     const response = await instance.put(`${endpoint}/${id}`, data, { headers });
     return response.data;
   } catch (error) {
-    // showError(error);
     throw error;
   } finally {
     store.dispatch({ type: "LOADING", payload: false });

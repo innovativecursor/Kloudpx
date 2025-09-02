@@ -20,10 +20,10 @@ const ProDetailsDes = ({ details }) => {
         </div>
 
         <div className="bg-gray-100 shadow-md sm:p-6 p-4 rounded-lg mb-7">
-          <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
-            {details.brandname}: Your daily essential for vitality and
-            well-being
-          </h3>
+          <div className="font-semibold tracking-wider sm:text-base text-sm dark-text">
+            <span className="uppercase">{details.brandname}</span>: Your daily
+            essential for vitality and well-being
+          </div>
         </div>
 
         <span className="text-gray-700 mb-7 w-full text-justify break-words hyphens-auto leading-relaxed">
@@ -41,7 +41,7 @@ const ProDetailsDes = ({ details }) => {
         {details?.keyingredients && (
           <>
             <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
-              <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
+              <h3 className="font-semibold uppercase tracking-wider sm:text-base text-sm dark-text">
                 Key Ingredients
               </h3>
             </div>
@@ -55,8 +55,8 @@ const ProDetailsDes = ({ details }) => {
         {details?.recommendeddailyallowance && (
           <>
             <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
-              <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
-               Recommended Usual Dose
+              <h3 className="font-semibold uppercase tracking-wider sm:text-base text-sm dark-text">
+                Recommended Usual Dose
               </h3>
             </div>
 
@@ -69,7 +69,7 @@ const ProDetailsDes = ({ details }) => {
         {details?.directionsforuse && (
           <>
             <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
-              <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
+              <h3 className="font-semibold uppercase tracking-wider sm:text-base text-sm dark-text">
                 Directions for use
               </h3>
             </div>
@@ -83,7 +83,7 @@ const ProDetailsDes = ({ details }) => {
         {details?.safetyinformation && (
           <>
             <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
-              <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
+              <h3 className="font-semibold uppercase tracking-wider sm:text-base text-sm dark-text">
                 Safety information
               </h3>
             </div>
@@ -97,7 +97,7 @@ const ProDetailsDes = ({ details }) => {
         {details?.storage && (
           <>
             <div className="bg-gray-100 shadow-md sm:p-6 p-5 rounded-lg mb-7 mt-9">
-              <h3 className="font-semibold tracking-wider sm:text-base text-sm dark-text">
+              <h3 className="font-semibold uppercase tracking-wider sm:text-base text-sm dark-text">
                 Storage
               </h3>
             </div>

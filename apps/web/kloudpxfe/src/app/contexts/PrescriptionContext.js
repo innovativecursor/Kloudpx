@@ -90,13 +90,9 @@ export const PrescriptionProvider = ({ children }) => {
   ) => {
     if (!medicineid || !prescriptionid || !quantity) {
       toast.error("Missing data for cart.");
-      console.error("Missing params:", {
-        medicineid,
-        prescriptionid,
-        quantity,
-      });
-      throw new Error("Missing data");
+      return; // ❌ throw ya console.error mat karo
     }
+
     try {
       await postAxiosCall(
         endpoints.prescriptioncart.add,
@@ -111,16 +107,25 @@ export const PrescriptionProvider = ({ children }) => {
       setSelectedPrescriptionId(null);
       getAllCartData();
     } catch (error) {
-      console.error(
-        "Cart error response:",
-        error.response?.data || error.message
-      );
-      toast.error(
-        error.response?.data?.message || "Failed to add item to cart."
-      );
-      throw error;
+      const errData = error?.response?.data;
+      const errMsg =
+        errData?.message ||
+        errData?.error ||
+        "Failed to add item to cart";
+      const available = errData?.available;
+
+      if (errMsg === "Insufficient stock") {
+        if (available === 0) {
+          toast.error("This item is out of stock.");
+        } else {
+          toast.error(`Only ${available} item(s) available in stock.`);
+        }
+      } else {
+        toast.error(errMsg);
+      }
     }
   };
+
 
   const clearPrescription = () => {
     setAllPrescription([]);
