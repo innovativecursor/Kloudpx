@@ -13,14 +13,12 @@ import (
 func UpsertRegionSetting(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
-		logrus.Warn("Unauthorized access: user not found in context")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
 		return
 	}
 
 	_, ok := user.(*models.Admin)
 	if !ok {
-		logrus.WithField("user", user).Warn("Unauthorized access: invalid user object")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
 		return
 	}
@@ -33,37 +31,23 @@ func UpsertRegionSetting(c *gin.Context, db *gorm.DB) {
 
 	var existing models.RegionSetting
 	err := db.Where("region_name = ?", req.RegionName).First(&existing).Error
-
-	if err == nil {
-		// Update
-		existing.ZipStart = req.ZipStart
-		existing.ZipEnd = req.ZipEnd
-		existing.DeliveryTime = req.DeliveryTime
-		existing.FreeShippingLimit = req.FreeShippingLimit
-		existing.StandardRate = req.StandardRate
-		if err := db.Save(&existing).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update region"})
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{"message": "Region updated successfully"})
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot create new regions, only edit existing"})
 		return
 	}
 
-	// Create new
-	region := models.RegionSetting{
-		RegionName:        req.RegionName,
-		ZipStart:          req.ZipStart,
-		ZipEnd:            req.ZipEnd,
-		DeliveryTime:      req.DeliveryTime,
-		FreeShippingLimit: req.FreeShippingLimit,
-		StandardRate:      req.StandardRate,
-	}
-	if err := db.Create(&region).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create region"})
+	// Update only
+	existing.ZipStart = req.ZipStart
+	existing.ZipEnd = req.ZipEnd
+	existing.DeliveryTime = req.DeliveryTime
+	existing.FreeShippingLimit = req.FreeShippingLimit
+	existing.StandardRate = req.StandardRate
+	if err := db.Save(&existing).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update region"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Region created successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Region updated successfully"})
 }
 
 func GetAllRegionSettings(c *gin.Context, db *gorm.DB) {
