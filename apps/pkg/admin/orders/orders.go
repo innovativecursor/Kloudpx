@@ -216,7 +216,7 @@ func UpdateOrderDetails(c *gin.Context, db *gorm.DB) {
 		}
 		order.Status = req.Status
 	}
-
+	//1
 	if req.PaidAmount > 0 {
 		order.PaidAmount = req.PaidAmount
 	}
