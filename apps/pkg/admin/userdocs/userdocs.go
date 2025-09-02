@@ -55,7 +55,7 @@ func VerifyUserPwdCertificate(c *gin.Context, db *gorm.DB) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update status"})
 		return
 	}
-
+	// response
 	c.JSON(http.StatusOK, gin.H{
 		"message":     "PWD status updated",
 		"pwd_id":      pwd.ID,
