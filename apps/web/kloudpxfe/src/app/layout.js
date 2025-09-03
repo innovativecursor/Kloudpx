@@ -24,6 +24,7 @@ import { ProfileProvider } from "./contexts/ProfileContext";
 import { PwdProvider } from "./contexts/PwdContext";
 import { SeniorCitizenProvider } from "./contexts/Seniorcitizen";
 import TawkMessenger from "./components/Tawkto/TawkMessenger";
+import { DoctorClinicsProvider } from "./contexts/DoctorClinicsContext";
 
 export default function RootLayout({ children }) {
   return (
@@ -50,16 +51,20 @@ export default function RootLayout({ children }) {
                           <ProductProvider>
                             <CheckoutProvider>
                               <CartProvider>
-                                <PrescriptionProvider>
-                                  <PaymentProvider>
-                                    <ImageProvider>
-                                      <Header />
-                                      <main className="flex-1">{children}</main>
-                                      <Footer />
-                                      <CustomToaster />
-                                    </ImageProvider>
-                                  </PaymentProvider>
-                                </PrescriptionProvider>
+                                <DoctorClinicsProvider>
+                                  <PrescriptionProvider>
+                                    <PaymentProvider>
+                                      <ImageProvider>
+                                        <Header />
+                                        <main className="flex-1">
+                                          {children}
+                                        </main>
+                                        <Footer />
+                                        <CustomToaster />
+                                      </ImageProvider>
+                                    </PaymentProvider>
+                                  </PrescriptionProvider>
+                                </DoctorClinicsProvider>
                               </CartProvider>
                             </CheckoutProvider>
                           </ProductProvider>

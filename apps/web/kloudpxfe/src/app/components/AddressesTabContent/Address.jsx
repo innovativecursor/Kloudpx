@@ -39,16 +39,17 @@ const Address = () => {
     if (Array.isArray(getAllAddress) && getAllAddress.length > 0) {
       const defaultAddress = getAllAddress.find((addr) => addr.IsDefault);
       if (defaultAddress && !selectedId) {
+        debugger;
         setSelectedId(defaultAddress.ID);
       }
     }
   }, [getAllAddress]);
 
   const handleSaveAndProceed = () => {
-    if (!checkoutData?.items || checkoutData.items.length === 0) {
-      toast.error("No items in checkout. Add items first!");
-      return;
-    }
+    // if (!checkoutData?.items || checkoutData.items.length === 0) {
+    //   toast.error("No items in checkout. Add items first!");
+    //   return;
+    // }
 
     let selectedAddressId = selectedId;
 
@@ -62,6 +63,7 @@ const Address = () => {
     }
 
     if (selectedAddressId) {
+       debugger;
       startLoader();
       selectedAddress(selectedAddressId);
       setSelectedId(selectedAddressId);

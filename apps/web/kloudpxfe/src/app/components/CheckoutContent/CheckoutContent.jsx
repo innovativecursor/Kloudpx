@@ -8,33 +8,25 @@ import { toast } from "react-hot-toast";
 import Clinics from "../Clinics/Clinics";
 import Doctors from "../Doctors/Doctors";
 import usePageLoader from "@/app/hooks/usePageLoader";
+import SaveForLater from "../SaveForLater/SaveForLater";
+import { useDoctorClinicsContext } from "@/app/contexts/DoctorClinicsContext";
 
 const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
   const { token } = useAuth();
   const router = useRouter();
-  const {
-    getAllCartData,
-    getAllClinics,
-    getAllDoctors,
-    allClinics,
-    allDoctors,
-  } = useCartContext();
-  const { toggleSaveForLater, savedForLaterIds, doCheckout } = useCheckout();
+  const { getAllCartData } = useCartContext();
+  const { getAllClinics, getAllDoctors, allClinics, allDoctors } =
+    useDoctorClinicsContext();
+  const { savedForLaterIds, doCheckout } = useCheckout();
   const [agreedTerms, setAgreedTerms] = useState(false);
-  const fallbackImage = "/assets/fallback.png";
   const { startLoader } = usePageLoader();
   const data = cartItems || [];
-  const loading = false;
 
   useEffect(() => {
     if (token) {
       getAllCartData();
     }
   }, [token]);
-
-  const handleSaveForLater = async (cartId) => {
-    await toggleSaveForLater(cartId);
-  };
 
   const handleCheckout = async () => {
     if (!agreedTerms) {
@@ -87,78 +79,8 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
 
       <Doctors />
 
-      <div className="pt-5">
-        {loading ? (
-          <p className="text-center text-gray-500">Loading cart...</p>
-        ) : (
-          <div className="space-y-4">
-            {data.map((item) => {
-              const medicine = item?.medicine;
-              const imageUrl =
-                Array.isArray(medicine?.images) && medicine.images[0]
-                  ? medicine.images[0]
-                  : fallbackImage;
+      <SaveForLater data={data} setSelectedProduct={setSelectedProduct} />
 
-              const price = medicine?.price || 0;
-              const discountPercent =
-                parseFloat(medicine?.discount?.replace("%", "")) || 0;
-              const discountedPrice = (
-                price -
-                (price * discountPercent) / 100
-              ).toFixed(2);
-
-              return (
-                <div
-                  key={item.cart_id}
-                  className="w-full py-3 sm:px-6 px-3  rounded-sm cursor-pointer flex justify-between items-center bg-green-50"
-                  onClick={() => setSelectedProduct(item)}
-                >
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={imageUrl}
-                      alt="product"
-                      className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-md"
-                    />
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-xs sm:text-sm truncate max-w-[140px]">
-                        {medicine?.genericname || "N/A"}
-                      </span>
-                      <span className="text-gray-500 text-[11px] sm:text-[13px] truncate max-w-[140px]">
-                        {medicine?.brandname || "N/A"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-end gap-1">
-                    {discountPercent > 0 ? (
-                      <div className="text-xs sm:text-sm font-semibold text-[#333]">
-                        ₱ {discountedPrice}
-                        <span className="text-[10px] sm:text-xs line-through text-gray-400 ml-1">
-                          ₱ {price}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="text-xs sm:text-sm font-semibold text-[#333]">
-                        ₱ {price}
-                      </div>
-                    )}
-
-                    <label className="flex items-center gap-1 text-[10px] sm:text-xs cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={savedForLaterIds.includes(item.cart_id)}
-                        onChange={() => handleSaveForLater(item.cart_id)}
-                        className="w-3 h-3 sm:w-4 sm:h-4 rounded-full border border-blue-600 cursor-pointer checked:bg-blue-500"
-                      />
-                      Save for Later
-                    </label>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
       <div className="flex items-center gap-3 mt-5">
         <label className="relative flex items-center cursor-pointer select-none">
           <input

@@ -1,11 +1,11 @@
 "use client";
 import React from "react";
 import AsyncSelect from "react-select/async";
-import { useCartContext } from "@/app/contexts/CartContext";
+import { useDoctorClinicsContext } from "@/app/contexts/DoctorClinicsContext";
 
 const Doctors = () => {
   const { allDoctors, selectedDoctorId, setSelectedDoctorId } =
-    useCartContext();
+    useDoctorClinicsContext();
 
   const doctorOptions =
     allDoctors?.map((doc) => ({

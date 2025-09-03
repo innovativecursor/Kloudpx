@@ -2,10 +2,11 @@
 import React from "react";
 import AsyncSelect from "react-select/async";
 import { useCartContext } from "@/app/contexts/CartContext";
+import { useDoctorClinicsContext } from "@/app/contexts/DoctorClinicsContext";
 
 const Clinics = () => {
   const { allClinics, selectedClinicId, setSelectedClinicId } =
-    useCartContext();
+   useDoctorClinicsContext();
 
   const clinicOptions =
     allClinics?.map((clinic) => ({
@@ -118,3 +119,9 @@ const Clinics = () => {
 };
 
 export default Clinics;
+
+
+
+
+
+
