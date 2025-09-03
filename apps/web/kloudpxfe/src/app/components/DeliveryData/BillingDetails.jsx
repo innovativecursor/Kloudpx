@@ -1,19 +1,22 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { AiFillProduct } from "react-icons/ai";
-import { MdDeliveryDining, MdLocalOffer, MdPayment } from "react-icons/md";
+import { MdDeliveryDining, MdLocalOffer } from "react-icons/md";
 import { CiDeliveryTruck } from "react-icons/ci";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
 
 const BillingDetails = () => {
-  const { deliveryData } = useCheckout();
+  const { deliveryData, checkoutData, doCheckout } = useCheckout();
   if (!deliveryData) return null;
   const fallbackImage = "/assets/fallback.png";
   const cartLength = deliveryData?.cart_items?.length || 0;
-  console.log(deliveryData?.cart_items?.length);
 
-  console.log(deliveryData);
+  useEffect(() => {
+    if (!checkoutData) {
+      doCheckout();
+    }
+  }, [checkoutData, doCheckout]);
 
   return (
     <div className="mt-4">

@@ -5,28 +5,29 @@ import { useCheckout } from "@/app/contexts/CheckoutContext";
 import { useCartContext } from "@/app/contexts/CartContext";
 import BillingDetails from "./BillingDetails";
 
-const DeliveryCart = () => {
+const DeliveryCart = ({ fetchCheckout = false, showBilling = true  }) => {
   const { checkoutData, deliveryData, doCheckout } = useCheckout();
   const { removeFromCart } = useCartContext();
   const items = checkoutData?.items || [];
   const fallbackImage = "/assets/fallback.png";
 
   useEffect(() => {
-    doCheckout();
-  }, []);
+    if (fetchCheckout) {
+      doCheckout();
+    }
+  }, [fetchCheckout]);
 
   const handleDelete = (id) => {
     removeFromCart(id, { addDelivery: false });
   };
 
-  if (deliveryData?.delivery_type) {
+  if (showBilling && deliveryData?.delivery_type) {
     return (
       <div className="bg-[#EDF4F6] w-full rounded-lg py-2">
         <BillingDetails deliveryData={deliveryData} />
       </div>
     );
   }
-
   return (
     <div className="bg-[#EDF4F6] w-full rounded-lg py-5">
       {items.length > 0 ? (

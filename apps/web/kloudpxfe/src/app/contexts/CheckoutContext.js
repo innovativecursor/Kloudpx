@@ -15,7 +15,6 @@ export const CheckoutProvider = ({ children }) => {
   const [deliveryData, setDeliveryData] = useState(null);
   const [getAllAddress, setGetAllAddress] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState("GCOD");
-  // const [OrderSubmit, setOrderSubmit] = useState([])
 
   const [formData, setFormData] = useState({
     id: null,
@@ -66,7 +65,6 @@ export const CheckoutProvider = ({ children }) => {
     try {
       const res = await postAxiosCall(endpoints.checkout.get, {}, true);
       setCheckoutData(res || null);
-      setDeliveryData(null);
     } catch (error) {
       setCheckoutData(null);
     }
@@ -169,6 +167,8 @@ export const CheckoutProvider = ({ children }) => {
         },
         true
       );
+      console.log(res, "my delievry data");
+
       setDeliveryData(res || null);
     } catch (error) {
       setDeliveryData(null);

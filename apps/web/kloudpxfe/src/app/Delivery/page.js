@@ -17,7 +17,7 @@ const page = () => {
                     </div>
 
                     <div className="md:w-[40%] w-full mt-12">
-                        <DeliveryCart />
+                        <DeliveryCart fetchCheckout={false} />
                     </div>
                 </div>
             </div>

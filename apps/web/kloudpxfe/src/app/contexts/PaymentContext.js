@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useCartContext } from "./CartContext";
 import usePageLoader from "../hooks/usePageLoader";
+import { useDoctorClinicsContext } from "./DoctorClinicsContext";
 
 const PaymentContext = createContext();
 
@@ -27,8 +28,9 @@ export const PaymentProvider = ({ children }) => {
   } = useCheckout();
   const [OrderSubmit, setOrderSubmit] = useState([]);
   const [paymentSlip, setPaymentSlip] = useState([]);
-  const { getAllCartData, setSelectedClinicId,
-    setSelectedDoctorId, } = useCartContext();
+  const { getAllCartData } = useCartContext();
+  const { setSelectedClinicId, setSelectedDoctorId } =
+    useDoctorClinicsContext();
   const router = useRouter();
 
   const handleFileChange = (e) => {
@@ -77,7 +79,7 @@ export const PaymentProvider = ({ children }) => {
         },
         true
       );
-      setOrderSubmit(res || [])
+      setOrderSubmit(res || []);
       toast.success("Payment submitted successfully!");
       router.push("/Success");
       getAllCartData();
@@ -87,8 +89,8 @@ export const PaymentProvider = ({ children }) => {
       setDeliveryData(null);
     } catch (error) {
       console.error("Error submitting order:", error.message);
-      toast.error("Something went wrong!");
-      setOrderSubmit([])
+      // toast.error("Something went wrong!");
+      setOrderSubmit([]);
     }
   };
 

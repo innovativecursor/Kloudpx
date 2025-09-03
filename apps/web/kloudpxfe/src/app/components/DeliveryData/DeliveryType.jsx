@@ -17,19 +17,16 @@ const DeliveryType = () => {
     paymentMethod,
     setPaymentMethod,
     setDeliveryData,
+    checkoutData,
   } = useCheckout();
 
   const { handleOrderSubmit } = usePayment();
 
-  useEffect(() => {
-    setDeliveryData(null);
-  }, []);
+  const checkoutsessionid = checkoutData?.checkout_session_id;
 
   useEffect(() => {
-    if (selectedId) {
-      addDeliveryData();
-    }
-  }, [selectedId]);
+    addDeliveryData();
+  }, [selectedId, selected, checkoutsessionid]);
 
   useEffect(() => {
     if (!selected) setSelected("standard");
