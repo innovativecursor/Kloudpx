@@ -74,34 +74,41 @@ func SelectClinicAndDoctor(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// Validate hospital
-	var hospital models.Hospital
-	if err := db.First(&hospital, req.HospitalID).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid hospital"})
+	updates := map[string]interface{}{}
+
+	// If selecting existing
+	if req.HospitalID != nil {
+		updates["hospital_id"] = *req.HospitalID
+	}
+	if req.PhysicianID != nil {
+		updates["physician_id"] = *req.PhysicianID
+	}
+
+	// If typing new values
+	if req.CustomHospital != "" {
+		updates["custom_hospital"] = req.CustomHospital
+	}
+	if req.CustomPhysician != "" {
+		updates["custom_physician"] = req.CustomPhysician
+	}
+
+	if len(updates) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No valid clinic/doctor provided"})
 		return
 	}
 
-	// Validate physician
-	var physician models.Physician
-	if err := db.First(&physician, req.PhysicianID).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid physician"})
-		return
-	}
-
-	// Update all matching cart IDs for this user that are NOT saved for later
+	// Update user cart
 	if err := db.Model(&models.Cart{}).
 		Where("user_id = ? AND id IN ? AND is_saved_for_later = false", userObj.ID, req.CartIDs).
-		Updates(map[string]interface{}{
-			"hospital_id":  req.HospitalID,
-			"physician_id": req.PhysicianID,
-		}).Error; err != nil {
+		Updates(updates).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart items"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":  "Clinic and doctor selected for all specified cart items",
+		"message":  "Clinic/doctor info assigned to cart items",
 		"cart_ids": req.CartIDs,
+		"updates":  updates,
 	})
 }
 
@@ -267,6 +274,17 @@ func buildCartResponse(cartItems []models.Cart, db *gorm.DB) []config.CartRespon
 
 	return response
 }
+
+func GetAddressTypes(c *gin.Context, db *gorm.DB) {
+	var types []models.AddressType
+	if err := db.Find(&types).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch address types"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"address_types": types})
+}
+
 func AddOrUpdateAddress(c *gin.Context, db *gorm.DB) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -285,7 +303,26 @@ func AddOrUpdateAddress(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	// If address ID is provided, update existing
+	// Validate AddressType
+	var addrType models.AddressType
+	if err := db.First(&addrType, req.AddressTypeID).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid address type"})
+		return
+	}
+
+	// Restrict single instance for Home/School/Office/Partner
+	if addrType.TypeName != "Others" {
+		var existing models.Address
+		if err := db.Where("user_id = ? AND address_type_id = ?", userObj.ID, req.AddressTypeID).First(&existing).Error; err == nil {
+			// Already exists
+			if req.ID == 0 { // trying to create new
+				c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%s address already exists. Delete it first before adding new.", addrType.TypeName)})
+				return
+			}
+		}
+	}
+
+	// If update
 	if req.ID != 0 {
 		var addr models.Address
 		if err := db.First(&addr, "id = ? AND user_id = ?", req.ID, userObj.ID).Error; err != nil {
@@ -300,9 +337,9 @@ func AddOrUpdateAddress(c *gin.Context, db *gorm.DB) {
 		addr.ZipCode = req.ZipCode
 		addr.PhoneNumber = req.PhoneNumber
 		addr.IsDefault = req.IsDefault
+		addr.AddressTypeID = req.AddressTypeID
 
 		if req.IsDefault {
-			// Reset other addresses as non-default
 			db.Model(&models.Address{}).
 				Where("user_id = ? AND id != ?", userObj.ID, req.ID).
 				Update("is_default", false)
@@ -324,6 +361,7 @@ func AddOrUpdateAddress(c *gin.Context, db *gorm.DB) {
 		ZipCode:       req.ZipCode,
 		PhoneNumber:   req.PhoneNumber,
 		IsDefault:     req.IsDefault,
+		AddressTypeID: req.AddressTypeID,
 	}
 
 	if req.IsDefault {
@@ -353,12 +391,35 @@ func GetUserAddresses(c *gin.Context, db *gorm.DB) {
 	}
 
 	var addresses []models.Address
-	if err := db.Where("user_id = ?", userObj.ID).Preload("User").Find(&addresses).Error; err != nil {
+	if err := db.Where("user_id = ?", userObj.ID).
+		Preload("AddressType").
+		Find(&addresses).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve addresses"})
 		return
 	}
 
-	c.JSON(http.StatusOK, addresses)
+	// Group addresses by type
+	response := gin.H{}
+	for _, addr := range addresses {
+		switch addr.AddressType.TypeName {
+		case "Home":
+			response["home_address"] = addr
+		case "Office":
+			response["office_address"] = addr
+		case "School":
+			response["school_address"] = addr
+		case "Partner":
+			response["partner_address"] = addr
+		case "Others":
+			// allow multiple "Others"
+			if _, ok := response["other_addresses"]; !ok {
+				response["other_addresses"] = []models.Address{}
+			}
+			response["other_addresses"] = append(response["other_addresses"].([]models.Address), addr)
+		}
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func SelectAddressForCheckout(c *gin.Context, db *gorm.DB) {
@@ -401,6 +462,48 @@ func SelectAddressForCheckout(c *gin.Context, db *gorm.DB) {
 		"message":   "Address selected",
 		"addressID": address.ID,
 	})
+}
+
+func DeleteAddress(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	userObj, ok := user.(*models.User)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
+		return
+	}
+
+	// Get address ID from request param
+	addressID := c.Param("id")
+	if addressID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Address ID is required"})
+		return
+	}
+
+	var address models.Address
+	if err := db.First(&address, "id = ? AND user_id = ?", addressID, userObj.ID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Address not found"})
+		return
+	}
+
+	// Hard delete (permanent)
+	if err := db.Unscoped().Delete(&address).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete address"})
+		return
+	}
+
+	// If deleted address was default, assign another one as default (if any exist)
+	if address.IsDefault {
+		var newDefault models.Address
+		if err := db.Where("user_id = ?", userObj.ID).First(&newDefault).Error; err == nil {
+			db.Model(&newDefault).Update("is_default", true)
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Address deleted successfully"})
 }
 
 func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
@@ -465,8 +568,12 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 	}
 
 	var pwd models.PwdCard
+	pwdFound := true
+	pwdMessage := "PWD record found"
+
 	if err := db.Where("user_id = ?", userObj.ID).First(&pwd).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No default address found. Please select an address."})
+		pwdFound = false
+		pwdMessage = "No PWD record found"
 	}
 
 	deliveryCost := 0
@@ -475,9 +582,8 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 	seniorDiscount := 0.0
 
 	// Apply PWD discount if approved
-	if pwd.Status == "approved" {
+	if pwdFound && pwd.Status == "approved" {
 		pwdDiscount = roundTo2Dec(totalCost * 0.20)
-
 	}
 
 	// Apply senior discount if age >= 60
@@ -599,6 +705,7 @@ func SelectDeliveryType(c *gin.Context, db *gorm.DB) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message":             "Delivery type selected successfully",
+		"pwd_message":         pwdMessage,
 		"delivery_cost":       deliveryCost,
 		"cod_fee":             codFee,
 		"delivery_type":       session.DeliveryType,
@@ -710,6 +817,8 @@ func SelectPaymentType(c *gin.Context, db *gorm.DB) {
 			OrderNumber:       orderNumber,
 			HospitalID:        item.HospitalID,
 			PhysicianID:       item.PhysicianID,
+			CustomHospital:    item.CustomHospital,
+			CustomPhysician:   item.CustomPhysician,
 		}
 		db.Create(&historyItem)
 	}
@@ -993,3 +1102,5 @@ func SelectPaymentType(c *gin.Context, db *gorm.DB) {
 // 		"screenshot_url": payment.ScreenshotURL,
 // 	})
 // }
+//done
+//done
