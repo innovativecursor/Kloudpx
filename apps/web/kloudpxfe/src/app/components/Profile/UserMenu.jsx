@@ -7,7 +7,9 @@ import {
   FaQuestionCircle,
   FaHistory,
   FaUserCircle,
+  FaUserTie
 } from "react-icons/fa";
+
 
 const UserMenu = ({ setActiveTab, activeTab }) => {
   const getButtonClass = (tabName) => {
@@ -41,6 +43,12 @@ const UserMenu = ({ setActiveTab, activeTab }) => {
           className={getButtonClass("pwd")}
         >
           <FaFileMedical className="mr-2" /> PWD
+        </button>
+           <button
+          onClick={() => setActiveTab("seniorcitizen")}
+          className={getButtonClass("seniorcitizen")}
+        >
+          <FaUserTie className="mr-2" /> Senior Citizen
         </button>
         <button
           onClick={() => setActiveTab("order")}

@@ -36,7 +36,7 @@ const Allpwd = () => {
   return (
     <div className="md:p-6 mt-16 mx-[4vw]">
       <h1 className="text-3xl md:text-4xl text-[#0070ba] font-extrabold text-center mb-10 tracking-tight">
-        All Pending PWD Certificates
+        All Pending PWD Certificates..
       </h1>
 
       {allPendingPwds?.length === 0 ? (
@@ -167,7 +167,6 @@ const Allpwd = () => {
         </div>
       )}
 
-      {/* Fullscreen Zoom Image */}
       {isImageZoomed && (
         <div
           className="fixed inset-0 flex items-center justify-center bg-black/90 backdrop-blur-sm z-[60] cursor-zoom-out"

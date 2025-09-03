@@ -9,6 +9,7 @@ import {
   FaFileMedical,
   FaHistory,
   FaSignOutAlt,
+  FaUserTie
 } from "react-icons/fa";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useCartContext } from "@/app/contexts/CartContext";
@@ -48,6 +49,8 @@ const UserDropdown = () => {
         return activeItem === "prescription" ? "bg-green-100" : "";
       case "pwd":
         return activeItem === "pwd" ? "bg-purple-100" : "";
+      case "seniorcitizen":
+        return activeItem === "seniorcitizen" ? "bg-red-100" : "";
       case "order":
         return activeItem === "order" ? "bg-orange-100" : "";
       case "logout":
@@ -126,6 +129,21 @@ const UserDropdown = () => {
           >
             <FaFileMedical className="text-base flex-shrink-0 text-gray-600" />
             <p className="truncate w-full text-sm  font-normal">PWD</p>
+          </div>
+
+          <div
+            className={`px-4 sm:px-6 py-3 cursor-pointer flex border-b border-gray-200 justify-start gap-3 items-center ${getBgColor(
+              "seniorcitizen"
+            )}`}
+            onClick={() => {
+              setActiveItem("seniorcitizen");
+              goToProfile("seniorcitizen");
+            }}
+          >
+            <FaUserTie className="text-base flex-shrink-0 text-gray-600" />
+            <p className="truncate w-full text-sm  font-normal">
+              Senior Citizen
+            </p>
           </div>
 
           <div

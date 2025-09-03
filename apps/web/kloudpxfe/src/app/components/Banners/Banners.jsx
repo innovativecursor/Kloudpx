@@ -67,7 +67,7 @@ const Banners = () => {
               {(image.ButtonText || image.Link) && (
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   {image.Link ? (
-                    <a href={image.Link} target="_blank" rel="noreferrer">
+                    <a href={image.Link} rel="noreferrer">
                       <PrimaryButton title={image.ButtonText || "View"} />
                     </a>
                   ) : (

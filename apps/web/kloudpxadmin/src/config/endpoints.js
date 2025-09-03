@@ -38,6 +38,14 @@ const endpoints = {
     getone: (id) => `${baseUrl}/v1/admin/pwd/${id}`,
     verify: `${baseUrl}/v1/admin/verify-pwd`,
   },
+  seniorcitizen: {
+    getAll: `${baseUrl}/v1/admin/senior`,
+    getone: (id) => `${baseUrl}/v1/admin/senior/${id}`,
+  },
+  prescription: {
+    getAll: `${baseUrl}/v1/admin/prescription-summary`,
+    getone: (id) => `${baseUrl}/v1/admin/prescriptions/history/${id}`,
+  },
   itemimage: {
     add: `${baseUrl}/v1/itemimage/add-itemimage`,
     delete: (id) => `${baseUrl}/v1/itemimage/delete-itemimage/${id}`,

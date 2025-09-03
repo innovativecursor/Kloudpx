@@ -12,6 +12,7 @@ import EditProfile from "../components/Profile/EditProfile";
 import PrescriptionHistoty from "../components/Profile/PrescriptionHistoty";
 import OrderHistory from "../components/Profile/OrderHistory";
 import Pwd from "../components/Profile/Pwd";
+import SeniorCitizen from "../components/Profile/SeniorCitizen";
 
 const Page = () => {
   const fallbackImage = "/assets/fallback.png";
@@ -88,8 +89,8 @@ const Page = () => {
 
         {activeTab === "edit" && <EditProfile />}
         {activeTab === "prescription" && <PrescriptionHistoty />}
-
         {activeTab === "pwd" && <Pwd />}
+        {activeTab === "seniorcitizen" && <SeniorCitizen />}
         {activeTab === "order" && <OrderHistory />}
       </main>
     </div>
