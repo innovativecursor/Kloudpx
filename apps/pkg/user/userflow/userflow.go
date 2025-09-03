@@ -1495,6 +1495,7 @@ func UpdateCartQuantity(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
+	// checking the available medicine stock
 	availableStock, err := itemscalculation.CalculateTotalStockByBrandName(db, medicine.BrandName, medicine.Power)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Stock check failed"})
