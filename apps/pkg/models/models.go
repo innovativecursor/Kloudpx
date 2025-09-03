@@ -100,7 +100,6 @@ type Pharmacist struct {
 }
 
 // user
-// User who uploads prescriptions
 type User struct {
 	gorm.Model
 	FirstName       string
@@ -182,6 +181,8 @@ type Cart struct {
 	Hospital          *Hospital `gorm:"foreignKey:HospitalID"`
 	PhysicianID       *uint
 	Physician         *Physician `gorm:"foreignKey:PhysicianID"`
+	CustomHospital    string
+	CustomPhysician   string
 }
 
 type CartHistory struct {
@@ -201,6 +202,8 @@ type CartHistory struct {
 	Hospital          *Hospital `gorm:"foreignKey:HospitalID"`
 	PhysicianID       *uint
 	Physician         *Physician `gorm:"foreignKey:PhysicianID"`
+	CustomHospital    string
+	CustomPhysician   string
 }
 
 type CarouselImage struct {
@@ -290,6 +293,14 @@ type Address struct {
 	ZipCode       string
 	PhoneNumber   string
 	IsDefault     bool
+
+	AddressTypeID uint        // FK to AddressType
+	AddressType   AddressType `gorm:"foreignKey:AddressTypeID"`
+}
+
+type AddressType struct {
+	gorm.Model
+	TypeName string `gorm:"unique;not null"` // e.g. Home, School, Office, Partner, Others
 }
 
 type CheckoutSession struct {

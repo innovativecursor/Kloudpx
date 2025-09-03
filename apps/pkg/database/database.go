@@ -44,6 +44,11 @@ func InitDB() (*gorm.DB, error) {
 	if err := seedRegionSettings(dbConn); err != nil {
 		return nil, fmt.Errorf("failed to seed region settings: %v", err)
 	}
+
+	if err := seedAddressTypes(dbConn); err != nil {
+		return nil, fmt.Errorf("failed to seed address types: %v", err)
+	}
+
 	return dbConn, nil
 }
 
@@ -64,6 +69,28 @@ func seedRegionSettings(db *gorm.DB) error {
 			}
 		}
 		// If exists → do nothing (preserve edits)
+	}
+
+	return nil
+}
+
+func seedAddressTypes(db *gorm.DB) error {
+	defaultTypes := []models.AddressType{
+		{TypeName: "Home"},
+		{TypeName: "School"},
+		{TypeName: "Office"},
+		{TypeName: "Partner"},
+		{TypeName: "Others"},
+	}
+
+	for _, at := range defaultTypes {
+		var existing models.AddressType
+		err := db.Where("type_name = ?", at.TypeName).First(&existing).Error
+		if err == gorm.ErrRecordNotFound {
+			if err := db.Create(&at).Error; err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil

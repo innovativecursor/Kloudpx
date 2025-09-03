@@ -172,12 +172,20 @@ func User(db *gorm.DB) {
 		uploadexcel.GetAllPhysicians(c, db)
 	})
 
+	apiV1.GET("/user/get-address-type", func(c *gin.Context) {
+		checkoutflow.GetAddressTypes(c, db)
+	})
+
 	apiV1.POST("/user/add-update-address", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
 		checkoutflow.AddOrUpdateAddress(c, db)
 	})
 
 	apiV1.GET("/user/get-address", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
 		checkoutflow.GetUserAddresses(c, db)
+	})
+
+	apiV1.DELETE("/user/delete-address/:id", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		checkoutflow.DeleteAddress(c, db)
 	})
 
 	apiV1.POST("/user/select-address", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
