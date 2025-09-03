@@ -132,11 +132,15 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 		clinicName := "Not selected"
 		if item.Hospital != nil {
 			clinicName = item.Hospital.Name
+		} else if item.CustomHospital != "" {
+			clinicName = item.CustomHospital
 		}
 
 		doctorName := "Not selected"
 		if item.Physician != nil {
 			doctorName = fmt.Sprintf("%s %s", item.Physician.FirstName, item.Physician.LastName)
+		} else if item.CustomPhysician != "" {
+			doctorName = item.CustomPhysician
 		}
 
 		itemResp := gin.H{
