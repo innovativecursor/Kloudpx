@@ -24,7 +24,6 @@ const SeniorCitizenProvider = ({ children }) => {
 
   const getSingleCitizenData = async (id) => {
     const res = await getAxiosCall(endpoints.seniorcitizen.getone(id));
-    console.log(res, "kkk");
 
     {
       if (res?.data?.senior) {

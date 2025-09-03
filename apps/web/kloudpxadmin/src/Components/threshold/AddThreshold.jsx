@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useThresholdContext } from "../../contexts/ThresholdContext";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const EditThreshold = () => {
   const { addOrUpdateRegion, editingRegion, setEditingRegion } =
@@ -37,7 +38,18 @@ const EditThreshold = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!editingRegion?.ID) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Only existing regions can be edited. Please select a region first.",
+      });
+      return;
+    }
+
     const payload = {
+      id: editingRegion.ID,
       region_name: formData.region_name,
       zip_start: Number(formData.zip_start),
       zip_end: Number(formData.zip_end),
@@ -60,7 +72,7 @@ const EditThreshold = () => {
           </h2>
           <p className="text-gray-600 mb-6">
             Please go to{" "}
-            <span className="font-semibold text-[#0070ba]">All Thresholds</span>
+            <span className="font-semibold text-[#0070ba]">All Thresholds</span>{" "}
             and select a region to edit.
           </p>
           <button
