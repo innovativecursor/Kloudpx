@@ -44,6 +44,11 @@ const endpoints = {
       `${baseUrl}/v1/user/order/details/${order_number}`,
     pwd: `${baseUrl}/v1/user/profile/pwd/upload`,
     allpwd: `${baseUrl}/v1/user/pwd`,
+
+  },
+  seniorcitizen: {
+    add: `${baseUrl}/v1/user/senior/upload`,
+    get: `${baseUrl}/v1/user/senior`,
   },
   prescriptioncart: {
     add: `${baseUrl}/v1/user/add-to-cart-medicine`,
@@ -55,7 +60,6 @@ const endpoints = {
     get: `${baseUrl}/v1/user/get-gallery-img-user`,
   },
   branded: {
-    // get: `${baseUrl}/v1/user/get-branded-medicine`,
     get: `${baseUrl}/v1/user/get-all-brands`,
   },
   twocategory: {

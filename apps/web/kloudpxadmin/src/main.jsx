@@ -19,6 +19,7 @@ import GetDataProvider from "./contexts/GetDataContext.jsx";
 import OrderProvider from "./contexts/OrderContext.jsx";
 import ThresholdProvider from "./contexts/ThresholdContext.jsx";
 import PwdProvider from "./contexts/Pwdcontext.jsx";
+import SeniorCitizenProvider from "./contexts/SeniorCitizen.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <GoogleOAuthProvider clientId="573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com">
@@ -38,7 +39,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                               <OrderProvider>
                                 <ThresholdProvider>
                                   <PwdProvider>
+                                    <SeniorCitizenProvider>
                                     <App />
+                                    </SeniorCitizenProvider>
                                   </PwdProvider>
                                 </ThresholdProvider>
                               </OrderProvider>
