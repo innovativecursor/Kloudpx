@@ -256,7 +256,7 @@ func Admin(db *gorm.DB) {
 		userdocs.UsersWithPrescriptionSummary(c, db)
 	})
 
-	apiV1.GET("admin/prescriptions/:user_id/history", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
+	apiV1.GET("admin/prescriptions/history/:user_id", middleware.JWTMiddlewareAdmin(db), func(c *gin.Context) {
 		userdocs.UserPrescriptionHistory(c, db)
 	})
 
