@@ -10,6 +10,7 @@ type AddressRequest struct {
 	ZipCode       string `json:"zipcode"`
 	PhoneNumber   string `json:"phonenumber"`
 	IsDefault     bool   `json:"isdefault"`
+	AddressTypeID uint   `json:"address_type_id"`
 }
 
 type ReqDelivery struct {
@@ -64,7 +65,13 @@ type ReqPaymentType struct {
 }
 
 type SelectClinicDoctorRequest struct {
-	CartIDs     []uint `json:"cart_ids"` // Multiple cart IDs
-	HospitalID  uint   `json:"hospital_id"`
-	PhysicianID uint   `json:"physician_id"`
+	CartIDs []uint `json:"cart_ids"`
+
+	// If selected from dropdowns
+	HospitalID  *uint `json:"hospital_id"`
+	PhysicianID *uint `json:"physician_id"`
+
+	// If entered manually
+	CustomHospital  string `json:"custom_hospital"`
+	CustomPhysician string `json:"custom_physician"`
 }
