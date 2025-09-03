@@ -1102,3 +1102,4 @@ func SelectPaymentType(c *gin.Context, db *gorm.DB) {
 // 		"screenshot_url": payment.ScreenshotURL,
 // 	})
 // }
+//done
