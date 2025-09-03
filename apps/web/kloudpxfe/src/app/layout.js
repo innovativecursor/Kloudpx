@@ -9,7 +9,6 @@ import { ProductProvider } from "./contexts/ProductContext";
 import { CartProvider } from "./contexts/CartContext";
 import { PrescriptionProvider } from "./contexts/PrescriptionContext";
 import { ImageProvider } from "./contexts/ImagesContext";
-
 import { Provider } from "react-redux";
 import { store, persistor } from "@/app/redux/store";
 import { PersistGate } from "redux-persist/integration/react";
@@ -23,6 +22,7 @@ import { LoginAuthProvider } from "./contexts/LoginAuth";
 import LoaderController from "./components/Loader/LoaderController";
 import { ProfileProvider } from "./contexts/ProfileContext";
 import { PwdProvider } from "./contexts/PwdContext";
+import { SeniorCitizenProvider } from "./contexts/Seniorcitizen";
 
 
 export default function RootLayout({ children }) {
@@ -46,22 +46,24 @@ export default function RootLayout({ children }) {
                   <LoginAuthProvider>
                     <ProfileProvider>
                       <PwdProvider>
-                        <ProductProvider>
-                          <CheckoutProvider>
-                            <CartProvider>
-                              <PrescriptionProvider>
-                                <PaymentProvider>
-                                  <ImageProvider>
-                                    <Header />
-                                    <main className="flex-1">{children}</main>
-                                    <Footer />
-                                    <CustomToaster />
-                                  </ImageProvider>
-                                </PaymentProvider>
-                              </PrescriptionProvider>
-                            </CartProvider>
-                          </CheckoutProvider>
-                        </ProductProvider>
+                        <SeniorCitizenProvider>
+                          <ProductProvider>
+                            <CheckoutProvider>
+                              <CartProvider>
+                                <PrescriptionProvider>
+                                  <PaymentProvider>
+                                    <ImageProvider>
+                                      <Header />
+                                      <main className="flex-1">{children}</main>
+                                      <Footer />
+                                      <CustomToaster />
+                                    </ImageProvider>
+                                  </PaymentProvider>
+                                </PrescriptionProvider>
+                              </CartProvider>
+                            </CheckoutProvider>
+                          </ProductProvider>
+                        </SeniorCitizenProvider>
                       </PwdProvider>
                     </ProfileProvider>
                   </LoginAuthProvider>
