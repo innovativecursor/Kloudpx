@@ -150,6 +150,11 @@ func User(db *gorm.DB) {
 	apiV1.GET("/user/filter", func(c *gin.Context) {
 		userflow.GetFilteredAndSortedMedicines(c, db)
 	})
+
+	apiV1.PATCH("/user/cart-quantity/:medicine_id", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {
+		userflow.UpdateCartQuantity(c, db)
+	})
+
 	//checkout flow
 
 	apiV1.PUT("/user/save-for-later/:id", middleware.JWTMiddlewareUser(db), func(c *gin.Context) {

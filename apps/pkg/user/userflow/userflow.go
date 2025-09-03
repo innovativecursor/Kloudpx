@@ -1460,3 +1460,78 @@ func GetFilteredAndSortedMedicines(c *gin.Context, db *gorm.DB) {
 		"category_ids": filteredCategoryIDs,
 	})
 }
+
+// UpdateCartQuantity handles both increasing and decreasing the quantity of a cart item.
+func UpdateCartQuantity(c *gin.Context, db *gorm.DB) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	userObj, ok := user.(*models.User)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user object"})
+		return
+	}
+
+	var req config.AddCartQuantity
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid payload"})
+		return
+	}
+
+	// Parse medicine_id from route
+	medicineIDStr := c.Param("medicine_id")
+	medicineID, err := strconv.Atoi(medicineIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid medicine_id"})
+		return
+	}
+
+	// Medicine & stock check
+	var medicine models.Medicine
+	if err := db.First(&medicine, medicineID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Medicine not found"})
+		return
+	}
+
+	availableStock, err := itemscalculation.CalculateTotalStockByBrandName(db, medicine.BrandName, medicine.Power)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Stock check failed"})
+		return
+	}
+
+	if req.Action == "increase" {
+		//  Increase quantity only if stock is available
+		if req.Quantity > availableStock {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error":     "Insufficient stock",
+				"available": availableStock,
+			})
+			return
+		}
+
+		result := db.Model(&models.Cart{}).
+			Where("user_id = ? AND medicine_id = ?", userObj.ID, medicineID).
+			Update("quantity", gorm.Expr("quantity + ?", req.Quantity))
+
+		if result.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Quantity increased successfully"})
+	} else {
+		//  Decrease quantity
+		result := db.Model(&models.Cart{}).
+			Where("user_id = ? AND medicine_id = ?", userObj.ID, medicineID).
+			Update("quantity", gorm.Expr("quantity - ?", req.Quantity))
+
+		if result.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update cart"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Quantity decreased successfully"})
+	}
+}
