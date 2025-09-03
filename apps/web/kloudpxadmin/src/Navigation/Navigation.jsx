@@ -28,6 +28,7 @@ import AllThreshold from "../Components/threshold/AllThreshold";
 import Allpwd from "../pages/Allpwd";
 import ScId from "../pages/ScId";
 import Prescription from "../pages/Prescription";
+import PrescriptionDetails from "../pages/PrescriptionDetails";
 
 function Navigation(props) {
   const location = useLocation();
@@ -72,6 +73,7 @@ function Navigation(props) {
                 <Route path="/allpwd" element={<Allpwd />} />
                 <Route path="/seniorcitizenid" element={<ScId />} />
                 <Route path="/prescription" element={<Prescription />} />
+                <Route path="/prescriptiondetails/:id" element={<PrescriptionDetails />} />
                 <Route path="/addsupplier" element={<AddSupplier />} />
                 <Route path="/edit-medicine/:id" element={<UpdateMedicine />} />
               </Route>

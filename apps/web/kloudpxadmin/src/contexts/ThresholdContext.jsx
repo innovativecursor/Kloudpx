@@ -14,7 +14,6 @@ const ThresholdProvider = ({ children }) => {
   const fetchRegions = async () => {
     setLoading(true);
     const response = await getAxiosCall(endpoints.regionSettings.getAll);
-
     setLoading(false);
 
     if (response?.data?.regions && Array.isArray(response.data.regions)) {
@@ -25,15 +24,25 @@ const ThresholdProvider = ({ children }) => {
   };
 
   const addOrUpdateRegion = async (payload) => {
+    if (!payload.id) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "ID is required to update a region!",
+      });
+      return;
+    }
+
     const response = await postAxiosCall(
       endpoints.regionSettings.upsert,
       payload
     );
+
     if (response) {
       Swal.fire({
         icon: "success",
         title: "Success",
-        text: "Region saved successfully!",
+        text: "Region updated successfully!",
       });
       fetchRegions();
     }

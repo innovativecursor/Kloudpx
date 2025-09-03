@@ -30,8 +30,6 @@ const ScId = () => {
     setIsImageZoomed(false);
   };
 
-  console.log(singleCitizenData, "jjj");
-
   return (
     <div className="md:p-6 mt-16 mx-[4vw]">
       <h1 className="text-3xl md:text-4xl text-[#0070ba] font-extrabold text-center mb-10 tracking-tight">

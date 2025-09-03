@@ -21,7 +21,7 @@ const EditProfile = () => {
       code: "+63",
       flag: "https://flagcdn.com/w40/ph.png",
     },
-    { code: "+1", flag: "https://flagcdn.com/w40/us.png" },
+
   ];
 
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);

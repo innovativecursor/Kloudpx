@@ -101,7 +101,7 @@ const ProductCardItem = ({ item, fallbackImage }) => {
           <AddToCart
             title="Add To Cart"
             productDetails={item}
-            className="md:text-xs text-[8px] flex items-center gap-1 rounded-full font-medium sm:px-5 px-3 py-1.5 justify-center text-white bg-[#0070ba] cursor-pointer "
+            className="md:text-xs text-[7px] flex items-center gap-1 rounded-full font-medium sm:px-5 px-2 py-1.5 justify-center text-white bg-[#0070ba] cursor-pointer "
           />
         </div>
       </div>
