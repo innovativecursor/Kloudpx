@@ -26,8 +26,6 @@ export const LoginAuthProvider = ({ children }) => {
   const countryCodes = [
     { label: "(+91)", value: "+91" },
     { label: "(+63)", value: "+63" },
-    { label: "(+1)", value: "+1" },
-    { label: "(+44)", value: "+44" },
   ];
 
   const handleChange = (e) => {
