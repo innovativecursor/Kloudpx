@@ -23,7 +23,7 @@ import LoaderController from "./components/Loader/LoaderController";
 import { ProfileProvider } from "./contexts/ProfileContext";
 import { PwdProvider } from "./contexts/PwdContext";
 import { SeniorCitizenProvider } from "./contexts/Seniorcitizen";
-
+import TawkMessenger from "./components/Tawkto/TawkMessenger";
 
 export default function RootLayout({ children }) {
   return (
@@ -72,6 +72,7 @@ export default function RootLayout({ children }) {
             </Provider>
           </GoogleOAuthProvider>
         </ClientOnly>
+        <TawkMessenger />
       </body>
     </html>
   );

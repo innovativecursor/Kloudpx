@@ -42,6 +42,10 @@ const endpoints = {
     getAll: `${baseUrl}/v1/admin/senior`,
     getone: (id) => `${baseUrl}/v1/admin/senior/${id}`,
   },
+  prescription: {
+    getAll: `${baseUrl}/v1/admin/prescription-summary`,
+    getone: (id) => `${baseUrl}/v1/admin/prescriptions/history/${id}`,
+  },
   itemimage: {
     add: `${baseUrl}/v1/itemimage/add-itemimage`,
     delete: (id) => `${baseUrl}/v1/itemimage/delete-itemimage/${id}`,

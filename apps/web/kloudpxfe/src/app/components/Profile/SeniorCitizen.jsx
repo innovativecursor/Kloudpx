@@ -16,14 +16,14 @@ const SeniorCitizen = () => {
     <div>
       <div className="flex md:flex-row flex-col justify-between md:items-end items-center bg-green-50/20 md:p-8 rounded-xl md:max-w-3xl w-full space-y-6">
         <h2 className="md:text-2xl text-xl font-semibold mb-4 flex items-center gap-2">
-          <FaUserTie className="text-green-600" />
-          <FaFemale className="text-green-600" />
+          <FaUserTie className="text-color" />
+          <FaFemale className="text-color" />
           Senior Citizen Certificate
         </h2>
 
         <label
           htmlFor="upload-senior"
-          className={`bg-green-600 md:w-[50%] hover:bg-green-700 cursor-pointer text-white flex items-center justify-center gap-2 
+          className={`bg-[#0070ba] md:w-[50%]  cursor-pointer text-white flex items-center justify-center gap-2 
                        md:text-sm text-[8px] w-full lg:py-3 md:py-2 py-3 px-5 rounded-full mb-4 ${
                          uploading ? "opacity-50 cursor-not-allowed" : ""
                        }`}
