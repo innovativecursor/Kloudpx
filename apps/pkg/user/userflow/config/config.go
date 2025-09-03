@@ -48,3 +48,8 @@ type CategoryWithMedicines struct {
 	IconURL      string               `json:"iconurl"`
 	Medicines    []UserFacingMedicine `json:"medicines"`
 }
+
+type AddCartQuantity struct {
+	Action   string `json:"action"` // "increase" or "decrease"
+	Quantity int    `json:"quantity" binding:"required"`
+}
