@@ -1,12 +1,18 @@
 "use client";
 import React from "react";
 import AsyncSelect from "react-select/async";
-import { useCartContext } from "@/app/contexts/CartContext";
 import { useDoctorClinicsContext } from "@/app/contexts/DoctorClinicsContext";
 
 const Clinics = () => {
-  const { allClinics, selectedClinicId, setSelectedClinicId } =
-   useDoctorClinicsContext();
+  const {
+    allClinics,
+    selectedClinicId,
+    setSelectedClinicId,
+    customHospital,
+    setCustomHospital,
+    handleCustomConfirm,
+    setIsCustomConfirmed,
+  } = useDoctorClinicsContext();
 
   const clinicOptions =
     allClinics?.map((clinic) => ({
@@ -37,16 +43,48 @@ const Clinics = () => {
       callback([]);
       return;
     }
+
+    let filtered = filterClinics(inputValue);
+
+    if (filtered.length === 0) {
+      filtered = [
+        {
+          value: `custom-${inputValue}`,
+          label: `➕ Use custom hospital: "${inputValue}"`,
+          isCustom: true,
+        },
+      ];
+    }
+
     setTimeout(() => {
-      callback(filterClinics(inputValue));
+      callback(filtered);
     }, 400);
   };
 
   const handleSelect = (selectedOption) => {
     if (selectedOption) {
-      setSelectedClinicId(selectedOption.value);
+      if (selectedOption.isCustom) {
+        setCustomHospital(
+          selectedOption.label
+            .replace("➕ Use custom hospital: ", "")
+            .replace(/"/g, "")
+        );
+        setSelectedClinicId(null);
+        handleCustomConfirm();
+      } else {
+        setSelectedClinicId(selectedOption.value);
+        setCustomHospital("");
+        setIsCustomConfirmed(false);
+      }
     } else {
       setSelectedClinicId(null);
+    }
+  };
+
+  const handleInputChange = (inputValue, { action }) => {
+    if (action === "input-change") {
+      setCustomHospital(inputValue && inputValue.length >= 3 ? inputValue : "");
+      if (inputValue && inputValue.length > 0) setSelectedClinicId(null);
     }
   };
 
@@ -64,6 +102,7 @@ const Clinics = () => {
         placeholder="🔍 Search clinic by name..."
         isClearable
         onChange={handleSelect}
+        onInputChange={handleInputChange}
         styles={{
           control: (provided, state) => ({
             ...provided,
@@ -114,14 +153,15 @@ const Clinics = () => {
           </p>
         </div>
       )}
+
+      {!selectedClinic && customHospital && (
+        <div className="mt-4 p-3 border border-dashed rounded-md text-sm text-gray-700">
+          Using custom hospital:{" "}
+          <span className="font-semibold">{customHospital}</span>
+        </div>
+      )}
     </div>
   );
 };
 
 export default Clinics;
-
-
-
-
-
-

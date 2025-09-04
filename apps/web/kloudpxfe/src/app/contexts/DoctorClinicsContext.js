@@ -1,5 +1,4 @@
 "use client";
-
 import React, { createContext, useContext, useEffect, useState } from "react";
 import endpoints from "../config/endpoints";
 import { postAxiosCall, getAxiosCall } from "../lib/axios";
@@ -15,6 +14,11 @@ export const DoctorClinicsProvider = ({ children }) => {
   const [allDoctors, setAllDoctors] = useState([]);
   const [selectedClinicId, setSelectedClinicId] = useState(null);
   const [selectedDoctorId, setSelectedDoctorId] = useState(null);
+  const [isCustomConfirmed, setIsCustomConfirmed] = useState(false);
+
+  const [customHospital, setCustomHospital] = useState("");
+  const [customPhysician, setCustomPhysician] = useState("");
+
   const { cartItems } = useCartContext();
 
   const getAllClinics = async () => {
@@ -43,38 +47,39 @@ export const DoctorClinicsProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    const callSelectDoctorOrClinic = async () => {
-      if (
-        pathname === "/Checkout" &&
-        cartItems.length > 0 &&
-        selectedClinicId !== null &&
-        selectedDoctorId !== null
-      ) {
-        const cart_ids = cartItems.map((item) => item.cart_id);
-        const payload = {
-          cart_ids,
-          hospital_id: selectedClinicId,
-          physician_id: selectedDoctorId,
-        };
+  const handleCustomConfirm = () => {
+    if (customHospital?.trim() && customPhysician?.trim()) {
+      setIsCustomConfirmed(true);
+    }
+  };
 
-        try {
-          const res = await postAxiosCall(
-            endpoints.sendclinicsdoctors.add,
-            payload,
-            true
-          );
-          // console.log("Selected clinic/doctor API called successfully:", res);
-          toast.success(res?.message);
-        } catch (error) {
-          console.error("Error calling select-doctor-or-clinic API", error);
-        }
-      }
-    };
+  const handleSendClinicsDoctors = async (cartItems) => {
+    if (!cartItems?.length) return;
 
-    callSelectDoctorOrClinic();
-  }, [cartItems, selectedClinicId, selectedDoctorId]);
+    const cart_ids = cartItems.map((item) => item.cart_id);
+    let payload = { cart_ids };
 
+    if (selectedClinicId && selectedDoctorId) {
+      payload.hospital_id = selectedClinicId;
+      payload.physician_id = selectedDoctorId;
+    } else if (isCustomConfirmed && customHospital && customPhysician) {
+      payload.custom_hospital = customHospital.trim();
+      payload.custom_physician = customPhysician.trim();
+    } else {
+      return;
+    }
+
+    try {
+      const res = await postAxiosCall(
+        endpoints.sendclinicsdoctors.add,
+        payload,
+        true
+      );
+      if (res?.message) toast.success(res.message);
+    } catch (error) {
+      console.error("Error calling select-doctor-or-clinic API", error);
+    }
+  };
   return (
     <DoctorClinicsContext.Provider
       value={{
@@ -86,6 +91,14 @@ export const DoctorClinicsProvider = ({ children }) => {
         setSelectedClinicId,
         selectedDoctorId,
         setSelectedDoctorId,
+        customHospital,
+        setCustomHospital,
+        customPhysician,
+        setCustomPhysician,
+        isCustomConfirmed,
+        setIsCustomConfirmed,
+        handleCustomConfirm,
+        handleSendClinicsDoctors,
       }}
     >
       {children}

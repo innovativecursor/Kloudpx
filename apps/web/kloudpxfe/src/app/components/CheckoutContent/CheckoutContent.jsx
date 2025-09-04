@@ -15,8 +15,13 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
   const { token } = useAuth();
   const router = useRouter();
   const { getAllCartData } = useCartContext();
-  const { getAllClinics, getAllDoctors, allClinics, allDoctors } =
-    useDoctorClinicsContext();
+  const {
+    getAllClinics,
+    getAllDoctors,
+    allClinics,
+    allDoctors,
+    handleSendClinicsDoctors,
+  } = useDoctorClinicsContext();
   const { savedForLaterIds, doCheckout } = useCheckout();
   const [agreedTerms, setAgreedTerms] = useState(false);
   const { startLoader } = usePageLoader();
@@ -76,9 +81,7 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
       </div>
 
       <Clinics />
-
       <Doctors />
-
       <SaveForLater data={data} setSelectedProduct={setSelectedProduct} />
 
       <div className="flex items-center gap-3 mt-5">
@@ -86,7 +89,13 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
           <input
             type="checkbox"
             checked={agreedTerms}
-            onChange={(e) => setAgreedTerms(e.target.checked)}
+            onChange={async (e) => {
+              const checked = e.target.checked;
+              setAgreedTerms(checked);
+              if (checked) {
+                await handleSendClinicsDoctors(data);
+              }
+            }}
             className="sr-only"
           />
 
@@ -111,7 +120,7 @@ const CheckoutContent = ({ setSelectedProduct, cartItems }) => {
               </svg>
             )}
           </span>
-          {/* Label text */}
+
           <span className="ml-2 text-sm text-gray-700 hover:text-blue-600 transition-colors duration-200">
             I agree with the{" "}
             <span className="text-blue-600 underline">

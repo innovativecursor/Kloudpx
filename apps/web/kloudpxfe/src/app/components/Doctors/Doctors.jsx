@@ -1,11 +1,19 @@
 "use client";
+
 import React from "react";
 import AsyncSelect from "react-select/async";
 import { useDoctorClinicsContext } from "@/app/contexts/DoctorClinicsContext";
 
 const Doctors = () => {
-  const { allDoctors, selectedDoctorId, setSelectedDoctorId } =
-    useDoctorClinicsContext();
+  const {
+    allDoctors,
+    selectedDoctorId,
+    setSelectedDoctorId,
+    customPhysician,
+    setCustomPhysician,
+    handleCustomConfirm,
+    setIsCustomConfirmed,
+  } = useDoctorClinicsContext();
 
   const doctorOptions =
     allDoctors?.map((doc) => ({
@@ -25,16 +33,50 @@ const Doctors = () => {
       callback([]);
       return;
     }
+
+    let filtered = filterDoctors(inputValue);
+
+    if (filtered.length === 0) {
+      filtered = [
+        {
+          value: `custom-${inputValue}`,
+          label: `➕ Use custom physician: "${inputValue}"`,
+          isCustom: true,
+        },
+      ];
+    }
+
     setTimeout(() => {
-      callback(filterDoctors(inputValue));
+      callback(filtered);
     }, 400);
   };
 
   const handleSelect = (selectedOption) => {
     if (selectedOption) {
-      setSelectedDoctorId(selectedOption.value);
+      if (selectedOption.isCustom) {
+        setCustomPhysician(
+          selectedOption.label
+            .replace("➕ Use custom physician: ", "")
+            .replace(/"/g, "")
+        );
+        setSelectedDoctorId(null);
+        handleCustomConfirm();
+      } else {
+        setSelectedDoctorId(selectedOption.value);
+        setCustomPhysician("");
+        setIsCustomConfirmed(false);
+      }
     } else {
       setSelectedDoctorId(null);
+    }
+  };
+
+  const handleInputChange = (inputValue, { action }) => {
+    if (action === "input-change") {
+      setCustomPhysician(
+        inputValue && inputValue.length >= 3 ? inputValue : ""
+      );
+      if (inputValue && inputValue.length > 0) setSelectedDoctorId(null);
     }
   };
 
@@ -52,22 +94,28 @@ const Doctors = () => {
         placeholder="🔍 Search doctor by first name..."
         isClearable
         onChange={handleSelect}
-        getOptionLabel={(option) => (
-          <div className="flex flex-col">
-            <span className="font-semibold text-gray-800">
-              {option.doc.FirstName} {option.doc.MiddleName}{" "}
-              {option.doc.LastName}
-            </span>
-            <span className="text-xs text-gray-500">
-              {option.doc.Municipality}, {option.doc.Province}
-            </span>
-            <span className="text-xs text-gray-500 italic">
-              🩺 {option.doc.Specialty}
-            </span>
-          </div>
-        )}
+        onInputChange={handleInputChange}
+        getOptionLabel={(option) => {
+          if (option.isCustom) {
+            return option.label;
+          }
+          if (option.doc) {
+            return `${option.doc.FirstName || ""} ${
+              option.doc.MiddleName || ""
+            } ${option.doc.LastName || ""}`.trim();
+          }
+          return option.value;
+        }}
         getOptionValue={(option) => option.value}
         formatOptionLabel={(option, { context }) => {
+          if (option.isCustom) {
+            return option.label;
+          }
+
+          if (!option.doc) {
+            return option.value;
+          }
+
           if (context === "menu") {
             return (
               <div className="flex flex-col">
@@ -138,6 +186,13 @@ const Doctors = () => {
           <p className="text-xs text-gray-500 italic mt-1">
             🩺 {selectedDoctor.Specialty}
           </p>
+        </div>
+      )}
+
+      {!selectedDoctor && customPhysician && (
+        <div className="mt-4 p-3 border border-dashed rounded-md text-sm text-gray-700">
+          Using custom physician:{" "}
+          <span className="font-semibold">{customPhysician}</span>
         </div>
       )}
     </div>
