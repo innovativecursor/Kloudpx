@@ -23,6 +23,14 @@ func UserSignUp(c *gin.Context, db *gorm.DB) {
 	}
 
 	var user models.User
+	if err := db.Where("email = ?", req.Email).First(&user).Error; err == nil {
+		// Email found → tell user to login with Google
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "This email is already registered. Please sign in via Google.",
+		})
+		return
+	}
+
 	err := db.Where("phone = ?", req.Phone).First(&user).Error
 
 	if err != nil {
@@ -31,6 +39,7 @@ func UserSignUp(c *gin.Context, db *gorm.DB) {
 			FirstName:       req.FirstName,
 			LastName:        req.LastName,
 			Phone:           &req.Phone,
+			Email:           &req.Email,
 			ApplicationRole: "user",
 		}
 		if err := db.Create(&user).Error; err != nil {
