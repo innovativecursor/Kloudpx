@@ -117,7 +117,7 @@ const Address = () => {
                     key={address.ID || index}
                     className="border border-[#0070ba] w-full py-4 px-2 mt-10 flex justify-between gap-2 shadow items-center rounded-lg"
                   >
-                    <div className="flex flex-col items-center text-center sm:w-1/6 sm:min-w-[80px] sm:max-w-[100px] w-12">
+                    <div className="flex flex-col items-center text-center sm:w-1/6 sm:min-w-[40px] sm:max-w-[40px] w-12">
                       <IoMdHome className="sm:text-2xl text-xl text-[#0070ba]" />
                       <span className="font-medium sm:text-[10px] text-[9px] text-gray-800 break-words mt-1 w-full overflow-hidden text-ellipsis">
                         {address?.AddressType?.TypeName || "N/A"}
@@ -141,11 +141,12 @@ const Address = () => {
                       </div>
                     </div>
 
-                    <div className="flex w-[12%] sm:w-[10%] gap-2">
+                    <div className="flex items-center w-[12%] sm:w-[12%] gap-2">
                       <input
                         type="radio"
                         checked={selectedId === address.ID}
                         onChange={() => setSelectedId(address.ID)}
+                        className="w-8 h-8"
                       />
                       <div
                         onClick={() => {
@@ -166,7 +167,7 @@ const Address = () => {
                         onClick={() => handleDeleteAddress(address.ID)}
                         className="cursor-pointer"
                       >
-                        <FaTrash className="sm:text-xl text-red-500 hover:text-red-700" />
+                        <FaTrash className=" text-red-500 hover:text-red-700" />
                       </div>
                     </div>
                   </div>

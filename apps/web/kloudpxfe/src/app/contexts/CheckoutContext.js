@@ -175,10 +175,10 @@ export const CheckoutProvider = ({ children }) => {
   const handleDeleteAddress = async (id) => {
     if (!id) return;
     try {
-      const confirmDelete = window.confirm(
-        "Are you sure you want to delete this address?"
-      );
-      if (!confirmDelete) return;
+      // const confirmDelete = window.confirm(
+      //   "Are you sure you want to delete this address?"
+      // );
+      // if (!confirmDelete) return;
 
       await deleteAxiosCall(endpoints.removeaddress.remove(id), true);
       toast.success("Address deleted successfully!");
