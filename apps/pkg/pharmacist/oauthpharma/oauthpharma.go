@@ -20,8 +20,8 @@ func init() {
 	googleOauthConfig = &oauth2.Config{
 		ClientID:     "573921060446-69ri70fkkm2ihruaqor1bugaeufbnsgj.apps.googleusercontent.com",
 		ClientSecret: "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",
-		RedirectURL:  "http://localhost:5173", // backend redirect URL
-		// RedirectURL:  "https://pharmacist.kloudpx.com", // backend redirect URL
+		// RedirectURL:  "http://localhost:5173", // backend redirect URL
+		RedirectURL:  "https://pharmacist.kloudpx.com", // backend redirect URL
 		Scopes:       []string{"profile", "email"},
 		Endpoint:     google.Endpoint,
 	}

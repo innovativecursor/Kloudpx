@@ -1,4 +1,4 @@
-const isLive = false;
+const isLive = true;
 
 const baseUrls = {
   admin: isLive ? "https://api.admin.kloudpx.com" : "http://localhost:10001",
