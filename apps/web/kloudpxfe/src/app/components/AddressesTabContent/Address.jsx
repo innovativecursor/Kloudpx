@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import { FaLocationDot, FaPlus } from "react-icons/fa6";
 import SubTitle from "../Titles/SubTitle";
@@ -10,6 +11,19 @@ import toast from "react-hot-toast";
 import { IoLocation } from "react-icons/io5";
 import { IoMdCall } from "react-icons/io";
 import usePageLoader from "@/app/hooks/usePageLoader";
+import { FaTrash } from "react-icons/fa";
+
+const normalizeAddresses = (data) => {
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+  const result = [];
+  Object.entries(data).forEach(([, value]) => {
+    if (!value) return;
+    if (Array.isArray(value)) result.push(...value);
+    else if (typeof value === "object") result.push(value);
+  });
+  return result;
+};
 
 const Address = () => {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -23,26 +37,68 @@ const Address = () => {
     selectedId,
     setSelectedId,
     checkoutData,
+    handleDeleteAddress,
   } = useCheckout();
   const { startLoader } = usePageLoader();
-  // console.log(checkoutData);
+
+  const addresses = normalizeAddresses(getAllAddress);
 
   useEffect(() => {
-    if (Array.isArray(getAllAddress) && getAllAddress.length === 0) {
-      fetchAddressData();
-    }
+    fetchAddressData();
   }, []);
 
-  // console.log(getAllAddress, "my add ");
+  useEffect(() => {
+    if (addresses.length === 0) return;
+
+    let storedId = null;
+    if (typeof window !== "undefined") {
+      storedId = sessionStorage.getItem("selectedaddressId");
+    }
+
+    if (storedId) {
+      setSelectedId(Number(storedId));
+    } else {
+      const defaultAddress = addresses.find((addr) => addr.IsDefault);
+      if (defaultAddress) setSelectedId(defaultAddress.ID);
+    }
+  }, [addresses]);
 
   useEffect(() => {
-    if (Array.isArray(getAllAddress) && getAllAddress.length > 0) {
-      const defaultAddress = getAllAddress.find((addr) => addr.IsDefault);
-      if (defaultAddress && !selectedId) {
-        setSelectedId(defaultAddress.ID);
-      }
+    if (selectedId) {
+      sessionStorage.setItem("selectedaddressId", selectedId);
     }
-  }, [getAllAddress]);
+  }, [selectedId]);
+
+  useEffect(() => {
+    if (addresses.length === 0) return;
+
+    let storedId = null;
+    if (typeof window !== "undefined") {
+      storedId = sessionStorage.getItem("selectedaddressId");
+    }
+
+    if (storedId) {
+      setSelectedId(Number(storedId));
+    } else {
+      const defaultAddress = addresses.find((addr) => addr.IsDefault);
+      if (defaultAddress) setSelectedId(defaultAddress.ID);
+    }
+  }, [addresses]);
+
+  // const handleSaveAndProceed = () => {
+  //   if (!checkoutData?.items || checkoutData.items.length === 0) {
+  //     toast.error("No items in checkout. Add items first!");
+  //     return;
+  //   }
+
+  //   if (!selectedId) {
+  //     toast.error("Please select an address");
+  //     return;
+  //   }
+
+  //   startLoader();
+  //   router.push("Delivery");
+  // };
 
   const handleSaveAndProceed = () => {
     if (!checkoutData?.items || checkoutData.items.length === 0) {
@@ -53,9 +109,7 @@ const Address = () => {
     let selectedAddressId = selectedId;
 
     if (!selectedAddressId) {
-      const defaultAddress = getAllAddress.find(
-        (addr) => addr.IsDefault === true
-      );
+      const defaultAddress = addresses.find((addr) => addr.IsDefault === true);
       if (defaultAddress) {
         selectedAddressId = defaultAddress.ID;
       }
@@ -84,8 +138,6 @@ const Address = () => {
       />
 
       <div className="pt-8 ">
-        {/* Header */}
-
         {!deliveryType && (
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
@@ -103,12 +155,11 @@ const Address = () => {
           </div>
         )}
 
-        {/* Saved Address */}
         {!deliveryType && (
           <>
-            {!showAddForm && getAllAddress && getAllAddress.length > 0 && (
+            {!showAddForm && addresses && addresses.length > 0 && (
               <>
-                {getAllAddress.map((address, index) => (
+                {addresses.map((address, index) => (
                   <div
                     key={address.ID || index}
                     className="border border-[#0070ba] w-full py-4 px-2  mt-10 flex justify-between sm:gap-5 gap-2 shadow items-center rounded-lg"
@@ -116,7 +167,7 @@ const Address = () => {
                     <div className="flex flex-col  items-center text-center sm:w-1/6 sm:min-w-[80px] sm:max-w-[100px] w-12">
                       <IoMdHome className="sm:text-2xl text-xl text-[#0070ba]" />
                       <span className="font-medium sm:text-[10px] text-[9px] text-gray-800 break-words mt-1 w-full overflow-hidden text-ellipsis">
-                        {address?.NameResidency}
+                        {address?.AddressType?.TypeName}
                       </span>
                     </div>
 
@@ -129,9 +180,9 @@ const Address = () => {
                         <div className="flex gap-1 items-start">
                           <IoLocation className="text-lg sm:text-base" />
                           <span className="text-xs ">
-                            {address?.City || "N/A"},{address?.Region || "N/A"},{" "}
-                            {address?.Province || "N/A"},{" "}
-                            {address?.ZipCode || "N/A"}{" "}
+                            {address?.City || "N/A"}, {address?.Region || "N/A"}
+                            , {address?.Province || "N/A"},{" "}
+                            {address?.ZipCode || "N/A"}
                           </span>
                         </div>
                       </div>
@@ -141,20 +192,37 @@ const Address = () => {
                       <div>
                         <input
                           type="radio"
-                          className="sm:w-5 sm:h-5 cursor-pointer w-4 h-4 rounded-full"
-                          name="selectedAddress"
                           checked={selectedId === address.ID}
-                          onChange={() => setSelectedId(address.ID)}
+                          onChange={() => {
+                            setSelectedId(address.ID);
+                            sessionStorage.setItem(
+                              "selectedaddressId",
+                              address.ID
+                            );
+                          }}
                         />
                       </div>
                       <div
                         onClick={() => {
                           setShowAddForm(true);
-                          handleEdit(address);
+
+                          handleEdit({
+                            ...address,
+                            addresstype:
+                              address.AddressTypeID ??
+                              address.AddressType?.ID ??
+                              null,
+                          });
                         }}
                         className="cursor-pointer"
                       >
                         <FaRegEdit className="sm:text-xl" />
+                      </div>
+                      <div
+                        onClick={() => handleDeleteAddress(address.ID)}
+                        className="cursor-pointer"
+                      >
+                        <FaTrash className="sm:text-xl text-red-500 hover:text-red-700" />
                       </div>
                     </div>
                   </div>

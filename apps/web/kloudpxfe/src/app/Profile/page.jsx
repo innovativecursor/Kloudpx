@@ -31,6 +31,7 @@ const Page = () => {
 
   const logout = () => {
     localStorage.removeItem("access_token");
+    sessionStorage.removeItem("selectedaddressId");
     startLoader();
     router.push("/");
     setToken(null);
