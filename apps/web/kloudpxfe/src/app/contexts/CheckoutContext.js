@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import {
   updateAxiosCall,
   postAxiosCall,
@@ -15,14 +15,7 @@ const CheckoutContext = createContext();
 export const CheckoutProvider = ({ children }) => {
   const [savedForLaterIds, setSavedForLaterIds] = useState([]);
   const [checkoutData, setCheckoutData] = useState(null);
-  const [selectedId, setSelectedId] = useState(() => {
-    if (typeof window !== "undefined") {
-      const id = sessionStorage.getItem("selectedaddressId");
-      return id ? Number(id) : null;
-    }
-    return null;
-  });
-
+  const [selectedId, setSelectedId] = useState(null);
   const [selected, setSelected] = useState("standard");
   const [deliveryData, setDeliveryData] = useState(null);
   const [getAllAddress, setGetAllAddress] = useState([]);
@@ -99,58 +92,6 @@ export const CheckoutProvider = ({ children }) => {
     });
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     const payload = {
-  //       nameresidency: formData.nameresidency,
-  //       region: formData.region,
-  //       province: formData.province,
-  //       city: formData.city,
-  //       barangay: formData.barangay,
-  //       zipcode: formData.zipcode,
-  //       phonenumber: formData.phonenumber,
-  //       isdefault: formData.isdefault,
-  //       address_type_id: formData.address_type_id,
-  //     };
-
-  //     if (formData.id) {
-  //       payload.id = formData.id;
-  //     }
-
-  //     const res = await postAxiosCall(endpoints.address.add, payload, true);
-
-  //     toast.success(
-  //       formData.id
-  //         ? "Address updated successfully!"
-  //         : "Address saved successfully!"
-  //     );
-
-  //     setFormData({
-  //       id: null,
-  //       nameresidency: "",
-  //       region: "",
-  //       province: "",
-  //       city: "",
-  //       barangay: "",
-  //       zipcode: "",
-  //       addresstype: "",
-  //       isdefault: false,
-  //     });
-  //     fetchAddressData();
-  //   } catch (error) {
-  //     // console.error("API error:", error);
-  //     if (error.response?.data?.error) {
-  //       toast.error(error.response.data.error);
-  //     } else {
-  //       toast.error("Failed to save address.");
-  //     }
-  //   }
-  // };
-
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -190,7 +131,7 @@ export const CheckoutProvider = ({ children }) => {
         payload.id = formData.id;
       }
 
-      const res = await postAxiosCall(endpoints.address.add, payload, true);
+      await postAxiosCall(endpoints.address.add, payload, true);
 
       toast.success(
         formData.id
@@ -220,15 +161,11 @@ export const CheckoutProvider = ({ children }) => {
     }
   };
 
-
-
-
-
-
   const fetchAddressData = async () => {
     try {
       const res = await getAxiosCall(endpoints.address.get, {}, true);
-      console.log(res, "jjjj");
+      console.log(res?.data, "myaddd");
+
       setGetAllAddress(res?.data || []);
     } catch (error) {
       setGetAllAddress([]);
@@ -264,13 +201,11 @@ export const CheckoutProvider = ({ children }) => {
 
   const selectedAddress = async (id) => {
     try {
-      const res = await postAxiosCall(
+      await postAxiosCall(
         endpoints.selectedAddress.add,
         { addressid: id },
         true
       );
-      console.log(res, "selected");
-
       toast.success("Address selected successfully!");
     } catch (error) {
       console.error("Error selecting address:", error.message);
@@ -289,7 +224,6 @@ export const CheckoutProvider = ({ children }) => {
         },
         true
       );
-
       setDeliveryData(res || null);
     } catch (error) {
       setDeliveryData(null);

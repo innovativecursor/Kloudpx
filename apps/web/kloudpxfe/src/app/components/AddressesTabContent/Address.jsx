@@ -1,17 +1,15 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
-import { FaLocationDot, FaPlus } from "react-icons/fa6";
+import { FaLocationArrow, FaPlus, FaRegEdit, FaTrash } from "react-icons/fa";
+import { IoMdHome, IoMdCall } from "react-icons/io";
+import { IoLocation } from "react-icons/io5";
 import SubTitle from "../Titles/SubTitle";
 import NewAddress from "./NewAddress";
 import { useRouter } from "next/navigation";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
-import { IoMdHome } from "react-icons/io";
-import { FaRegEdit } from "react-icons/fa";
 import toast from "react-hot-toast";
-import { IoLocation } from "react-icons/io5";
-import { IoMdCall } from "react-icons/io";
 import usePageLoader from "@/app/hooks/usePageLoader";
-import { FaTrash } from "react-icons/fa";
 
 const normalizeAddresses = (data) => {
   if (!data) return [];
@@ -39,6 +37,7 @@ const Address = () => {
     checkoutData,
     handleDeleteAddress,
   } = useCheckout();
+
   const { startLoader } = usePageLoader();
 
   const addresses = normalizeAddresses(getAllAddress);
@@ -46,59 +45,13 @@ const Address = () => {
   useEffect(() => {
     fetchAddressData();
   }, []);
-
   useEffect(() => {
-    if (addresses.length === 0) return;
-
-    let storedId = null;
-    if (typeof window !== "undefined") {
-      storedId = sessionStorage.getItem("selectedaddressId");
-    }
-
-    if (storedId) {
-      setSelectedId(Number(storedId));
-    } else {
+    if (!addresses || addresses.length === 0) return;
+    if (!selectedId) {
       const defaultAddress = addresses.find((addr) => addr.IsDefault);
       if (defaultAddress) setSelectedId(defaultAddress.ID);
     }
-  }, [addresses]);
-
-  useEffect(() => {
-    if (selectedId) {
-      sessionStorage.setItem("selectedaddressId", selectedId);
-    }
-  }, [selectedId]);
-
-  useEffect(() => {
-    if (addresses.length === 0) return;
-
-    let storedId = null;
-    if (typeof window !== "undefined") {
-      storedId = sessionStorage.getItem("selectedaddressId");
-    }
-
-    if (storedId) {
-      setSelectedId(Number(storedId));
-    } else {
-      const defaultAddress = addresses.find((addr) => addr.IsDefault);
-      if (defaultAddress) setSelectedId(defaultAddress.ID);
-    }
-  }, [addresses]);
-
-  // const handleSaveAndProceed = () => {
-  //   if (!checkoutData?.items || checkoutData.items.length === 0) {
-  //     toast.error("No items in checkout. Add items first!");
-  //     return;
-  //   }
-
-  //   if (!selectedId) {
-  //     toast.error("Please select an address");
-  //     return;
-  //   }
-
-  //   startLoader();
-  //   router.push("Delivery");
-  // };
+  }, [addresses, selectedId]);
 
   const handleSaveAndProceed = () => {
     if (!checkoutData?.items || checkoutData.items.length === 0) {
@@ -137,17 +90,17 @@ const Address = () => {
         }
       />
 
-      <div className="pt-8 ">
+      <div className="pt-8">
         {!deliveryType && (
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <FaLocationDot className="text-2xl" />
+              <FaLocationArrow className="text-2xl" />
               <span className="font-medium text-lg">Add Address</span>
             </div>
             {!showAddForm && (
               <button
                 onClick={() => setShowAddForm(true)}
-                className="bg-[#0070BA] cursor-pointer text-white hover:bg-[#005c96] sm:text-[11px] text-[8px] w-32 flex justify-center items-center py-2 gap-2 rounded-full font-semibold"
+                className="bg-[#0070BA] text-white hover:bg-[#005c96] sm:text-[11px] text-[8px] w-32 flex justify-center items-center py-2 gap-2 rounded-full font-semibold"
               >
                 <FaPlus /> <span>Add</span>
               </button>
@@ -162,17 +115,17 @@ const Address = () => {
                 {addresses.map((address, index) => (
                   <div
                     key={address.ID || index}
-                    className="border border-[#0070ba] w-full py-4 px-2  mt-10 flex justify-between sm:gap-5 gap-2 shadow items-center rounded-lg"
+                    className="border border-[#0070ba] w-full py-4 px-2 mt-10 flex justify-between gap-2 shadow items-center rounded-lg"
                   >
-                    <div className="flex flex-col  items-center text-center sm:w-1/6 sm:min-w-[80px] sm:max-w-[100px] w-12">
+                    <div className="flex flex-col items-center text-center sm:w-1/6 sm:min-w-[80px] sm:max-w-[100px] w-12">
                       <IoMdHome className="sm:text-2xl text-xl text-[#0070ba]" />
                       <span className="font-medium sm:text-[10px] text-[9px] text-gray-800 break-words mt-1 w-full overflow-hidden text-ellipsis">
-                        {address?.AddressType?.TypeName}
+                        {address?.AddressType?.TypeName || "N/A"}
                       </span>
                     </div>
 
                     <div className="w-[70%]">
-                      <div className="text-xs tracking-wide text-gray-700 flex flex-col items-start justify-center gap-2">
+                      <div className="text-xs tracking-wide text-gray-700 flex flex-col gap-2">
                         <div className="flex gap-1 items-start">
                           <IoMdCall className="text-base" />
                           <span>{address?.PhoneNumber || "N/A"}</span>
@@ -188,24 +141,15 @@ const Address = () => {
                       </div>
                     </div>
 
-                    <div className="flex w-[12%] sm:w-[10%]  gap-2 ">
-                      <div>
-                        <input
-                          type="radio"
-                          checked={selectedId === address.ID}
-                          onChange={() => {
-                            setSelectedId(address.ID);
-                            sessionStorage.setItem(
-                              "selectedaddressId",
-                              address.ID
-                            );
-                          }}
-                        />
-                      </div>
+                    <div className="flex w-[12%] sm:w-[10%] gap-2">
+                      <input
+                        type="radio"
+                        checked={selectedId === address.ID}
+                        onChange={() => setSelectedId(address.ID)}
+                      />
                       <div
                         onClick={() => {
                           setShowAddForm(true);
-
                           handleEdit({
                             ...address,
                             addresstype:

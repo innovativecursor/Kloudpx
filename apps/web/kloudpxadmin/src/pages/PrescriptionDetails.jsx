@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePrescriptionContext } from "../contexts/PrescriptionContext";
+import { FaPhone } from "react-icons/fa6";
 import {
   FaArrowLeft,
   FaUser,
@@ -56,9 +57,18 @@ const PrescriptionDetails = () => {
           {user?.name?.charAt(0).toUpperCase()}
         </div>
         <h2 className="text-xl font-semibold text-gray-800">{user?.name}</h2>
-        <p className="flex items-center gap-2 text-gray-600 mt-2">
-          <FaEnvelope className="text-blue-500" /> {user?.email}
-        </p>
+
+        {user?.email && (
+          <p className="flex items-center gap-2 text-gray-600 mt-2">
+            <FaEnvelope className="text-blue-500" /> {user.email}
+          </p>
+        )}
+
+        {user?.phone && (
+          <p className="flex items-center gap-2 text-gray-600 mt-2">
+            <FaIdCard className="text-blue-500" /> {user.phone}
+          </p>
+        )}
         <p className="flex items-center gap-2 text-gray-600">
           <FaIdCard className="text-blue-500" /> ID: {user?.id}
         </p>
