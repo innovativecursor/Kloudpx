@@ -9,7 +9,7 @@ import {
   FaFileMedical,
   FaHistory,
   FaSignOutAlt,
-  FaUserTie
+  FaUserTie,
 } from "react-icons/fa";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useCartContext } from "@/app/contexts/CartContext";
@@ -28,6 +28,7 @@ const UserDropdown = () => {
 
   const logout = () => {
     localStorage.removeItem("access_token");
+    sessionStorage.removeItem("selectedaddressId");
     router.push("/");
     setToken(null);
     setUser(null);

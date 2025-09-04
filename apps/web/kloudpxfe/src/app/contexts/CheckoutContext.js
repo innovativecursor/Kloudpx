@@ -1,7 +1,12 @@
 "use client";
 
 import { createContext, useContext, useState } from "react";
-import { updateAxiosCall, postAxiosCall, getAxiosCall } from "../lib/axios";
+import {
+  updateAxiosCall,
+  postAxiosCall,
+  getAxiosCall,
+  deleteAxiosCall,
+} from "../lib/axios";
 import endpoints from "../config/endpoints";
 import toast from "react-hot-toast";
 
@@ -15,6 +20,7 @@ export const CheckoutProvider = ({ children }) => {
   const [deliveryData, setDeliveryData] = useState(null);
   const [getAllAddress, setGetAllAddress] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState("GCOD");
+  const [addressType, setAddressType] = useState([]);
 
   const [formData, setFormData] = useState({
     id: null,
@@ -26,6 +32,7 @@ export const CheckoutProvider = ({ children }) => {
     barangay: "",
     phonenumber: "",
     isdefault: false,
+    address_type_id: null,
   });
 
   const handleChange = (e) => {
@@ -81,11 +88,31 @@ export const CheckoutProvider = ({ children }) => {
       zipcode: address.ZipCode,
       phonenumber: address.PhoneNumber || "",
       isdefault: address.IsDefault,
+      address_type_id: address.addresstype,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // ✅ Front-end validation
+    const requiredFields = [
+      "nameresidency",
+      "region",
+      "province",
+      "city",
+      "barangay",
+      "zipcode",
+      "phonenumber",
+      "address_type_id",
+    ];
+
+    for (let field of requiredFields) {
+      if (!formData[field] || formData[field].toString().trim() === "") {
+        toast.error(`Please fill the ${field} field`);
+        return;
+      }
+    }
 
     try {
       const payload = {
@@ -97,13 +124,14 @@ export const CheckoutProvider = ({ children }) => {
         zipcode: formData.zipcode,
         phonenumber: formData.phonenumber,
         isdefault: formData.isdefault,
+        address_type_id: formData.address_type_id,
       };
 
       if (formData.id) {
         payload.id = formData.id;
       }
 
-      const res = await postAxiosCall(endpoints.address.add, payload, true);
+      await postAxiosCall(endpoints.address.add, payload, true);
 
       toast.success(
         formData.id
@@ -119,19 +147,24 @@ export const CheckoutProvider = ({ children }) => {
         city: "",
         barangay: "",
         zipcode: "",
-
+        addresstype: "",
         isdefault: false,
+        address_type_id: null,
       });
       fetchAddressData();
     } catch (error) {
-      console.error("API error:", error);
-      toast.error("Failed to save address.");
+      if (error.response?.data?.error) {
+        toast.error(error.response.data.error);
+      } else {
+        toast.error("Failed to save address.");
+      }
     }
   };
 
   const fetchAddressData = async () => {
     try {
       const res = await getAxiosCall(endpoints.address.get, {}, true);
+      console.log(res?.data, "myaddd");
 
       setGetAllAddress(res?.data || []);
     } catch (error) {
@@ -139,17 +172,41 @@ export const CheckoutProvider = ({ children }) => {
     }
   };
 
-  const selectedAddress = async (id) => {
-    // console.log(id);
+  const handleDeleteAddress = async (id) => {
+    if (!id) return;
     try {
-      const res = await postAxiosCall(
+      // const confirmDelete = window.confirm(
+      //   "Are you sure you want to delete this address?"
+      // );
+      // if (!confirmDelete) return;
+
+      await deleteAxiosCall(endpoints.removeaddress.remove(id), true);
+      toast.success("Address deleted successfully!");
+      fetchAddressData();
+      if (selectedId === id) setSelectedId(null);
+    } catch (error) {
+      console.error("Failed to delete address:", error);
+      toast.error("Failed to delete address.");
+    }
+  };
+
+  const fetchAddresstype = async () => {
+    try {
+      const res = await getAxiosCall(endpoints.addresstype.get, {});
+      setAddressType(res?.data?.address_types || []);
+    } catch (error) {
+      setAddressType([]);
+    }
+  };
+
+  const selectedAddress = async (id) => {
+    try {
+      await postAxiosCall(
         endpoints.selectedAddress.add,
         { addressid: id },
         true
       );
-      // console.log("Address selected:", res);
       toast.success("Address selected successfully!");
-      // addDeliveryData()
     } catch (error) {
       console.error("Error selecting address:", error.message);
       toast.error("Something went wrong!");
@@ -167,8 +224,6 @@ export const CheckoutProvider = ({ children }) => {
         },
         true
       );
-      console.log(res, "my delievry data");
-
       setDeliveryData(res || null);
     } catch (error) {
       setDeliveryData(null);
@@ -199,7 +254,9 @@ export const CheckoutProvider = ({ children }) => {
         setPaymentMethod,
         setDeliveryData,
         setCheckoutData,
-        // handleOrderSubmit,
+        fetchAddresstype,
+        addressType,
+        handleDeleteAddress,
       }}
     >
       {children}

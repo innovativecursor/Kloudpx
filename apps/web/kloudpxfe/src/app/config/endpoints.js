@@ -44,7 +44,6 @@ const endpoints = {
       `${baseUrl}/v1/user/order/details/${order_number}`,
     pwd: `${baseUrl}/v1/user/profile/pwd/upload`,
     allpwd: `${baseUrl}/v1/user/pwd`,
-
   },
   seniorcitizen: {
     add: `${baseUrl}/v1/user/senior/upload`,
@@ -85,8 +84,14 @@ const endpoints = {
     add: `${baseUrl}/v1/user/add-update-address`,
     get: `${baseUrl}/v1/user/get-address`,
   },
+  addresstype: {
+    get: `${baseUrl}/v1/user/get-address-type`,
+  },
   selectedAddress: {
     add: `${baseUrl}/v1/user/select-address`,
+  },
+  removeaddress: {
+    remove: (id) => `${baseUrl}/v1/user/delete-address/${id}`,
   },
   deliveryType: {
     add: `${baseUrl}/v1/user/select-delivery-type`,
