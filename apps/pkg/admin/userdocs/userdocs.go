@@ -208,6 +208,7 @@ func UsersWithPrescriptionSummary(c *gin.Context, db *gorm.DB) {
 		UserID              uint   `json:"userid"`
 		Name                string `json:"name"`
 		Email               string `json:"email"`
+		Phone               string `json:"phone"`
 		PastPrescription    int64  `json:"pastprescription"`
 		PendingPrescription int64  `json:"pendingprescription"`
 	}
@@ -222,6 +223,7 @@ func UsersWithPrescriptionSummary(c *gin.Context, db *gorm.DB) {
 			u.id AS user_id, 
 			CONCAT(u.first_name, ' ', u.last_name) AS name,
 			u.email,
+			u.phone AS phone,	
 			SUM(CASE 
 					WHEN p.status IN ('fulfilled', 'rejected') 
 					THEN 1 
@@ -239,7 +241,7 @@ func UsersWithPrescriptionSummary(c *gin.Context, db *gorm.DB) {
 				END) AS pending_prescription
 		FROM prescriptions p
 		JOIN users u ON p.user_id = u.id
-		GROUP BY u.id, u.first_name, u.last_name, u.email
+		GROUP BY u.id, u.first_name, u.last_name, u.email,u.phone
 	`).Scan(&result)
 
 	c.JSON(http.StatusOK, result)
@@ -289,6 +291,7 @@ func UserPrescriptionHistory(c *gin.Context, db *gorm.DB) {
 			"id":    userInfo.ID,
 			"name":  userInfo.FirstName + " " + userInfo.LastName,
 			"email": userInfo.Email,
+			"phone": userInfo.Phone,
 		},
 		"past":      past,
 		"unsettled": unsettled,
