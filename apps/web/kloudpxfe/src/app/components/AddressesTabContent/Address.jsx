@@ -62,9 +62,11 @@ const Address = () => {
     let selectedAddressId = selectedId;
 
     if (!selectedAddressId) {
-      const defaultAddress = addresses.find((addr) => addr.IsDefault === true);
-      if (defaultAddress) {
-        selectedAddressId = defaultAddress.ID;
+      const defaultAddress = addresses?.find(
+        (addr) => addr?.isDefault === true
+      );
+      if (defaultAddress?.id) {
+        selectedAddressId = defaultAddress.id;
       }
     }
 
