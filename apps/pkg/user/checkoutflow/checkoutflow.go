@@ -457,6 +457,18 @@ func SelectAddressForCheckout(c *gin.Context, db *gorm.DB) {
 			return
 		}
 	}
+	var session models.CheckoutSession
+	if err := db.Where("user_id = ? AND status = ?", userObj.ID, "pending").
+		First(&session).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No active checkout session found"})
+		return
+	}
+
+	session.AddressID = &address.ID
+	if err := db.Save(&session).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update checkout session"})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message":   "Address selected",
