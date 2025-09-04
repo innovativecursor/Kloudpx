@@ -1,7 +1,9 @@
-const isLive = false;
+const isLive = true;
 
 const baseUrls = {
-  users: isLive ? "https://api.user.kloudpx.com" : "https://api.user.kloudpx.com",
+  users: isLive
+    ? "https://api.user.kloudpx.com"
+    : "https://api.user.kloudpx.com",
 };
 
 export { isLive, baseUrls };
