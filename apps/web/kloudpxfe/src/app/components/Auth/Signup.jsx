@@ -63,6 +63,19 @@ const Signup = ({ isOpen, onClose }) => {
                   />
                 </div>
                 <div className="py-2 px-4 border-b border-gray-200 focus-within:border focus-within:border-[#0070ba] focus-within:rounded-md">
+                  <label className="text-[10px] text-gray-500">EMAIL</label>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Your email"
+                    value={formData.email}
+                    required
+                    onChange={handleChange}
+                    className="w-full placeholder:text-xs text-base outline-none"
+                  />
+                </div>
+
+                <div className="py-2 px-4 border-b border-gray-200 focus-within:border focus-within:border-[#0070ba] focus-within:rounded-md">
                   <label className="text-[10px] text-gray-500">PHONE</label>
                   <div className="flex">
                     <select
