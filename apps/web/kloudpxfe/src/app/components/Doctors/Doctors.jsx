@@ -40,7 +40,7 @@ const Doctors = () => {
       filtered = [
         {
           value: `custom-${inputValue}`,
-          label: `➕ Use custom physician: "${inputValue}"`,
+          label: `➕ physician: "${inputValue}"`,
           isCustom: true,
         },
       ];
@@ -55,9 +55,7 @@ const Doctors = () => {
     if (selectedOption) {
       if (selectedOption.isCustom) {
         setCustomPhysician(
-          selectedOption.label
-            .replace("➕ Use custom physician: ", "")
-            .replace(/"/g, "")
+          selectedOption.label.replace("➕ physician: ", "").replace(/"/g, "")
         );
         setSelectedDoctorId(null);
         handleCustomConfirm();
@@ -190,8 +188,8 @@ const Doctors = () => {
       )}
 
       {!selectedDoctor && customPhysician && (
-        <div className="mt-4 p-3 border border-dashed rounded-md text-sm text-gray-700">
-          Using custom physician:{" "}
+        <div className="mt-4 p-5 border border-dashed rounded-md text-sm text-gray-700">
+          Physician Name:{" "}
           <span className="font-semibold">{customPhysician}</span>
         </div>
       )}

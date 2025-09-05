@@ -14,9 +14,11 @@ import { faqData } from "../components/FaqData/FaqData";
 import Cards from "@/app/components/cards/Cards";
 import { useProductContext } from "../contexts/ProductContext";
 import { useEffect } from "react";
+import { useImageContext } from "../contexts/ImagesContext";
 
 function Home() {
   const { getAllOtc, allOtc } = useProductContext();
+  const { carousel } = useImageContext();
 
   const testimonials = [
     {
@@ -67,15 +69,15 @@ function Home() {
 
   return (
     <div className="bg-[#F9FAFB]">
-      <div className="mt-40 md:mt-64 sm:mt-48">
-      <Hero />
+      <div className={carousel.length > 0 ? "mt-40 md:mt-64 sm:mt-48" : ""}>
+        <Hero />
       </div>
       <Banners />
       <Video />
       <Upload />
       <Instructions />
       <div className="mt-12 md:mt-24">
-      <Cards data={allOtc} title="OTC Medications & Supplements" />
+        <Cards data={allOtc} title="OTC Medications & Supplements" />
       </div>
       <DeliveryHome />
       <WhyChooseUs />

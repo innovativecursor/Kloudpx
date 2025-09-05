@@ -50,7 +50,7 @@ const Clinics = () => {
       filtered = [
         {
           value: `custom-${inputValue}`,
-          label: `➕ Use custom hospital: "${inputValue}"`,
+          label: `➕  hospital: "${inputValue}"`,
           isCustom: true,
         },
       ];
@@ -66,7 +66,7 @@ const Clinics = () => {
       if (selectedOption.isCustom) {
         setCustomHospital(
           selectedOption.label
-            .replace("➕ Use custom hospital: ", "")
+            .replace("➕ hospital: ", "")
             .replace(/"/g, "")
         );
         setSelectedClinicId(null);
@@ -93,7 +93,7 @@ const Clinics = () => {
   return (
     <div className="my-6">
       <label className="block mb-2 text-sm font-semibold text-gray-700">
-        Select Clinic
+        Select Clinic/hospital
       </label>
       <AsyncSelect
         cacheOptions
@@ -155,8 +155,8 @@ const Clinics = () => {
       )}
 
       {!selectedClinic && customHospital && (
-        <div className="mt-4 p-3 border border-dashed rounded-md text-sm text-gray-700">
-          Using custom hospital:{" "}
+        <div className="mt-4 p-5 border border-dashed rounded-md text-sm text-gray-700">
+          Hospital Name:{" "}
           <span className="font-semibold">{customHospital}</span>
         </div>
       )}

@@ -11,7 +11,7 @@ import container2 from "@/assets/Container (2).png";
 import { useImageContext } from "@/app/contexts/ImagesContext";
 
 const Banners = () => {
-  const { galleryImages, getGalleryImages } = useImageContext();
+  const { galleryImages, getGalleryImages, carousel } = useImageContext();
 
   const cards = [
     {
@@ -43,7 +43,13 @@ const Banners = () => {
     : [];
 
   return (
-    <div className="responsive-mx md:mt-24 mt-12">
+    <div
+      className={
+        carousel.length > 0
+          ? " responsive-mx md:mt-24 mt-12"
+          : "mt-40 md:mt-44 responsive-mx"
+      }
+    >
       <motion.h1
         className="font-semibold sm:text-2xl text-lg tracking-wide md:mb-4 mb-4"
         initial={{ opacity: 0, y: 30 }}

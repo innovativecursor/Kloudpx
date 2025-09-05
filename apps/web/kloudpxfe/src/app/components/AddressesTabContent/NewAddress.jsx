@@ -2,10 +2,11 @@
 import React, { useRef, useEffect } from "react";
 import { useLoadScript } from "@react-google-maps/api";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
+import usePageLoader from "@/app/hooks/usePageLoader";
 
 const libraries = ["places"];
 
-export default function NewAddress({ setShowAddForm }) {
+export default function NewAddress() {
   const {
     handleSubmit,
     handleChange,
@@ -14,11 +15,20 @@ export default function NewAddress({ setShowAddForm }) {
     addressType,
   } = useCheckout();
   const autocompleteRef = useRef(null);
+  const { startLoader, stopLoader } = usePageLoader();
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyBPaQPcHOUo3rYBRZuWnx792DbiJFRNyoA",
     libraries,
   });
+
+  useEffect(() => {
+    if (!isLoaded) {
+      startLoader();
+    } else {
+      stopLoader();
+    }
+  }, [isLoaded]);
 
   useEffect(() => {
     fetchAddresstype();
@@ -68,10 +78,9 @@ export default function NewAddress({ setShowAddForm }) {
   const onSubmit = async (e) => {
     e.preventDefault();
     await handleSubmit(e);
-    setShowAddForm(false);
   };
 
-  if (!isLoaded) return <p>Loading...</p>;
+  if (!isLoaded) return null;
 
   return (
     <div className="">
@@ -79,13 +88,13 @@ export default function NewAddress({ setShowAddForm }) {
         {/* Address Type */}
         <div className="mb-6">
           <label className="font-semibold text-sm text-gray-700">
-            Address Type
+            Type of Address
           </label>
-          <div className="flex flex-wrap gap-4 mt-2">
+          <div className="flex flex-wrap gap-4 md:mt-2 mt-3">
             {addressType.map((type) => (
               <label
                 key={type.ID}
-                className="flex items-center gap-2 text-sm bg-gray-100 px-3 py-1 rounded-full cursor-pointer hover:bg-blue-50 transition"
+                className="flex  items-center gap-2 text-sm bg-gray-100 px-4 py-2 rounded-full cursor-pointer hover:bg-blue-50 transition"
               >
                 <input
                   type="checkbox"
@@ -97,7 +106,7 @@ export default function NewAddress({ setShowAddForm }) {
                       target: { name: "address_type_id", value: type.ID },
                     })
                   }
-                  className="accent-blue-500"
+                  className="accent-blue-500 cursor-pointer"
                 />
                 {type.TypeName}
               </label>
@@ -115,30 +124,70 @@ export default function NewAddress({ setShowAddForm }) {
               ref={autocompleteRef}
               type="text"
               placeholder="Start typing your address..."
-              className="w-full border border-gray-300 px-4 py-2 mt-1 rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+              className="w-full border border-gray-300 px-4 py-3 mt-1 rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
             />
           </div>
 
           {/* Other Inputs */}
           {[
-            { label: "Region", name: "region", required: false, placeholder: "e.g., Central" },
-            { label: "Province", name: "province", required: true, placeholder: "e.g., Metro Province" },
-            { label: "City", name: "city", required: false, placeholder: "e.g., Metro City" },
-            { label: "Barangay", name: "barangay", required: true, placeholder: "e.g., Office 1" },
-            { label: "Zip Code", name: "zipcode", required: false, placeholder: "" },
-            { label: "Location", name: "nameresidency", required: true, placeholder: "" },
-            { label: "Phone Number", name: "phonenumber", required: true, placeholder: "e.g., 09123456789" },
+            {
+              label: "Region",
+              name: "region",
+              required: true,
+              placeholder: "Enter Your Region",
+            },
+            {
+              label: "Province",
+              name: "province",
+              required: true,
+              placeholder: "Enter Your Province",
+            },
+            {
+              label: "City",
+              name: "city",
+              required: true,
+              placeholder: "Enter Your City",
+            },
+            {
+              label: "Barangay",
+              name: "barangay",
+              required: true,
+              placeholder: "Enter Your Barangay",
+            },
+            {
+              label: "Zip Code",
+              name: "zipcode",
+              required: true,
+              placeholder: "Enter Your Zip Code",
+            },
+            {
+              label: "Location",
+              name: "nameresidency",
+              required: true,
+              placeholder: "House No., Building, Street, Landmark",
+            },
+            {
+              label: "Phone Number",
+              name: "phonenumber",
+              required: true,
+              placeholder: "Enter Your Active Mobile Number",
+            },
           ].map((field) => (
             <div key={field.name}>
-              <label className="font-medium text-xs text-gray-700">{field.label}</label>
+              <label className="font-medium text-xs text-gray-700">
+                {field.label}
+              </label>
               <input
                 type="text"
                 name={field.name}
-                value={formData[field.name] || (field.name === "phonenumber" ? "+63" : "")}
+                value={
+                  formData[field.name] ||
+                  (field.name === "phonenumber" ? "" : "")
+                }
                 onChange={handleChange}
                 required={field.required}
                 placeholder={field.placeholder}
-                className="w-full border border-gray-300 px-4 py-2 mt-1 rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+                className="w-full border border-gray-300 px-4 py-3 mt-1 rounded-lg text-sm placeholder:text-xs shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
               />
             </div>
           ))}
@@ -154,7 +203,7 @@ export default function NewAddress({ setShowAddForm }) {
                   target: { name: "isdefault", value: e.target.checked },
                 })
               }
-              className="accent-blue-500"
+              className="accent-blue-500 cursor-pointer"
             />
             <label className="text-xs font-medium text-gray-700">
               Make this my default address
@@ -164,7 +213,7 @@ export default function NewAddress({ setShowAddForm }) {
           {/* Submit Button */}
           <button
             type="submit"
-            className="bg-[#0070ba] text-white py-3 cursor-pointer text-sm rounded-full font-semibold  transition shadow-md"
+            className="bg-[#0070ba] text-white py-3 mt-4 cursor-pointer text-sm rounded-full font-semibold  transition shadow-md"
           >
             {formData.id ? "Update Address" : "Save & Proceed"}
           </button>
