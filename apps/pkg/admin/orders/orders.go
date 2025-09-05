@@ -167,14 +167,14 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 
 	// fetching pwd id by user id
 	var pwd models.PwdCard
-	if err := db.Where("user_id = ?", order.User.ID).First(&pwd).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No default address found. Please select an address."})
+	pwdID := uint(0)
+	if err := db.Where("user_id = ?", order.User.ID).First(&pwd).Error; err == nil {
+		pwdID = pwd.ID
 	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"customer_details": order.User,
 		"order_number":     order.OrderNumber,
-		"pwd_id":           pwd.ID,
+		"pwd_id":           pwdID,
 		"items":            items,
 		"grand_total":      order.TotalAmount, // locked at order time
 		"order_status":     order.Status,
@@ -188,6 +188,7 @@ func GetOrderDetails(c *gin.Context, db *gorm.DB) {
 		"payment_type":     order.PaymentType,
 		"pwd_discount":     order.CheckoutSession.PwdDiscount,
 		"senior_discount":  order.CheckoutSession.SeniorDiscount,
+		"delivery_cost":    order.CheckoutSession.DeliveryCost,
 		"created_at":       order.CreatedAt.Format("2006-01-02 15:04:05"),
 	})
 }
