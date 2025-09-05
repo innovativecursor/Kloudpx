@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
   //       const res = await getAxiosCall(endpoints.auth.getCurrentUser, {}, true);
   //       setUser(res?.data);
   //     } catch (err) {
-  //       console.error("Error fetching user info", err);
+  //       console.log("Error fetching user info", err);
   //       setUser(null);
   //     }
   //   };
@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
       setUser(res?.data);
       return res?.data;
     } catch (err) {
-      console.error("Error fetching user info", err);
+      console.log("Error fetching user info", err);
       setUser(null);
       return null;
     }
@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
 
         // router.push("/");
       } catch (error) {
-        console.error("Login failed", error.message);
+        console.log("Login failed", error.message);
       }
     },
   });

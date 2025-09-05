@@ -1,4 +1,3 @@
-"use client";
 
 import Faq from "@/app/components/FaqData/Faq";
 import { faqData } from "../components/FaqData/FaqData";

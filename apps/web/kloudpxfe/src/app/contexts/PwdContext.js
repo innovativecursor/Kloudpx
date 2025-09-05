@@ -38,7 +38,7 @@ export const PwdProvider = ({ children }) => {
         confirmButtonText: "OK",
       });
     } catch (error) {
-      console.error("PWD upload failed:", error);
+      console.log("PWD upload failed:", error);
       Swal.fire({
         title: "Error",
         text:
@@ -58,7 +58,7 @@ export const PwdProvider = ({ children }) => {
         setAllPwd(res?.data?.pwd || {});
       }
     } catch (error) {
-      console.error("Error fetching All Pwd :", error);
+      console.log("Error fetching All Pwd :", error);
       setAllPwd([]);
     }
   };

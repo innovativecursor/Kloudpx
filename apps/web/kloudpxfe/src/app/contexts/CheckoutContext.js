@@ -9,6 +9,7 @@ import {
 } from "../lib/axios";
 import endpoints from "../config/endpoints";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const CheckoutContext = createContext();
 
@@ -21,7 +22,7 @@ export const CheckoutProvider = ({ children }) => {
   const [getAllAddress, setGetAllAddress] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState("GCOD");
   const [addressType, setAddressType] = useState([]);
-
+  const router = useRouter();
   const [formData, setFormData] = useState({
     id: null,
     nameresidency: "",
@@ -63,7 +64,7 @@ export const CheckoutProvider = ({ children }) => {
 
       return isSaved;
     } catch (error) {
-      console.error("Error toggling save for later:", error);
+      console.log("Error toggling save for later:", error);
       return false;
     }
   };
@@ -95,7 +96,6 @@ export const CheckoutProvider = ({ children }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Front-end validation
     const requiredFields = [
       "nameresidency",
       "region",
@@ -109,7 +109,11 @@ export const CheckoutProvider = ({ children }) => {
 
     for (let field of requiredFields) {
       if (!formData[field] || formData[field].toString().trim() === "") {
-        toast.error(`Please fill the ${field} field`);
+        if (field === "address_type_id") {
+          toast.error("Please select address type");
+        } else {
+          toast.error(`Please fill the ${field} field`);
+        }
         return;
       }
     }
@@ -138,7 +142,8 @@ export const CheckoutProvider = ({ children }) => {
           ? "Address updated successfully!"
           : "Address saved successfully!"
       );
-
+      router.push("/Address");
+      fetchAddressData();
       setFormData({
         id: null,
         nameresidency: "",
@@ -151,7 +156,6 @@ export const CheckoutProvider = ({ children }) => {
         isdefault: false,
         address_type_id: null,
       });
-      fetchAddressData();
     } catch (error) {
       if (error.response?.data?.error) {
         toast.error(error.response.data.error);
@@ -185,7 +189,7 @@ export const CheckoutProvider = ({ children }) => {
       fetchAddressData();
       if (selectedId === id) setSelectedId(null);
     } catch (error) {
-      console.error("Failed to delete address:", error);
+      console.log("Failed to delete address:", error);
       toast.error("Failed to delete address.");
     }
   };
@@ -208,7 +212,7 @@ export const CheckoutProvider = ({ children }) => {
       );
       toast.success("Address selected successfully!");
     } catch (error) {
-      console.error("Error selecting address:", error.message);
+      console.log("Error selecting address:", error.message);
       toast.error("Something went wrong!");
     }
   };

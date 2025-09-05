@@ -88,6 +88,9 @@ const PrescriptionDetails = () => {
         <p className="text-sm text-gray-500 mt-1">
           {prescriptionDetails?.user?.email || "Not Found"}
         </p>
+         <p className="text-sm text-gray-500 mt-1">
+          {prescriptionDetails?.user?.phone_no || "Not Found"}
+        </p>
       </div>
 
       {/* Tabs */}
@@ -130,3 +133,14 @@ const PrescriptionDetails = () => {
 };
 
 export default PrescriptionDetails;
+
+
+
+
+
+
+
+
+
+
+

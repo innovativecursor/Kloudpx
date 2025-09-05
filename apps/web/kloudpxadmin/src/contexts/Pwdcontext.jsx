@@ -55,7 +55,7 @@ const PwdProvider = ({ children }) => {
         });
       }
     } catch (error) {
-      console.error("Error verifying PWD:", error);
+      console.log("Error verifying PWD:", error);
     }
   };
 

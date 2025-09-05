@@ -27,11 +27,9 @@ const OrderHistory = () => {
   const openModal = async (order) => {
     setIsModalOpen(true);
     setLoadingDetails(true);
-    await getOrderDetails(order.order_number);
+    await getOrderDetails(order?.order_number);
     setLoadingDetails(false);
   };
-
-  console.log(selectedOrder);
 
   return (
     <div className="order-history-page  bg-white rounded-lg shadow overflow-hidden mx-auto not-prose">
@@ -52,14 +50,14 @@ const OrderHistory = () => {
           <tbody>
             {paginatedOrders.map((order) => (
               <tr
-                key={order.order_number}
+                key={order?.order_number}
                 onClick={() => openModal(order)}
                 className="border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition text-gray-700 text-sm"
               >
-                <td className="py-3 px-4">{order.order_number}</td>
-                <td className="py-3 px-4">{order.shipping_number || "-"}</td>
-                <td className="py-3 px-4">{order.customer_name || "-"}</td>
-                <td className="py-3 px-4">{order.status || "-"}</td>
+                <td className="py-3 px-4">{order?.order_number}</td>
+                <td className="py-3 px-4">{order?.shipping_number || "-"}</td>
+                <td className="py-3 px-4">{order?.customer_name || "-"}</td>
+                <td className="py-3 px-4">{order?.status || "-"}</td>
               </tr>
             ))}
           </tbody>
@@ -68,18 +66,25 @@ const OrderHistory = () => {
 
       {/* Pagination */}
       <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 text-sm gap-2 text-gray-600">
-        <div>
-          Showing {(currentPage - 1) * pageSize + 1} -{" "}
-          {Math.min(currentPage * pageSize, allOrder.length)} of{" "}
-          {allOrder.length} records
-        </div>
-        <Pagination
-          current={currentPage}
-          total={allOrder.length}
-          pageSize={pageSize}
-          onChange={(page) => setCurrentPage(page)}
-          showSizeChanger={false}
-        />
+        {allOrder?.length > 0 ? (
+          <div>
+            Showing {(currentPage - 1) * pageSize + 1} -{" "}
+            {Math.min(currentPage * pageSize, allOrder.length)} of{" "}
+            {allOrder.length} records
+          </div>
+        ) : (
+          <div>No data found</div>
+        )}
+
+        {allOrder?.length > 0 && (
+          <Pagination
+            current={currentPage}
+            total={allOrder.length}
+            pageSize={pageSize}
+            onChange={(page) => setCurrentPage(page)}
+            showSizeChanger={false}
+          />
+        )}
       </div>
 
       {/* Modal */}
@@ -97,13 +102,13 @@ const OrderHistory = () => {
         ) : selectedOrder ? (
           <div className="md:p-4">
             <h2 className="text-lg font-semibold mb-1 text-gray-800">
-              {selectedOrder.customer_name || "Customer Name"}
+              {selectedOrder?.customer_name || "Customer Name"}
             </h2>
             <p className="text-sm text-gray-500 mb-2">
-              Order #: {selectedOrder.order_number}
+              Order #: {selectedOrder?.order_number}
             </p>
             <p className="text-sm text-gray-500 mb-4">
-              Shipping Address: {selectedOrder.delivery_address || "-"}
+              Shipping Address: {selectedOrder?.delivery_address || "-"}
             </p>
 
             <div className="grid cursor-pointer grid-cols-1 md:grid-cols-2 md:gap-4 gap-6 mt-6">
@@ -113,24 +118,24 @@ const OrderHistory = () => {
                   <h3 className="text-base font-semibold mb-4 text-gray-800">
                     Product Details
                   </h3>
-                  {selectedOrder.items && selectedOrder.items.length > 0 ? (
-                    selectedOrder.items.map((item, idx) => (
+                  {selectedOrder?.items && selectedOrder?.items?.length > 0 ? (
+                    selectedOrder?.items.map((item, idx) => (
                       <div
                         key={idx}
                         className="flex items-start sm:items-center gap-4 mb-4"
                       >
                         <img
-                          src={item.image || fallbackImage}
-                          alt={item.medicine_name || "Product"}
+                          src={item?.image || fallbackImage}
+                          alt={item?.medicine_name || "Product"}
                           className="w-16 h-16 object-cover rounded-md"
                         />
                         <div className="flex-1 text-sm sm:text-base text-gray-700">
                           <h4 className="font-semibold">
-                            {item.medicine_name}
+                            {item?.medicine_name}
                           </h4>
-                          <p>Price: ₱{item.price}</p>
-                          <p>Qty: {item.quantity}</p>
-                          <p>{item.pharmacist_status}</p>
+                          <p>Price: ₱{item?.price}</p>
+                          <p>Qty: {item?.quantity}</p>
+                          <p>{item?.pharmacist_status}</p>
                         </div>
                       </div>
                     ))
@@ -148,41 +153,47 @@ const OrderHistory = () => {
                 <div className="text-sm space-y-2 text-gray-700">
                   <div className="flex justify-between">
                     <span>Order date</span>
-                    <span>{selectedOrder.created_at || "-"}</span>
+                    <span>{selectedOrder?.created_at || "-"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Payment Type</span>
-                    <span>{selectedOrder.payment_type || "-"}</span>
+                    <span>{selectedOrder?.payment_type || "-"}</span>
                   </div>
 
                   <div className="flex justify-between">
                     <span>Delivery Type</span>
-                    <span>{selectedOrder.delivery_type || "-"}</span>
+                    <span>{selectedOrder?.delivery_type || "-"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Shipping Number</span>
-                    <span>{selectedOrder.shipping_number || "-"}</span>
+                    <span>{selectedOrder?.shipping_number || "-"}</span>
                   </div>
 
                   <div className="flex justify-between">
                     <span>Pwd Discount</span>
-                    <span>  ₱{(selectedOrder.pwd_discount || 0).toFixed(2)}</span>
+                    <span>
+                      {" "}
+                      ₱{(selectedOrder?.pwd_discount || 0).toFixed(2)}
+                    </span>
                   </div>
 
                   <div className="flex justify-between">
                     <span>Senior Discount</span>
-                    <span>  ₱{(selectedOrder.senior_discount || 0).toFixed(2)}</span>
+                    <span>
+                      {" "}
+                      ₱{(selectedOrder?.senior_discount || 0).toFixed(2)}
+                    </span>
                   </div>
 
                   <div className="flex justify-between">
                     <span>Order Status</span>
-                    <span>{selectedOrder.order_status || "-"}</span>
+                    <span>{selectedOrder?.order_status || "-"}</span>
                   </div>
 
                   <hr className="my-2" />
                   <div className="flex justify-between font-semibold">
                     <span>Total Amount</span>
-                    <span>₱{(selectedOrder.grand_total || 0).toFixed(2)}</span>
+                    <span>₱{(selectedOrder?.grand_total || 0).toFixed(2)}</span>
                   </div>
                 </div>
               </div>

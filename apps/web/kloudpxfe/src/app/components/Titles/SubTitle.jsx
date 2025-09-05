@@ -10,6 +10,7 @@ const SubTitle = ({ paths }) => {
     Cart: "/",
     Checkout: "/Checkout",
     Address: "/Address",
+    NewAddress: "/NewAddress",
     "Delivery Type": "/Delivery",
   };
 

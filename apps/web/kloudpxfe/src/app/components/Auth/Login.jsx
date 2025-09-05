@@ -130,7 +130,7 @@ const Login = () => {
                   await googleLogin();
                   closeLogin();
                 } catch (err) {
-                  console.error("Google login failed", err);
+                  console.log("Google login failed", err);
                 }
               }}
               className="p-2 border border-gray-200 cursor-pointer rounded-md"

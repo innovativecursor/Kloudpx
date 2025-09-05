@@ -67,11 +67,15 @@ export const LoginAuthProvider = ({ children }) => {
 
     setLoading(true);
     try {
+      // const payload = {
+      //   firstName: formData.firstName.trim(),
+      //   lastName: formData.lastName.trim(),
+      //   email: formData.email.trim(),
+      //   phone: `${formData.countryCode}${formData.phone.trim()}`,
+      // };
       const payload = {
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        email: formData.email.trim(),
         phone: `${formData.countryCode}${formData.phone.trim()}`,
+        email: formData.email.trim(),
       };
 
       await postAxiosCall(endpoints.basicauthphone.signup, payload, false);
@@ -112,10 +116,18 @@ export const LoginAuthProvider = ({ children }) => {
     }
     setLoading(true);
     try {
+      // const payload = {
+      //   phone: `${formData.countryCode}${formData.phone}`,
+      //   otp: formData.otp,
+      // };
       const payload = {
-        phone: `${formData.countryCode}${formData.phone}`,
-        otp: formData.otp,
+        first_name: formData.firstName.trim(),
+        last_name: formData.lastName.trim(),
+        phone: `${formData.countryCode}${formData.phone.trim()}`,
+        email: formData.email.trim(),
+        otp: formData.otp.trim(),
       };
+
       await postAxiosCall(
         endpoints.basicauthphone.signupverify,
         payload,

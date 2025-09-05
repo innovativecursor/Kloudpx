@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { FaLocationArrow, FaPlus, FaRegEdit, FaTrash } from "react-icons/fa";
 import { IoMdHome, IoMdCall } from "react-icons/io";
 import { IoLocation } from "react-icons/io5";
 import SubTitle from "../Titles/SubTitle";
-import NewAddress from "./NewAddress";
 import { useRouter } from "next/navigation";
 import { useCheckout } from "@/app/contexts/CheckoutContext";
 import toast from "react-hot-toast";
@@ -24,8 +23,6 @@ const normalizeAddresses = (data) => {
 };
 
 const Address = () => {
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [deliveryType, setDeliveryType] = useState(false);
   const router = useRouter();
   const {
     fetchAddressData,
@@ -39,34 +36,33 @@ const Address = () => {
   } = useCheckout();
 
   const { startLoader } = usePageLoader();
-
   const addresses = normalizeAddresses(getAllAddress);
 
   useEffect(() => {
     fetchAddressData();
   }, []);
+
   useEffect(() => {
-    if (!addresses || addresses.length === 0) return;
+    if (!addresses || addresses?.length === 0) return;
     if (!selectedId) {
-      const defaultAddress = addresses.find((addr) => addr.IsDefault);
-      if (defaultAddress) setSelectedId(defaultAddress.ID);
+      const defaultAddress = addresses?.find((addr) => addr?.IsDefault);
+      if (defaultAddress) setSelectedId(defaultAddress?.ID);
     }
   }, [addresses, selectedId]);
 
   const handleSaveAndProceed = () => {
-    if (!checkoutData?.items || checkoutData.items.length === 0) {
+    if (!checkoutData?.items || checkoutData?.items?.length === 0) {
       toast.error("No items in checkout. Add items first!");
       return;
     }
 
     let selectedAddressId = selectedId;
-
     if (!selectedAddressId) {
       const defaultAddress = addresses?.find(
         (addr) => addr?.isDefault === true
       );
       if (defaultAddress?.id) {
-        selectedAddressId = defaultAddress.id;
+        selectedAddressId = defaultAddress?.id;
       }
     }
 
@@ -74,7 +70,7 @@ const Address = () => {
       startLoader();
       selectedAddress(selectedAddressId);
       setSelectedId(selectedAddressId);
-      router.push("Delivery");
+      router.push("/Delivery");
     } else {
       toast.error("Please select an address");
     }
@@ -82,111 +78,114 @@ const Address = () => {
 
   return (
     <>
-      <SubTitle
-        paths={
-          deliveryType
-            ? ["Cart", "Checkout", "Address", "Delivery Type"]
-            : showAddForm
-            ? ["Cart", "Checkout", "Address", "New Address"]
-            : ["Cart", "Checkout", "Address"]
-        }
-      />
+      <SubTitle paths={["Cart", "Checkout", "Address"]} />
 
       <div className="pt-8">
-        {!deliveryType && (
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <FaLocationArrow className="text-2xl" />
-              <span className="font-medium text-lg">Add Address</span>
-            </div>
-            {!showAddForm && (
-              <button
-                onClick={() => setShowAddForm(true)}
-                className="bg-[#0070BA] text-white hover:bg-[#005c96] sm:text-[11px] text-[8px] w-32 flex justify-center items-center py-2 gap-2 rounded-full font-semibold"
-              >
-                <FaPlus /> <span>Add</span>
-              </button>
-            )}
+        {/* Header */}
+        <div className="flex justify-between items-center md:mb-6 mb-8">
+          <div className="flex items-center gap-2">
+            <FaLocationArrow className="md:text-2xl text-[#0070BA]" />
+            <span className="font-semibold md:text-lg ">Manage Addresses</span>
           </div>
-        )}
+          <button
+            onClick={() => {
+              startLoader("/NewAddress");
+              router.push("/NewAddress");
+            }}
+            className="bg-[#0070BA] hover:bg-[#005c96] text-white cursor-pointer 
+            sm:text-sm text-xs md:px-6 px-4 md:py-2 py-1.5 flex items-center gap-2 rounded-full font-medium shadow"
+          >
+            <FaPlus /> <span>Add</span>
+          </button>
+        </div>
 
-        {!deliveryType && (
+        {/* Addresses */}
+        {addresses && addresses?.length > 0 ? (
           <>
-            {!showAddForm && addresses && addresses.length > 0 && (
-              <>
-                {addresses.map((address, index) => (
-                  <div
-                    key={address.ID || index}
-                    className="border border-[#0070ba] w-full py-4 px-2 mt-10 flex justify-between gap-2 shadow items-center rounded-lg"
-                  >
-                    <div className="flex flex-col items-center text-center sm:w-1/6 sm:min-w-[40px] sm:max-w-[40px] w-12">
-                      <IoMdHome className="sm:text-2xl text-xl text-[#0070ba]" />
-                      <span className="font-medium sm:text-[10px] text-[9px] text-gray-800 break-words mt-1 w-full overflow-hidden text-ellipsis">
-                        {address?.AddressType?.TypeName || "N/A"}
-                      </span>
-                    </div>
+            <div className="space-y-4">
+              {addresses.map((address, index) => (
+                <div
+                  key={address?.ID || index}
+                  className={`border ${
+                    selectedId === address.ID
+                      ? "border-[#0070BA] shadow-md"
+                      : "border-gray-300"
+                  } bg-white p-4 flex justify-between items-center rounded-xl transition-all`}
+                >
+                  {/* Address Type */}
+                  <div className="flex flex-col items-center text-center md:w-16 w-10 shrink-0">
+                    <IoMdHome className="text-2xl text-[#0070BA]" />
+                    <span className="text-[10px] font-medium text-gray-600 mt-1">
+                      {address?.AddressType?.TypeName || "N/A"}
+                    </span>
+                  </div>
 
-                    <div className="w-[70%]">
-                      <div className="text-xs tracking-wide text-gray-700 flex flex-col gap-2">
-                        <div className="flex gap-1 items-start">
-                          <IoMdCall className="text-base" />
-                          <span>{address?.PhoneNumber || "N/A"}</span>
-                        </div>
-                        <div className="flex gap-1 items-start">
-                          <IoLocation className="text-lg sm:text-base" />
-                          <span className="text-xs ">
-                            {address?.City || "N/A"}, {address?.Region || "N/A"}
-                            , {address?.Province || "N/A"},{" "}
-                            {address?.ZipCode || "N/A"}
-                          </span>
-                        </div>
+                  {/* Address Details */}
+                  <div className="flex-1 px-3">
+                    <div className="md:text-xs text-[10px] text-gray-700 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <IoMdCall className="text-sm text-[#0070BA]" />
+                        <span>{address?.PhoneNumber || "N/A"}</span>
                       </div>
-                    </div>
-
-                    <div className="flex items-center w-[12%] sm:w-[12%] gap-2">
-                      <input
-                        type="radio"
-                        checked={selectedId === address.ID}
-                        onChange={() => setSelectedId(address.ID)}
-                        className="w-8 h-8"
-                      />
-                      <div
-                        onClick={() => {
-                          setShowAddForm(true);
-                          handleEdit({
-                            ...address,
-                            addresstype:
-                              address.AddressTypeID ??
-                              address.AddressType?.ID ??
-                              null,
-                          });
-                        }}
-                        className="cursor-pointer"
-                      >
-                        <FaRegEdit className="sm:text-xl" />
-                      </div>
-                      <div
-                        onClick={() => handleDeleteAddress(address.ID)}
-                        className="cursor-pointer"
-                      >
-                        <FaTrash className=" text-red-500 hover:text-red-700" />
+                      <div className="flex items-start gap-2">
+                        <IoLocation className="text-sm text-[#0070BA] mt-0.5" />
+                        <span>
+                          {address?.City || "N/A"}, {address?.Region || "N/A"},{" "}
+                          {address?.Province || "N/A"},{" "}
+                          {address?.ZipCode || "N/A"}
+                        </span>
                       </div>
                     </div>
                   </div>
-                ))}
 
-                <button
-                  type="button"
-                  onClick={handleSaveAndProceed}
-                  className="bg-[#0070BA] text-white w-full py-3 sm:text-sm text-xs rounded-full font-medium mt-8 md:mt-10 cursor-pointer hover:bg-[#005c96]"
-                >
-                  Save & Proceed
-                </button>
-              </>
-            )}
+                  {/* Actions */}
+                  <div className="flex items-center md:gap-3 gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={selectedId === address?.ID}
+                      onChange={() => setSelectedId(address?.ID)}
+                      className="md:w-5 md:h-5 w-4 h-4 text-[#0070BA] accent-[#0070BA] cursor-pointer"
+                    />
+                    <button
+                      onClick={() => {
+                        handleEdit({
+                          ...address,
+                          addresstype:
+                            address.AddressTypeID ??
+                            address.AddressType?.ID ??
+                            null,
+                        });
+                        router.push("/NewAddress");
+                      }}
+                      className="text-gray-600 hover:text-[#0070BA]  cursor-pointer"
+                    >
+                      <FaRegEdit className="md:text-lg" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteAddress(address?.ID)}
+                      className="text-red-500 hover:text-red-700 cursor-pointer"
+                    >
+                      <FaTrash className="md:text-lg" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-            {showAddForm && <NewAddress setShowAddForm={setShowAddForm} />}
+            {/* Save & Proceed */}
+            <button
+              type="button"
+              onClick={handleSaveAndProceed}
+              className="bg-[#0070BA] hover:bg-[#005c96] text-white w-full py-3 
+              sm:text-sm text-xs rounded-full font-semibold mt-8 shadow cursor-pointer"
+            >
+              Save & Proceed
+            </button>
           </>
+        ) : (
+          <p className="text-center text-gray-500 mt-10">
+            No address found. Please add one.
+          </p>
         )}
       </div>
     </>

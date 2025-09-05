@@ -27,7 +27,7 @@ export const ImageProvider = ({ children }) => {
 
       Swal.fire("Uploaded", "Images uploaded successfully!", "success");
     } catch (error) {
-      console.error(
+      console.log(
         "❌ Upload failed:",
         error?.response?.data || error.message
       );

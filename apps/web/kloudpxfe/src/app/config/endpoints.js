@@ -35,6 +35,7 @@ const endpoints = {
     get: `${baseUrl}/v1/user/get-cart`,
     remove: (id) => `${baseUrl}/v1/user/remove-item-cart/${id}`,
     saveForLater: `${baseUrl}/v1/user/save-for-later`,
+    updateqty: (id) => `${baseUrl}/v1/user/cart-quantity/${id}`,
   },
   account: {
     edit: () => `${baseUrl}/v1/user/profile/update`,

@@ -12,7 +12,7 @@ export const SeniorCitizenProvider = ({ children }) => {
   const { compressImage } = useImageCompressor();
   const [uploading, setUploading] = useState(false);
   const [fileUrl, setFileUrl] = useState("");
-  const [allSenior, setAllSenior] = useState([]);
+  const [allSenior, setAllSenior] = useState({});
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -20,26 +20,29 @@ export const SeniorCitizenProvider = ({ children }) => {
 
     try {
       setUploading(true);
+
       const compressedBase64 = await compressImage(file, 800, 800, 0.6);
       const base64Data = compressedBase64.split(",")[1];
-      const response = await postAxiosCall(
-        endpoints.seniorcitizen.add,
-        { file: base64Data },
-        true
-      );
+      if (base64Data) {
+        const response = await postAxiosCall(
+          endpoints.seniorcitizen.add,
+          { file: base64Data },
+          true
+        );
 
-      const uploadedUrl = response?.file_url || "";
-      setFileUrl(uploadedUrl);
-      getAllSenior();
+        const uploadedUrl = response?.file_url || "";
+        setFileUrl(uploadedUrl);
+        await getAllSenior();
 
-      Swal.fire({
-        title: "Success",
-        text: "Senior Citizen certificate uploaded successfully.",
-        icon: "success",
-        confirmButtonText: "OK",
-      });
+        Swal.fire({
+          title: "Success",
+          text: "Senior Citizen certificate uploaded successfully.",
+          icon: "success",
+          confirmButtonText: "OK",
+        });
+      }
     } catch (error) {
-      console.error("Senior Citizen upload failed:", error);
+      console.log("Senior Citizen upload failed:", error);
       Swal.fire({
         title: "Error",
         text:
@@ -61,8 +64,11 @@ export const SeniorCitizenProvider = ({ children }) => {
         setAllSenior(res?.data || {});
       }
     } catch (error) {
-      console.error("Error fetching Senior Citizen data:", error);
-      setAllSenior([]);
+      if (error?.response?.status === 404) {
+        setAllSenior({});
+      } else {
+        setAllSenior({});
+      }
     }
   };
 

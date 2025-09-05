@@ -23,7 +23,7 @@ const CategoryProvider = ({ children }) => {
       }));
       setCategoryIconOptions(formatted);
     } catch (error) {
-      console.error("❌ Category icon fetch error:", error);
+      console.log("❌ Category icon fetch error:", error);
     }
   };
 
@@ -82,7 +82,7 @@ const CategoryProvider = ({ children }) => {
         return null;
       }
     } catch (error) {
-      console.error("❌ Category create error:", error);
+      console.log("❌ Category create error:", error);
       setCategoryError("Failed to add new category.");
       return null;
     }
@@ -97,7 +97,7 @@ const CategoryProvider = ({ children }) => {
     try {
       const res = await postAxiosCall(endpoints.assignIcon.add, payload);
     } catch (error) {
-      console.error("❌ Icon assign failed:", error);
+      console.log("❌ Icon assign failed:", error);
     }
   };
 

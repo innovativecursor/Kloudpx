@@ -1,4 +1,3 @@
-"use client";
 
 import { useRouter } from "next/navigation";
 import { useProductContext } from "../contexts/ProductContext";

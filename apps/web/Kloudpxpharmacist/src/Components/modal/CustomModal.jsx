@@ -28,8 +28,6 @@ const CustomModal = ({ isOpen, onClose, selectedPrescription, activeTab }) => {
     }
   }, [isOpen, selectedPrescription]);
 
-  if (!isOpen) return null;
-
   const handleApprove = async (cartid) => {
     if (!cartid) return;
 
@@ -48,7 +46,7 @@ const CustomModal = ({ isOpen, onClose, selectedPrescription, activeTab }) => {
         showConfirmButton: false,
       });
 
-      onClose();
+      // onClose();
     } else {
       Swal.fire({
         icon: "error",
@@ -76,7 +74,7 @@ const CustomModal = ({ isOpen, onClose, selectedPrescription, activeTab }) => {
         showConfirmButton: false,
       });
 
-      onClose();
+      // onClose();
     } else {
       Swal.fire({
         icon: "error",
@@ -85,6 +83,23 @@ const CustomModal = ({ isOpen, onClose, selectedPrescription, activeTab }) => {
       });
     }
   };
+
+  useEffect(() => {
+    if (
+      activeTab === "unsettled" &&
+      prescriptionCart &&
+      prescriptionCart.length > 0 &&
+      prescriptionCart.every(
+        (item) =>
+          item.MedicineStatus === "approved" ||
+          item.MedicineStatus === "rejected"
+      )
+    ) {
+      onClose();
+    }
+  }, [prescriptionCart, onClose]);
+
+  if (!isOpen) return null;
 
   return (
     <div

@@ -88,7 +88,7 @@ export const PaymentProvider = ({ children }) => {
       setSelectedDoctorId(null);
       setDeliveryData(null);
     } catch (error) {
-      console.error("Error submitting order:", error.message);
+      console.log("Error submitting order:", error.message);
       // toast.error("Something went wrong!");
       setOrderSubmit([]);
     }

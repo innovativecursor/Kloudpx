@@ -47,7 +47,7 @@ const GetDataProvider = ({ children }) => {
 
       await Swal.fire("Deleted!", "The medicine has been deleted.", "success");
     } catch (error) {
-      console.error("❌ Delete failed:", error);
+      console.log("❌ Delete failed:", error);
     }
   };
 
@@ -88,7 +88,7 @@ const GetDataProvider = ({ children }) => {
       link.click();
       link.remove();
     } catch (error) {
-      console.error("Excel download failed", error);
+      console.log("Excel download failed", error);
       Swal.fire({
         title: "Error",
         text: "Download failed. Try again!",

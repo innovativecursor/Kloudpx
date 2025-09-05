@@ -60,7 +60,7 @@ export default function SearchBar() {
       setResults(res?.data?.medicines || []);
       setShowDropdown(true);
     } catch (error) {
-      console.error("Search error:", error);
+      console.log("Search error:", error);
       setResults([]);
     } finally {
       setLoading(false);
@@ -132,7 +132,7 @@ export default function SearchBar() {
                   <span className="font-medium text-gray-800 text-[15px]">
                     {item.genericname}
                   </span>
-                  <span className="text-xs text-gray-500">
+                  <span className="md:text-base text-sm text-gray-500">
                     {item.brandname}
                   </span>
                 </div>

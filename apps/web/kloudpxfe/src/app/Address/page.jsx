@@ -18,7 +18,7 @@ const page = () => {
   return (
     <div className=" pb-10 min-h-screen md:mt-52 sm:mt-48 mt-32">
       <div className="responsive-mx pt-7 md:pt-11">
-        <div className="flex justify-between md:flex-row flex-col md:gap-0 gap-10 items-start">
+        <div className="flex justify-between md:flex-row flex-col md:gap-0 gap-7 items-start">
           <div className="lg:w-[45%] md:w-[55%] w-full flex flex-col">
             <Address />
           </div>

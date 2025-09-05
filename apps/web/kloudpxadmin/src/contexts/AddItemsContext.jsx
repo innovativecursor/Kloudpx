@@ -156,7 +156,7 @@ const AddItemsProvider = ({ children }) => {
       navigate("/allmedicine");
     } catch (error) {
       Swal.fire("❌ Error", "Failed to save medicine.", "error");
-      console.error("❌ API Error:", error);
+      console.log("❌ API Error:", error);
     }
   };
 
