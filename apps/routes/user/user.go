@@ -45,6 +45,10 @@ func User(db *gorm.DB) {
 		usersignup.VerifySignupOTP(c, db)
 	})
 
+	apiV1.POST("/user/resend-otp", func(c *gin.Context) {
+		usersignup.ResendOTP(c, db)
+	})
+
 	apiV1.POST("/user/login", func(c *gin.Context) {
 		userlogin.UserLogin(c, db)
 	})
