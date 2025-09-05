@@ -18,6 +18,7 @@ export const LoginAuthProvider = ({ children }) => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
+    email: "",
     countryCode: "+91",
     phone: "",
     otp: "",
@@ -49,6 +50,9 @@ export const LoginAuthProvider = ({ children }) => {
     if (!formData.lastName.trim()) {
       return Swal.fire("Error", "Enter last name", "error");
     }
+    if (!formData.email.trim()) {
+      return Swal.fire("Error", "Enter email", "error");
+    }
 
     if (!formData.phone.trim()) {
       return Swal.fire("Error", "Enter phone number", "error");
@@ -66,6 +70,7 @@ export const LoginAuthProvider = ({ children }) => {
       const payload = {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
+        email: formData.email.trim(),
         phone: `${formData.countryCode}${formData.phone.trim()}`,
       };
 
@@ -77,6 +82,17 @@ export const LoginAuthProvider = ({ children }) => {
 
       if (message === "Failed to send OTP") {
         Swal.fire("Info", "You are already signed up, please login!", "info");
+        closeSignup();
+        openLogin();
+      } else if (
+        message.includes("email already exists") ||
+        message.includes("phone already exists")
+      ) {
+        Swal.fire(
+          "Info",
+          "Email or phone already registered, please login!",
+          "info"
+        );
         closeSignup();
         openLogin();
       } else {
