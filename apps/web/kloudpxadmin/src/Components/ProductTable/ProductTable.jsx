@@ -219,8 +219,7 @@ function ProductTable(props) {
         }
       });
     } catch (error) {
-      console.error("Error deleting inquiry:", error);
-      message.error("Failed to delete inquiry");
+      console.log("Error deleting inquiry:", error);
     }
   };
 

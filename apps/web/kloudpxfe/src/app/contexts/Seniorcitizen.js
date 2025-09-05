@@ -42,7 +42,7 @@ export const SeniorCitizenProvider = ({ children }) => {
         });
       }
     } catch (error) {
-      console.error("Senior Citizen upload failed:", error);
+      console.log("Senior Citizen upload failed:", error);
       Swal.fire({
         title: "Error",
         text:

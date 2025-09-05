@@ -29,7 +29,7 @@ const AuthProvider = ({ children }) => {
             logoutUser();
           }
         } catch (error) {
-          console.error("initializeUser error:", error);
+          console.log("initializeUser error:", error);
         }
       }
     };
@@ -51,7 +51,7 @@ const AuthProvider = ({ children }) => {
         throw new Error("Failed to fetch admin info");
       }
     } catch (error) {
-      console.error("fetchAdminInfo error:", error);
+      console.log("fetchAdminInfo error:", error);
       Swal.fire({
         title: "Error",
         text: "Failed to fetch admin info. Please login again.",

@@ -250,7 +250,7 @@ export default function useMedicineForm() {
       setMessage("");
       setPreviewUrls([]);
     } catch (err) {
-      console.error("Error submitting:", err);
+      console.log("Error submitting:", err);
       alert("Failed to submit medicine data.");
     }
   };

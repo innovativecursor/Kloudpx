@@ -65,7 +65,7 @@ const CarouselProvider = ({ children }) => {
         await getAllCarouselImages();
       }
     } catch (error) {
-      console.error("Status toggle failed", error);
+      console.log("Status toggle failed", error);
     }
   };
 
@@ -77,7 +77,7 @@ const CarouselProvider = ({ children }) => {
         await getAllCarouselImages();
       }
     } catch (error) {
-      console.error("Failed to delete carousel image", error);
+      console.log("Failed to delete carousel image", error);
     }
   };
 

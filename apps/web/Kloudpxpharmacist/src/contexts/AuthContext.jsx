@@ -23,7 +23,7 @@ const AuthProvider = ({ children }) => {
 
         setUser(res);
       } catch (err) {
-        console.error("Error fetching user info", err);
+        console.log("Error fetching user info", err);
         setUser(null);
       }
     };
@@ -51,7 +51,7 @@ const AuthProvider = ({ children }) => {
         setToken(token);
         navigate("/home");
       } catch (error) {
-        console.error(error);
+        console.log(error);
         Swal.fire("Error", error.message || "Login failed", "error");
       }
     },

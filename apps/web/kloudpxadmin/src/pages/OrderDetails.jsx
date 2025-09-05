@@ -67,6 +67,7 @@ const OrderDetails = () => {
 
   // Safely handle numeric values
   const grandTotal = parseFloat(orderDetails.grand_total || 0).toFixed(2);
+  const deliverycost = parseFloat(orderDetails.delivery_cost || 0).toFixed(2);
   const pwdDiscount = parseFloat(orderDetails.pwd_discount || 0).toFixed(2);
   const seniorDiscount = parseFloat(orderDetails.senior_discount || 0).toFixed(
     2
@@ -230,19 +231,23 @@ const OrderDetails = () => {
             </p>
             <p>
               <span className="font-semibold">Delivery Type:</span>{" "}
-              {orderDetails.delivery_type || "N/A"}
+              {orderDetails?.delivery_type || "N/A"}
             </p>
             <p>
               <span className="font-semibold">Payment Type:</span>{" "}
-              {orderDetails.payment_type || "N/A"}
+              {orderDetails?.payment_type || "N/A"}
             </p>
             <p>
               <span className="font-semibold">Order Status:</span>{" "}
-              {orderDetails.order_status || "N/A"}
+              {orderDetails?.order_status || "N/A"}
             </p>
             <p>
               <span className="font-semibold">Delivery Address:</span>{" "}
-              {orderDetails.delivery_address || "N/A"}
+              {orderDetails?.delivery_address || "N/A"}
+            </p>
+            <p>
+              <span className="font-semibold">Phone No: </span>{" "}
+              {orderDetails?.phone_number || "N/A"}
             </p>
           </div>
         </div>
@@ -264,8 +269,11 @@ const OrderDetails = () => {
             />
           </div>
           <div className="space-y-2 text-sm">
-            <p className="flex justify-between mt-2">
+            {/* <p className="flex justify-between mt-2">
               <span>Payable Amount:</span> <span>₱{grandTotal}</span>
+            </p> */}
+            <p className="flex justify-between">
+              <span>Delivery Cost:</span> <span>₱{deliverycost}</span>
             </p>
             <p className="flex justify-between">
               <span>PWD Discount:</span> <span>₱{pwdDiscount}</span>

@@ -52,7 +52,7 @@ export const ProductProvider = ({ children }) => {
       const res = await getAxiosCall(endpoints.medicine.get, {}, false);
       setSelectedCategoryItems(res?.data?.medicines || []);
     } catch (error) {
-      console.error("Error fetching all medicines", err);
+      console.log("Error fetching all medicines", err);
     }
   };
 
@@ -127,7 +127,7 @@ export const ProductProvider = ({ children }) => {
       );
       setSelectedCategoryItems(res?.data?.medicines || []);
     } catch (error) {
-      console.error("Failed to fetch items by category", error);
+      console.log("Failed to fetch items by category", error);
       setSelectedCategoryItems([]);
     }
   };
@@ -137,7 +137,7 @@ export const ProductProvider = ({ children }) => {
       const res = await getAxiosCall(endpoints.details.get(id), {}, false);
       setProductDetails(res?.data || []);
     } catch (error) {
-      console.error("Failed to fetch items by category", error);
+      console.log("Failed to fetch items by category", error);
       setProductDetails([]);
     }
   };
@@ -192,7 +192,7 @@ export const ProductProvider = ({ children }) => {
       const res = await getAxiosCall(endpoints.filters.get, params, false);
       setFilteredMedicines(res?.data?.medicines || []);
     } catch (err) {
-      console.error("Failed to fetch filtered medicines", err);
+      console.log("Failed to fetch filtered medicines", err);
       setFilteredMedicines([]);
     } finally {
       setLoading(false);

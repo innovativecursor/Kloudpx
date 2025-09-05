@@ -28,7 +28,7 @@ const Login = () => {
         await loginUser(null, token);
         navigate("/home");
       } catch (error) {
-        console.error("Login error:", error);
+        console.log("Login error:", error);
         Swal.fire(
           "Login Failed",
           "Google Login did not complete successfully",

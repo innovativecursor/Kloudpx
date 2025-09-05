@@ -52,7 +52,7 @@ const ImageUploader = () => {
 
         compressedBase64Images.push(base64);
       } catch (err) {
-        console.error("❌ Compression failed:", err);
+        console.log("❌ Compression failed:", err);
       }
     }
 
@@ -94,7 +94,7 @@ const ImageUploader = () => {
         ...uploadedImageIds.filter((id) => !existingImageIds.includes(id)),
       ]);
     } catch (err) {
-      console.error("❌ Image delete failed:", err);
+      console.log("❌ Image delete failed:", err);
     }
   };
 

@@ -203,3 +203,17 @@ const CartModal = ({ isOpen, onClose, modalRef }) => {
 };
 
 export default CartModal;
+
+
+
+
+
+
+
+
+
+
+
+
+
+

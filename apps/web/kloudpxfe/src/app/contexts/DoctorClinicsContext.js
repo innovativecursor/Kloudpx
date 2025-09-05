@@ -77,7 +77,7 @@ export const DoctorClinicsProvider = ({ children }) => {
       );
       if (res?.message) toast.success(res.message);
     } catch (error) {
-      console.error("Error calling select-doctor-or-clinic API", error);
+      console.log("Error calling select-doctor-or-clinic API", error);
     }
   };
   return (

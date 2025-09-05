@@ -50,7 +50,7 @@ export const ProfileProvider = ({ children }) => {
 
       if (fetchUser) await fetchUser();
     } catch (error) {
-      console.error("Profile update failed:", error);
+      console.log("Profile update failed:", error);
       Swal.fire({
         title: "Error",
         text: "Profile update failed. Try again later.",
@@ -71,7 +71,7 @@ export const ProfileProvider = ({ children }) => {
         setPrescriptionHistory(res.data || {});
       }
     } catch (error) {
-      console.error("Error fetching prescription history:", error);
+      console.log("Error fetching prescription history:", error);
       setPrescriptionHistory({});
     }
   };
@@ -83,7 +83,7 @@ export const ProfileProvider = ({ children }) => {
         setAllOrder(res?.data?.orders || {});
       }
     } catch (error) {
-      console.error("Error fetching AllOrder history:", error);
+      console.log("Error fetching AllOrder history:", error);
       setAllOrder([]);
     }
   };
@@ -98,7 +98,7 @@ export const ProfileProvider = ({ children }) => {
         setSelectedOrder(res.data || null);
       }
     } catch (error) {
-      console.error("Error fetching order details:", error);
+      console.log("Error fetching order details:", error);
       setSelectedOrder(null);
     }
   };

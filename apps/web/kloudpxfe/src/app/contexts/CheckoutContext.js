@@ -64,7 +64,7 @@ export const CheckoutProvider = ({ children }) => {
 
       return isSaved;
     } catch (error) {
-      console.error("Error toggling save for later:", error);
+      console.log("Error toggling save for later:", error);
       return false;
     }
   };
@@ -189,7 +189,7 @@ export const CheckoutProvider = ({ children }) => {
       fetchAddressData();
       if (selectedId === id) setSelectedId(null);
     } catch (error) {
-      console.error("Failed to delete address:", error);
+      console.log("Failed to delete address:", error);
       toast.error("Failed to delete address.");
     }
   };
@@ -212,7 +212,7 @@ export const CheckoutProvider = ({ children }) => {
       );
       toast.success("Address selected successfully!");
     } catch (error) {
-      console.error("Error selecting address:", error.message);
+      console.log("Error selecting address:", error.message);
       toast.error("Something went wrong!");
     }
   };

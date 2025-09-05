@@ -54,7 +54,7 @@ export const PrescriptionProvider = ({ children }) => {
       getAllPrescription();
     } catch (err) {
       toast.error("Upload failed. Try again.");
-      console.error("Upload error:", err);
+      console.log("Upload error:", err);
     } finally {
       setLoading(false);
     }
@@ -79,7 +79,7 @@ export const PrescriptionProvider = ({ children }) => {
         true
       );
     } catch (error) {
-      console.error("Error selecting prescription:", error);
+      console.log("Error selecting prescription:", error);
     }
   };
 
@@ -90,7 +90,7 @@ export const PrescriptionProvider = ({ children }) => {
   ) => {
     if (!medicineid || !prescriptionid || !quantity) {
       toast.error("Missing data for cart.");
-      return; // ❌ throw ya console.error mat karo
+      return; // ❌ throw ya console.log mat karo
     }
 
     try {

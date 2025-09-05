@@ -60,7 +60,7 @@ export default function SearchBar() {
       setResults(res?.data?.medicines || []);
       setShowDropdown(true);
     } catch (error) {
-      console.error("Search error:", error);
+      console.log("Search error:", error);
       setResults([]);
     } finally {
       setLoading(false);
