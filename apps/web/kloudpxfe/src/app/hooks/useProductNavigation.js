@@ -1,4 +1,4 @@
-"use client";
+
 import { useRouter } from "next/navigation";
 import { generateSlug } from "@/app/utils/slugify";
 import usePageLoader from "./usePageLoader";
