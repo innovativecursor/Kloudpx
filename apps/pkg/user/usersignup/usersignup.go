@@ -116,7 +116,7 @@ func ResendOTP(c *gin.Context, db *gorm.DB) {
 	sendOTP(c, db, req.Phone)
 }
 
-//old flow
+//old flow need to remove after testing
 // func UserSignUp(c *gin.Context, db *gorm.DB) {
 // 	var req config.Req
 // 	if err := c.ShouldBindJSON(&req); err != nil {
