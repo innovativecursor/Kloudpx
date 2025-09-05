@@ -51,6 +51,12 @@ func UpdateUserProfile(c *gin.Context, db *gorm.DB) {
 
 	// update other fields
 	if updateProfileData.Phone != nil {
+		var existingUser models.User
+		if err := db.Where("phone = ?", updateProfileData.Phone).First(&existingUser).Error; err == nil {
+			// Phone already exists with another account
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Phone number already registered with another account"})
+			return
+		}
 		user.Phone = updateProfileData.Phone
 	}
 

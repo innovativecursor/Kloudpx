@@ -375,7 +375,31 @@ func AddOrUpdateAddress(c *gin.Context, db *gorm.DB) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Address added successfully"})
+	phoneMessage := UpdateUserPhoneFromAddress(db, userObj, req.PhoneNumber)
+
+	resp := gin.H{"message": "Address added successfully"}
+	if phoneMessage != "" {
+		resp["phone_message"] = phoneMessage
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
+func UpdateUserPhoneFromAddress(db *gorm.DB, userObj *models.User, payloadPhone string) (phoneMessage string) {
+	if userObj.Phone == nil && payloadPhone != "" {
+		var existingUser models.User
+		if err := db.Where("phone = ?", payloadPhone).First(&existingUser).Error; err == nil {
+			// Phone already exists with another account
+			return "Phone number already registered with another account"
+		}
+
+		// Safe to update since no duplicate found
+		if err := db.Model(&models.User{}).
+			Where("id = ?", userObj.ID).
+			Updates(map[string]interface{}{"phone": payloadPhone, "phone_verified": true}).Error; err != nil {
+			return "Failed to update user phone"
+		}
+	}
+	return ""
 }
 
 func GetUserAddresses(c *gin.Context, db *gorm.DB) {

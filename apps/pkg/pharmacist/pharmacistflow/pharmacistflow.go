@@ -94,9 +94,10 @@ func GetUserPrescriptionHistory(c *gin.Context, db *gorm.DB) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"user": gin.H{
-			"id":    userInfo.ID,
-			"name":  userInfo.FirstName + " " + userInfo.LastName,
-			"email": userInfo.Email,
+			"id":       userInfo.ID,
+			"name":     userInfo.FirstName + " " + userInfo.LastName,
+			"email":    userInfo.Email,
+			"phone_no": userInfo.Phone,
 		},
 		"past":      past,
 		"unsettled": unsettled,
